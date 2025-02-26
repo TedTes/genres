@@ -289,3 +289,9 @@ def generate_pdf(html_string):
     html = HTML(string=html_string)
     pdf = html.write_pdf()
     return pdf
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    resumes = Resume.query.filter_by(user_id=current_user.id).all()
+    return render_template('dashboard.html', resumes=resumes)

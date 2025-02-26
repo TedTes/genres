@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your Resumes</h2>
+<ul>
+{% for resume in resumes %}
+    <li>
+        Resume for <strong>{{ resume.job.title }}</strong> -
+        <a href="{{ url_for('resume_preview', resume_id=resume.id) }}">Preview</a> |
+        <a href="{{ url_for('resume_download', resume_id=resume.id) }}">Download</a> |
+        <a href="{{ url_for('resume_contact', resume_id=resume.id) }}">Edit</a>
+    </li>
+{% endfor %}
+</ul>
+{% endblock %}
