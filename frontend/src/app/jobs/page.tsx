@@ -24,7 +24,7 @@ export default function JobsPage() {
 
   useEffect(() => {
     // Fetch categories
-    fetch('http://localhost:8000/api/categories')
+    fetch('http://localhost:8000/api/jobs/categories')
       .then(response => response.json())
       .then(data => {
         setCategories(data);
