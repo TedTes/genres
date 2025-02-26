@@ -8,6 +8,9 @@ from datetime import datetime
 from forms import RegistrationForm, LoginForm,JobSearchForm
 import requests
 
+import spacy
+nlp = spacy.load('en_core_web_sm')
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-here'  #TODOO Replace with a secure key
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///resume_matcher.db'
@@ -65,6 +68,18 @@ def fetch_jobs(search_term=None, location=None, remote=None):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+@app.route('/')
+def home():
+    try:
+      print("home being accessed")
+      job_count = Job.query.count()
+      user_count = User.query.count()
+      resume_count = Resume.query.count()
+      return render_template('home.html', job_count=job_count, user_count=user_count, resume_count=resume_count)
+    except Exception as e:
+      print(f"Error rendering home page: {e}")  # Debug print
+      abort(500)
 
 @app.route('/jobs', methods=['GET', 'POST'])
 def jobs():
@@ -140,8 +155,6 @@ if __name__ == '__main__':
 
 
 
-import spacy
-nlp = spacy.load('en_core_web_sm')
 
 def analyze_job_description(description):
     doc = nlp(description)
@@ -283,8 +296,8 @@ def resume_download(resume_id):
         as_attachment=True,
         download_name=f'resume_for_{resume.job.slug}.pdf'
     )
-from weasyprint import HTML
 
+from weasyprint import HTML
 def generate_pdf(html_string):
     html = HTML(string=html_string)
     pdf = html.write_pdf()
