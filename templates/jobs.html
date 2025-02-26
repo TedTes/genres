@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Job Listings</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.search.label }} {{ form.search() }}<br>
+    {{ form.location.label }} {{ form.location() }}<br>
+    {{ form.remote.label }} {{ form.remote() }}<br>
+    {{ form.submit() }}
+</form>
+<ul>
+{% for job in jobs %}
+    <li>
+        <a href="{{ url_for('job_detail', slug=job.slug) }}">{{ job.title }}</a> - {{ job.company_name }} ({{ job.location }})
+    </li>
+{% endfor %}
+</ul>
+{% endblock %}

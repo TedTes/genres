@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ job.title }}</h2>
+<p>{{ job.company }} - {{ job.location }}</p>
+<p>Posted on {{ job.posted_at }}</p>
+<div>{{ job.description | safe }}</div>
+{% if current_user.is_authenticated %}
+    <a href="{{ url_for('start_resume', job_id=job.id) }}">Create Resume</a>
+{% else %}
+    <p><a href="{{ url_for('login') }}">Log in</a> to create a resume.</p>
+{% endif %}
+{% endblock %}
