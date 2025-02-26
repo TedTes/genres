@@ -13,3 +13,37 @@ class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
+
+class JobSearchForm(FlaskForm):
+    search = StringField('Search Term')
+    location = StringField('Location')
+    remote = BooleanField('Remote Only')
+    submit = SubmitField('Search')
+
+class ContactForm(FlaskForm):
+    name = StringField('Full Name', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    phone = StringField('Phone', validators=[DataRequired()])
+    submit = SubmitField('Next')
+
+class SummaryForm(FlaskForm):
+    summary = TextAreaField('Summary', validators=[DataRequired()])
+    submit = SubmitField('Next')
+
+class ExperienceForm(FlaskForm):
+    title = StringField('Job Title', validators=[DataRequired()])
+    company = StringField('Company', validators=[DataRequired()])
+    start_date = StringField('Start Date', validators=[DataRequired()])
+    end_date = StringField('End Date')
+    bullets = TextAreaField('Achievements (one per line)', validators=[DataRequired()])
+    submit = SubmitField('Next')
+
+class EducationForm(FlaskForm):
+    degree = StringField('Degree', validators=[DataRequired()])
+    school = StringField('School', validators=[DataRequired()])
+    year = StringField('Year', validators=[DataRequired()])
+    submit = SubmitField('Next')
+
+class SkillsForm(FlaskForm):
+    skills = TextAreaField('Skills (comma-separated)', validators=[DataRequired()])
+    submit = SubmitField('Finish')

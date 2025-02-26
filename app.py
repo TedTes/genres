@@ -5,7 +5,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import io
 from datetime import datetime
-from forms import RegistrationForm, LoginForm
+from forms import RegistrationForm, LoginForm,JobSearchForm
+import requests
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-here'  #TODOO Replace with a secure key
@@ -43,11 +44,60 @@ class Resume(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+
+def fetch_jobs(search_term=None, location=None, remote=None):
+    url = "https://job-board.arbeitnow.com/api/jobs"  # Correct endpoint as per API docs ????
+    params = {}
+    if search_term:
+        params['q'] = search_term
+    if location:
+        params['location'] = location
+    if remote is not None:
+        params['remote'] = 'true' if remote else 'false'
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        return response.json()['data']
+    except requests.RequestException:
+        flash('Error fetching jobs from API.', 'danger')
+        return []
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+@app.route('/jobs', methods=['GET', 'POST'])
+def jobs():
+    form = JobSearchForm()
+    jobs_data = []
+    if form.validate_on_submit():
+        jobs_data = fetch_jobs(form.search.data, form.location.data, form.remote.data)
+    else:
+        jobs_data = fetch_jobs()  # Default fetch
+    return render_template('jobs.html', jobs=jobs_data, form=form)
 
+@app.route('/job/<slug>')
+def job_detail(slug):
+    job = Job.query.filter_by(slug=slug).first()
+    if not job:
+        url = "https://job-board.arbeitnow.com/api/jobs"  # Fetch all and find, or use specific endpoint if available
+        jobs_data = fetch_jobs()
+        job_data = next((j for j in jobs_data if j['slug'] == slug), None)
+        if job_data:
+            job = Job(
+                slug=job_data['slug'],
+                title=job_data['title'],
+                company=job_data['company_name'],
+                location=job_data['location'],
+                description=job_data['description'],
+                posted_at=datetime.fromisoformat(job_data['created_at'].replace('Z', '+00:00'))
+            )
+            db.session.add(job)
+            db.session.commit()
+        else:
+            flash('Job not found.', 'danger')
+            return redirect(url_for('jobs'))
+    return render_template('job_detail.html', job=job)
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
