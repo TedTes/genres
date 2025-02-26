@@ -137,3 +137,13 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True)
+
+
+
+import spacy
+nlp = spacy.load('en_core_web_sm')
+
+def analyze_job_description(description):
+    doc = nlp(description)
+    skills = [token.text for token in doc if token.pos_ in ['NOUN', 'PROPN']]
+    return list(set(skills))  # Remove duplicates
