@@ -147,3 +147,145 @@ def analyze_job_description(description):
     doc = nlp(description)
     skills = [token.text for token in doc if token.pos_ in ['NOUN', 'PROPN']]
     return list(set(skills))  # Remove duplicates
+
+
+from flask import session
+
+@app.route('/resume/start/<int:job_id>')
+@login_required
+def start_resume(job_id):
+    job = Job.query.get_or_404(job_id)
+    resume = Resume(user_id=current_user.id, job_id=job.id, resume_data={})
+    db.session.add(resume)
+    db.session.commit()
+    skills = analyze_job_description(job.description)
+    session['skills'] = skills
+    return redirect(url_for('resume_contact', resume_id=resume.id))
+
+@app.route('/resume/<int:resume_id>/contact', methods=['GET', 'POST'])
+@login_required
+def resume_contact(resume_id):
+    resume = Resume.query.get_or_404(resume_id)
+    if resume.user_id != current_user.id:
+        abort(403)
+    form = ContactForm()
+    if form.validate_on_submit():
+        resume.resume_data['contact'] = {
+            'name': form.name.data,
+            'email': form.email.data,
+            'phone': form.phone.data
+        }
+        db.session.commit()
+        return redirect(url_for('resume_summary', resume_id=resume.id))
+    if 'contact' in resume.resume_data:
+        form.name.data = resume.resume_data['contact'].get('name', '')
+        form.email.data = resume.resume_data['contact'].get('email', '')
+        form.phone.data = resume.resume_data['contact'].get('phone', '')
+    return render_template('resume_contact.html', form=form, resume=resume)
+
+@app.route('/resume/<int:resume_id>/summary', methods=['GET', 'POST'])
+@login_required
+def resume_summary(resume_id):
+    resume = Resume.query.get_or_404(resume_id)
+    if resume.user_id != current_user.id:
+        abort(403)
+    form = SummaryForm()
+    if form.validate_on_submit():
+        resume.resume_data['summary'] = form.summary.data
+        db.session.commit()
+        return redirect(url_for('resume_experience', resume_id=resume.id))
+    if 'summary' in resume.resume_data:
+        form.summary.data = resume.resume_data['summary']
+    return render_template('resume_summary.html', form=form, resume=resume, skills=session.get('skills', []))
+
+@app.route('/resume/<int:resume_id>/experience', methods=['GET', 'POST'])
+@login_required
+def resume_experience(resume_id):
+    resume = Resume.query.get_or_404(resume_id)
+    if resume.user_id != current_user.id:
+        abort(403)
+    form = ExperienceForm()
+    if form.validate_on_submit():
+        resume.resume_data['experience'] = {
+            'title': form.title.data,
+            'company': form.company.data,
+            'start_date': form.start_date.data,
+            'end_date': form.end_date.data,
+            'bullets': form.bullets.data
+        }
+        db.session.commit()
+        return redirect(url_for('resume_education', resume_id=resume.id))
+    if 'experience' in resume.resume_data:
+        exp = resume.resume_data['experience']
+        form.title.data = exp.get('title', '')
+        form.company.data = exp.get('company', '')
+        form.start_date.data = exp.get('start_date', '')
+        form.end_date.data = exp.get('end_date', '')
+        form.bullets.data = exp.get('bullets', '')
+    return render_template('resume_experience.html', form=form, resume=resume, skills=session.get('skills', []))
+
+@app.route('/resume/<int:resume_id>/education', methods=['GET', 'POST'])
+@login_required
+def resume_education(resume_id):
+    resume = Resume.query.get_or_404(resume_id)
+    if resume.user_id != current_user.id:
+        abort(403)
+    form = EducationForm()
+    if form.validate_on_submit():
+        resume.resume_data['education'] = {
+            'degree': form.degree.data,
+            'school': form.school.data,
+            'year': form.year.data
+        }
+        db.session.commit()
+        return redirect(url_for('resume_skills', resume_id=resume.id))
+    if 'education' in resume.resume_data:
+        edu = resume.resume_data['education']
+        form.degree.data = edu.get('degree', '')
+        form.school.data = edu.get('school', '')
+        form.year.data = edu.get('year', '')
+    return render_template('resume_education.html', form=form, resume=resume)
+
+@app.route('/resume/<int:resume_id>/skills', methods=['GET', 'POST'])
+@login_required
+def resume_skills(resume_id):
+    resume = Resume.query.get_or_404(resume_id)
+    if resume.user_id != current_user.id:
+        abort(403)
+    form = SkillsForm()
+    if form.validate_on_submit():
+        resume.resume_data['skills'] = form.skills.data
+        db.session.commit()
+        return redirect(url_for('resume_preview', resume_id=resume.id))
+    if 'skills' in resume.resume_data:
+        form.skills.data = resume.resume_data['skills']
+    return render_template('resume_skills.html', form=form, resume=resume, suggested_skills=session.get('skills', []))
+
+@app.route('/resume/<int:resume_id>/preview')
+@login_required
+def resume_preview(resume_id):
+    resume = Resume.query.get_or_404(resume_id)
+    if resume.user_id != current_user.id:
+        abort(403)
+    return render_template('resume_template.html', **resume.resume_data, job=resume.job)
+
+@app.route('/resume/<int:resume_id>/download')
+@login_required
+def resume_download(resume_id):
+    resume = Resume.query.get_or_404(resume_id)
+    if resume.user_id != current_user.id:
+        abort(403)
+    html = render_template('resume_template.html', **resume.resume_data, job=resume.job)
+    pdf = generate_pdf(html)
+    return send_file(
+        io.BytesIO(pdf),
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name=f'resume_for_{resume.job.slug}.pdf'
+    )
+from weasyprint import HTML
+
+def generate_pdf(html_string):
+    html = HTML(string=html_string)
+    pdf = html.write_pdf()
+    return pdf

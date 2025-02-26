@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Resume - Contact Info</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {% for field in [form.name, form.email, form.phone] %}
+        <div>{{ field.label }}<br>{{ field() }}<br>
+        {% for error in field.errors %}<span style="color: red;">{{ error }}</span><br>{% endfor %}</div>
+    {% endfor %}
+    {{ form.submit() }}
+</form>
+{% endblock %}

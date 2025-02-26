@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Resume - Summary</h2>
+<p>Suggested skills from job: {{ skills|join(', ') }}</p>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.summary.label }}<br>{{ form.summary(rows=5, cols=50) }}<br>
+    {% for error in form.summary.errors %}<span style="color: red;">{{ error }}</span><br>{% endfor %}
+    {{ form.submit() }}
+</form>
+{% endblock %}
