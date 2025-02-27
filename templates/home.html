@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="main-nav">
+    <div class="container nav-container">
+        <div class="logo">
+            <a href="{{ url_for('home') }}">ResumeMatch</a>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('jobs') }}">Browse Jobs</a>
+            <a href="#templates">Templates</a>
+            <a href="#features">Features</a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline">Dashboard</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+            {% endif %}
+        </div>
+        <div class="mobile-nav-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">Land your dream job with an ATS-optimized resume</h1>
+                <p class="hero-subtitle">Create professional resumes tailored to specific job listings with AI-powered skills matching</p>
+                
+                <div class="stats-highlights">
+                    <div class="stat-highlight">
+                        <span class="highlight-number">39%</span>
+                        <span class="highlight-text">more likely to get interviews</span>
+                    </div>
+                    <div class="stat-highlight">
+                        <span class="highlight-number">8%</span>
+                        <span class="highlight-text">higher salary offers</span>
+                    </div>
+                </div>
+
+                <div class="hero-cta">
+                    <a href="{{ url_for('register') }}" class="btn btn-primary btn-large">
+                        Build my resume now
+                    </a>
+                    <a href="{{ url_for('jobs') }}" class="btn btn-outline btn-large">
+                        Browse jobs
+                    </a>
+                </div>
+            </div>
+            
+            <div class="hero-image">
+                <img src="{{ url_for('static', filename='images/hero-resume.png') }}" alt="Resume template preview" 
+                    onerror="this.src='https://via.placeholder.com/500x600?text=Resume+Preview'">
+                <div class="hero-image-backdrop"></div>
+            </div>
+        </div>
+
+        <div class="resume-counter">
+            <div class="counter-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div>
+                <div class="counter-number">{{ resume_count|default('47,832') }}</div>
+                <div class="counter-text">resumes created this month</div>
+            </div>
+        </div>
+
+        <div class="trusted-by">
+            <p>Our users have been hired at top companies worldwide</p>
+            <div class="company-logos">
+                <img src="{{ url_for('static', filename='images/companies/google.svg') }}" alt="Google" 
+                    onerror="this.src='https://via.placeholder.com/120x40?text=Google'">
+                <img src="{{ url_for('static', filename='images/companies/apple.svg') }}" alt="Apple" 
+                    onerror="this.src='https://via.placeholder.com/120x40?text=Apple'">
+                <img src="{{ url_for('static', filename='images/companies/microsoft.svg') }}" alt="Microsoft" 
+                    onerror="this.src='https://via.placeholder.com/120x40?text=Microsoft'">
+                <img src="{{ url_for('static', filename='images/companies/amazon.svg') }}" alt="Amazon" 
+                    onerror="this.src='https://via.placeholder.com/120x40?text=Amazon'">
+                <img src="{{ url_for('static', filename='images/companies/meta.svg') }}" alt="Meta" 
+                    onerror="this.src='https://via.placeholder.com/120x40?text=Meta'">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works">
+    <div class="container">
+        <h2 class="section-title">How it works</h2>
+        <p class="section-subtitle">Three simple steps to your perfect resume</p>
+        
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>Find a job</h3>
+                <p>Browse our database of current job listings or paste a job description you're interested in.</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-icon">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <h3>Create your resume</h3>
+                <p>Our AI analyzes the job description and helps you highlight your most relevant skills and experience.</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-icon">
+                    <i class="fas fa-file-download"></i>
+                </div>
+                <h3>Download & apply</h3>
+                <p>Get a professionally formatted, ATS-friendly PDF resume ready to submit to employers.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Templates Section -->
+<section class="templates" id="templates">
+    <div class="container">
+        <h2 class="section-title">Professional resume templates</h2>
+        <p class="section-subtitle">Choose from ATS-friendly designs proven to get past applicant tracking systems</p>
+        
+        <div class="templates-grid">
+            <div class="template-card">
+                <div class="template-preview">
+                    <img src="{{ url_for('static', filename='images/templates/toronto.png') }}" alt="Toronto Template"
+                        onerror="this.src='https://via.placeholder.com/300x420?text=Toronto+Template'">
+                    <div class="template-overlay">
+                        <a href="{{ url_for('register') }}" class="btn btn-sm btn-white">Use this template</a>
+                    </div>
+                </div>
+                <div class="template-info">
+                    <h3>Toronto</h3>
+                    <p>Clean, professional design suitable for most industries</p>
+                    <div class="template-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="count">2.8M+ users</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="template-card">
+                <div class="template-preview">
+                    <img src="{{ url_for('static', filename='images/templates/stockholm.png') }}" alt="Stockholm Template"
+                        onerror="this.src='https://via.placeholder.com/300x420?text=Stockholm+Template'">
+                    <div class="template-overlay">
+                        <a href="{{ url_for('register') }}" class="btn btn-sm btn-white">Use this template</a>
+                    </div>
+                </div>
+                <div class="template-info">
+                    <h3>Stockholm</h3>
+                    <p>Modern design with accent colors for creative fields</p>
+                    <div class="template-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="count">1.6M+ users</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="template-card">
+                <div class="template-preview">
+                    <img src="{{ url_for('static', filename='images/templates/tokyo.png') }}" alt="Tokyo Template"
+                        onerror="this.src='https://via.placeholder.com/300x420?text=Tokyo+Template'">
+                    <div class="template-overlay">
+                        <a href="{{ url_for('register') }}" class="btn btn-sm btn-white">Use this template</a>
+                    </div>
+                </div>
+                <div class="template-info">
+                    <h3>Tokyo</h3>
+                    <p>Minimal, sleek layout for technical positions</p>
+                    <div class="template-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="count">1.2M+ users</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="templates-footer">
+            <a href="{{ url_for('register') }}" class="btn btn-outline">See all templates</a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features" id="features">
+    <div class="container">
+        <h2 class="section-title">AI-powered resume building</h2>
+        <p class="section-subtitle">Our intelligent tools help you create the perfect resume for each job application</p>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>Smart skill matching</h3>
+                <p>Our AI analyzes job descriptions to identify key skills and requirements, ensuring your resume targets exactly what employers are looking for.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>ATS optimization</h3>
+                <p>All templates are built to pass through Applicant Tracking Systems with proper formatting that machines can read.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Quick content generation</h3>
+                <p>Stuck writing about yourself? Our AI suggests professional phrasing for your experience and accomplishments.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <h3>Instant PDF download</h3>
+                <p>Download your perfectly formatted resume as a PDF, ready to submit to employers immediately.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Reviews Section -->
+<section class="reviews">
+    <div class="container">
+        <div class="reviews-header">
+            <h2 class="section-title">Trusted by job seekers worldwide</h2>
+            <div class="rating">
+                <div class="stars">★★★★★</div>
+                <span class="rating-score">4.8 out of 5</span>
+                <span class="rating-base">based on 53,280 reviews</span>
+            </div>
+        </div>
+        
+        <div class="reviews-grid">
+            <div class="review-card">
+                <div class="review-content">
+                    <p>"I was looking for a job for 6 months with no luck. After using ResumeMatch, I got 3 interviews in just 2 weeks and landed my dream position!"</p>
+                </div>
+                <div class="reviewer">
+                    <div class="reviewer-avatar">
+                        <img src="{{ url_for('static', filename='images/avatars/user1.jpg') }}" alt="User"
+                            onerror="this.src='https://via.placeholder.com/50?text=J'">
+                    </div>
+                    <div class="reviewer-info">
+                        <h4>James T.</h4>
+                        <p>Software Engineer</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="review-card">
+                <div class="review-content">
+                    <p>"The AI skill matching was incredibly helpful. It picked up keywords from the job description that I would have missed and helped me tailor my resume perfectly."</p>
+                </div>
+                <div class="reviewer">
+                    <div class="reviewer-avatar">
+                        <img src="{{ url_for('static', filename='images/avatars/user2.jpg') }}" alt="User"
+                            onerror="this.src='https://via.placeholder.com/50?text=S'">
+                    </div>
+                    <div class="reviewer-info">
+                        <h4>Sarah M.</h4>
+                        <p>Marketing Specialist</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="review-card">
+                <div class="review-content">
+                    <p>"As someone who struggles with formatting, the templates were a lifesaver. Professional-looking and ATS-friendly. Worth every penny!"</p>
+                </div>
+                <div class="reviewer">
+                    <div class="reviewer-avatar">
+                        <img src="{{ url_for('static', filename='images/avatars/user3.jpg') }}" alt="User"
+                            onerror="this.src='https://via.placeholder.com/50?text=D'">
+                    </div>
+                    <div class="reviewer-info">
+                        <h4>David L.</h4>
+                        <p>Financial Analyst</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta">
+    <div class="container">
+        <h2 class="cta-title">Ready to land your next job?</h2>
+        <p class="cta-subtitle">Create an ATS-optimized resume in minutes</p>
+        
+        <div class="cta-buttons">
+            <a href="{{ url_for('register') }}" class="btn btn-white btn-large">
+                Get started free
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            <a href="{{ url_for('jobs') }}" class="btn btn-outline-white btn-large">
+                Browse jobs
+            </a>
+        </div>
+        
+        <p class="cta-note">No credit card required</p>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="main-footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <h3>ResumeMatch</h3>
+                <p>The AI-powered resume builder</p>
+            </div>
+            
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#templates">Templates</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="{{ url_for('jobs') }}">Jobs</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Resume Guide</a></li>
+                        <li><a href="#">Career Blog</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; {{ current_year }} ResumeMatch. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Font Awesome for icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+{% endblock %}

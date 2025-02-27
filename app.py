@@ -4,9 +4,10 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, curren
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import io
-from datetime import datetime
+
 from forms import RegistrationForm, LoginForm,JobSearchForm
 import requests
+from flask import Flask, abort
 
 import spacy
 nlp = spacy.load('en_core_web_sm')
@@ -20,8 +21,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-
-
+from datetime import datetime
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -64,6 +64,10 @@ def fetch_jobs(search_term=None, location=None, remote=None):
     except requests.RequestException:
         flash('Error fetching jobs from API.', 'danger')
         return []
+
+@app.context_processor
+def inject_current_year():
+    return {'current_year': datetime.now().year}
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -308,3 +312,7 @@ def generate_pdf(html_string):
 def dashboard():
     resumes = Resume.query.filter_by(user_id=current_user.id).all()
     return render_template('dashboard.html', resumes=resumes)
+
+@app.route('/pricing')
+def pricing():
+    return render_template('pricing.html')
