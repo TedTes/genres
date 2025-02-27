@@ -75,3 +75,4 @@ $RECYCLE.BIN/
 .env.production.local
 *.sqlite
 *.db
+python-dotenv.env

@@ -56,7 +56,7 @@
             
             <div class="hero-image">
                 <img src="{{ url_for('static', filename='images/hero-resume.png') }}" alt="Resume template preview" 
-                    onerror="this.src='https://via.placeholder.com/500x600?text=Resume+Preview'">
+                    onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'500\' height=\'600\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 500 600\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23AAAAAA;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:25pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'500\' height=\'600\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'185\' y=\'300\'%3EResume%3C/text%3E%3Ctext x=\'175\' y=\'340\'%3EPreview%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
                 <div class="hero-image-backdrop"></div>
             </div>
         </div>
@@ -74,16 +74,11 @@
         <div class="trusted-by">
             <p>Our users have been hired at top companies worldwide</p>
             <div class="company-logos">
-                <img src="{{ url_for('static', filename='images/companies/google.svg') }}" alt="Google" 
-                    onerror="this.src='https://via.placeholder.com/120x40?text=Google'">
-                <img src="{{ url_for('static', filename='images/companies/apple.svg') }}" alt="Apple" 
-                    onerror="this.src='https://via.placeholder.com/120x40?text=Apple'">
-                <img src="{{ url_for('static', filename='images/companies/microsoft.svg') }}" alt="Microsoft" 
-                    onerror="this.src='https://via.placeholder.com/120x40?text=Microsoft'">
-                <img src="{{ url_for('static', filename='images/companies/amazon.svg') }}" alt="Amazon" 
-                    onerror="this.src='https://via.placeholder.com/120x40?text=Amazon'">
-                <img src="{{ url_for('static', filename='images/companies/meta.svg') }}" alt="Meta" 
-                    onerror="this.src='https://via.placeholder.com/120x40?text=Meta'">
+                <div class="logo-item">Google</div>
+                <div class="logo-item">Apple</div>
+                <div class="logo-item">Microsoft</div>
+                <div class="logo-item">Amazon</div>
+                <div class="logo-item">Meta</div>
             </div>
         </div>
     </div>
@@ -136,7 +131,7 @@
             <div class="template-card">
                 <div class="template-preview">
                     <img src="{{ url_for('static', filename='images/templates/toronto.png') }}" alt="Toronto Template"
-                        onerror="this.src='https://via.placeholder.com/300x420?text=Toronto+Template'">
+                        onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'300\' height=\'420\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 420\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23555555;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:21pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'300\' height=\'420\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'90\' y=\'210\'%3EToronto%3C/text%3E%3Ctext x=\'90\' y=\'250\'%3ETemplate%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
                     <div class="template-overlay">
                         <a href="{{ url_for('register') }}" class="btn btn-sm btn-white">Use this template</a>
                     </div>
@@ -154,7 +149,7 @@
             <div class="template-card">
                 <div class="template-preview">
                     <img src="{{ url_for('static', filename='images/templates/stockholm.png') }}" alt="Stockholm Template"
-                        onerror="this.src='https://via.placeholder.com/300x420?text=Stockholm+Template'">
+                        onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'300\' height=\'420\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 420\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23555555;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:21pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'300\' height=\'420\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'75\' y=\'210\'%3EStockholm%3C/text%3E%3Ctext x=\'90\' y=\'250\'%3ETemplate%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
                     <div class="template-overlay">
                         <a href="{{ url_for('register') }}" class="btn btn-sm btn-white">Use this template</a>
                     </div>
@@ -172,7 +167,7 @@
             <div class="template-card">
                 <div class="template-preview">
                     <img src="{{ url_for('static', filename='images/templates/tokyo.png') }}" alt="Tokyo Template"
-                        onerror="this.src='https://via.placeholder.com/300x420?text=Tokyo+Template'">
+                        onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'300\' height=\'420\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 420\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23555555;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:21pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'300\' height=\'420\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'110\' y=\'210\'%3ETokyo%3C/text%3E%3Ctext x=\'90\' y=\'250\'%3ETemplate%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
                     <div class="template-overlay">
                         <a href="{{ url_for('register') }}" class="btn btn-sm btn-white">Use this template</a>
                     </div>
@@ -255,8 +250,7 @@
                 </div>
                 <div class="reviewer">
                     <div class="reviewer-avatar">
-                        <img src="{{ url_for('static', filename='images/avatars/user1.jpg') }}" alt="User"
-                            onerror="this.src='https://via.placeholder.com/50?text=J'">
+                        <div class="avatar-placeholder">J</div>
                     </div>
                     <div class="reviewer-info">
                         <h4>James T.</h4>
@@ -271,8 +265,7 @@
                 </div>
                 <div class="reviewer">
                     <div class="reviewer-avatar">
-                        <img src="{{ url_for('static', filename='images/avatars/user2.jpg') }}" alt="User"
-                            onerror="this.src='https://via.placeholder.com/50?text=S'">
+                        <div class="avatar-placeholder">S</div>
                     </div>
                     <div class="reviewer-info">
                         <h4>Sarah M.</h4>
@@ -287,8 +280,7 @@
                 </div>
                 <div class="reviewer">
                     <div class="reviewer-avatar">
-                        <img src="{{ url_for('static', filename='images/avatars/user3.jpg') }}" alt="User"
-                            onerror="this.src='https://via.placeholder.com/50?text=D'">
+                        <div class="avatar-placeholder">D</div>
                     </div>
                     <div class="reviewer-info">
                         <h4>David L.</h4>
