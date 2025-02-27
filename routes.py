@@ -67,17 +67,44 @@ def init_routes(flask_app):
         return render_template('job_detail.html', job=job)
     @app.route('/register', methods=['GET', 'POST'])
     def register():
+        # Redirect if user is already logged in
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+        
         form = RegistrationForm()
+        
         if form.validate_on_submit():
-            if User.query.filter_by(email=form.email.data).first():
-                flash('Email already registered.', 'danger')
-                return redirect(url_for('register'))
-            hashed_password = generate_password_hash(form.password.data)
-            new_user = User(username=form.username.data, email=form.email.data, password_hash=hashed_password)
-            db.session.add(new_user)
-            db.session.commit()
-            flash('Registration successful. Please log in.', 'success')
-            return redirect(url_for('login'))
+            try:
+                # Check if email already exists
+                existing_user = supabase.table('users').select('*').eq('email', form.email.data).execute()
+                
+                if existing_user.data:
+                    flash('Email already registered. Please log in.', 'danger')
+                    return redirect(url_for('login'))
+                
+                # Generate password hash
+                hashed_password = generate_password_hash(form.password.data)
+                
+                # Insert new user into Supabase
+                new_user = {
+                    'username': form.username.data,
+                    'email': form.email.data,
+                    'password_hash': hashed_password
+                }
+                
+                # Insert the user data
+                response = supabase.table('users').insert(new_user).execute()
+                
+                if response.data:
+                    flash('Account created successfully! Please log in.', 'success')
+                    return redirect(url_for('login'))
+                else:
+                    flash('Registration failed. Please try again.', 'danger')
+            
+            except Exception as e:
+                print(f"Registration error: {e}")
+                flash('An error occurred during registration. Please try again.', 'danger')
+        
         return render_template('register.html', form=form)
 
     @app.route('/login', methods=['GET', 'POST'])
