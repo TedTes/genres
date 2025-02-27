@@ -998,6 +998,28 @@ ul, ol {
     text-decoration: underline;
 }
 
+.auth-divider span {
+    position: relative;
+    background-color: var(--white);
+    padding: 0 1rem;
+    color: var(--text-light);
+    font-size: 0.875rem;
+    z-index: 2;
+}
+.social-login {
+    margin-bottom: 1.5rem;
+}
+.btn-social {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+}
+.btn-social i {
+    font-size: 1.125rem;
+}
 /* Dashboard */
 .dashboard-header {
     background-color: var(--white);

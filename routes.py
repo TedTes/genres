@@ -109,15 +109,36 @@ def init_routes(flask_app):
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
+        # Redirect if user is already logged in
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+        
         form = LoginForm()
+        
         if form.validate_on_submit():
-            user = User.query.filter_by(email=form.email.data).first()
-            if user and check_password_hash(user.password_hash, form.password.data):
-                login_user(user)
-                flash('Login successful.', 'success')
-                return redirect(url_for('dashboard'))
-            else:
-                flash('Invalid email or password.', 'danger')
+            try:
+                # Get user by email using SQLAlchemy
+                user = User.query.filter_by(email=form.email.data).first()
+                
+                if user:
+                    # Verify password
+                    if check_password_hash(user.password_hash, form.password.data):
+                        # Log in user
+                        login_user(user)
+                        
+                        # Get next page or default to dashboard
+                        next_page = request.args.get('next')
+                        flash('Login successful!', 'success')
+                        return redirect(next_page or url_for('dashboard'))
+                    else:
+                        flash('Invalid password. Please try again.', 'danger')
+                else:
+                    flash('Email not found. Please check your email or register.', 'danger')
+            
+            except Exception as e:
+                print(f"Login error: {e}")
+                flash('An error occurred during login. Please try again.', 'danger')
+        
         return render_template('login.html', form=form)
 
     @app.route('/logout')
