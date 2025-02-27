@@ -7,7 +7,7 @@ import io
 
 import spacy
 import secrets
-
+from datetime import datetime
 from supabase import create_client, Client
 from db import db
 app = Flask(__name__)
