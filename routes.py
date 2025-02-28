@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, flash, session, abort, send_file
-from helpers import fetch_jobs,extract_job_tags
+from helpers import fetch_jobs,extract_job_tags,calculate_resume_completeness
 from flask import render_template, request, redirect, url_for, flash, session, abort, send_file
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -510,47 +510,54 @@ def init_routes(flask_app):
         # Get user's resumes
         resumes = Resume.query.filter_by(user_id=current_user.id).all()
         
-        #TODOO: based on the user's skills and preferences Get some sample job matches if they don't exist yet
-       
-        job_matches = 0
-        job_matches_list = []
-        
-        # sample data - in a real implementation, would fetch this from database
-        # based on job matching algorithm
-        if resumes:
-            # Count job matches
-            job_matches = 3  #TODOO: This would be calculated based on  matching algorithm
+        # Process resumes for display
+        for resume in resumes:
+            # Handle general resumes (without a job)
+                   # Set display values explicitly
+            if resume.job:
+                resume.display_title = f"Resume for {resume.job.title}"
+                resume.display_company = resume.job.company
+                resume.display_match = 85  # Or calculate actual match
+            else:
+                resume.display_title = resume.title or "General Resume"
+                resume.display_company = "Multiple Companies"
+                resume.display_match = 100  # General resumes show 100%
+                
+                # Add match score for general resumes (could be based on completeness)
+            resume.match_score = calculate_resume_completeness(resume.resume_data)
             
-            # Sample job match data - TODOO: replace with actual job matching logic
-            job_matches_list = [
-                {
-                    'slug': 'software-engineer-xyz-company',
-                    'title': 'Software Engineer',
-                    'company_name': 'XYZ Tech',
-                    'location': 'San Francisco, CA',
-                    'remote': True,
-                    'match': 92
-                },
-                {
-                    'slug': 'frontend-developer-abc-inc',
-                    'title': 'Frontend Developer',
-                    'company_name': 'ABC Inc',
-                    'location': 'New York, NY',
-                    'remote': False,
-                    'match': 87
-                },
-                {
-                    'slug': 'fullstack-engineer-startup',
-                    'title': 'Fullstack Engineer',
-                    'company_name': 'Startup Co',
-                    'location': 'Austin, TX',
-                    'remote': True,
-                    'match': 84
-                }
-            ]
+        # Get job matches count
+        job_matches = 3  # This would be calculated based on  matching algorithm
         
-        # Placeholder for applications count - in a real implementation, 
-        # this would be fetched from  database
+        # Get sample job matches list ( TODO:this would come from  database)
+        job_matches_list = [
+            {
+                'slug': 'software-engineer-xyz-company',
+                'title': 'Software Engineer',
+                'company_name': 'XYZ Tech',
+                'location': 'San Francisco, CA',
+                'remote': True,
+                'match': 92
+            },
+            {
+                'slug': 'frontend-developer-abc-inc',
+                'title': 'Frontend Developer',
+                'company_name': 'ABC Inc',
+                'location': 'New York, NY',
+                'remote': False,
+                'match': 87
+            },
+            {
+                'slug': 'fullstack-engineer-startup',
+                'title': 'Fullstack Engineer',
+                'company_name': 'Startup Co',
+                'location': 'Austin, TX',
+                'remote': True,
+                'match': 84
+            }
+        ]
+        
+        # Placeholder for applications count
         applications = 0
         
         return render_template(
@@ -574,7 +581,9 @@ def init_routes(flask_app):
             flash('You do not have permission to view this resume.', 'danger')
             return redirect(url_for('dashboard'))
         
-        return render_template('view_resume.html', resume=resume)
+        # return render_template('view_resume.html', resume=resume)
+        # Temp
+        return render_template('resume_template.html', resume=resume)
     
 
     @app.route('/resume/<int:resume_id>/pdf')
@@ -591,3 +600,35 @@ def init_routes(flask_app):
         # For now, redirect to the preview page
         flash('PDF generation will be implemented soon.', 'info')
         return redirect(url_for('resume_preview', resume_id=resume.id))
+
+
+   
+    @app.route('/resume/create/general')
+    @login_required
+    def create_general_resume():
+        """
+        Create a general resume not tied to any specific job
+        """
+        try:
+            # Create a new resume without a job_id
+            resume = Resume(
+                user_id=current_user.id,
+                resume_data={},
+                title="General Resume"  # Default title for general resumes
+            )
+            
+            # Add to database
+            db.session.add(resume)
+            db.session.commit()
+            
+            # Set default skills list (empty for general resume)
+            session['skills'] = []
+            
+            # Redirect to the first step of resume creation
+            flash('General resume creation started! Let\'s add your contact information.', 'success')
+            return redirect(url_for('resume_contact', resume_id=resume.id))
+        
+        except Exception as e:
+            print(f"Error creating general resume: {e}")
+            flash(f"Error creating resume: {str(e)}", 'danger')
+            return redirect(url_for('dashboard'))

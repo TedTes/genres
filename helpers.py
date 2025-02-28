@@ -99,3 +99,20 @@ def generate_pdf(html_string):
     html = HTML(string=html_string)
     pdf = html.write_pdf()
     return pdf
+
+
+def calculate_resume_completeness(resume_data):
+    """
+    Calculate completeness percentage of a resume based on filled sections
+    """
+    if not resume_data:
+        return 0
+        
+    # Define key sections for a complete resume
+    key_sections = ['contact', 'summary', 'experience', 'education', 'skills']
+    
+    # Count completed sections
+    completed = sum(1 for section in key_sections if section in resume_data and resume_data[section])
+    
+    # Calculate percentage
+    return int((completed / len(key_sections)) * 100)
