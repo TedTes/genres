@@ -1,4 +1,4 @@
-
+import requests
 
 def fetch_jobs(search_term=None, location=None, remote=None):
     """

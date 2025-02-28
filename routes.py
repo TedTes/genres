@@ -5,7 +5,6 @@ from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import io
-import requests
 
 from forms import RegistrationForm, LoginForm, JobSearchForm, ContactForm, SummaryForm, ExperienceForm, EducationForm, SkillsForm
 from db import db
@@ -50,7 +49,7 @@ def init_routes(flask_app):
             else:
                 # Default fetch with no filters
                 jobs_data = fetch_jobs()
-                
+
             # Process job data to extract tags and format dates
             processed_jobs = []
             for job in jobs_data:
@@ -62,7 +61,10 @@ def init_routes(flask_app):
                 if created_at:
                     # Convert ISO date to more readable format
                     try:
-                        date_obj = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                        if created_at and isinstance(created_at,str):
+                           date_obj = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                        else:
+                            date_obj = datetime.now()
                         days_ago = (datetime.now(date_obj.tzinfo) - date_obj).days
                         
                         if days_ago == 0:
@@ -94,6 +96,7 @@ def init_routes(flask_app):
 
     @app.route('/job/<slug>')
     def job_detail(slug):
+
             try:
                 # First, check if job exists in the database
                 job = Job.query.filter_by(slug=slug).first()
@@ -110,6 +113,7 @@ def init_routes(flask_app):
                         flash('Job not found.', 'danger')
                         return redirect(url_for('jobs'))
                     
+                    created_at = job_data.get('created_at')
                     # Create a new Job record in the database
                     job = Job(
                         slug=job_data.get('slug'),
@@ -117,7 +121,7 @@ def init_routes(flask_app):
                         company=job_data.get('company_name', 'Unknown Company'),
                         location=job_data.get('location', 'Remote'),
                         description=job_data.get('description', ''),
-                        posted_at=datetime.fromisoformat(job_data.get('created_at', datetime.now().isoformat()).replace('Z', '+00:00')) if job_data.get('created_at') else datetime.now()
+                        posted_at=datetime.fromisoformat(job_data.get('created_at', datetime.now().isoformat()).replace('Z', '+00:00')) if created_at and isinstance(created_at,str) else datetime.now()
                     )
                     
                     # Add additional attributes from API data
@@ -128,8 +132,11 @@ def init_routes(flask_app):
                     # Format the date
                     created_at = job_data.get('created_at')
                     if created_at:
-                        try:
-                            date_obj = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                        try: 
+                            if created_at and isinstance(created_at,str):
+                               date_obj = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                            else:
+                               date_obj = datetime.now()
                             days_ago = (datetime.now(date_obj.tzinfo) - date_obj).days
                             
                             if days_ago == 0:
@@ -251,7 +258,10 @@ def init_routes(flask_app):
                         created_at = job.get('created_at')
                         if created_at:
                             try:
-                                date_obj = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                                if created_at and isinstance(created_at,str):
+                                   date_obj = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                                else:
+                                    date_obj = datetime.now()
                                 days_ago = (datetime.now(date_obj.tzinfo) - date_obj).days
                                 
                                 if days_ago == 0:
