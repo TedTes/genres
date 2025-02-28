@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, flash, session, abort, send_file
-from helpers import fetch_jobs
+from helpers import fetch_jobs,extract_job_tags
 from flask import render_template, request, redirect, url_for, flash, session, abort, send_file
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -37,34 +37,246 @@ def init_routes(flask_app):
     def jobs():
         form = JobSearchForm()
         jobs_data = []
-        if form.validate_on_submit():
-            jobs_data = fetch_jobs(form.search.data, form.location.data, form.remote.data)
-        else:
-            jobs_data = fetch_jobs()  # Default fetch
-        return render_template('jobs.html', jobs=jobs_data, form=form)
+        
+        try:
+            if form.validate_on_submit():
+                # Get form data for filtering
+                search_term = form.search.data
+                location = form.location.data
+                remote_only = form.remote.data
+                
+                # Fetch jobs with filters
+                jobs_data = fetch_jobs(search_term, location, remote_only)
+            else:
+                # Default fetch with no filters
+                jobs_data = fetch_jobs()
+                
+            # Process job data to extract tags and format dates
+            processed_jobs = []
+            for job in jobs_data:
+                # Extract tags from job title and description
+                tags = extract_job_tags(job.get('title', ''), job.get('description', ''))
+                
+                # Format the date
+                created_at = job.get('created_at')
+                if created_at:
+                    # Convert ISO date to more readable format
+                    try:
+                        date_obj = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                        days_ago = (datetime.now(date_obj.tzinfo) - date_obj).days
+                        
+                        if days_ago == 0:
+                            formatted_date = "Today"
+                        elif days_ago == 1:
+                            formatted_date = "Yesterday"
+                        else:
+                            formatted_date = f"{days_ago} days ago"
+                    except:
+                        formatted_date = "Recently"
+                else:
+                    formatted_date = "Recently"
+                
+                # Create processed job object
+                processed_job = {
+                    **job,  # Include all original job data
+                    'tags': tags[:3],  # Limit to top 3 tags
+                    'created_at': formatted_date
+                }
+                
+                processed_jobs.append(processed_job)
+            
+            return render_template('jobs.html', jobs=processed_jobs, form=form)
+        
+        except Exception as e:
+            print(f"Error in jobs route: {e}")
+            flash(f"Error fetching jobs: {str(e)}", 'danger')
+            return render_template('jobs.html', jobs=[], form=form)
 
     @app.route('/job/<slug>')
     def job_detail(slug):
-        job = Job.query.filter_by(slug=slug).first()
-        if not job:
-            url = "https://job-board.arbeitnow.com/api/jobs"  # Fetch all and find, or use specific endpoint if available
-            jobs_data = fetch_jobs()
-            job_data = next((j for j in jobs_data if j['slug'] == slug), None)
-            if job_data:
-                job = Job(
-                    slug=job_data['slug'],
-                    title=job_data['title'],
-                    company=job_data['company_name'],
-                    location=job_data['location'],
-                    description=job_data['description'],
-                    posted_at=datetime.fromisoformat(job_data['created_at'].replace('Z', '+00:00'))
+            try:
+                # First, check if job exists in the database
+                job = Job.query.filter_by(slug=slug).first()
+                
+                # If not in database, fetch from API
+                if not job:
+                    # Fetch all jobs from API 
+                    jobs_data = fetch_jobs()
+                    
+                    # Find the job with matching slug
+                    job_data = next((j for j in jobs_data if j.get('slug') == slug), None)
+                    
+                    if not job_data:
+                        flash('Job not found.', 'danger')
+                        return redirect(url_for('jobs'))
+                    
+                    # Create a new Job record in the database
+                    job = Job(
+                        slug=job_data.get('slug'),
+                        title=job_data.get('title', 'Untitled Position'),
+                        company=job_data.get('company_name', 'Unknown Company'),
+                        location=job_data.get('location', 'Remote'),
+                        description=job_data.get('description', ''),
+                        posted_at=datetime.fromisoformat(job_data.get('created_at', datetime.now().isoformat()).replace('Z', '+00:00')) if job_data.get('created_at') else datetime.now()
+                    )
+                    
+                    # Add additional attributes from API data
+                    job_data['remote'] = job_data.get('remote', False)
+                    job_data['apply_url'] = job_data.get('url', '')
+                    job_data['tags'] = extract_job_tags(job_data.get('title', ''), job_data.get('description', ''))
+                    
+                    # Format the date
+                    created_at = job_data.get('created_at')
+                    if created_at:
+                        try:
+                            date_obj = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                            days_ago = (datetime.now(date_obj.tzinfo) - date_obj).days
+                            
+                            if days_ago == 0:
+                                job_data['created_at'] = "Today"
+                            elif days_ago == 1:
+                                job_data['created_at'] = "Yesterday"
+                            else:
+                                job_data['created_at'] = f"{days_ago} days ago"
+                        except:
+                            job_data['created_at'] = "Recently"
+                    else:
+                        job_data['created_at'] = "Recently"
+                    
+                    # Save to database
+                    db.session.add(job)
+                    db.session.commit()
+                else:
+                    # Convert the SQLAlchemy model to a dictionary for template rendering
+                    job_data = {
+                        'id': job.id,
+                        'slug': job.slug,
+                        'title': job.title,
+                        'company_name': job.company,
+                        'location': job.location,
+                        'description': job.description,
+                        'remote': True if 'remote' in job.location.lower() else False,
+                        'created_at': "Today" if (datetime.now() - job.posted_at).days == 0 else 
+                                    "Yesterday" if (datetime.now() - job.posted_at).days == 1 else
+                                    f"{(datetime.now() - job.posted_at).days} days ago",
+                        'tags': extract_job_tags(job.title, job.description),
+                        'apply_url': f"https://www.arbeitnow.com/view/{job.slug}" if job.slug else None
+                    }
+                
+                # For authenticated users, calculate skills match
+                skills_match = []
+                match_percentage = 0
+                
+                if current_user.is_authenticated:
+                    # This would be where TODOoo implement  actual skills matching algorithm
+                    
+                    
+                    # Example mock skills data - TODOoo:  extract these from the user's profile
+                    user_skills = [
+                        {"name": "Python", "level": 85},
+                        {"name": "JavaScript", "level": 70},
+                        {"name": "SQL", "level": 75},
+                        {"name": "React", "level": 65},
+                        {"name": "Flask", "level": 80}
+                    ]
+                    
+                    # Extract skills from job description
+                    job_skills = extract_job_tags(job_data.get('title', ''), job_data.get('description', ''))
+                    
+                    # Calculate match for each user skill (simplified algorithm)
+                    for skill in user_skills:
+                        skill_name = skill["name"]
+                        # Check if the skill is mentioned in the job skills
+                        if any(skill_name.lower() in job_skill.lower() for job_skill in job_skills):
+                            # High match if directly mentioned
+                            match = skill["level"]
+                        elif any(skill_name.lower() in job_data.get('description', '').lower() for job_skill in job_skills):
+                            # Medium match if mentioned in description
+                            match = int(skill["level"] * 0.7)
+                        else:
+                            # Low match for general skills
+                            match = int(skill["level"] * 0.3)
+                        
+                        skills_match.append({
+                            "name": skill_name,
+                            "match": match
+                        })
+                    
+                    # Calculate overall match percentage (average of all skills)
+                    if skills_match:
+                        match_percentage = int(sum(skill["match"] for skill in skills_match) / len(skills_match))
+                
+                # Find similar jobs
+                similar_jobs = []
+                
+                if job_data.get('tags'):
+                    # Get all jobs (TODO: use a more efficient query in a real app)
+                    all_jobs = fetch_jobs()
+                    
+                    # Score each job based on tag similarity
+                    job_scores = []
+                    for other_job in all_jobs:
+                        # Skip the current job
+                        if other_job.get('slug') == slug:
+                            continue
+                        
+                        # Extract tags for the other job
+                        other_tags = extract_job_tags(other_job.get('title', ''), other_job.get('description', ''))
+                        
+                        # Calculate score based on tag overlap
+                        common_tags = set(job_data.get('tags')).intersection(set(other_tags))
+                        score = len(common_tags)
+                        
+                        # Add location score if locations match
+                        if job_data.get('location') == other_job.get('location'):
+                            score += 1
+                        
+                        # Add remote score if both are remote
+                        if job_data.get('remote') and other_job.get('remote'):
+                            score += 1
+                        
+                        # Store the job with its score
+                        if score > 0:
+                            job_scores.append((score, other_job))
+                    
+                    # Sort by score (highest first) and take top 3
+                    job_scores.sort(reverse=True, key=lambda x: x[0])
+                    similar_jobs = [job for _, job in job_scores[:3]]
+                    
+                    # Process similar jobs to add tags and format dates
+                    for job in similar_jobs:
+                        job['tags'] = extract_job_tags(job.get('title', ''), job.get('description', ''))
+                        
+                        # Format date
+                        created_at = job.get('created_at')
+                        if created_at:
+                            try:
+                                date_obj = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                                days_ago = (datetime.now(date_obj.tzinfo) - date_obj).days
+                                
+                                if days_ago == 0:
+                                    job['created_at'] = "Today"
+                                elif days_ago == 1:
+                                    job['created_at'] = "Yesterday"
+                                else:
+                                    job['created_at'] = f"{days_ago} days ago"
+                            except:
+                                job['created_at'] = "Recently"
+                        else:
+                            job['created_at'] = "Recently"
+                
+                return render_template(
+                    'job_detail.html',
+                    job=job_data,
+                    skills_match=skills_match,
+                    match_percentage=match_percentage,
+                    similar_jobs=similar_jobs
                 )
-                db.session.add(job)
-                db.session.commit()
-            else:
-                flash('Job not found.', 'danger')
+            
+            except Exception as e:
+                print(f"Error in job detail route: {e}")
+                flash(f"Error loading job details: {str(e)}", 'danger')
                 return redirect(url_for('jobs'))
-        return render_template('job_detail.html', job=job)
     @app.route('/register', methods=['GET', 'POST'])
     def register():
         # Redirect if user is already logged in
@@ -156,6 +368,7 @@ def init_routes(flask_app):
         db.session.commit()
         skills = analyze_job_description(job.description)
         session['skills'] = skills
+        flash('Resume creation started! Let\'s add your contact information.', 'success')
         return redirect(url_for('resume_contact', resume_id=resume.id))
 
     @app.route('/resume/<int:resume_id>/contact', methods=['GET', 'POST'])
