@@ -284,8 +284,59 @@ def init_routes(flask_app):
     @app.route('/dashboard')
     @login_required
     def dashboard():
+        # Get user's resumes
         resumes = Resume.query.filter_by(user_id=current_user.id).all()
-        return render_template('dashboard.html', resumes=resumes)
+        
+        #TODOO: based on the user's skills and preferences Get some sample job matches if they don't exist yet
+       
+        job_matches = 0
+        job_matches_list = []
+        
+        # sample data - in a real implementation, would fetch this from database
+        # based on job matching algorithm
+        if resumes:
+            # Count job matches
+            job_matches = 3  #TODOO: This would be calculated based on  matching algorithm
+            
+            # Sample job match data - TODOO: replace with actual job matching logic
+            job_matches_list = [
+                {
+                    'slug': 'software-engineer-xyz-company',
+                    'title': 'Software Engineer',
+                    'company_name': 'XYZ Tech',
+                    'location': 'San Francisco, CA',
+                    'remote': True,
+                    'match': 92
+                },
+                {
+                    'slug': 'frontend-developer-abc-inc',
+                    'title': 'Frontend Developer',
+                    'company_name': 'ABC Inc',
+                    'location': 'New York, NY',
+                    'remote': False,
+                    'match': 87
+                },
+                {
+                    'slug': 'fullstack-engineer-startup',
+                    'title': 'Fullstack Engineer',
+                    'company_name': 'Startup Co',
+                    'location': 'Austin, TX',
+                    'remote': True,
+                    'match': 84
+                }
+            ]
+        
+        # Placeholder for applications count - in a real implementation, 
+        # this would be fetched from  database
+        applications = 0
+        
+        return render_template(
+            'dashboard.html', 
+            resumes=resumes,
+            job_matches=job_matches,
+            job_matches_list=job_matches_list,
+            applications=applications
+        )
 
     @app.route('/pricing')
     def pricing():
