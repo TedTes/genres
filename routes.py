@@ -75,33 +75,30 @@ def init_routes(flask_app):
         
         if form.validate_on_submit():
             try:
-                # Check if email already exists
-                existing_user = supabase.table('users').select('*').eq('email', form.email.data).execute()
+                # Check if email already exists using SQLAlchemy
+                existing_user = User.query.filter_by(email=form.email.data).first()
                 
-                if existing_user.data:
+                if existing_user:
                     flash('Email already registered. Please log in.', 'danger')
                     return redirect(url_for('login'))
                 
-                # Generate password hash
                 hashed_password = generate_password_hash(form.password.data)
+                # Create new user with SQLAlchemy model
+                new_user = User(
+                    username=form.username.data,
+                    email=form.email.data,
+                    password_hash=hashed_password
+                )
                 
-                # Insert new user into Supabase
-                new_user = {
-                    'username': form.username.data,
-                    'email': form.email.data,
-                    'password_hash': hashed_password
-                }
+                # Add and commit to database
+                db.session.add(new_user)
+                db.session.commit()
                 
-                # Insert the user data
-                response = supabase.table('users').insert(new_user).execute()
+                flash('Account created successfully! Please log in.', 'success')
+                return redirect(url_for('login'))
                 
-                if response.data:
-                    flash('Account created successfully! Please log in.', 'success')
-                    return redirect(url_for('login'))
-                else:
-                    flash('Registration failed. Please try again.', 'danger')
-            
             except Exception as e:
+                db.session.rollback()  # Roll back the session on error
                 print(f"Registration error: {e}")
                 flash('An error occurred during registration. Please try again.', 'danger')
         
