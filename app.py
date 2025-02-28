@@ -10,6 +10,7 @@ import secrets
 from datetime import datetime
 from supabase import create_client, Client
 from db import db
+from models import  User
 app = Flask(__name__)
 
 load_dotenv(dotenv_path='python-dotenv.env')
