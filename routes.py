@@ -564,3 +564,30 @@ def init_routes(flask_app):
     @app.route('/pricing')
     def pricing():
         return render_template('pricing.html')
+
+    @app.route('/resume/<int:resume_id>/view')
+    @login_required
+    def view_resume(resume_id):
+        resume = Resume.query.get_or_404(resume_id)
+        # Check if the resume belongs to the current user
+        if resume.user_id != current_user.id:
+            flash('You do not have permission to view this resume.', 'danger')
+            return redirect(url_for('dashboard'))
+        
+        return render_template('view_resume.html', resume=resume)
+    
+
+    @app.route('/resume/<int:resume_id>/pdf')
+    @login_required
+    def generate_pdf(resume_id):
+        resume = Resume.query.get_or_404(resume_id)
+        
+        # Check if the resume belongs to the current user
+        if resume.user_id != current_user.id:
+            flash('You do not have permission to access this resume.', 'danger')
+            return redirect(url_for('dashboard'))
+        
+        # TODO:Generate PDF logic here
+        # For now, redirect to the preview page
+        flash('PDF generation will be implemented soon.', 'info')
+        return redirect(url_for('resume_preview', resume_id=resume.id))

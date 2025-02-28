@@ -95,7 +95,7 @@ def extract_job_tags(title, description):
     
     return tags
 # from weasyprint import HTML
-# def generate_pdf(html_string):
-#     html = HTML(string=html_string)
-#     pdf = html.write_pdf()
-#     return pdf
+def generate_pdf(html_string):
+    html = HTML(string=html_string)
+    pdf = html.write_pdf()
+    return pdf
