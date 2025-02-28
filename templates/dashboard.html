@@ -137,7 +137,11 @@
                             </div>
                         </div>
                         <div class="resume-details">
-                            <h3 class="resume-title">{{ resume.title|default('Resume for ' + resume.job.title) }}</h3>
+                            <h3 class="resume-title">   {% if resume.job %}
+                                {{ resume.title|default('Resume for ' + resume.job.title) }}
+                            {% else %}
+                                {{ resume.title|default('General Resume') }}
+                            {% endif %}</h3>
                             <div class="resume-meta">
                                 <span class="resume-date">
                                     <i class="far fa-calendar-alt"></i> 
@@ -149,15 +153,25 @@
                                 </span>
                             </div>
                             <div class="resume-job">
-                                <span class="job-title">{{ resume.job.title if resume.job else 'General Resume' }}</span>
-                                <span class="job-company">{{ resume.job.company if resume.job else '' }}</span>
+                                {% if resume.job %}
+                                <span class="job-title">{{ resume.job.title }}</span>
+                                <span class="job-company">{{ resume.job.company }}</span>
+                            {% elif resume.job_info %}
+                                <span class="job-title">{{ resume.job_info.title }}</span>
+                                <span class="job-company">{{ resume.job_info.company }}</span>
+                            {% else %}
+                                <span class="job-title">General Resume</span>
+                                <span class="job-company">Multiple Companies</span>
+                            {% endif %}
                             </div>
                             <div class="match-score">
-                                <div class="score-label">Match Score</div>
-                                <div class="score-bar">
-                                    <div class="score-fill" style="width: {{ resume.match_score|default(85) }}%;"></div>
-                                </div>
-                                <div class="score-value">{{ resume.match_score|default(85) }}%</div>
+                                    <div class="score-label">Match Score</div>
+        <div class="score-bar">
+            <div class="score-fill" style="width: {{ resume.display_match }}%;"></div>
+        </div>
+        <div class="score-value">{{ resume.display_match }}%</div>
+                               
+                             
                             </div>
                         </div>
                     </div>
@@ -241,16 +255,17 @@
                             <a href="{{ url_for('jobs') }}" class="btn btn-primary btn-sm">Browse Jobs</a>
                         </div>
                     </div>
-                    <div class="resume-option">
-                        <div class="option-icon">
-                            <i class="fas fa-file-alt"></i>
-                        </div>
-                        <div class="option-details">
-                            <h4>Create General Resume</h4>
-                            <p>Create a versatile resume you can use for multiple applications</p>
-                            <a href="#" class="btn btn-outline btn-sm">Create Resume</a>
-                        </div>
+
+                <div class="resume-option">
+                    <div class="option-icon">
+                        <i class="fas fa-file-alt"></i>
                     </div>
+                    <div class="option-details">
+                        <h4>Create General Resume</h4>
+                        <p>Create a versatile resume you can use for multiple applications</p>
+                        <a href="{{ url_for('create_general_resume') }}" class="btn btn-outline btn-sm">Create Resume</a>
+                    </div>
+                </div>
                 </div>
             </div>
         </div>
