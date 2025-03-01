@@ -1,12 +1,219 @@
 {% extends "base.html" %}
+
+{% block title %}Contact Information - Resume Builder{% endblock %}
+
 {% block content %}
-<h2>Resume - Contact Info</h2>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    {% for field in [form.name, form.email, form.phone] %}
-        <div>{{ field.label }}<br>{{ field() }}<br>
-        {% for error in field.errors %}<span style="color: red;">{{ error }}</span><br>{% endfor %}</div>
-    {% endfor %}
-    {{ form.submit() }}
-</form>
+<!-- Navigation Bar -->
+<nav class="main-nav dashboard-nav">
+    <div class="container nav-container">
+        <div class="logo">
+            <a href="{{ url_for('home') }}">ResumeMatch</a>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('jobs') }}">Browse Jobs</a>
+        </div>
+        <div class="user-menu">
+            <div class="user-info" id="user-dropdown-toggle">
+                <div class="user-avatar">
+                    <span>{{ current_user.username[0].upper() }}</span>
+                </div>
+                <span class="user-name">{{ current_user.username }}</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="user-dropdown" id="user-dropdown">
+                <a href="{{ url_for('dashboard') }}" class="dropdown-item">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="{{ url_for('logout') }}" class="dropdown-item">
+                    <i class="fas fa-sign-out-alt"></i> Log Out
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="resume-builder">
+    <div class="container">
+        <div class="resume-builder-header">
+            <h1>Create Your Resume</h1>
+            <p>Let's start with your contact information</p>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 20%;"></div>
+            </div>
+            <div class="progress-steps">
+                <div class="step active">
+                    <div class="step-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="step-label">Contact</div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="step-label">Skills</div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="step-label">Experience</div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="step-label">Education</div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="step-label">Summary</div>
+                </div>
+               
+            </div>
+        </div>
+        
+        <div class="resume-form-container">
+            <div class="resume-form-content">
+                <form method="POST" class="resume-form">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ form.name.label }}</label>
+                        {{ form.name(class="form-control", placeholder="e.g. John Smith") }}
+                        {% if form.name.errors %}
+                            <div class="error-feedback">
+                                {% for error in form.name.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-tip">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Use your full name as it should appear on your resume</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ form.email.label }}</label>
+                        {{ form.email(class="form-control", placeholder="e.g. johnsmith@example.com") }}
+                        {% if form.email.errors %}
+                            <div class="error-feedback">
+                                {% for error in form.email.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-tip">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Use a professional email address that you check regularly</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ form.phone.label }}</label>
+                        {{ form.phone(class="form-control", placeholder="e.g. (555) 123-4567") }}
+                        {% if form.phone.errors %}
+                            <div class="error-feedback">
+                                {% for error in form.phone.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group form-group-half">
+                            <label class="form-label">Location</label>
+                            <input type="text" name="location" class="form-control" placeholder="e.g. San Francisco, CA" 
+                                   value="{{ resume.resume_data.get('contact', {}).get('location', '') }}">
+                            <div class="form-tip">
+                                <i class="fas fa-lightbulb"></i>
+                                <span>City and state/country is usually sufficient</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group form-group-half">
+                            <label class="form-label">LinkedIn Profile</label>
+                            <input type="text" name="linkedin" class="form-control" placeholder="e.g. linkedin.com/in/johnsmith"
+                                   value="{{ resume.resume_data.get('contact', {}).get('linkedin', '') }}">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Website/Portfolio (Optional)</label>
+                        <input type="text" name="website" class="form-control" placeholder="e.g. johnsmith.com"
+                               value="{{ resume.resume_data.get('contact', {}).get('website', '') }}">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Next: Skills</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="resume-form-sidebar">
+                <div class="sidebar-section">
+                    <h3>Why Contact Information Matters</h3>
+                    <p>Your contact information is the first thing employers see. Make sure it's professional and up-to-date so they can easily reach you.</p>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>Tips</h3>
+                    <ul class="tips-list">
+                        <li>Use a professional email address (avoid nicknames)</li>
+                        <li>Include a cell phone number that you check regularly</li>
+                        <li>Add your LinkedIn profile if it's up-to-date</li>
+                        <li>Include a portfolio or personal website if relevant to your field</li>
+                    </ul>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>Example</h3>
+                    <div class="example-box">
+                        <p class="example-name">Sarah Johnson</p>
+                        <p class="example-details">
+                            <i class="fas fa-envelope"></i> sarah.johnson@email.com<br>
+                            <i class="fas fa-phone"></i> (555) 123-4567<br>
+                            <i class="fas fa-map-marker-alt"></i> Chicago, IL<br>
+                            <i class="fab fa-linkedin"></i> linkedin.com/in/sarahjohnson
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // User dropdown toggle
+        const userDropdownToggle = document.getElementById('user-dropdown-toggle');
+        const userDropdown = document.getElementById('user-dropdown');
+        
+        if (userDropdownToggle && userDropdown) {
+            userDropdownToggle.addEventListener('click', function() {
+                userDropdown.classList.toggle('active');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!userDropdownToggle.contains(event.target) && !userDropdown.contains(event.target)) {
+                    userDropdown.classList.remove('active');
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}
