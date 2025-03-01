@@ -1,0 +1,466 @@
+{% extends "base.html" %}
+
+{% block title %}Education - Resume Builder{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="main-nav dashboard-nav">
+    <div class="container nav-container">
+        <div class="logo">
+            <a href="{{ url_for('home') }}">ResumeMatch</a>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('jobs') }}">Browse Jobs</a>
+        </div>
+        <div class="user-menu">
+            <div class="user-info" id="user-dropdown-toggle">
+                <div class="user-avatar">
+                    <span>{{ current_user.username[0].upper() }}</span>
+                </div>
+                <span class="user-name">{{ current_user.username }}</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="user-dropdown" id="user-dropdown">
+                <a href="{{ url_for('dashboard') }}" class="dropdown-item">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="{{ url_for('logout') }}" class="dropdown-item">
+                    <i class="fas fa-sign-out-alt"></i> Log Out
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="resume-builder">
+    <div class="container">
+        <div class="resume-builder-header">
+            <h1>Create Your Resume</h1>
+            <p>Add your educational background</p>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 80%;"></div>
+            </div>
+            <div class="progress-steps">
+                <div class="step completed">
+                    <div class="step-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="step-label">Contact</div>
+                </div>
+                <div class="step completed">
+                    <div class="step-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="step-label">Summary</div>
+                </div>
+                <div class="step completed">
+                    <div class="step-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="step-label">Experience</div>
+                </div>
+                <div class="step active">
+                    <div class="step-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="step-label">Education</div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="step-label">Skills</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="resume-form-container">
+            <div class="resume-form-content">
+                <div id="education-list" class="education-list">
+                    <!-- Education entries will be added here -->
+                    {% if educations %}
+                        {% for education in educations %}
+                            <div class="education-item" data-index="{{ loop.index0 }}">
+                                <div class="education-header">
+                                    <h3>{{ education.degree }}</h3>
+                                    <span class="education-school">{{ education.school }}</span>
+                                    <span class="education-dates">{{ education.start_year }} - {{ education.end_year|default('Present') }}</span>
+                                    <div class="education-actions">
+                                        <button type="button" class="btn-edit" data-index="{{ loop.index0 }}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn-delete" data-index="{{ loop.index0 }}">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {% if education.description %}
+                                <div class="education-description">
+                                    <p>{{ education.description }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-education">
+                            <p>No education added yet. Click the button below to add your educational background.</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <button type="button" id="add-education-btn" class="btn btn-outline btn-add">
+                    <i class="fas fa-plus"></i> Add Education
+                </button>
+                
+                <div id="education-form" class="education-form" style="display: none;">
+                    <div class="form-header">
+                        <h3 id="form-title">Add Education</h3>
+                        <button type="button" id="close-form-btn" class="btn-close">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <form id="education-entry-form" class="resume-form">
+                        <input type="hidden" id="education-index" value="-1">
+                        
+                        <div class="form-group">
+                            <label class="form-label">Degree / Certificate <span class="required">*</span></label>
+                            <input type="text" id="degree" class="form-control" placeholder="e.g. Bachelor of Science in Computer Science" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">School / University <span class="required">*</span></label>
+                            <input type="text" id="school" class="form-control" placeholder="e.g. University of California, Berkeley" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group form-group-half">
+                                <label class="form-label">Start Year <span class="required">*</span></label>
+                                <input type="text" id="start-year" class="form-control" placeholder="e.g. 2018" required>
+                            </div>
+                            
+                            <div class="form-group form-group-half">
+                                <label class="form-label">End Year</label>
+                                <div class="end-year-group">
+                                    <input type="text" id="end-year" class="form-control" placeholder="e.g. 2022">
+                                    <label class="current-education-label">
+                                        <input type="checkbox" id="current-education"> Currently studying
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Description (Optional)</label>
+                            <div class="form-tip">
+                                <i class="fas fa-lightbulb"></i>
+                                <span>Add relevant coursework, achievements, or activities</span>
+                            </div>
+                            <textarea id="education-description" class="form-control" rows="4" placeholder="e.g. Relevant coursework: Data Structures, Algorithms, Machine Learning. Graduated with honors (GPA: 3.8/4.0)."></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" id="cancel-btn" class="btn btn-outline">Cancel</button>
+                            <button type="submit" id="save-btn" class="btn btn-primary">Save Education</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <form method="POST" id="main-form" class="main-form">
+                    {{ form.hidden_tag() }}
+                    <input type="hidden" name="education_data" id="education-data" value="">
+                    
+                    <div class="form-actions main-actions">
+                        <a href="{{ url_for('resume_experience', resume_id=resume.id) }}" class="btn btn-outline">Back: Experience</a>
+                        <button type="submit" class="btn btn-primary">Next: Skills</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="resume-form-sidebar">
+                <div class="sidebar-section">
+                    <h3>Education on Your Resume</h3>
+                    <p>Your educational background demonstrates your knowledge foundation and academic achievements, which can be especially important for recent graduates or career changers.</p>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>Tips for Education Section</h3>
+                    <ul class="tips-list">
+                        <li>List your highest level of education first</li>
+                        <li>Include relevant certifications and professional development</li>
+                        <li>For recent graduates, add relevant coursework, projects, or academic achievements</li>
+                        <li>If you have extensive work experience, keep education brief</li>
+                        <li>Include GPA if it's above 3.5 (and you graduated recently)</li>
+                        <li>List degrees in progress with expected graduation date</li>
+                    </ul>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>Example</h3>
+                    <div class="example-box">
+                        <p class="example-degree">Bachelor of Science in Computer Science</p>
+                        <p class="example-school">University of Washington</p>
+                        <p class="example-dates">2018 - 2022</p>
+                        <p class="example-description">Graduated cum laude (GPA: 3.7/4.0). Relevant coursework: Data Structures, Algorithms, Machine Learning, Web Development. Recipient of Dean's Scholar Award.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // User dropdown toggle
+        const userDropdownToggle = document.getElementById('user-dropdown-toggle');
+        const userDropdown = document.getElementById('user-dropdown');
+        
+        if (userDropdownToggle && userDropdown) {
+            userDropdownToggle.addEventListener('click', function() {
+                userDropdown.classList.toggle('active');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!userDropdownToggle.contains(event.target) && !userDropdown.contains(event.target)) {
+                    userDropdown.classList.remove('active');
+                }
+            });
+        }
+        
+        // Education form handling
+        const educationList = document.getElementById('education-list');
+        const addEducationBtn = document.getElementById('add-education-btn');
+        const educationForm = document.getElementById('education-form');
+        const educationEntryForm = document.getElementById('education-entry-form');
+        const closeFormBtn = document.getElementById('close-form-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const formTitle = document.getElementById('form-title');
+        const educationIndex = document.getElementById('education-index');
+        const degree = document.getElementById('degree');
+        const school = document.getElementById('school');
+        const startYear = document.getElementById('start-year');
+        const endYear = document.getElementById('end-year');
+        const currentEducation = document.getElementById('current-education');
+        const educationDescription = document.getElementById('education-description');
+        const educationData = document.getElementById('education-data');
+        const mainForm = document.getElementById('main-form');
+        
+        // Array to store education entries
+        let educations = [];
+        
+        // Initialize from existing data if available
+        const initializeEducations = () => {
+            const items = document.querySelectorAll('.education-item');
+            
+            if (items.length > 0) {
+                items.forEach(item => {
+                    const index = parseInt(item.dataset.index);
+                    const degree = item.querySelector('h3').textContent;
+                    const school = item.querySelector('.education-school').textContent;
+                    const dates = item.querySelector('.education-dates').textContent.split(' - ');
+                    const startYear = dates[0];
+                    const endYear = dates[1] === 'Present' ? '' : dates[1];
+                    
+                    let description = '';
+                    const descriptionEl = item.querySelector('.education-description p');
+                    if (descriptionEl) {
+                        description = descriptionEl.textContent;
+                    }
+                    
+                    educations[index] = {
+                        degree: degree,
+                        school: school,
+                        startYear: startYear,
+                        endYear: endYear,
+                        current: endYear === 'Present',
+                        description: description
+                    };
+                });
+            }
+            
+            // Update hidden input with JSON data
+            educationData.value = JSON.stringify(educations);
+        };
+        
+        // Call initialization
+        initializeEducations();
+        
+        // Show add education form
+        addEducationBtn.addEventListener('click', function() {
+            formTitle.textContent = 'Add Education';
+            educationIndex.value = -1;
+            educationEntryForm.reset();
+            educationForm.style.display = 'block';
+            addEducationBtn.style.display = 'none';
+        });
+        
+        // Close form buttons
+        closeFormBtn.addEventListener('click', function() {
+            educationForm.style.display = 'none';
+            addEducationBtn.style.display = 'block';
+        });
+        
+        cancelBtn.addEventListener('click', function() {
+            educationForm.style.display = 'none';
+            addEducationBtn.style.display = 'block';
+        });
+        
+        // Current education checkbox handler
+        currentEducation.addEventListener('change', function() {
+            if (this.checked) {
+                endYear.value = '';
+                endYear.disabled = true;
+            } else {
+                endYear.disabled = false;
+            }
+        });
+        
+        // Save education
+        educationEntryForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate form
+            if (!degree.value || !school.value || !startYear.value) {
+                alert('Please fill out all required fields.');
+                return;
+            }
+            
+            const index = parseInt(educationIndex.value);
+            const isNewEducation = index === -1;
+            
+            const education = {
+                degree: degree.value,
+                school: school.value,
+                startYear: startYear.value,
+                endYear: currentEducation.checked ? '' : endYear.value,
+                current: currentEducation.checked,
+                description: educationDescription.value
+            };
+            
+            if (isNewEducation) {
+                educations.push(education);
+            } else {
+                educations[index] = education;
+            }
+            
+            // Update hidden input with JSON data
+            educationData.value = JSON.stringify(educations);
+            
+            // Rebuild education list
+            renderEducations();
+            
+            // Close form
+            educationForm.style.display = 'none';
+            addEducationBtn.style.display = 'block';
+        });
+        
+        // Render education list
+        function renderEducations() {
+            educationList.innerHTML = '';
+            
+            if (educations.length === 0) {
+                educationList.innerHTML = `
+                    <div class="no-education">
+                        <p>No education added yet. Click the button below to add your educational background.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            educations.forEach((edu, index) => {
+                let html = `
+                    <div class="education-item" data-index="${index}">
+                        <div class="education-header">
+                            <h3>${edu.degree}</h3>
+                            <span class="education-school">${edu.school}</span>
+                            <span class="education-dates">${edu.startYear} - ${edu.current ? 'Present' : edu.endYear}</span>
+                            <div class="education-actions">
+                                <button type="button" class="btn-edit" data-index="${index}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn-delete" data-index="${index}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                `;
+                
+                if (edu.description) {
+                    html += `
+                        <div class="education-description">
+                            <p>${edu.description}</p>
+                        </div>
+                    `;
+                }
+                
+                html += `</div>`;
+                
+                educationList.innerHTML += html;
+            });
+            
+            // Add edit and delete button event listeners
+            document.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.addEventListener('click', editEducation);
+            });
+            
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', deleteEducation);
+            });
+        }
+        
+        // Edit education
+        function editEducation() {
+            const index = this.dataset.index;
+            const education = educations[index];
+            
+            formTitle.textContent = 'Edit Education';
+            educationIndex.value = index;
+            
+            degree.value = education.degree;
+            school.value = education.school;
+            startYear.value = education.startYear;
+            
+            if (education.current) {
+                currentEducation.checked = true;
+                endYear.value = '';
+                endYear.disabled = true;
+            } else {
+                currentEducation.checked = false;
+                endYear.value = education.endYear;
+                endYear.disabled = false;
+            }
+            
+            educationDescription.value = education.description;
+            
+            educationForm.style.display = 'block';
+            addEducationBtn.style.display = 'none';
+        }
+        
+        // Delete education
+        function deleteEducation() {
+            if (confirm('Are you sure you want to delete this education entry?')) {
+                const index = this.dataset.index;
+                educations.splice(index, 1);
+                
+                // Update hidden input with JSON data
+                educationData.value = JSON.stringify(educations);
+                
+                // Rebuild education list
+                renderEducations();
+            }
+        }
+        
+        // Submit main form handler - education is optional, so we don't need validation
+    });
+</script>
+{% endblock %}
