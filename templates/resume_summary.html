@@ -44,7 +44,7 @@
         <!-- Progress Bar -->
         <div class="progress-container">
             <div class="progress-bar">
-                <div class="progress-fill" style="width: 40%;"></div>
+                <div class="progress-fill" style="width: 100%;"></div>
             </div>
             <div class="progress-steps">
                 <div class="step completed">
@@ -53,29 +53,30 @@
                     </div>
                     <div class="step-label">Contact</div>
                 </div>
+                <div class="step completed">
+                    <div class="step-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="step-label">Skills</div>
+                </div>
+                <div class="step completed">
+                    <div class="step-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="step-label">Experience</div>
+                </div>
+                <div class="step completed">
+                    <div class="step-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="step-label">Education</div>
+                </div>
+               
                 <div class="step active">
                     <div class="step-icon">
                         <i class="fas fa-file-alt"></i>
                     </div>
                     <div class="step-label">Summary</div>
-                </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-briefcase"></i>
-                    </div>
-                    <div class="step-label">Experience</div>
-                </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <div class="step-label">Education</div>
-                </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                    <div class="step-label">Skills</div>
                 </div>
             </div>
         </div>
@@ -135,8 +136,8 @@
                     </div>
                     
                     <div class="form-actions">
-                        <a href="{{ url_for('resume_contact', resume_id=resume.id) }}" class="btn btn-outline">Back: Contact</a>
-                        <button type="submit" class="btn btn-primary">Next: Work Experience</button>
+                        <a href="{{ url_for('resume_education', resume_id=resume.id) }}" class="btn btn-outline">Back: Education</a>
+                        <button type="submit" class="btn btn-primary">Next: Finish</button>
                     </div>
                 </form>
             </div>

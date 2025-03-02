@@ -395,7 +395,7 @@ def init_routes(flask_app):
                 'phone': form.phone.data
             }
             db.session.commit()
-            return redirect(url_for('resume_summary', resume_id=resume.id))
+            return redirect(url_for('resume_skills', resume_id=resume.id))
         if 'contact' in resume.resume_data:
             form.name.data = resume.resume_data['contact'].get('name', '')
             form.email.data = resume.resume_data['contact'].get('email', '')
@@ -412,7 +412,7 @@ def init_routes(flask_app):
         if form.validate_on_submit():
             resume.resume_data['summary'] = form.summary.data
             db.session.commit()
-            return redirect(url_for('resume_experience', resume_id=resume.id))
+            return redirect(url_for('resume_preview', resume_id=resume.id))
         if 'summary' in resume.resume_data:
             form.summary.data = resume.resume_data['summary']
         return render_template('resume_summary.html', form=form, resume=resume, skills=session.get('skills', []))
@@ -457,7 +457,7 @@ def init_routes(flask_app):
                 'year': form.year.data
             }
             db.session.commit()
-            return redirect(url_for('resume_skills', resume_id=resume.id))
+            return redirect(url_for('resume_summary', resume_id=resume.id))
         if 'education' in resume.resume_data:
             edu = resume.resume_data['education']
             form.degree.data = edu.get('degree', '')
@@ -475,7 +475,7 @@ def init_routes(flask_app):
         if form.validate_on_submit():
             resume.resume_data['skills'] = form.skills.data
             db.session.commit()
-            return redirect(url_for('resume_preview', resume_id=resume.id))
+            return redirect(url_for('resume_experience', resume_id=resume.id))
         if 'skills' in resume.resume_data:
             form.skills.data = resume.resume_data['skills']
         return render_template('resume_skills.html', form=form, resume=resume, suggested_skills=session.get('skills', []))

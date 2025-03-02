@@ -28,7 +28,7 @@ class ContactForm(FlaskForm):
 
 class SummaryForm(FlaskForm):
     summary = TextAreaField('Summary', validators=[DataRequired()])
-    submit = SubmitField('Next')
+    submit = SubmitField('Finish')
 
 class ExperienceForm(FlaskForm):
     title = StringField('Job Title', validators=[DataRequired()])
@@ -46,4 +46,4 @@ class EducationForm(FlaskForm):
 
 class SkillsForm(FlaskForm):
     skills = TextAreaField('Skills (comma-separated)', validators=[DataRequired()])
-    submit = SubmitField('Finish')
+    submit = SubmitField('Next')
