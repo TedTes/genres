@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, session, abort, send_file
+from flask import make_response,render_template, request, redirect, url_for, flash, session, abort, send_file
 from helpers import fetch_jobs,extract_job_tags,calculate_resume_completeness
 from flask import render_template, request, redirect, url_for, flash, session, abort, send_file
 from flask_login import login_user, logout_user, current_user, login_required
@@ -11,6 +11,13 @@ from db import db
 from models import  User, Job, Resume
 import json
 from flask import jsonify
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.units import inch
+from io import BytesIO
 # Import NLP analyzer 
 import spacy
 nlp = spacy.load('en_core_web_sm')
@@ -694,11 +701,196 @@ def init_routes(flask_app):
         if resume.user_id != current_user.id:
             flash('You do not have permission to access this resume.', 'danger')
             return redirect(url_for('dashboard'))
-        
-        # TODO:Generate PDF logic here
-        # For now, redirect to the preview page
-        flash('PDF generation will be implemented soon.', 'info')
-        return redirect(url_for('resume_preview', resume_id=resume.id))
+         # Prepare the resume name for the PDF file
+        if resume.job:
+           filename = f"resume_{current_user.username}_{resume.job.title}.pdf"
+        else:
+           filename = f"resume_{current_user.username}.pdf"
+        filename = filename.replace(' ', '_')
+
+        try:
+                # Create a file-like buffer to receive PDF data
+                buffer = BytesIO()
+                
+                # Create the PDF document using ReportLab
+                doc = SimpleDocTemplate(
+                    buffer,
+                    pagesize=letter,
+                    rightMargin=0.75*inch,
+                    leftMargin=0.75*inch,
+                    topMargin=0.75*inch,
+                    bottomMargin=0.75*inch
+                )
+                
+                # Define styles
+                styles = getSampleStyleSheet()
+                resume_title_style = ParagraphStyle(
+                        name='ResumeTitle',
+                        parent=styles['Heading1'],
+                        alignment=1,  # Center alignment
+                        fontSize=18,
+                        spaceAfter=12
+                )
+                section_heading_style = ParagraphStyle(
+                    name='ResumeSectionHeading',
+                    parent=styles['Heading2'],
+                    fontSize=14,
+                    textColor=colors.blue,
+                    spaceAfter=6
+                )
+                contact_info_style = ParagraphStyle(
+                    name='ResumeContactInfo',
+                    parent=styles['Normal'],
+                    alignment=1,  # Center alignment
+                    fontSize=10,
+                    spaceAfter=12
+                )
+                
+                # Build the document content
+                elements = []
+                
+                # Add contact information
+                contact = resume.resume_data.get('contact', {})
+                elements.append(Paragraph(contact.get('name', 'Your Name'), resume_title_style))
+                
+                contact_text = []
+                if contact.get('email'):
+                    contact_text.append(contact.get('email'))
+                if contact.get('phone'):
+                    contact_text.append(contact.get('phone'))
+                if contact.get('location'):
+                    contact_text.append(contact.get('location'))
+                
+                elements.append(Paragraph(' | '.join(contact_text), contact_info_style))
+                
+                if contact.get('linkedin') or contact.get('website'):
+                    website_text = []
+                    if contact.get('linkedin'):
+                        website_text.append(contact.get('linkedin'))
+                    if contact.get('website'):
+                        website_text.append(contact.get('website'))
+                    elements.append(Paragraph(' | '.join(website_text), contact_info_style))
+                
+                elements.append(Spacer(1, 0.2*inch))
+                
+                # Add summary if available
+                if resume.resume_data.get('summary'):
+                    elements.append(Paragraph('Professional Summary', section_heading_style))
+                    
+                    summary_text = resume.resume_data.get('summary')
+                    if not isinstance(summary_text, str):
+                        summary_text = summary_text.get('content', '')
+                    
+                    elements.append(Paragraph(summary_text, styles['Normal']))
+                    elements.append(Spacer(1, 0.2*inch))
+                
+                # Add experience if available
+                if resume.resume_data.get('experience'):
+                    elements.append(Paragraph('Work Experience', section_heading_style))
+                    
+                    for exp in resume.resume_data.get('experience'):
+                        title_company = f"<b>{exp.get('title')}</b> - {exp.get('company')}"
+                        elements.append(Paragraph(title_company, styles['Normal']))
+                        
+                        date_range = f"{exp.get('startDate')} - {'Present' if exp.get('current') else exp.get('endDate')}"
+                        elements.append(Paragraph(f"<i>{date_range}</i>", styles['Normal']))
+                        
+                        if exp.get('description'):
+                            for line in exp.get('description').split('\n'):
+                                if line.strip():
+                                    elements.append(Paragraph(f"• {line.strip()}", styles['Normal']))
+                        
+                        elements.append(Spacer(1, 0.1*inch))
+                    
+                    elements.append(Spacer(1, 0.1*inch))
+                
+                # Add education if available
+                if resume.resume_data.get('education'):
+                    elements.append(Paragraph('Education', section_heading_style))
+                    
+                    education_data = resume.resume_data.get('education')
+                    if isinstance(education_data, dict):
+                        # Single education entry
+                        degree = education_data.get('degree', '')
+                        school = education_data.get('school', '')
+                        year = education_data.get('year', '')
+                        
+                        elements.append(Paragraph(f"<b>{degree}</b>", styles['Normal']))
+                        elements.append(Paragraph(f"{school}", styles['Normal']))
+                        elements.append(Paragraph(f"<i>{year}</i>", styles['Normal']))
+                    elif isinstance(education_data, list):
+                        # Multiple education entries
+                        for edu in education_data:
+                            degree = edu.get('degree', '')
+                            school = edu.get('school', '')
+                            start_year = edu.get('startYear', '')
+                            end_year = 'Present' if edu.get('current') else edu.get('endYear', '')
+                            date_range = f"{start_year} - {end_year}"
+                            
+                            elements.append(Paragraph(f"<b>{degree}</b>", styles['Normal']))
+                            elements.append(Paragraph(f"{school}", styles['Normal']))
+                            elements.append(Paragraph(f"<i>{date_range}</i>", styles['Normal']))
+                            
+                            if edu.get('description'):
+                                elements.append(Paragraph(edu.get('description'), styles['Normal']))
+                            
+                            elements.append(Spacer(1, 0.1*inch))
+                    
+                    elements.append(Spacer(1, 0.1*inch))
+                
+                # Add skills if available
+                if resume.resume_data.get('skills'):
+                    elements.append(Paragraph('Skills', section_heading_style))
+                    
+                    skills_text = resume.resume_data.get('skills')
+                    if isinstance(skills_text, str):
+                        skills_list = [skill.strip() for skill in skills_text.split(',') if skill.strip()]
+                    else:
+                        skills_list = skills_text
+                    
+                    # Create a table for skills with 3 columns
+                    if skills_list:
+                        # Organize skills into rows of 3
+                        skill_rows = []
+                        row = []
+                        for skill in skills_list:
+                            row.append(skill)
+                            if len(row) == 3:
+                                skill_rows.append(row)
+                                row = []
+                        
+                        if row:  # Add any remaining skills
+                            while len(row) < 3:
+                                row.append('')
+                            skill_rows.append(row)
+                        
+                        # Create the skills table
+                        skills_table = Table(skill_rows, colWidths=[2*inch, 2*inch, 2*inch])
+                        skills_table.setStyle(TableStyle([
+                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                            ('FONTSIZE', (0, 0), (-1, -1), 10),
+                        ]))
+                        
+                        elements.append(skills_table)
+                
+                # Build the PDF document
+                doc.build(elements)
+                
+                # Get the PDF value from the buffer
+                pdf_value = buffer.getvalue()
+                buffer.close()
+                
+                # Create response with PDF
+                response = make_response(pdf_value)
+                response.headers['Content-Type'] = 'application/pdf'
+                response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+                
+                return response
+                
+        except Exception as e:
+                print(f"Error generating PDF: {str(e)}")
+                flash(f"Error generating PDF: {str(e)}", 'danger')
+                return redirect(url_for('resume_preview', resume_id=resume.id))
 
 
    
