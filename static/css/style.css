@@ -2590,10 +2590,11 @@ ul, ol {
 .contact-info {
     font-size: 1rem;
     color: var(--text);
+    line-height: 1.5;
 }
 
 .resume-section {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2.5rem;
 }
 
 .resume-section h3 {
@@ -2607,7 +2608,7 @@ ul, ol {
 
 .empty-resume {
     text-align: center;
-    padding: 3rem;
+    padding: 4rem 2rem;
 }
 
 .empty-resume p {
@@ -3275,7 +3276,7 @@ body.modal-open {
     background-color: var(--light-gray);
     border-radius: var(--radius);
     padding: 1.25rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .experience-header,
@@ -3286,21 +3287,23 @@ body.modal-open {
     margin-bottom: 0.75rem;
 }
 
-.experience-header h3,
-.education-header h3 {
+.experience-header h4,
+.education-header h4 {
     font-size: 1rem;
     font-weight: 600;
     color: var(--dark);
     margin-bottom: 0.25rem;
     flex: 1 1 100%;
 }
-
+.experience-company,
 .experience-dates,
 .education-dates,
 .education-school {
     font-size: 0.875rem;
+    font-weight: 500;
     color: var(--text-light);
-    flex: 1;
+    margin-bottom: 0.25rem;
+    
 }
 
 .experience-actions,
@@ -3354,8 +3357,21 @@ body.modal-open {
 
 .experience-description li {
     margin-bottom: 0.5rem;
+    font-size: 0.9375rem;
+    color: var(--text);
 }
 
+.education-description p {
+    font-size: 0.9375rem;
+    color: var(--text);
+    margin-top: 0.5rem;
+}
+
+.skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
 .no-experiences,
 .no-education {
     text-align: center;
