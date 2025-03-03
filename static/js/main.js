@@ -52,16 +52,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
-            const target = document.querySelector(this.getAttribute('href'));
-            
-            if (target) {
-                e.preventDefault();
-                
-                window.scrollTo({
-                    top: target.offsetTop - 100,
-                    behavior: 'smooth'
-                });
+            const hrefValue = this.getAttribute('href');
+        
+            // Skip empty anchors or just "#"
+            if (hrefValue === "#" || !hrefValue) {
+                return;
             }
+            try {
+                const targetId = hrefValue.substring(1); // Remove the # character
+                const target = document.getElementById(targetId);
+                
+                if (target) {
+                    e.preventDefault();
+                    
+                    window.scrollTo({
+                        top: target.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            } catch(error) {
+                console.error("Smooth scroll error:", error);
+            }
+      
         });
     });
     
