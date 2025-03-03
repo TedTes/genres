@@ -9,7 +9,7 @@ import io
 from forms import RegistrationForm, LoginForm, JobSearchForm, ContactForm, SummaryForm, ExperienceForm, EducationForm, SkillsForm
 from db import db
 from models import  User, Job, Resume
-
+import json
 
 # Import NLP analyzer 
 import spacy
@@ -423,25 +423,50 @@ def init_routes(flask_app):
         resume = Resume.query.get_or_404(resume_id)
         if resume.user_id != current_user.id:
             abort(403)
+        
         form = ExperienceForm()
-        if form.validate_on_submit():
-            resume.resume_data['experience'] = {
-                'title': form.title.data,
-                'company': form.company.data,
-                'start_date': form.start_date.data,
-                'end_date': form.end_date.data,
-                'bullets': form.bullets.data
-            }
-            db.session.commit()
-            return redirect(url_for('resume_education', resume_id=resume.id))
-        if 'experience' in resume.resume_data:
-            exp = resume.resume_data['experience']
-            form.title.data = exp.get('title', '')
-            form.company.data = exp.get('company', '')
-            form.start_date.data = exp.get('start_date', '')
-            form.end_date.data = exp.get('end_date', '')
-            form.bullets.data = exp.get('bullets', '')
-        return render_template('resume_experience.html', form=form, resume=resume, skills=session.get('skills', []))
+        if request.method == 'POST' and request.form.get('experience_data'):
+            if form.csrf_token.validate(form):
+                try:
+                    # Get and debug the experience data
+                    experience_data = request.form.get('experience_data')
+                    print(f"Received experience_data: {experience_data}")
+                    
+                    if not resume.resume_data:
+                        resume.resume_data = {}
+                    
+                    if experience_data and experience_data.strip():
+                        # Store as parsed JSON
+                        experiences_json = json.loads(experience_data)
+                        resume.resume_data['experience'] = experiences_json
+                        print(f"Saved experiences: {experiences_json}")
+                        
+                        # Commit and redirect
+                        db.session.commit()
+                        return redirect(url_for('resume_education', resume_id=resume.id))
+                    else:
+                        print("No experience data received")
+                        flash("Please add at least one work experience", "warning")
+                except Exception as e:
+                    print(f"Error processing experience data: {str(e)}")
+                    flash(f"Error saving experiences: {str(e)}", "danger")
+            else:
+               flash('CSRF validation failed.', 'danger')
+    
+        # Extract experiences from resume data for rendering
+        experiences = []
+        if resume.resume_data and 'experience' in resume.resume_data:
+            experiences_data = resume.resume_data['experience']
+            if isinstance(experiences_data, list):
+                experiences = experiences_data
+            else:
+                # Handle single experience object
+                experiences = [experiences_data]
+        
+        print(f"Rendering with experiences: {experiences}")
+    
+        return render_template('resume_experience.html', form=form, resume=resume, 
+                          experiences=experiences, skills=session.get('skills', []))
 
     @app.route('/resume/<int:resume_id>/education', methods=['GET', 'POST'])
     @login_required

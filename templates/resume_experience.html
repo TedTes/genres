@@ -271,7 +271,7 @@
                 }
             });
         }
-        
+
         // Experience form handling
         const experienceList = document.getElementById('experience-list');
         const addExperienceBtn = document.getElementById('add-experience-btn');
@@ -297,7 +297,7 @@
         // Initialize from existing data if available
         const initializeExperiences = () => {
             const items = document.querySelectorAll('.experience-item');
-            
+
             if (items.length > 0) {
                 items.forEach(item => {
                     const index = parseInt(item.dataset.index);
@@ -327,10 +327,10 @@
             // Update hidden input with JSON data
             experienceData.value = JSON.stringify(experiences);
         };
-        
+
         // Call initialization
         initializeExperiences();
-        
+
         // Show add experience form
         addExperienceBtn.addEventListener('click', function() {
             formTitle.textContent = 'Add Work Experience';
@@ -554,13 +554,13 @@
                 });
             });
         }
-        
-        // Submit main form handler
+   
+
         mainForm.addEventListener('submit', function(e) {
             if (experiences.length === 0) {
                 e.preventDefault();
                 alert('Please add at least one work experience before continuing.');
-            }
+            } 
         });
     });
 </script>
