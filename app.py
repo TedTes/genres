@@ -11,8 +11,9 @@ from datetime import datetime
 from supabase import create_client, Client
 from db import db
 from models import  User
+from flask_wtf.csrf import CSRFProtect
 app = Flask(__name__)
-
+csrf = CSRFProtect(app)
 load_dotenv(dotenv_path='python-dotenv.env')
 
 app.config['SECRET_KEY'] = secrets.token_hex(16) #TODOO Replace with a secure key
