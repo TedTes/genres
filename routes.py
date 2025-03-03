@@ -10,7 +10,7 @@ from forms import RegistrationForm, LoginForm, JobSearchForm, ContactForm, Summa
 from db import db
 from models import  User, Job, Resume
 import json
-
+from flask import jsonify
 # Import NLP analyzer 
 import spacy
 nlp = spacy.load('en_core_web_sm')
@@ -564,7 +564,20 @@ def init_routes(flask_app):
             download_name=f'resume_for_{resume.job.slug}.pdf'
         )
 
+    @app.route('/resume/<int:resume_id>/delete', methods=['POST'])
+    @login_required
+    def delete_resume(resume_id):
+        resume = Resume.query.get_or_404(resume_id)
+        if resume.user_id != current_user.id:
+            abort(403)  # Forbidden if not the owner
 
+        try:
+            db.session.delete(resume)
+            db.session.commit()
+            return jsonify({"success": True})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"success": False, "error": str(e)}), 500
     @app.route('/dashboard')
     @login_required
     def dashboard():
@@ -582,7 +595,7 @@ def init_routes(flask_app):
             else:
                 resume.display_title = resume.title or "General Resume"
                 resume.display_company = "Multiple Companies"
-                resume.display_match = 100  # General resumes show 100%
+                resume.display_match = 30  # General resumes show 100%
                 
                 # Add match score for general resumes (could be based on completeness)
             resume.match_score = calculate_resume_completeness(resume.resume_data)
