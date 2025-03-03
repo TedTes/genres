@@ -394,16 +394,22 @@ def init_routes(flask_app):
             resume.resume_data['contact'] = {
                 'name': form.name.data,
                 'email': form.email.data,
-                'phone': form.phone.data
+                'phone': form.phone.data,
+                'location': request.form.get('location', ''),
+                'linkedin': request.form.get('linkedin', ''),
+                'website': request.form.get('website', '')
             }
             try:
               attributes.flag_modified(resume, 'resume_data')
               db.session.commit()
+              flash('Contact information saved successfully!', 'success')
+              return redirect(url_for('resume_skills', resume_id=resume.id))
             except Exception as e:
-              print(e)
+              db.session.rollback()
+              print(f"Error saving contact info: {str(e)}")
+              flash(f"Error saving contact information: {str(e)}", 'danger')
 
-            return redirect(url_for('resume_skills', resume_id=resume.id))
-        if 'contact' in resume.resume_data:
+        if resume.resume_data and 'contact' in resume.resume_data:
             form.name.data = resume.resume_data['contact'].get('name', '')
             form.email.data = resume.resume_data['contact'].get('email', '')
             form.phone.data = resume.resume_data['contact'].get('phone', '')
@@ -429,10 +435,15 @@ def init_routes(flask_app):
             }
             attributes.flag_modified(resume, 'resume_data')
             # Save changes
-            db.session.commit()
-            
-            # Redirect to preview
-            return redirect(url_for('resume_preview', resume_id=resume.id))
+            try:
+                # Save changes
+                db.session.commit()
+                flash('Summary saved successfully!', 'success')
+                return redirect(url_for('resume_preview', resume_id=resume.id))
+            except Exception as e:
+                db.session.rollback()
+                print(f"Error saving summary: {str(e)}")
+                flash(f"Error saving summary: {str(e)}", 'danger')
         
         # Pre-populate form for GET requests
         if 'summary' in resume.resume_data:
@@ -461,12 +472,11 @@ def init_routes(flask_app):
         if request.method == 'POST' and request.form.get('experience_data'):
             if form.csrf_token.validate(form):
                 try:
+                    if resume.resume_data is None:
+                       resume.resume_data = {}
                     # Get and debug the experience data
                     experience_data = request.form.get('experience_data')
                     print(f"Received experience_data: {experience_data}")
-                    
-                    if not resume.resume_data:
-                        resume.resume_data = {}
                     
                     if experience_data and experience_data.strip():
                         # Store as parsed JSON
@@ -476,11 +486,13 @@ def init_routes(flask_app):
                         attributes.flag_modified(resume, 'resume_data')
                         # Commit and redirect
                         db.session.commit()
+                        flash('Experience information saved successfully!', 'success')
                         return redirect(url_for('resume_education', resume_id=resume.id))
                     else:
                         print("No experience data received")
                         flash("Please add at least one work experience", "warning")
                 except Exception as e:
+                    db.session.rollback()
                     print(f"Error processing experience data: {str(e)}")
                     flash(f"Error saving experiences: {str(e)}", "danger")
             else:
@@ -510,15 +522,20 @@ def init_routes(flask_app):
         form = EducationForm()
 
         if request.method == 'POST' and request.form.get('education_data'):
-            resume.resume_data['education'] = {
-                'degree': form.degree.data,
-                'school': form.school.data,
-                'year': form.year.data
-            }
-            attributes.flag_modified(resume, 'resume_data')
-            db.session.commit()
-            return redirect(url_for('resume_summary', resume_id=resume.id))
-        if 'education' in resume.resume_data:
+            if resume.resume_data is None:
+              resume.resume_data = {}
+            try:
+                educations_json = json.loads(request.form.get('education_data'))
+                resume.resume_data['education'] = educations_json
+                attributes.flag_modified(resume, 'resume_data')
+                db.session.commit()
+                flash('Education information saved successfully!', 'success')
+                return redirect(url_for('resume_summary', resume_id=resume.id))
+            except Exception as e:
+                db.session.rollback()
+                print(f"Error processing education data: {str(e)}")
+                flash(f"Error saving education: {str(e)}", 'danger')
+        if resume.resume_data and 'education' in resume.resume_data:
             edu = resume.resume_data['education']
             form.degree.data = edu.get('degree', '')
             form.school.data = edu.get('school', '')
@@ -532,12 +549,20 @@ def init_routes(flask_app):
         if resume.user_id != current_user.id:
             abort(403)
         form = SkillsForm()
-        if request.method == 'POST' and form.skills.data:
+        if form.validate_on_submit() and form.skills.data :
+            if resume.resume_data is None:
+              resume.resume_data = {}
             resume.resume_data['skills'] = form.skills.data
             attributes.flag_modified(resume, 'resume_data')
-            db.session.commit()
-            return redirect(url_for('resume_experience', resume_id=resume.id))
-        if 'skills' in resume.resume_data:
+            try:
+               db.session.commit()
+               flash('Skills saved successfully!', 'success')
+               return redirect(url_for('resume_experience', resume_id=resume.id))
+            except Exception as e:
+               db.session.rollback()
+               print(f"Error saving skills: {str(e)}")
+               flash(f"Error saving skills: {str(e)}", 'danger')
+        if resume.resume_data and 'skills' in resume.resume_data:
             form.skills.data = resume.resume_data['skills']
         return render_template('resume_skills.html', form=form, resume=resume, suggested_skills=session.get('skills', []))
 
