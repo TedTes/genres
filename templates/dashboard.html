@@ -111,7 +111,7 @@
                 
                 <div class="resumes-grid">
                     {% for resume in resumes %}
-                    <div class="resume-card">
+                    <div class="resume-card" data-id="{{ resume.id }}">
                         <div class="resume-preview">
                             <div class="resume-template-preview template-{{ resume.template|default('toronto') }}">
                                 <div class="template-header"></div>
@@ -167,10 +167,10 @@
                             <div class="match-score">
                                     <div class="score-label">Match Score</div>
         <div class="score-bar">
-            <div class="score-fill" style="width: {{ resume.display_match }}%;"></div>
+            <div class="score-fill" >{{ resume.display_match }}%</div>
         </div>
         <div class="score-value">{{ resume.display_match }}%</div>
-                               
+        
                              
                             </div>
                         </div>
@@ -358,12 +358,37 @@
             
             if (confirmDelete) {
                 confirmDelete.addEventListener('click', function() {
+                    const xsrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                     if (resumeToDelete) {
-                        // Here you would make an AJAX call to delete the resume
-                        console.log('Deleting resume ID:', resumeToDelete);
-                        // After successful deletion:
-                        deleteModal.classList.remove('active');
-                        document.body.classList.remove('modal-open');
+                        fetch(`/resume/${resumeToDelete}/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': xsrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("from data");
+                console.log(data);
+                if (data.success) {
+                    // Remove the resume card from the DOM
+                    document.querySelector(`.resume-card[data-id="${resumeToDelete}"]`).remove();
+                    // Show success message
+                    // TODO: add flash message functionality here
+                } else {
+                    alert('Error deleting resume: ' + data.error);
+                }
+                // Close the modal
+                deleteModal.classList.remove('active');
+                document.body.classList.remove('modal-open');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting resume');
+                deleteModal.classList.remove('active');
+                document.body.classList.remove('modal-open');
+            });
                     }
                 });
             }
