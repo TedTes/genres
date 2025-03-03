@@ -408,14 +408,41 @@ def init_routes(flask_app):
         resume = Resume.query.get_or_404(resume_id)
         if resume.user_id != current_user.id:
             abort(403)
+        
+        if resume.resume_data is None:
+            resume.resume_data = {}
+        
         form = SummaryForm()
+        
+        # Handle form submission
         if form.validate_on_submit():
-            resume.resume_data['summary'] = form.summary.data
+            # Store summary as structured data
+            resume.resume_data['summary'] = {
+                'content': form.summary.data,
+                'last_updated': datetime.now().isoformat()
+            }
+            
+            # Save changes
             db.session.commit()
+            
+            # Redirect to preview
             return redirect(url_for('resume_preview', resume_id=resume.id))
+        
+        # Pre-populate form for GET requests
         if 'summary' in resume.resume_data:
-            form.summary.data = resume.resume_data['summary']
-        return render_template('resume_summary.html', form=form, resume=resume, skills=session.get('skills', []))
+            # Handle both formats (string or dictionary)
+            if isinstance(resume.resume_data['summary'], dict):
+                form.summary.data = resume.resume_data['summary'].get('content', '')
+            else:
+                form.summary.data = resume.resume_data['summary']
+        
+        # Render the form template
+        return render_template(
+            'resume_summary.html', 
+            form=form, 
+            resume=resume, 
+            skills=session.get('skills', [])
+        )
 
     @app.route('/resume/<int:resume_id>/experience', methods=['GET', 'POST'])
     @login_required
@@ -475,7 +502,7 @@ def init_routes(flask_app):
         if resume.user_id != current_user.id:
             abort(403)
         form = EducationForm()
-        if form.validate_on_submit():
+        if request.method == 'POST' and request.form.get('education_data'):
             resume.resume_data['education'] = {
                 'degree': form.degree.data,
                 'school': form.school.data,
