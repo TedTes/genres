@@ -5,7 +5,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import io
-
+from sqlalchemy.orm import attributes
 from forms import RegistrationForm, LoginForm, JobSearchForm, ContactForm, SummaryForm, ExperienceForm, EducationForm, SkillsForm
 from db import db
 from models import  User, Job, Resume
@@ -23,7 +23,6 @@ def init_routes(flask_app):
     @app.route('/')
     def home():
         try:
-            print("home being accessed")
             job_count = Job.query.count()
             user_count = User.query.count()
             resume_count = Resume.query.count()
@@ -388,13 +387,21 @@ def init_routes(flask_app):
         if resume.user_id != current_user.id:
             abort(403)
         form = ContactForm()
+
         if form.validate_on_submit():
+            if resume.resume_data is None:
+               resume.resume_data = {}
             resume.resume_data['contact'] = {
                 'name': form.name.data,
                 'email': form.email.data,
                 'phone': form.phone.data
             }
-            db.session.commit()
+            try:
+              attributes.flag_modified(resume, 'resume_data')
+              db.session.commit()
+            except Exception as e:
+              print(e)
+
             return redirect(url_for('resume_skills', resume_id=resume.id))
         if 'contact' in resume.resume_data:
             form.name.data = resume.resume_data['contact'].get('name', '')
@@ -413,7 +420,6 @@ def init_routes(flask_app):
             resume.resume_data = {}
         
         form = SummaryForm()
-        
         # Handle form submission
         if form.validate_on_submit():
             # Store summary as structured data
@@ -421,7 +427,7 @@ def init_routes(flask_app):
                 'content': form.summary.data,
                 'last_updated': datetime.now().isoformat()
             }
-            
+            attributes.flag_modified(resume, 'resume_data')
             # Save changes
             db.session.commit()
             
@@ -467,7 +473,7 @@ def init_routes(flask_app):
                         experiences_json = json.loads(experience_data)
                         resume.resume_data['experience'] = experiences_json
                         print(f"Saved experiences: {experiences_json}")
-                        
+                        attributes.flag_modified(resume, 'resume_data')
                         # Commit and redirect
                         db.session.commit()
                         return redirect(url_for('resume_education', resume_id=resume.id))
@@ -502,12 +508,14 @@ def init_routes(flask_app):
         if resume.user_id != current_user.id:
             abort(403)
         form = EducationForm()
+
         if request.method == 'POST' and request.form.get('education_data'):
             resume.resume_data['education'] = {
                 'degree': form.degree.data,
                 'school': form.school.data,
                 'year': form.year.data
             }
+            attributes.flag_modified(resume, 'resume_data')
             db.session.commit()
             return redirect(url_for('resume_summary', resume_id=resume.id))
         if 'education' in resume.resume_data:
@@ -524,8 +532,9 @@ def init_routes(flask_app):
         if resume.user_id != current_user.id:
             abort(403)
         form = SkillsForm()
-        if form.validate_on_submit():
+        if request.method == 'POST' and form.skills.data:
             resume.resume_data['skills'] = form.skills.data
+            attributes.flag_modified(resume, 'resume_data')
             db.session.commit()
             return redirect(url_for('resume_experience', resume_id=resume.id))
         if 'skills' in resume.resume_data:
@@ -538,7 +547,7 @@ def init_routes(flask_app):
         resume = Resume.query.get_or_404(resume_id)
         if resume.user_id != current_user.id:
             abort(403)
-        return render_template('resume_template.html', **resume.resume_data, job=resume.job)
+        return render_template('resume_template.html', resume=resume, job=resume.job)
 
     @app.route('/resume/<int:resume_id>/download')
     @login_required
