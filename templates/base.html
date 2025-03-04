@@ -31,7 +31,12 @@
     
     <!-- Main Content -->
     {% block content %}{% endblock %}
-    
+    <div class="save-indicator" id="save-indicator">
+        <span class="save-icon">
+            <i class="fas fa-check-circle"></i>
+        </span>
+        <span class="save-text">Progress saved</span>
+    </div>
     <!-- Scripts -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block extra_js %}{% endblock %}

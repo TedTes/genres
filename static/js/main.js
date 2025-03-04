@@ -163,7 +163,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     });
 });
+function showSaveIndicator() {
+    const indicator = document.getElementById('save-indicator');
+    if (indicator) {
+        indicator.classList.add('show');
+        setTimeout(() => {
+            indicator.classList.remove('show');
+        }, 3000);
+    }
+}
 
+// Call this after successful form submission
+document.querySelectorAll('.resume-form').forEach(form => {
+    form.addEventListener('submit', function() {
+        // Store in localStorage that form was submitted
+        localStorage.setItem('formSubmitted', 'true');
+    });
+});
+   // Check on page load if we should show the indicator
+if (localStorage.getItem('formSubmitted') === 'true') {
+    showSaveIndicator();
+    localStorage.removeItem('formSubmitted');
+}
 // Add CSS for JavaScript-dependent styles
 document.head.insertAdjacentHTML('beforeend', `
 <style>
