@@ -43,6 +43,10 @@
         
         <!-- Progress Bar -->
         <div class="progress-container">
+            <div class="progress-info">
+                <span class="current-step">Step 1 of 5</span>
+                <span class="step-name">Contact Information</span>
+            </div>
             <div class="progress-bar">
                 <div class="progress-fill" style="width: 20%;"></div>
             </div>
@@ -87,8 +91,11 @@
                     {{ form.hidden_tag() }}
                     
                     <div class="form-group">
-                        <label class="form-label">{{ form.name.label }}</label>
+                        <label class="form-label">{{ form.name.label }}<span class="required">*</span></label>
                         {{ form.name(class="form-control", placeholder="e.g. John Smith") }}
+                        <span class="field-tooltip" data-tooltip="Use your full professional name as you'd like it to appear on your resume">
+                            <i class="fas fa-info-circle"></i>
+                        </span>
                         {% if form.name.errors %}
                             <div class="error-feedback">
                                 {% for error in form.name.errors %}
