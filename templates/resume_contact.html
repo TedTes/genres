@@ -201,7 +201,51 @@
         // User dropdown toggle
         const userDropdownToggle = document.getElementById('user-dropdown-toggle');
         const userDropdown = document.getElementById('user-dropdown');
+        const form = document.querySelector('.resume-form');
+        if (form) {
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            const requiredFields = form.querySelectorAll('[required]');
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    
+                    // Clear previous error
+                    const existingError = field.parentElement.querySelector('.field-error');
+                    if (existingError) {
+                        existingError.remove();
+                    }
+                    
+                    // Add error message
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'field-error';
+                    errorMsg.textContent = `Please enter your ${field.getAttribute('placeholder') || field.name}`;
+                    field.parentElement.appendChild(errorMsg);
+                    
+                    // Highlight field
+                    field.classList.add('error-field');
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
         
+        // Clear error when field is filled
+        form.querySelectorAll('input, textarea').forEach(field => {
+            field.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.classList.remove('error-field');
+                    const errorMsg = this.parentElement.querySelector('.field-error');
+                    if (errorMsg) {
+                        errorMsg.remove();
+                    }
+                }
+            });
+        });
+    }
         if (userDropdownToggle && userDropdown) {
             userDropdownToggle.addEventListener('click', function() {
                 userDropdown.classList.toggle('active');

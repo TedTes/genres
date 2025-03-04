@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
-from wtforms.validators import DataRequired, Email, EqualTo, Length
+from wtforms.validators import DataRequired, Email, EqualTo, Length,Regexp
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=4, max=80)])
@@ -21,9 +21,9 @@ class JobSearchForm(FlaskForm):
     submit = SubmitField('Search')
 
 class ContactForm(FlaskForm):
-    name = StringField('Full Name', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    phone = StringField('Phone', validators=[DataRequired()])
+    name = StringField('Full Name', validators=[DataRequired(message="Please enter your full name"),Length(min=2, max=100, message="Name must be between 2 and 100 characters")])
+    email = StringField('Email', validators=[DataRequired(message="Please enter your email address"), Email(message="Please enter a valid email address")])
+    phone = StringField('Phone', validators=[DataRequired(message="Please enter your phone number"),Regexp(r'^\+?[\d\s\(\)-]{10,20}$', message="Please enter a valid phone number")])
     submit = SubmitField('Next')
 
 class SummaryForm(FlaskForm):

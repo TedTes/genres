@@ -2250,6 +2250,23 @@ ul, ol {
     border-left: 4px solid var(--danger);
 }
 
+/* error states  */
+.error-field {
+    border-color: var(--danger) !important;
+    background-color: rgba(239, 68, 68, 0.05);
+}
+
+.field-error {
+    color: var(--danger);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 /* Mobile Filters Toggle */
 .mobile-filters-toggle {
     display: none;
