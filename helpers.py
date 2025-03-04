@@ -285,3 +285,61 @@ def calculate_skill_match(user_skills, job_skills):
     skill_matches = skill_matches[:10]
     
     return overall_match, skill_matches
+
+
+
+def find_similar_jobs(current_slug, job_skills, limit=3):
+    """
+    Find similar jobs based on skills overlap
+    """
+    from models import Job
+    
+    try:
+        # Get all jobs except the current one
+        all_jobs = Job.query.filter(Job.slug != current_slug).all()
+        job_scores = []
+        
+        for job in all_jobs:
+            # Extract skills from this job
+            other_job_skills = extract_skills_from_text(job.description)
+            
+            # Calculate similarity score based on skills overlap
+            similarity_score = 0
+            
+            for skill, importance in job_skills.items():
+                if skill in other_job_skills:
+                    # Add to similarity score, weighted by both jobs' importance for this skill
+                    other_importance = other_job_skills.get(skill, 0)
+                    similarity_score += (importance + other_importance) / 2
+            
+            # Add location score if locations match
+            current_job = Job.query.filter_by(slug=current_slug).first()
+            if current_job and job.location == current_job.location:
+                similarity_score += 20
+            
+            # Add to scores list
+            job_scores.append((similarity_score, job))
+        
+        # Sort by score (highest first) and take top X
+        job_scores.sort(reverse=True, key=lambda x: x[0])
+        similar_jobs = [job for _, job in job_scores[:limit]]
+        
+        # Process similar jobs for display (add any needed attributes)
+        for job in similar_jobs:
+            # Add tags for display
+            job.tags = list(extract_skills_from_text(job.description).keys())[:5]
+            
+            # Format dates
+            days_ago = (datetime.now() - job.posted_at).days if job.posted_at else 0
+            if days_ago == 0:
+                job.created_at = "Today"
+            elif days_ago == 1:
+                job.created_at = "Yesterday"
+            else:
+                job.created_at = f"{days_ago} days ago"
+        
+        return similar_jobs
+    
+    except Exception as e:
+        print(f"Error finding similar jobs: {e}")
+        return []

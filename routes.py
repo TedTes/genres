@@ -1,5 +1,5 @@
 from flask import make_response,render_template, request, redirect, url_for, flash, session, abort, send_file
-from helpers import fetch_jobs,extract_job_tags,calculate_resume_completeness,extract_skills_from_text
+from helpers import fetch_jobs,extract_job_tags,calculate_resume_completeness,extract_skills_from_text,find_similar_jobs
 from flask import render_template, request, redirect, url_for, flash, session, abort, send_file
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
