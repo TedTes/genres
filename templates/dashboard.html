@@ -128,7 +128,7 @@
                                 <a href="{{ url_for('generate_pdf', resume_id=resume.id) }}" class="resume-action" title="Download PDF">
                                     <i class="fas fa-download"></i>
                                 </a>
-                                <a href="{{ url_for('view_resume', resume_id=resume.id) }}" class="resume-action" title="Edit">
+                                <a href="{{ url_for('resume_preview', resume_id=resume.id) }}" class="resume-action" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <a href="#" class="resume-action delete" title="Delete">
@@ -358,24 +358,27 @@
             
             if (confirmDelete) {
                 confirmDelete.addEventListener('click', function() {
-                    const xsrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
                     if (resumeToDelete) {
                         fetch(`/resume/${resumeToDelete}/delete`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': xsrfToken
+                    'X-CSRFToken': csrfToken
                 }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     // Remove the resume card from the DOM
-                    document.querySelector(`.resume-card[data-id="${resumeToDelete}"]`).remove();
-                    // Show success message
-                    // TODO: add flash message functionality here
+                    const resumeCard = document.querySelector(`.resume-card[data-id="${resumeToDelete}"]`);
+                    if (resumeCard) {
+                            resumeCard.remove();
+                        }
+                    showNotification('Resume deleted successfully', 'success');
                 } else {
-                    alert('Error deleting resume: ' + data.error);
+                    showNotification('Error: ' + (data.error || 'Could not delete resume'), 'error');
+                    
                 }
                 // Close the modal
                 deleteModal.classList.remove('active');
@@ -383,7 +386,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error deleting resume');
+                showNotification('Error deleting resume. Please try again.', 'error');
                 deleteModal.classList.remove('active');
                 document.body.classList.remove('modal-open');
             });
@@ -451,5 +454,38 @@
             });
         }
     });
+    function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <div class="notification-message">${message}</div>
+            <button class="notification-close">&times;</button>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Show notification
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+    
+    // Close button functionality
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    });
+}
 </script>
 {% endblock %}

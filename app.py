@@ -11,7 +11,7 @@ from datetime import datetime
 from supabase import create_client, Client
 from db import db
 from models import  User
-from flask_wtf.csrf import CSRFProtect
+from flask_wtf.csrf import CSRFProtect, CSRFError
 app = Flask(__name__)
 csrf = CSRFProtect(app)
 load_dotenv(dotenv_path='python-dotenv.env')
@@ -44,6 +44,12 @@ init_routes(app)
 with app.app_context():
     db.create_all()
 
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    if request.is_json:
+        return jsonify({"success": False, "error": "CSRF token missing or invalid"}), 400
+    else:
+        return render_template('error.html', error=e.description), 400
 
 if __name__ == '__main__':
     app.run(debug=True)

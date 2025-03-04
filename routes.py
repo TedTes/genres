@@ -606,9 +606,10 @@ def init_routes(flask_app):
         try:
             db.session.delete(resume)
             db.session.commit()
-            return jsonify({"success": True})
+            return jsonify({"success": True,"message": "Resume deleted successfully"})
         except Exception as e:
             db.session.rollback()
+            print(f"Error deleting resume: {str(e)}")
             return jsonify({"success": False, "error": str(e)}), 500
     @app.route('/dashboard')
     @login_required
