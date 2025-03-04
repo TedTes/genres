@@ -1,5 +1,5 @@
 from flask import make_response,render_template, request, redirect, url_for, flash, session, abort, send_file
-from helpers import fetch_jobs,extract_job_tags,calculate_resume_completeness
+from helpers import fetch_jobs,extract_job_tags,calculate_resume_completeness,extract_skills_from_text
 from flask import render_template, request, redirect, url_for, flash, session, abort, send_file
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -161,7 +161,7 @@ def init_routes(flask_app):
                     db.session.commit()
                 else:
                     # Convert the SQLAlchemy model to a dictionary for template rendering
-                    job_data = {
+                    job = {
                         'id': job.id,
                         'slug': job.slug,
                         'title': job.title,
@@ -175,115 +175,37 @@ def init_routes(flask_app):
                         'tags': extract_job_tags(job.title, job.description),
                         'apply_url': f"https://www.arbeitnow.com/view/{job.slug}" if job.slug else None
                     }
-                
+                job_skills = extract_skills_from_text(job.description)
                 # For authenticated users, calculate skills match
                 skills_match = []
                 match_percentage = 0
                 
                 if current_user.is_authenticated:
-                    # This would be where TODOoo implement  actual skills matching algorithm
+                    # Get user skills
+                    user_resume = Resume.query.filter_by(user_id=current_user.id).first()
                     
+                    user_skills = []
                     
-                    # Example mock skills data - TODOoo:  extract these from the user's profile
-                    user_skills = [
-                        {"name": "Python", "level": 85},
-                        {"name": "JavaScript", "level": 70},
-                        {"name": "SQL", "level": 75},
-                        {"name": "React", "level": 65},
-                        {"name": "Flask", "level": 80}
-                    ]
-                    
-                    # Extract skills from job description
-                    job_skills = extract_job_tags(job_data.get('title', ''), job_data.get('description', ''))
-                    
-                    # Calculate match for each user skill (simplified algorithm)
-                    for skill in user_skills:
-                        skill_name = skill["name"]
-                        # Check if the skill is mentioned in the job skills
-                        if any(skill_name.lower() in job_skill.lower() for job_skill in job_skills):
-                            # High match if directly mentioned
-                            match = skill["level"]
-                        elif any(skill_name.lower() in job_data.get('description', '').lower() for job_skill in job_skills):
-                            # Medium match if mentioned in description
-                            match = int(skill["level"] * 0.7)
-                        else:
-                            # Low match for general skills
-                            match = int(skill["level"] * 0.3)
-                        
-                        skills_match.append({
-                            "name": skill_name,
-                            "match": match
-                        })
-                    
-                    # Calculate overall match percentage (average of all skills)
-                    if skills_match:
-                        match_percentage = int(sum(skill["match"] for skill in skills_match) / len(skills_match))
+                    if user_resume and user_resume.resume_data and 'skills' in user_resume.resume_data:
+                       user_skills_data = user_resume.resume_data['skills']
+
+                       # Handle different formats of skills data
+                       if isinstance(user_skills_data, str):
+                         user_skills = [skill.strip() for skill in user_skills_data.split(',')]
+                       elif isinstance(user_skills_data, list):
+                         user_skills = user_skills_data
+
+                    match_percentage, skills_match = calculate_skill_match(user_skills, job_skills)
+                  
+                # Add job skills to the session for use in resume creation
+                session['job_skills'] = list(job_skills.keys())
+                # Find similar jobs using skills overlap
+                similar_jobs = find_similar_jobs(slug, job_skills, limit=3)
                 
-                # Find similar jobs
-                similar_jobs = []
-                
-                if job_data.get('tags'):
-                    # Get all jobs (TODO: use a more efficient query in a real app)
-                    all_jobs = fetch_jobs()
-                    
-                    # Score each job based on tag similarity
-                    job_scores = []
-                    for other_job in all_jobs:
-                        # Skip the current job
-                        if other_job.get('slug') == slug:
-                            continue
-                        
-                        # Extract tags for the other job
-                        other_tags = extract_job_tags(other_job.get('title', ''), other_job.get('description', ''))
-                        
-                        # Calculate score based on tag overlap
-                        common_tags = set(job_data.get('tags')).intersection(set(other_tags))
-                        score = len(common_tags)
-                        
-                        # Add location score if locations match
-                        if job_data.get('location') == other_job.get('location'):
-                            score += 1
-                        
-                        # Add remote score if both are remote
-                        if job_data.get('remote') and other_job.get('remote'):
-                            score += 1
-                        
-                        # Store the job with its score
-                        if score > 0:
-                            job_scores.append((score, other_job))
-                    
-                    # Sort by score (highest first) and take top 3
-                    job_scores.sort(reverse=True, key=lambda x: x[0])
-                    similar_jobs = [job for _, job in job_scores[:3]]
-                    
-                    # Process similar jobs to add tags and format dates
-                    for job in similar_jobs:
-                        job['tags'] = extract_job_tags(job.get('title', ''), job.get('description', ''))
-                        
-                        # Format date
-                        created_at = job.get('created_at')
-                        if created_at:
-                            try:
-                                if created_at and isinstance(created_at,str):
-                                   date_obj = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
-                                else:
-                                    date_obj = datetime.now()
-                                days_ago = (datetime.now(date_obj.tzinfo) - date_obj).days
-                                
-                                if days_ago == 0:
-                                    job['created_at'] = "Today"
-                                elif days_ago == 1:
-                                    job['created_at'] = "Yesterday"
-                                else:
-                                    job['created_at'] = f"{days_ago} days ago"
-                            except:
-                                job['created_at'] = "Recently"
-                        else:
-                            job['created_at'] = "Recently"
                 
                 return render_template(
                     'job_detail.html',
-                    job=job_data,
+                    job=job,
                     skills_match=skills_match,
                     match_percentage=match_percentage,
                     similar_jobs=similar_jobs
