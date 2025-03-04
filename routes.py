@@ -491,9 +491,18 @@ def init_routes(flask_app):
                db.session.rollback()
                print(f"Error saving skills: {str(e)}")
                flash(f"Error saving skills: {str(e)}", 'danger')
+            # Get suggested skills
+        suggested_skills = []
+        if resume.job:
+            # Extract skills from job description
+            job_skills = extract_skills_from_text(resume.job.description)
+            # Sort by importance and take top skills
+            suggested_skills = sorted(job_skills.items(), key=lambda x: x[1], reverse=True)
+            suggested_skills = [skill for skill, _ in suggested_skills[:15]]
+        # Pre-populate form
         if resume.resume_data and 'skills' in resume.resume_data:
             form.skills.data = resume.resume_data['skills']
-        return render_template('resume_skills.html', form=form, resume=resume, suggested_skills=session.get('skills', []))
+        return render_template('resume_skills.html', form=form, resume=resume, suggested_skills=suggested_skills)
 
     @app.route('/resume/<int:resume_id>/preview')
     @login_required
