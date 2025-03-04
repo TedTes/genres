@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Choose Template - ResumeMatch{% endblock %}
+
+{% block content %}
+<nav class="main-nav dashboard-nav">
+    <div class="container nav-container">
+        <div class="logo">
+            <a href="{{ url_for('home') }}">ResumeMatch</a>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('jobs') }}">Browse Jobs</a>
+        </div>
+        <div class="user-menu">
+            <div class="user-info" id="user-dropdown-toggle">
+                <div class="user-avatar">
+                    <span>{{ current_user.username[0].upper() }}</span>
+                </div>
+                <span class="user-name">{{ current_user.username }}</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="user-dropdown" id="user-dropdown">
+                <a href="{{ url_for('dashboard') }}" class="dropdown-item">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="{{ url_for('logout') }}" class="dropdown-item">
+                    <i class="fas fa-sign-out-alt"></i> Log Out
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="resume-builder">
+    <div class="container">
+        <div class="resume-builder-header">
+            <h1>Choose Your Resume Template</h1>
+            <p>Select a design that best represents your professional brand</p>
+        </div>
+        
+        <!-- Progress bar (TODO: optional ) -->
+        
+        <div class="templates-grid">
+            {% for template_id, template in templates.items() %}
+            <div class="template-card">
+                <div class="template-preview">
+                    <img src="{{ url_for('static', filename=template.preview_image) }}" alt="{{ template.name }} Template">
+                    <div class="template-overlay">
+                        <a href="{{ url_for('set_resume_template', resume_id=resume.id, template_id=template_id) }}" class="btn btn-white btn-sm">
+                            Use this template
+                        </a>
+                    </div>
+                </div>
+                <div class="template-info">
+                    <h3>{{ template.name }}</h3>
+                    <p>{{ template.description }}</p>
+                </div>
+                {% if resume.template == template_id %}
+                <div class="template-selected">
+                    <span><i class="fas fa-check-circle"></i> Currently Selected</span>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="template-actions">
+            <a href="{{ url_for('resume_preview', resume_id=resume.id) }}" class="btn btn-primary">
+                Continue with Selected Template
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
