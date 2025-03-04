@@ -219,3 +219,69 @@ def extract_skills_from_text(text):
         skill_scores[skill] = normalized_score
     
     return skill_scores
+
+
+
+
+def calculate_skill_match(user_skills, job_skills):
+    """
+    Calculate the match percentage between user skills and job skills.
+    
+    Parameters:
+    - user_skills: List of strings representing user's skills
+    - job_skills: Dictionary of job skills with importance scores
+    
+    Returns:
+    - match_percentage: Overall match percentage (0-100)
+    - skill_matches: List of dictionaries with skill match details
+    """
+    if not user_skills or not job_skills:
+        return 0, []
+    
+    # Normalize user skills (convert to lowercase for matching)
+    user_skills_normalized = [skill.lower() for skill in user_skills]
+    
+    # Initialize match metrics
+    total_job_importance = sum(job_skills.values())
+    total_match_score = 0
+    skill_matches = []
+    
+    # Calculate match for each job skill
+    for job_skill, importance in job_skills.items():
+        skill_match = 0
+        
+        # Exact match
+        if job_skill.lower() in user_skills_normalized:
+            skill_match = 100
+        else:
+            # Check for partial matches (e.g., "Python" would partially match "Python Programming")
+            for user_skill in user_skills_normalized:
+                if job_skill.lower() in user_skill or user_skill in job_skill.lower():
+                    # Partial match - score based on similarity
+                    skill_match = 70
+                    break
+        
+        # Add to skill matches list
+        if skill_match > 0:
+            skill_matches.append({
+                "name": job_skill,
+                "match": skill_match,
+                "importance": importance
+            })
+            
+            # Add to total match score, weighted by importance
+            total_match_score += (skill_match / 100) * importance
+    
+    # Calculate overall match percentage
+    if total_job_importance > 0:
+        overall_match = int((total_match_score / total_job_importance) * 100)
+    else:
+        overall_match = 0
+    
+    # Sort skills by importance
+    skill_matches.sort(key=lambda x: x["importance"], reverse=True)
+    
+    # Limit to top skills
+    skill_matches = skill_matches[:10]
+    
+    return overall_match, skill_matches
