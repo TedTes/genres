@@ -855,3 +855,43 @@ def init_routes(flask_app):
             print(f"Error creating general resume: {e}")
             flash(f"Error creating resume: {str(e)}", 'danger')
             return redirect(url_for('dashboard'))
+
+    @app.route('/resume/<int:resume_id>/template')
+    @login_required
+    def select_resume_template(resume_id):
+        resume = Resume.query.get_or_404(resume_id)
+        if resume.user_id != current_user.id:
+            abort(403)
+        
+        from resume_templates import RESUME_TEMPLATES
+        
+        return render_template('resume_template_select.html', 
+                            resume=resume, 
+                            templates=RESUME_TEMPLATES)
+
+
+    @app.route('/resume/<int:resume_id>/template/<template_id>')
+    @login_required
+    def set_resume_template(resume_id, template_id):
+        resume = Resume.query.get_or_404(resume_id)
+        if resume.user_id != current_user.id:
+            abort(403)
+        
+       
+        from resume_templates import RESUME_TEMPLATES
+        
+        # Check if the template_id is valid
+        if template_id in RESUME_TEMPLATES:
+            # Update the resume with the selected template
+            resume.template = template_id
+            
+            try:
+                db.session.commit()
+                flash('Resume template updated successfully!', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash(f'Error updating template: {str(e)}', 'danger')
+        else:
+            flash('Invalid template selection.', 'danger')
+        
+        return redirect(url_for('select_resume_template', resume_id=resume.id))
