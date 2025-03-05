@@ -510,7 +510,8 @@ def init_routes(flask_app):
         resume = Resume.query.get_or_404(resume_id)
         if resume.user_id != current_user.id:
             abort(403)
-        return render_template('resume_template.html', resume=resume, job=resume.job)
+        from resume_templates import RESUME_TEMPLATES
+        return render_template('resume_template.html', resume=resume, job=resume.job,templates=RESUME_TEMPLATES)
 
     @app.route('/resume/<int:resume_id>/download')
     @login_required
@@ -641,6 +642,10 @@ def init_routes(flask_app):
         filename = filename.replace(' ', '_')
 
         try:
+                from resume_templates import RESUME_TEMPLATES
+                # Get template info
+                template_info = RESUME_TEMPLATES.get(resume.template, RESUME_TEMPLATES['standard'])
+                template_class = template_info['css_class']
                 # Create a file-like buffer to receive PDF data
                 buffer = BytesIO()
                 
@@ -656,28 +661,128 @@ def init_routes(flask_app):
                 
                 # Define styles
                 styles = getSampleStyleSheet()
-                resume_title_style = ParagraphStyle(
+                 # Create template-specific styles
+                if template_class == 'template-modern':
+                    # Modern template styles
+                    resume_title_style = ParagraphStyle(
                         name='ResumeTitle',
                         parent=styles['Heading1'],
-                        alignment=1,  # Center alignment
-                        fontSize=18,
+                        alignment=0,  # Left alignment
+                        fontSize=20,
+                        spaceAfter=12,
+                        textColor=colors.blue
+                    )
+                    
+                    section_heading_style = ParagraphStyle(
+                        name='ResumeSectionHeading',
+                        parent=styles['Heading2'],
+                        fontSize=14,
+                        textColor=colors.blue,
+                        spaceAfter=8,
+                        bulletIndent=10
+                    )
+                    
+                    contact_info_style = ParagraphStyle(
+                        name='ResumeContactInfo',
+                        parent=styles['Normal'],
+                        alignment=0,  # Left alignment
+                        fontSize=10,
                         spaceAfter=12
-                )
-                section_heading_style = ParagraphStyle(
-                    name='ResumeSectionHeading',
-                    parent=styles['Heading2'],
-                    fontSize=14,
-                    textColor=colors.blue,
-                    spaceAfter=6
-                )
-                contact_info_style = ParagraphStyle(
-                    name='ResumeContactInfo',
+                    )
+                elif template_class == 'template-minimal':
+                        # Minimal template styles
+                        resume_title_style = ParagraphStyle(
+                            name='ResumeTitle',
+                            parent=styles['Heading1'],
+                            alignment=0,  # Left alignment
+                            fontSize=22,
+                            fontName='Helvetica',
+                            spaceAfter=8
+                        )
+                        
+                        section_heading_style = ParagraphStyle(
+                            name='ResumeSectionHeading',
+                            parent=styles['Heading2'],
+                            fontSize=12,
+                            fontName='Helvetica-Bold',
+                            textTransform='uppercase',
+                            spaceAfter=6,
+                            textColor=colors.black
+                        )
+                        
+                        contact_info_style = ParagraphStyle(
+                            name='ResumeContactInfo',
+                            parent=styles['Normal'],
+                            alignment=0,  # Left alignment
+                            fontSize=9,
+                            fontName='Helvetica',
+                            textColor=colors.gray
+                        )
+                elif template_class == 'template-executive':
+                        # Executive template styles
+                        resume_title_style = ParagraphStyle(
+                            name='ResumeTitle',
+                            parent=styles['Heading1'],
+                            alignment=1,  # Center alignment
+                            fontSize=20,
+                            spaceAfter=12,
+                            fontName='Times-Bold'
+                        )
+                        
+                        section_heading_style = ParagraphStyle(
+                            name='ResumeSectionHeading',
+                            parent=styles['Heading2'],
+                            fontSize=14,
+                            fontName='Times-Bold',
+                            textTransform='uppercase',
+                            borderWidth=1,
+                            borderColor=colors.black,
+                            borderPadding=(0, 0, 1, 0),  # bottom border only
+                            spaceAfter=8
+                        )
+                        
+                        contact_info_style = ParagraphStyle(
+                            name='ResumeContactInfo',
+                            parent=styles['Normal'],
+                            alignment=1,  # Center alignment
+                            fontSize=10,
+                            fontName='Times-Roman',
+                            spaceAfter=14
+                        )
+            
+                else:
+                        # Standard template (default)
+                        resume_title_style = ParagraphStyle(
+                            name='ResumeTitle',
+                            parent=styles['Heading1'],
+                            alignment=1,  # Center alignment
+                            fontSize=18,
+                            spaceAfter=12
+                        )
+                        
+                        section_heading_style = ParagraphStyle(
+                            name='ResumeSectionHeading',
+                            parent=styles['Heading2'],
+                            fontSize=14,
+                            textColor=colors.blue,
+                            spaceAfter=6
+                        )
+                        
+                        contact_info_style = ParagraphStyle(
+                            name='ResumeContactInfo',
+                            parent=styles['Normal'],
+                            alignment=1,  # Center alignment
+                            fontSize=10,
+                            spaceAfter=12
+                        )
+           
+                 # Create normal text style based on template
+                normal_text_style = ParagraphStyle(
+                    name='NormalText',
                     parent=styles['Normal'],
-                    alignment=1,  # Center alignment
-                    fontSize=10,
-                    spaceAfter=12
+                    fontName='Helvetica' if template_class == 'template-minimal' else 'Times-Roman' if template_class == 'template-executive' else 'Helvetica',
+                    fontSize=10
                 )
-                
                 # Build the document content
                 elements = []
                 
