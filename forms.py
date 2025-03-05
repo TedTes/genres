@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Email, EqualTo, Length,Regexp
 
 class RegistrationForm(FlaskForm):
@@ -47,3 +47,15 @@ class EducationForm(FlaskForm):
 class SkillsForm(FlaskForm):
     skills = TextAreaField('Skills (comma-separated)', validators=[DataRequired()])
     submit = SubmitField('Next')
+
+
+class ApplicationForm(FlaskForm):
+    status = SelectField('Application Status', choices=[
+        ('applied', 'Applied'),
+        ('interviewing', 'Interviewing'),
+        ('offered', 'Received Offer'),
+        ('rejected', 'Rejected'),
+        ('accepted', 'Accepted Offer')
+    ])
+    notes = TextAreaField('Notes')
+    submit = SubmitField('Save')

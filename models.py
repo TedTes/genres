@@ -35,3 +35,21 @@ class Resume(db.Model):
     
     # Make the job relationship optional
     job = db.relationship('Job', back_populates='resumes', lazy=True, foreign_keys=[job_id])
+
+class Application(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    job_id = db.Column(db.Integer, db.ForeignKey('job.id'), nullable=False)
+    resume_id = db.Column(db.Integer, db.ForeignKey('resume.id'), nullable=True)
+    status = db.Column(db.String(50), default='applied')  # applied, interviewing, offered, rejected, accepted
+    applied_date = db.Column(db.DateTime, default=datetime.utcnow)
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    notes = db.Column(db.Text, nullable=True)
+    
+    # Relationships
+    user = db.relationship('User', backref=db.backref('applications', lazy=True))
+    job = db.relationship('Job', backref=db.backref('applications', lazy=True))
+    resume = db.relationship('Resume', backref=db.backref('applications', lazy=True))
+    
+    def __repr__(self):
+        return f'<Application {self.id} - {self.job.title if self.job else "Unknown Job"}>'
