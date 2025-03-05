@@ -39,6 +39,25 @@
         <div class="preview-header">
             <h1>Resume Preview</h1>
             <div class="preview-actions">
+                <div class="template-switcher">
+                    <button id="switch-template-btn" class="btn btn-outline">
+                        <i class="fas fa-palette"></i> Change Template
+                    </button>
+                    
+                    <div id="template-dropdown" class="template-dropdown">
+                        <h4>Choose a Template</h4>
+                        {% for template_id, template in templates.items() %}
+                        <a href="{{ url_for('set_resume_template', resume_id=resume.id, template_id=template_id) }}" class="template-option {% if resume.template == template_id %}active{% endif %}">
+                            <span class="template-name">{{ template.name }}</span>
+                            <span class="template-check">
+                                {% if resume.template == template_id %}
+                                <i class="fas fa-check"></i>
+                                {% endif %}
+                            </span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
                 <a href="{{ url_for('dashboard') }}" class="btn btn-outline">
                     <i class="fas fa-arrow-left"></i> Back to Dashboard
                 </a>
@@ -49,7 +68,7 @@
         </div>
         
         <div class="resume-preview-container">
-            <div class="resume-paper">
+            <div class="resume-paper {{ templates[resume.template]['css_class'] if resume.template in templates else 'template-standard' }}">
                 {% if resume.resume_data %}
                     <!-- Contact Information -->
                     <div class="resume-header">
@@ -173,6 +192,20 @@
         const userDropdownToggle = document.getElementById('user-dropdown-toggle');
         const userDropdown = document.getElementById('user-dropdown');
         
+        const templateBtn = document.getElementById('switch-template-btn');
+        const templateDropdown = document.getElementById('template-dropdown');
+    
+        if (templateBtn && templateDropdown) {
+          templateBtn.addEventListener('click', function() {
+            templateDropdown.classList.toggle('active');
+        });
+        
+        document.addEventListener('click', function(event) {
+            if (!templateBtn.contains(event.target) && !templateDropdown.contains(event.target)) {
+                templateDropdown.classList.remove('active');
+            }
+        });
+    }
         if (userDropdownToggle && userDropdown) {
             userDropdownToggle.addEventListener('click', function() {
                 userDropdown.classList.toggle('active');
