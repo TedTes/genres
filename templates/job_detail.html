@@ -92,6 +92,12 @@
                     {% endif %}
                 </a>
                 
+                {% if current_user.is_authenticated %}
+                  <a href="{{ url_for('apply_to_job', slug=job.slug) }}" class="btn btn-success">
+                     Track Application
+                  </a>
+                {% endif %}
+
                 <button class="btn btn-outline btn-save-job" title="Save Job">
                     <i class="far fa-bookmark"></i> Save
                 </button>
