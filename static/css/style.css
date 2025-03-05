@@ -3850,3 +3850,284 @@ body.modal-open {
 .save-icon {
     font-size: 1.25rem;
 }
+
+/* Template Switcher */
+.template-switcher {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.template-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    padding: 1rem;
+    min-width: 200px;
+    z-index: 100;
+    display: none;
+}
+
+.template-dropdown.active {
+    display: block;
+}
+
+.template-dropdown h4 {
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--text-light);
+}
+
+.template-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    margin-bottom: 0.25rem;
+    color: var(--text);
+    text-decoration: none;
+}
+
+.template-option:hover {
+    background-color: var(--light-gray);
+}
+
+.template-option.active {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.template-check {
+    color: var(--primary);
+}
+
+/* Template Grid Styles */
+.templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.template-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: var(--transition);
+    position: relative;
+}
+
+.template-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+}
+
+.template-preview {
+    height: 320px;
+    position: relative;
+    overflow: hidden;
+}
+
+.template-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.template-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.template-card:hover .template-overlay {
+    opacity: 1;
+}
+
+.template-info {
+    padding: 1rem;
+}
+
+.template-info h3 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.template-info p {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin-bottom: 0;
+}
+
+.template-selected {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background-color: var(--primary);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.template-actions {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+/* Resume Templates Styles */
+.resume-paper {
+    position: relative;
+}
+
+/* Standard Template */
+.template-standard .resume-header {
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.template-standard .resume-section h3 {
+    color: var(--primary);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.25rem;
+}
+
+/* Modern Template */
+.template-modern .resume-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.template-modern .resume-header h2 {
+    font-size: 2rem;
+    color: var(--primary);
+}
+
+.template-modern .resume-section h3 {
+    color: var(--primary);
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    position: relative;
+    padding-left: 1rem;
+}
+
+.template-modern .resume-section h3:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.25rem;
+    height: 1rem;
+    width: 4px;
+    background-color: var(--primary);
+}
+
+.template-modern .skill-tag {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+/* Minimal Template */
+.template-minimal {
+    font-family: 'Helvetica', Arial, sans-serif;
+}
+
+.template-minimal .resume-header {
+    text-align: left;
+    margin-bottom: 2rem;
+}
+
+.template-minimal .resume-header h2 {
+    font-size: 2.25rem;
+    font-weight: 300;
+    margin-bottom: 0.5rem;
+}
+
+.template-minimal .contact-info {
+    font-size: 0.875rem;
+    color: var(--text-light);
+}
+
+.template-minimal .resume-section {
+    margin-bottom: 2rem;
+}
+
+.template-minimal .resume-section h3 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.template-minimal .experience-item,
+.template-minimal .education-item {
+    margin-bottom: 1.25rem;
+}
+
+.template-minimal .skill-tag {
+    background: none;
+    border: 1px solid var(--border);
+}
+
+/* Executive Template */
+.template-executive .resume-header {
+    text-align: center;
+    border-bottom: 3px double var(--border);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.template-executive .resume-header h2 {
+    font-size: 2.25rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+}
+
+.template-executive .resume-section h3 {
+    font-size: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--dark);
+    border-bottom: 2px solid var(--dark);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.template-executive .experience-header h4,
+.template-executive .education-header h4 {
+    font-weight: 700;
+}
+
+.template-executive .experience-dates,
+.template-executive .education-dates {
+    font-style: normal;
+}
+
+.template-executive .skills-list {
+    column-count: 2;
+    column-gap: 2rem;
+}
