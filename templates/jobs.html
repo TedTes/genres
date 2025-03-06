@@ -60,59 +60,59 @@
     </div>
 </section>
 
-<section class="jobs-content">
+<section class="job-search-content">
     <div class="container">
-        <div class="jobs-layout">
+        <div class="job-search-layout">
             <!-- Filters Sidebar -->
-            <div class="jobs-filters">
-                <div class="filter-header">
+            <div class="job-search-filters">
+                <div class="job-search-filter-header">
                     <h3>Filters</h3>
-                    <button class="btn-clear-filters">Clear All</button>
+                    <button class="job-search-clear-btn">Clear All</button>
                 </div>
                 
-                <form method="POST" id="filter-form" class="filter-form">
+                <form method="POST" id="job-search-filter-form" class="job-search-filter-form">
                     {{ form.hidden_tag() }}
                     
-                    <div class="filter-group">
-                        <h4 class="filter-title">Keywords</h4>
-                        <div class="filter-content">
-                            {{ form.search(class="filter-input", placeholder="Job title, skills, or keywords") }}
+                    <div class="job-search-filter-group">
+                        <h4 class="job-search-filter-title">Keywords</h4>
+                        <div class="job-search-filter-input-wrapper">
+                            {{ form.search(class="job-search-filter-input", placeholder="Job title, skills, or keywords") }}
                         </div>
                     </div>
                     
-                    <div class="filter-group">
-                        <h4 class="filter-title">Location</h4>
-                        <div class="filter-content">
-                            {{ form.location(class="filter-input", placeholder="City, state, or country") }}
+                    <div class="job-search-filter-group">
+                        <h4 class="job-search-filter-title">Location</h4>
+                        <div class="job-search-filter-input-wrapper">
+                            {{ form.location(class="job-search-filter-input", placeholder="City, state, or country") }}
                         </div>
                     </div>
                     
-                    <div class="filter-group">
-                        <h4 class="filter-title">Job Type</h4>
-                        <div class="filter-content filter-checkboxes">
-                            <label class="filter-checkbox">
+                    <div class="job-search-filter-group">
+                        <h4 class="job-search-filter-title">Job Type</h4>
+                        <div class="job-search-filter-options">
+                            <label class="job-search-filter-checkbox">
                                 {{ form.remote() }}
-                                <span class="checkmark"></span>
+                                <span class="job-search-checkmark"></span>
                                 Remote Only
                             </label>
                         </div>
                     </div>
                     
-                    <div class="filter-actions">
+                    <div class="job-search-filter-actions">
                         {{ form.submit(class="btn btn-primary btn-full") }}
                     </div>
                 </form>
             </div>
             
             <!-- Jobs Listing -->
-            <div class="jobs-listing">
-                <div class="jobs-header-actions">
-                    <div class="jobs-count">
+            <div class="job-search-results">
+                <div class="job-search-header">
+                    <div class="job-search-count">
                         <span>{{ jobs|length }} jobs found</span>
                     </div>
-                    <div class="jobs-sort">
-                        <label for="sort-jobs">Sort by:</label>
-                        <select id="sort-jobs" class="sort-select">
+                    <div class="job-search-sort">
+                        <label for="job-search-sort-select">Sort by:</label>
+                        <select id="job-search-sort-select" class="job-search-sort-select">
                             <option value="recent">Most Recent</option>
                             <option value="relevant">Most Relevant</option>
                         </select>
@@ -120,39 +120,39 @@
                 </div>
                 
                 {% if jobs %}
-                    <div class="jobs-list">
+                    <div class="job-search-listing">
                         {% for job in jobs %}
-                            <div class="job-item">
-                                <div class="job-company-logo">
+                            <div class="job-search-item">
+                                <div class="job-search-company-logo">
                                     {{ job.company_name[0]|upper if job.company_name else 'C' }}
                                 </div>
-                                <div class="job-details">
-                                    <h3 class="job-title">
+                                <div class="job-search-details">
+                                    <h3 class="job-search-title">
                                         <a href="{{ url_for('job_detail', slug=job.slug) }}">{{ job.title }}</a>
                                     </h3>
-                                    <div class="job-company">{{ job.company_name }}</div>
-                                    <div class="job-meta">
-                                        <span class="job-location">
+                                    <div class="job-search-company">{{ job.company_name }}</div>
+                                    <div class="job-search-meta">
+                                        <span class="job-search-location">
                                             <i class="fas fa-map-marker-alt"></i> {{ job.location }}
                                         </span>
                                         {% if job.remote %}
-                                            <span class="job-tag">Remote</span>
+                                            <span class="job-search-tag job-search-remote">Remote</span>
                                         {% endif %}
-                                        <span class="job-date">
+                                        <span class="job-search-date">
                                             <i class="far fa-calendar-alt"></i> 
                                             {{ job.created_at|default('Recently posted') }}
                                         </span>
                                     </div>
-                                    <div class="job-tags">
+                                    <div class="job-search-tags">
                                         {% for tag in job.tags|default([]) %}
-                                            <span class="job-tag">{{ tag }}</span>
+                                            <span class="job-search-tag">{{ tag }}</span>
                                         {% endfor %}
                                     </div>
                                 </div>
-                                <div class="job-actions">
+                                <div class="job-search-actions">
                                     <a href="{{ url_for('job_detail', slug=job.slug) }}" class="btn btn-outline btn-sm">View Job</a>
                                     {% if current_user.is_authenticated %}
-                                        <button class="btn-save-job" data-job-id="{{ job.id }}" title="Save Job">
+                                        <button class="job-search-save-btn" data-job-id="{{ job.id }}" title="Save Job">
                                             <i class="far fa-bookmark"></i>
                                         </button>
                                     {% endif %}
@@ -161,8 +161,8 @@
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div class="jobs-empty">
-                        <div class="empty-icon">
+                    <div class="job-search-empty">
+                        <div class="job-search-empty-icon">
                             <i class="fas fa-search"></i>
                         </div>
                         <h3>No jobs found</h3>

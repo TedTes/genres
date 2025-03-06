@@ -202,24 +202,28 @@
             <div class="job-matches">
                 {% if job_matches_list %}
                     {% for job in job_matches_list %}
-                    <div class="job-card">
-                        <div class="job-company-logo">
-                            {{ job.company_name[0]|upper if job.company_name else 'C' }}
-                        </div>
-                        <div class="job-details">
-                            <h3 class="job-title">{{ job.title }}</h3>
-                            <div class="job-company">{{ job.company_name }}</div>
-                            <div class="job-location">
-                                <i class="fas fa-map-marker-alt"></i> {{ job.location }}
-                                {% if job.remote %}
-                                <span class="remote-badge">Remote</span>
-                                {% endif %}
+                    <div class="job-card" data-match="{% if job.match >= 90 %}high{% elif job.match >= 70 %}medium{% else %}standard{% endif %}">
+                        <div class="job-card-header">
+                            <div class="job-company-logo">
+                                {{ job.company_name[0]|upper if job.company_name else 'C' }}
+                            </div>
+                            <div class="job-details">
+                                <h3 class="job-title">{{ job.title }}</h3>
+                                <div class="job-company">{{ job.company_name }}</div>
+                                <div class="job-location">
+                                    <i class="fas fa-map-marker-alt"></i> {{ job.location }}
+                                    {% if job.remote %}
+                                    <span class="remote-badge">Remote</span>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
+                        
                         <div class="job-match">
                             <div class="match-percentage">{{ job.match }}%</div>
                             <div class="match-label">Match</div>
                         </div>
+                        
                         <div class="job-actions">
                             <a href="{{ url_for('job_detail', slug=job.slug) }}" class="btn btn-sm btn-outline">View Job</a>
                         </div>
