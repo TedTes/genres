@@ -140,44 +140,43 @@
                             </div>
                         </div>
                         <div class="resume-details">
-                            <h3 class="resume-title">   {% if resume.job %}
-                                {{ resume.title|default('Resume for ' + resume.job.title) }}
-                            {% else %}
-                                {{ resume.title|default('General Resume') }}
-                            {% endif %}</h3>
-                            <div class="resume-meta">
-                                <span class="resume-date">
-                                    <i class="far fa-calendar-alt"></i> 
-                                    {{ resume.created_at.strftime('%b %d, %Y') if resume.created_at else 'No date' }}
-                                </span>
-                                <span class="resume-template">
-                                    <i class="fas fa-file-alt"></i> 
-                                    {{ resume.template|default('Toronto')|capitalize }}
-                                </span>
-                            </div>
-                            <div class="resume-job">
-                                {% if resume.job %}
-                                <span class="job-title">{{ resume.job.title }}</span>
-                                <span class="job-company">{{ resume.job.company }}</span>
-                            {% elif resume.job_info %}
-                                <span class="job-title">{{ resume.job_info.title }}</span>
-                                <span class="job-company">{{ resume.job_info.company }}</span>
-                            {% else %}
+                            
+                            <div class="resume-info">
+                                <div class="resume-job">
+                                    {% if resume.job %}
+                                        <span class="job-title">{{ resume.job.title }}</span>
+                                        <span class="job-company">{{ resume.job.company | default('Multiple Companies') }}</span>
+                                    {% elif resume.job_info %}
+                                        <span class="job-title">{{ resume.job_info.title }}</span>
+                                        <span class="job-company">{{ resume.job_info.company }}</span>
+                                        {% else %}
                                 <span class="job-title">General Resume</span>
                                 <span class="job-company">Multiple Companies</span>
-                            {% endif %}
+                                    {% endif %}
+                                </div>
+                                <div class="resume-meta">
+                                    <span class="resume-date" title="Creation Date">
+                                        <i class="far fa-calendar-alt"></i>
+                                        {{ resume.created_at.strftime('%b %d, %Y') if resume.created_at else 'No date' }}
+                                    </span>
+                                    <span class="resume-template" title="Template Style">
+                                        <i class="fas fa-file-alt"></i>
+                                        {{ resume.template|default('Toronto')|capitalize }}
+                                    </span>
+                                </div>
                             </div>
-                            <div class="match-score">
+                            
+                            <div class="match-score-container">
+                                <div class="match-score-header">
                                     <div class="score-label">Match Score</div>
-        <div class="score-bar">
-            <div class="score-fill" >{{ resume.display_match }}%</div>
-        </div>
-        <div class="score-value">{{ resume.display_match }}%</div>
-        
-                             
+                                    <div class="score-value">{{ resume.display_match }}%</div>
+                                </div>
+                                <div class="score-bar">
+                                    <div class="score-fill" style="width:30%"></div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                 </div>
                     {% endfor %}
                 </div>
             </div>
