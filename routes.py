@@ -1,5 +1,5 @@
 from flask import make_response,render_template, request, redirect, url_for, flash, session, abort, send_file
-from helpers import fetch_jobs,extract_job_tags,calculate_resume_completeness,extract_skills_from_text,find_similar_jobs
+from helpers import fetch_jobs,extract_job_tags,calculate_resume_completeness,extract_skills_from_text,find_similar_jobs,calculate_skill_match,analyze_job_description
 from flask import render_template, request, redirect, url_for, flash, session, abort, send_file
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -114,7 +114,7 @@ def init_routes(flask_app):
                     
                     # Find the job with matching slug
                     job_data = next((j for j in jobs_data if j.get('slug') == slug), None)
-                    
+
                     if not job_data:
                         flash('Job not found.', 'danger')
                         return redirect(url_for('jobs'))
@@ -167,7 +167,7 @@ def init_routes(flask_app):
                         'title': job.title,
                         'company_name': job.company,
                         'location': job.location,
-                        'description': job.description,
+                        'description': job.description or '',
                         'remote': True if 'remote' in job.location.lower() else False,
                         'created_at': "Today" if (datetime.now() - job.posted_at).days == 0 else 
                                     "Yesterday" if (datetime.now() - job.posted_at).days == 1 else
@@ -175,7 +175,8 @@ def init_routes(flask_app):
                         'tags': extract_job_tags(job.title, job.description),
                         'apply_url': f"https://www.arbeitnow.com/view/{job.slug}" if job.slug else None
                     }
-                job_skills = extract_skills_from_text(job.description)
+
+                job_skills = extract_skills_from_text(job.get('description'))
                 # For authenticated users, calculate skills match
                 skills_match = []
                 match_percentage = 0
