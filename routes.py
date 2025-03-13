@@ -1,5 +1,5 @@
 from flask import make_response,render_template, request, redirect, url_for, flash, session, abort, send_file
-from helpers import fetch_jobs,extract_job_tags,calculate_resume_completeness,extract_skills_from_text,fetch_job_by_slug,find_similar_jobs,calculate_skill_match,analyze_job_description
+from helpers import fetch_jobs,extract_job_tags,calculate_resume_completeness,get_recent_job_matches,extract_skills_from_text,fetch_job_by_slug,find_similar_jobs,calculate_skill_match,analyze_job_description
 from flask import render_template, request, redirect, url_for, flash, session, abort, send_file
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -8,7 +8,7 @@ import io
 from sqlalchemy.orm import attributes
 from forms import RegistrationForm, LoginForm, JobSearchForm, ContactForm, SummaryForm, ExperienceForm, EducationForm, SkillsForm
 from db import db
-from models import  User, Job, Resume
+from models import  User, Job, Resume,Application
 import json
 from flask import jsonify
 
@@ -564,46 +564,28 @@ def init_routes(flask_app):
                 # Add match score for general resumes (could be based on completeness)
             resume.match_score = calculate_resume_completeness(resume.resume_data)
             
-        # Get job matches count
-        job_matches = 3  # This would be calculated based on  matching algorithm
+               # Get job matches from the database
+        job_matches_list = get_recent_job_matches(current_user.id, limit=3)
         
-        # Get sample job matches list ( TODO:this would come from  database)
-        job_matches_list = [
-            {
-                'slug': 'software-engineer-xyz-company',
-                'title': 'Software Engineer',
-                'company_name': 'XYZ Tech',
-                'location': 'San Francisco, CA',
-                'remote': True,
-                'match': 92
-            },
-            {
-                'slug': 'frontend-developer-abc-inc',
-                'title': 'Frontend Developer',
-                'company_name': 'ABC Inc',
-                'location': 'New York, NY',
-                'remote': False,
-                'match': 87
-            },
-            {
-                'slug': 'fullstack-engineer-startup',
-                'title': 'Fullstack Engineer',
-                'company_name': 'Startup Co',
-                'location': 'Austin, TX',
-                'remote': True,
-                'match': 84
-            }
-        ]
+        # Format dates for display
+        for job in job_matches_list:
+            days_ago = job.get('created_at', 0)
+            if days_ago == 0:
+                job['created_at'] = "Today"
+            elif days_ago == 1:
+                job['created_at'] = "Yesterday"
+            else:
+                job['created_at'] = f"{days_ago} days ago"
         
         # Placeholder for applications count
-        applications = 0
+        applications_count = Application.query.filter_by(user_id=current_user.id).count()
         
         return render_template(
             'dashboard.html', 
             resumes=resumes,
-            job_matches=job_matches,
+            job_matches=len(job_matches_list),
             job_matches_list=job_matches_list,
-            applications=applications
+            applications=applications_count
         )
 
     @app.route('/pricing')

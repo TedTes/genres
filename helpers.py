@@ -369,3 +369,82 @@ def find_similar_jobs(current_slug, job_skills, limit=3):
     except Exception as e:
         print(f"Error finding similar jobs: {e}")
         return []
+    
+
+
+
+def get_recent_job_matches(user_id, limit=3):
+    """
+    Fetch recent job matches from the database for a specific user.
+    
+    Args:
+        user_id: The ID of the user to fetch matches for
+        limit: Maximum number of matches to return
+        
+    Returns:
+        A list of job match dictionaries
+    """
+    from models import Job, Resume
+    from sqlalchemy import desc
+    
+    try:
+        # Get the user's skills from their most recent resume
+        user_resume = Resume.query.filter_by(user_id=user_id).order_by(desc(Resume.updated_at)).first()
+        if not user_resume or not user_resume.resume_data or 'skills' not in user_resume.resume_data:
+            # If no skills found, return the most recent jobs posted
+            recent_jobs = Job.query.order_by(desc(Job.posted_at)).limit(limit).all()
+            return [{
+                'slug': job.slug,
+                'title': job.title,
+                'company_name': job.company,
+                'location': job.location,
+                'remote': 'remote' in job.location.lower() if job.location else False,
+                'created_at': (datetime.now() - job.posted_at).days if job.posted_at else 0,
+                'match': 50  # Default match score of 50% for users without skills
+            } for job in recent_jobs]
+        
+        # Extract user skills
+        user_skills_data = user_resume.resume_data['skills']
+        user_skills = []
+        
+        if isinstance(user_skills_data, str):
+            user_skills = [skill.strip() for skill in user_skills_data.split(',')]
+        elif isinstance(user_skills_data, list):
+            user_skills = user_skills_data
+        
+        # Get all jobs to match against
+        all_jobs = Job.query.order_by(desc(Job.posted_at)).limit(50).all()
+        # Calculate match score for each job
+        job_matches = []
+        
+        for job in all_jobs:
+            # Extract skills from job description
+            job_skills = extract_skills_from_text(job.description)
+            
+            # Calculate match score
+            match_percentage, _ = calculate_skill_match(user_skills, job_skills)
+            
+            # Create job match dictionary with score
+            job_match = {
+                'id': job.id,
+                'slug': job.slug,
+                'title': job.title,
+                'company_name': job.company,
+                'location': job.location,
+                'remote': 'remote' in job.location.lower() if job.location else False,
+                'match': match_percentage,
+                'created_at': (datetime.now() - job.posted_at).days if job.posted_at else 0
+            }
+            
+            job_matches.append(job_match)
+        
+        # Sort by match score (highest first) and take top matches
+        job_matches.sort(key=lambda x: x['match'], reverse=True)
+        
+        return job_matches[:limit]
+    
+    except Exception as e:
+        print(f"Error getting job matches: {e}")
+        import traceback
+        traceback.print_exc()
+        return []
