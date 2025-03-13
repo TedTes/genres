@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import io
 from sqlalchemy.orm import attributes
-from forms import RegistrationForm, LoginForm, JobSearchForm, ContactForm, SummaryForm, ExperienceForm, EducationForm, SkillsForm
+from forms import RegistrationForm, LoginForm, JobSearchForm, ContactForm, SummaryForm, ExperienceForm, EducationForm, SkillsForm,ResetPasswordForm,ResetPasswordRequestForm
 from db import db
 from models import  User, Job, Resume,Application
 import json
@@ -18,6 +18,11 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.units import inch
 from io import BytesIO
+
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+import os
+
 # Import NLP analyzer 
 import spacy
 nlp = spacy.load('en_core_web_sm')
@@ -27,6 +32,9 @@ app = None
 def init_routes(flask_app):
     global app
     app = flask_app
+    mail = Mail(app)
+    #serializer for generating secure tokens
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
     @app.route('/')
     def home():
         try:
@@ -236,13 +244,32 @@ def init_routes(flask_app):
                 new_user = User(
                     username=form.username.data,
                     email=form.email.data,
-                    password_hash=hashed_password
+                    password_hash=hashed_password,
+                    verified=False,
+                    verification_sent_at=datetime.now()
                 )
                 
                 # Add and commit to database
                 db.session.add(new_user)
                 db.session.commit()
                 
+                # Generate verification token
+                token = serializer.dumps(new_user.email, salt='email-verification-salt')
+
+                # Create verification URL
+                verification_url = url_for(
+                    'verify_email',
+                    token=token,
+                    _external=True
+                )
+                # Send verification email
+                msg = Message(
+                    subject='Verify Your ResumeMatch Account',
+                    recipients=[new_user.email],
+                    html=render_template('email/verify_email.html', verification_url=verification_url, user=new_user),
+                    sender=app.config.get('MAIL_DEFAULT_SENDER', 'noreply@resumematch.com')
+                )
+                mail.send(msg)
                 flash('Account created successfully! Please log in.', 'success')
                 return redirect(url_for('login'))
                 
@@ -252,6 +279,32 @@ def init_routes(flask_app):
                 flash('An error occurred during registration. Please try again.', 'danger')
         
         return render_template('register.html', form=form)
+
+    @app.route('/verify-email/<token>')
+    def verify_email(token):
+        try:
+            # Verify token - valid for 7 days
+            email = serializer.loads(token, salt='email-verification-salt', max_age=604800)
+            user = User.query.filter_by(email=email).first()
+            
+            if not user:
+                flash('Invalid verification link.', 'danger')
+                return redirect(url_for('login'))
+                
+            if user.verified:
+                flash('Your account is already verified. Please log in.', 'info')
+                return redirect(url_for('login'))
+            
+            # Verify user
+            user.verified = True
+            db.session.commit()
+            
+            flash('Your account has been verified! You can now log in.', 'success')
+            return redirect(url_for('login'))
+            
+        except (SignatureExpired, BadSignature):
+            flash('The verification link is invalid or has expired.', 'danger')
+            return redirect(url_for('login'))
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
@@ -295,6 +348,66 @@ def init_routes(flask_app):
         return redirect(url_for('login'))
 
 
+    @app.route('/reset-password', methods=['GET', 'POST'])
+    def reset_password_request():
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+        
+        form = ResetPasswordRequestForm()
+        if form.validate_on_submit():
+            user = User.query.filter_by(email=form.email.data).first()
+            if user:
+                # Generate a token
+                token = serializer.dumps(user.email, salt='password-reset-salt')
+                
+                # Build reset URL
+                reset_url = url_for(
+                    'reset_password',
+                    token=token,
+                    _external=True
+                )
+                
+                # Send email
+                msg = Message(
+                    subject='Password Reset Request',
+                    recipients=[user.email],
+                    html=render_template('email/reset_password.html', reset_url=reset_url, user=user),
+                    sender=app.config.get('MAIL_DEFAULT_SENDER', 'noreply@resumematch.com')
+                )
+                mail.send(msg)
+                
+            # Always to show this message even if email is not found (security best practice)
+            flash('If an account exists with that email, you will receive password reset instructions.', 'info')
+            return redirect(url_for('login'))
+        
+        return render_template('reset_password_request.html', form=form)
+
+    @app.route('/reset-password/<token>', methods=['GET', 'POST'])
+    def reset_password(token):
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+        
+        # Verify token - valid for 24 hours
+        try:
+            email = serializer.loads(token, salt='password-reset-salt', max_age=86400)
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                flash('Invalid or expired reset link.', 'danger')
+                return redirect(url_for('reset_password_request'))
+        except (SignatureExpired, BadSignature):
+            flash('Invalid or expired reset link.', 'danger')
+            return redirect(url_for('reset_password_request'))
+        
+        form = ResetPasswordForm()
+        if form.validate_on_submit():
+            # Update password
+            user.password_hash = generate_password_hash(form.password.data)
+            db.session.commit()
+            
+            flash('Your password has been reset! You can now log in.', 'success')
+            return redirect(url_for('login'))
+        
+        return render_template('reset_password.html', form=form)
 
     @app.route('/resume/start/<int:job_id>')
     @login_required

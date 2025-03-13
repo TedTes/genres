@@ -10,6 +10,8 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.Text, nullable=False)
     resumes = db.relationship('Resume', backref='user', lazy=True)
+    verified = db.Column(db.Boolean, default=False)
+    verification_sent_at = db.Column(db.DateTime, nullable=True)
 
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
