@@ -43,8 +43,6 @@ def fetch_job_by_slug(slug):
         matching_job = next((job for job in data if job.get('slug') == slug), None)
         if matching_job:
             return matching_job
-        print("matching_job")
-        print(matching_job)   
         # If the API doesn't support slug filtering, we need to fetch all and filter
         if not data or len(data) > 1:
             print("API doesn't support direct slug lookup, fetching all jobs")

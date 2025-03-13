@@ -1,5 +1,5 @@
 from flask import make_response,render_template, request, redirect, url_for, flash, session, abort, send_file
-from helpers import fetch_jobs,extract_job_tags,calculate_resume_completeness,extract_skills_from_text,find_similar_jobs,calculate_skill_match,analyze_job_description
+from helpers import fetch_jobs,extract_job_tags,calculate_resume_completeness,extract_skills_from_text,fetch_job_by_slug,find_similar_jobs,calculate_skill_match,analyze_job_description
 from flask import render_template, request, redirect, url_for, flash, session, abort, send_file
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -109,19 +109,16 @@ def init_routes(flask_app):
                 
                 # If not in database, fetch from API
                 if not job:
-                    # Fetch all jobs from API 
-                    jobs_data = fetch_jobs()
-                    
-                    # Find the job with matching slug
-                    job_data = next((j for j in jobs_data if j.get('slug') == slug), None)
+                    job_data = fetch_job_by_slug(slug)
 
                     if not job_data:
                         flash('Job not found.', 'danger')
                         return redirect(url_for('jobs'))
                     
                     created_at = job_data.get('created_at')
+                   
                     # Create a new Job record in the database
-                    job = Job(
+                    jobRes = Job(
                         slug=job_data.get('slug'),
                         title=job_data.get('title', 'Untitled Position'),
                         company=job_data.get('company_name', 'Unknown Company'),
@@ -129,14 +126,13 @@ def init_routes(flask_app):
                         description=job_data.get('description', ''),
                         posted_at=datetime.fromisoformat(job_data.get('created_at', datetime.now().isoformat()).replace('Z', '+00:00')) if created_at and isinstance(created_at,str) else datetime.now()
                     )
-                    
+                   
                     # Add additional attributes from API data
                     job_data['remote'] = job_data.get('remote', False)
                     job_data['apply_url'] = job_data.get('url', '')
                     job_data['tags'] = extract_job_tags(job_data.get('title', ''), job_data.get('description', ''))
                     
                     # Format the date
-                    created_at = job_data.get('created_at')
                     if created_at:
                         try: 
                             if created_at and isinstance(created_at,str):
@@ -155,11 +151,14 @@ def init_routes(flask_app):
                             job_data['created_at'] = "Recently"
                     else:
                         job_data['created_at'] = "Recently"
-                    
+
                     # Save to database
-                    db.session.add(job)
+                    db.session.add(jobRes)
                     db.session.commit()
+                    job_data['id'] = jobRes.id
+                    job = job_data
                 else:
+
                     # Convert the SQLAlchemy model to a dictionary for template rendering
                     job = {
                         'id': job.id,
@@ -175,7 +174,6 @@ def init_routes(flask_app):
                         'tags': extract_job_tags(job.title, job.description),
                         'apply_url': f"https://www.arbeitnow.com/view/{job.slug}" if job.slug else None
                     }
-
                 job_skills = extract_skills_from_text(job.get('description'))
                 # For authenticated users, calculate skills match
                 skills_match = []
