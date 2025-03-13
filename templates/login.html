@@ -41,7 +41,7 @@
                     <div class="form-group">
                         <div class="password-header">
                             {{ form.password.label(class="form-label") }}
-                            <a href="#" class="forgot-password">Forgot password?</a>
+                            <a href="{{ url_for('reset_password_request') }}" class="forgot-password">Forgot password?</a>
                         </div>
                         {{ form.password(class="form-control", placeholder="Your password") }}
                         {% if form.password.errors %}
@@ -55,7 +55,7 @@
                     
                     <div class="form-terms">
                         <label class="checkbox-container">
-                            <input type="checkbox" name="remember">
+                            {{ form.remember() }}
                             <span class="checkmark"></span>
                             Remember me
                         </label>
@@ -65,6 +65,14 @@
                         {{ form.submit(class="btn btn-primary btn-full") }}
                     </div>
                 </form>
+                
+                {% if show_resend %}
+                <div class="verification-alert">
+                    <p>Your account needs verification. 
+                        <a href="{{ url_for('process_resend_verification') }}?email={{ email|urlencode }}">Resend verification email</a>
+                    </p>
+                </div>
+                {% endif %}
                 
                 <div class="auth-divider">
                     <span>or</span>

@@ -305,6 +305,63 @@ def init_routes(flask_app):
         except (SignatureExpired, BadSignature):
             flash('The verification link is invalid or has expired.', 'danger')
             return redirect(url_for('login'))
+    
+    @app.route('/resend-verification')
+    def resend_verification():
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+        
+        return render_template('resend_verification.html')
+   
+    @app.route('/resend-verification', methods=['POST'])
+    def process_resend_verification():
+        email = request.form.get('email')
+        
+        if not email:
+            flash('Please provide your email address.', 'danger')
+            return redirect(url_for('resend_verification'))
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if not user:
+            # Not to reveal if email exists or not for security
+            flash('If your email is registered, you will receive a verification link shortly.', 'info')
+            return redirect(url_for('login'))
+        
+        if user.verified:
+            flash('Your account is already verified. Please log in.', 'info')
+            return redirect(url_for('login'))
+        
+        # Check if last verification was sent less than 10 minutes ago
+        if user.verification_sent_at and (datetime.now() - user.verification_sent_at).total_seconds() < 600:
+            flash('A verification email was recently sent. Please check your inbox or wait a few minutes before requesting another.', 'info')
+            return redirect(url_for('login'))
+        
+        # Generate new verification token
+        token = serializer.dumps(user.email, salt='email-verification-salt')
+        
+        # Create verification URL
+        verification_url = url_for(
+            'verify_email',
+            token=token,
+            _external=True
+        )
+        
+        # Send verification email
+        msg = Message(
+            subject='Verify Your ResumeMatch Account',
+            recipients=[user.email],
+            html=render_template('email/verify_email.html', verification_url=verification_url, user=user),
+            sender=app.config.get('MAIL_DEFAULT_SENDER', 'noreply@resumematch.com')
+        )
+        mail.send(msg)
+        
+        # Update verification sent time
+        user.verification_sent_at = datetime.now()
+        db.session.commit()
+        
+        flash('Verification email sent. Please check your inbox.', 'success')
+        return redirect(url_for('login'))
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
@@ -322,6 +379,10 @@ def init_routes(flask_app):
                 if user:
                     # Verify password
                     if check_password_hash(user.password_hash, form.password.data):
+
+                        if not user.verified:
+                            flash('Please verify your email address before logging in.', 'warning')
+                            return render_template('login.html', form=form, show_resend=True, email=user.email)
                         # Log in user
                         login_user(user)
                         
