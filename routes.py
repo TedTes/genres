@@ -207,7 +207,7 @@ def init_routes(flask_app):
                 # Add job skills to the session for use in resume creation
                 session['job_skills'] = list(job_skills.keys())
                 # Find similar jobs using skills overlap
-                similar_jobs = find_similar_jobs(slug, job_skills, limit=3)
+                # similar_jobs = find_similar_jobs(slug, job_skills, limit=3)
                 
                 
                 return render_template(
@@ -215,7 +215,7 @@ def init_routes(flask_app):
                     job=job,
                     skills_match=skills_match,
                     match_percentage=match_percentage,
-                    similar_jobs=similar_jobs
+                    # similar_jobs=similar_jobs
                 )
             
             except Exception as e:
@@ -380,9 +380,9 @@ def init_routes(flask_app):
                     # Verify password
                     if check_password_hash(user.password_hash, form.password.data):
 
-                        if not user.verified:
-                            flash('Please verify your email address before logging in.', 'warning')
-                            return render_template('login.html', form=form, show_resend=True, email=user.email)
+                        # if not user.verified:
+                        #     flash('Please verify your email address before logging in.', 'warning')
+                        #     return render_template('login.html', form=form, show_resend=True, email=user.email)
                         # Log in user
                         login_user(user)
                         
@@ -780,311 +780,67 @@ def init_routes(flask_app):
         return render_template('resume_template.html', resume=resume)
     
 
-    @app.route('/resume/<int:resume_id>/pdf')
+    @app.route('/resume/<int:resume_id>/pdf', methods=['GET', 'POST'])
     @login_required
     def generate_pdf(resume_id):
+        """Generate and download a PDF version of the resume.
+        
+        Supports both GET and POST methods:
+        - GET: Simple PDF generation with default settings
+        - POST: Enhanced PDF generation with optional profile image upload
+        """
+        # Import the PDF generator
+        from pdf_generator import generate_resume_pdf
+        
+        # Generate the PDF
+        pdf_buffer, result = generate_resume_pdf(resume_id, current_user, db, Resume)
+        
+        if pdf_buffer is None:
+            # Error occurred
+            flash(f"Error generating PDF: {result}", 'danger')
+            return redirect(url_for('resume_preview', resume_id=resume_id))
+        
+        # Create response with PDF
+        return send_file(
+            pdf_buffer,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name=result
+        )
+
+    @app.route('/resume/<int:resume_id>/pdf-settings', methods=['GET', 'POST'])
+    @login_required
+    def pdf_settings(resume_id):
+        """Page for customizing PDF export options."""
         resume = Resume.query.get_or_404(resume_id)
         
         # Check if the resume belongs to the current user
         if resume.user_id != current_user.id:
             flash('You do not have permission to access this resume.', 'danger')
             return redirect(url_for('dashboard'))
-         # Prepare the resume name for the PDF file
-        if resume.job:
-           filename = f"resume_{current_user.username}_{resume.job.title}.pdf"
-        else:
-           filename = f"resume_{current_user.username}.pdf"
-        filename = filename.replace(' ', '_')
-
-        try:
-                from resume_templates import RESUME_TEMPLATES
-                # Get template info
-                template_info = RESUME_TEMPLATES.get(resume.template, RESUME_TEMPLATES['standard'])
-                template_class = template_info['css_class']
-                # Create a file-like buffer to receive PDF data
-                buffer = BytesIO()
-                
-                # Create the PDF document using ReportLab
-                doc = SimpleDocTemplate(
-                    buffer,
-                    pagesize=letter,
-                    rightMargin=0.75*inch,
-                    leftMargin=0.75*inch,
-                    topMargin=0.75*inch,
-                    bottomMargin=0.75*inch
-                )
-                
-                # Define styles
-                styles = getSampleStyleSheet()
-                 # Create template-specific styles
-                if template_class == 'template-modern':
-                    # Modern template styles
-                    resume_title_style = ParagraphStyle(
-                        name='ResumeTitle',
-                        parent=styles['Heading1'],
-                        alignment=0,  # Left alignment
-                        fontSize=20,
-                        spaceAfter=12,
-                        textColor=colors.blue
-                    )
-                    
-                    section_heading_style = ParagraphStyle(
-                        name='ResumeSectionHeading',
-                        parent=styles['Heading2'],
-                        fontSize=14,
-                        textColor=colors.blue,
-                        spaceAfter=8,
-                        bulletIndent=10
-                    )
-                    
-                    contact_info_style = ParagraphStyle(
-                        name='ResumeContactInfo',
-                        parent=styles['Normal'],
-                        alignment=0,  # Left alignment
-                        fontSize=10,
-                        spaceAfter=12
-                    )
-                elif template_class == 'template-minimal':
-                        # Minimal template styles
-                        resume_title_style = ParagraphStyle(
-                            name='ResumeTitle',
-                            parent=styles['Heading1'],
-                            alignment=0,  # Left alignment
-                            fontSize=22,
-                            fontName='Helvetica',
-                            spaceAfter=8
-                        )
-                        
-                        section_heading_style = ParagraphStyle(
-                            name='ResumeSectionHeading',
-                            parent=styles['Heading2'],
-                            fontSize=12,
-                            fontName='Helvetica-Bold',
-                            textTransform='uppercase',
-                            spaceAfter=6,
-                            textColor=colors.black
-                        )
-                        
-                        contact_info_style = ParagraphStyle(
-                            name='ResumeContactInfo',
-                            parent=styles['Normal'],
-                            alignment=0,  # Left alignment
-                            fontSize=9,
-                            fontName='Helvetica',
-                            textColor=colors.gray
-                        )
-                elif template_class == 'template-executive':
-                        # Executive template styles
-                        resume_title_style = ParagraphStyle(
-                            name='ResumeTitle',
-                            parent=styles['Heading1'],
-                            alignment=1,  # Center alignment
-                            fontSize=20,
-                            spaceAfter=12,
-                            fontName='Times-Bold'
-                        )
-                        
-                        section_heading_style = ParagraphStyle(
-                            name='ResumeSectionHeading',
-                            parent=styles['Heading2'],
-                            fontSize=14,
-                            fontName='Times-Bold',
-                            textTransform='uppercase',
-                            borderWidth=1,
-                            borderColor=colors.black,
-                            borderPadding=(0, 0, 1, 0),  # bottom border only
-                            spaceAfter=8
-                        )
-                        
-                        contact_info_style = ParagraphStyle(
-                            name='ResumeContactInfo',
-                            parent=styles['Normal'],
-                            alignment=1,  # Center alignment
-                            fontSize=10,
-                            fontName='Times-Roman',
-                            spaceAfter=14
-                        )
+        
+        # Get available templates
+        from resume_templates import RESUME_TEMPLATES
+        
+        if request.method == 'POST':
+            # Process form submission for PDF settings
+            selected_template = request.form.get('template', resume.template)
             
-                else:
-                        # Standard template (default)
-                        resume_title_style = ParagraphStyle(
-                            name='ResumeTitle',
-                            parent=styles['Heading1'],
-                            alignment=1,  # Center alignment
-                            fontSize=18,
-                            spaceAfter=12
-                        )
-                        
-                        section_heading_style = ParagraphStyle(
-                            name='ResumeSectionHeading',
-                            parent=styles['Heading2'],
-                            fontSize=14,
-                            textColor=colors.blue,
-                            spaceAfter=6
-                        )
-                        
-                        contact_info_style = ParagraphStyle(
-                            name='ResumeContactInfo',
-                            parent=styles['Normal'],
-                            alignment=1,  # Center alignment
-                            fontSize=10,
-                            spaceAfter=12
-                        )
-           
-                 # Create normal text style based on template
-                normal_text_style = ParagraphStyle(
-                    name='NormalText',
-                    parent=styles['Normal'],
-                    fontName='Helvetica' if template_class == 'template-minimal' else 'Times-Roman' if template_class == 'template-executive' else 'Helvetica',
-                    fontSize=10
-                )
-                # Build the document content
-                elements = []
-                
-                # Add contact information
-                contact = resume.resume_data.get('contact', {})
-                elements.append(Paragraph(contact.get('name', 'Your Name'), resume_title_style))
-                
-                contact_text = []
-                if contact.get('email'):
-                    contact_text.append(contact.get('email'))
-                if contact.get('phone'):
-                    contact_text.append(contact.get('phone'))
-                if contact.get('location'):
-                    contact_text.append(contact.get('location'))
-                
-                elements.append(Paragraph(' | '.join(contact_text), contact_info_style))
-                
-                if contact.get('linkedin') or contact.get('website'):
-                    website_text = []
-                    if contact.get('linkedin'):
-                        website_text.append(contact.get('linkedin'))
-                    if contact.get('website'):
-                        website_text.append(contact.get('website'))
-                    elements.append(Paragraph(' | '.join(website_text), contact_info_style))
-                
-                elements.append(Spacer(1, 0.2*inch))
-                
-                # Add summary if available
-                if resume.resume_data.get('summary'):
-                    elements.append(Paragraph('Professional Summary', section_heading_style))
-                    
-                    summary_text = resume.resume_data.get('summary')
-                    if not isinstance(summary_text, str):
-                        summary_text = summary_text.get('content', '')
-                    
-                    elements.append(Paragraph(summary_text, styles['Normal']))
-                    elements.append(Spacer(1, 0.2*inch))
-                
-                # Add experience if available
-                if resume.resume_data.get('experience'):
-                    elements.append(Paragraph('Work Experience', section_heading_style))
-                    
-                    for exp in resume.resume_data.get('experience'):
-                        title_company = f"<b>{exp.get('title')}</b> - {exp.get('company')}"
-                        elements.append(Paragraph(title_company, styles['Normal']))
-                        
-                        date_range = f"{exp.get('startDate')} - {'Present' if exp.get('current') else exp.get('endDate')}"
-                        elements.append(Paragraph(f"<i>{date_range}</i>", styles['Normal']))
-                        
-                        if exp.get('description'):
-                            for line in exp.get('description').split('\n'):
-                                if line.strip():
-                                    elements.append(Paragraph(f"• {line.strip()}", styles['Normal']))
-                        
-                        elements.append(Spacer(1, 0.1*inch))
-                    
-                    elements.append(Spacer(1, 0.1*inch))
-                
-                # Add education if available
-                if resume.resume_data.get('education'):
-                    elements.append(Paragraph('Education', section_heading_style))
-                    
-                    education_data = resume.resume_data.get('education')
-                    if isinstance(education_data, dict):
-                        # Single education entry
-                        degree = education_data.get('degree', '')
-                        school = education_data.get('school', '')
-                        year = education_data.get('year', '')
-                        
-                        elements.append(Paragraph(f"<b>{degree}</b>", styles['Normal']))
-                        elements.append(Paragraph(f"{school}", styles['Normal']))
-                        elements.append(Paragraph(f"<i>{year}</i>", styles['Normal']))
-                    elif isinstance(education_data, list):
-                        # Multiple education entries
-                        for edu in education_data:
-                            degree = edu.get('degree', '')
-                            school = edu.get('school', '')
-                            start_year = edu.get('startYear', '')
-                            end_year = 'Present' if edu.get('current') else edu.get('endYear', '')
-                            date_range = f"{start_year} - {end_year}"
-                            
-                            elements.append(Paragraph(f"<b>{degree}</b>", styles['Normal']))
-                            elements.append(Paragraph(f"{school}", styles['Normal']))
-                            elements.append(Paragraph(f"<i>{date_range}</i>", styles['Normal']))
-                            
-                            if edu.get('description'):
-                                elements.append(Paragraph(edu.get('description'), styles['Normal']))
-                            
-                            elements.append(Spacer(1, 0.1*inch))
-                    
-                    elements.append(Spacer(1, 0.1*inch))
-                
-                # Add skills if available
-                if resume.resume_data.get('skills'):
-                    elements.append(Paragraph('Skills', section_heading_style))
-                    
-                    skills_text = resume.resume_data.get('skills')
-                    if isinstance(skills_text, str):
-                        skills_list = [skill.strip() for skill in skills_text.split(',') if skill.strip()]
-                    else:
-                        skills_list = skills_text
-                    
-                    # Create a table for skills with 3 columns
-                    if skills_list:
-                        # Organize skills into rows of 3
-                        skill_rows = []
-                        row = []
-                        for skill in skills_list:
-                            row.append(skill)
-                            if len(row) == 3:
-                                skill_rows.append(row)
-                                row = []
-                        
-                        if row:  # Add any remaining skills
-                            while len(row) < 3:
-                                row.append('')
-                            skill_rows.append(row)
-                        
-                        # Create the skills table
-                        skills_table = Table(skill_rows, colWidths=[2*inch, 2*inch, 2*inch])
-                        skills_table.setStyle(TableStyle([
-                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                            ('FONTSIZE', (0, 0), (-1, -1), 10),
-                        ]))
-                        
-                        elements.append(skills_table)
-                
-                # Build the PDF document
-                doc.build(elements)
-                
-                # Get the PDF value from the buffer
-                pdf_value = buffer.getvalue()
-                buffer.close()
-                
-                # Create response with PDF
-                response = make_response(pdf_value)
-                response.headers['Content-Type'] = 'application/pdf'
-                response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
-                
-                return response
-                
-        except Exception as e:
-                print(f"Error generating PDF: {str(e)}")
-                flash(f"Error generating PDF: {str(e)}", 'danger')
-                return redirect(url_for('resume_preview', resume_id=resume.id))
-
-
+            # Update the resume with selected template if changed
+            if selected_template != resume.template and selected_template in RESUME_TEMPLATES:
+                resume.template = selected_template
+                db.session.commit()
+                flash('Resume template updated successfully!', 'success')
+            
+            # Redirect to PDF generation with the form data
+            return redirect(url_for('generate_pdf', resume_id=resume_id))
+        
+        # Render settings page for GET request
+        return render_template(
+            'resume_pdf_settings.html',
+            resume=resume,
+            templates=RESUME_TEMPLATES
+        )
    
     @app.route('/resume/create/general')
     @login_required
@@ -1116,46 +872,34 @@ def init_routes(flask_app):
             flash(f"Error creating resume: {str(e)}", 'danger')
             return redirect(url_for('dashboard'))
 
-    @app.route('/resume/<int:resume_id>/template')
+    @app.route('/resume/<int:resume_id>/preview-pdf')
     @login_required
-    def select_resume_template(resume_id):
+    def preview_pdf(resume_id):
+        """Preview the PDF in the browser instead of downloading it."""
         resume = Resume.query.get_or_404(resume_id)
+        
+        # Check if the resume belongs to the current user
         if resume.user_id != current_user.id:
-            abort(403)
+            flash('You do not have permission to access this resume.', 'danger')
+            return redirect(url_for('dashboard'))
         
-        from resume_templates import RESUME_TEMPLATES
+        # Import the PDF generator
+        from pdf_generator import generate_resume_pdf
         
-        return render_template('resume_template_select.html', 
-                            resume=resume, 
-                            templates=RESUME_TEMPLATES)
-
-
-    @app.route('/resume/<int:resume_id>/template/<template_id>')
-    @login_required
-    def set_resume_template(resume_id, template_id):
-        resume = Resume.query.get_or_404(resume_id)
-        if resume.user_id != current_user.id:
-            abort(403)
+        # Generate the PDF
+        pdf_buffer, result = generate_resume_pdf(resume_id, current_user, db, Resume)
         
-       
-        from resume_templates import RESUME_TEMPLATES
+        if pdf_buffer is None:
+            # Error occurred
+            flash(f"Error generating PDF preview: {result}", 'danger')
+            return redirect(url_for('resume_preview', resume_id=resume_id))
         
-        # Check if the template_id is valid
-        if template_id in RESUME_TEMPLATES:
-            # Update the resume with the selected template
-            resume.template = template_id
-            
-            try:
-                db.session.commit()
-                flash('Resume template updated successfully!', 'success')
-            except Exception as e:
-                db.session.rollback()
-                flash(f'Error updating template: {str(e)}', 'danger')
-        else:
-            flash('Invalid template selection.', 'danger')
+        # Create response with PDF for display in browser
+        response = make_response(pdf_buffer.getvalue())
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = 'inline'
         
-        return redirect(url_for('select_resume_template', resume_id=resume.id))
-
+        return response
 
     @app.route('/applications')
     @login_required
