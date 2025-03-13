@@ -4,9 +4,10 @@
 
 {% block content %}
 <!-- Navigation Bar -->
-{% with active_page='jobs', extra_nav_item={'id': 'create_resume', 'url': url_for('create_general_resume'), 'text': 'Createe Resume'} %}
+{% with active_page='jobs', extra_nav_item={'id': 'create_resume', 'url': url_for('create_general_resume'), 'text': 'Create Resume'} %}
     {% include 'partials/navbar.html' with context %}
 {% endwith %}
+
 <section class="job-detail-header">
     <div class="container">
         <div class="back-link">
@@ -29,7 +30,7 @@
                         <i class="fas fa-map-marker-alt"></i> {{ job.location }}
                     </span>
                     {% if job.remote %}
-                        <span class="job-tag">Remote</span>
+                        <span class="job-tag job-tag-remote">Remote</span>
                     {% endif %}
                     <span class="job-date">
                         <i class="far fa-calendar-alt"></i> 
@@ -38,28 +39,20 @@
                 </div>
             </div>
             
-            <div class="job-actions">
-                <a href="{{ url_for('start_resume', job_id=job.id) if current_user.is_authenticated else url_for('login') }}" class="btn btn-primary">
-                    {% if current_user.is_authenticated %}
-                        Create Resume
-                    {% else %}
-                        Log in to Create Resume
-                    {% endif %}
+            <div class="job-actions-header">
+                <a href="{{ url_for('start_resume', job_id=job.id) if current_user.is_authenticated else url_for('login') }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-file-alt"></i> Create
                 </a>
                 
                 {% if current_user.is_authenticated %}
-                  <a href="{{ url_for('apply_to_job', slug=job.slug) }}" class="btn btn-success">
-                     Track Application
+                  <a href="{{ url_for('apply_to_job', slug=job.slug) }}" class="btn btn-sm btn-success">
+                     <i class="fas fa-clipboard-check"></i> Track
                   </a>
                 {% endif %}
-
-                <button class="btn btn-outline btn-save-job" title="Save Job">
-                    <i class="far fa-bookmark"></i> Save
-                </button>
                 
                 {% if job.apply_url %}
-                    <a href="{{ job.apply_url }}" target="_blank" class="btn btn-outline">
-                        Apply Externally <i class="fas fa-external-link-alt"></i>
+                    <a href="{{ job.apply_url }}" target="_blank" class="btn btn-sm btn-outline">
+                        <i class="fas fa-external-link-alt"></i> Apply
                     </a>
                 {% endif %}
             </div>
@@ -75,29 +68,34 @@
                 <!-- Skills Match Section (Shown only to logged-in users) -->
                 {% if current_user.is_authenticated and skills_match %}
                 <div class="job-match-section">
-                    <h2>Your Skills Match</h2>
+                    <h2><i class="fas fa-chart-pie"></i> Your Skills Match</h2>
                     <div class="match-details">
                         <div class="match-score">
-                            <div class="match-percentage">{{ match_percentage }}%</div>
-                            <div class="match-circle-progress">
-                                <svg width="120" height="120" viewBox="0 0 120 120">
-                                    <circle cx="60" cy="60" r="54" fill="none" stroke="#e6e6e6" stroke-width="12" />
-                                    <circle cx="60" cy="60" r="54" fill="none" stroke="#3b82f6" stroke-width="12"
-                                            stroke-dasharray="339.3" stroke-dashoffset="{{ 339.3 - (339.3 * match_percentage / 100) }}"
-                                            transform="rotate(-90, 60, 60)" />
-                                </svg>
+                            <div class="match-circle-container">
+                                <div class="match-circle-progress">
+                                    <svg width="120" height="120" viewBox="0 0 120 120">
+                                        <circle cx="60" cy="60" r="54" fill="none" stroke="#e6e6e6" stroke-width="12" />
+                                        <circle cx="60" cy="60" r="54" fill="none" 
+                                                stroke="{% if match_percentage >= 85 %}#10b981{% elif match_percentage >= 70 %}#3b82f6{% elif match_percentage >= 50 %}#f59e0b{% else %}#ef4444{% endif %}" 
+                                                stroke-width="12"
+                                                stroke-dasharray="339.3" 
+                                                stroke-dashoffset="{{ 339.3 - (339.3 * match_percentage / 100) }}"
+                                                transform="rotate(-90, 60, 60)" />
+                                    </svg>
+                                    <div class="match-percentage-overlay">{{ match_percentage }}%</div>
+                                </div>
+                                <div class="match-label">Overall Match</div>
                             </div>
-                            <div class="match-label">Overall Match</div>
                         </div>
                         
                         <div class="skills-breakdown">
-                            <h3>Skills Breakdown</h3>
+                            <h3>Your Matching Skills</h3>
                             <ul class="match-skills-list">
                                 {% for skill in skills_match %}
                                 <li class="match-skill">
                                     <div class="skill-name">{{ skill.name }}</div>
                                     <div class="skill-bar">
-                                        <div class="skill-progress">{{skill.match}}%</div>
+                                        <div class="skill-progress" style="width: {{ skill.match }}%"></div>
                                     </div>
                                     <div class="skill-percentage">{{ skill.match }}%</div>
                                 </li>
@@ -108,7 +106,7 @@
                     
                     <div class="match-cta">
                         <a href="{{ url_for('start_resume', job_id=job.id) }}" class="btn btn-primary">
-                            Create Tailored Resume
+                            <i class="fas fa-file-alt"></i> Create Tailored Resume
                         </a>
                     </div>
                 </div>
@@ -116,7 +114,7 @@
                 
                 <!-- Job Description -->
                 <div class="job-description">
-                    <h2>Job Description</h2>
+                    <h2><i class="fas fa-briefcase"></i> Job Description</h2>
                     <div class="description-content">
                         {{ job.description|safe }}
                     </div>
@@ -189,17 +187,17 @@
                 </div>
                 
                 <div class="job-actions-sidebar">
-                    <a href="{{ url_for('start_resume', job_id=job.id) if current_user.is_authenticated else url_for('login') }}" class="btn btn-primary btn-full">
+                    <a href="{{ url_for('start_resume', job_id=job.id) if current_user.is_authenticated else url_for('login') }}" class="btn btn-sm btn-primary btn-full">
                         {% if current_user.is_authenticated %}
-                            Create Tailored Resume
+                            <i class="fas fa-file-alt"></i> Create Resume
                         {% else %}
-                            Log in to Create Resume
+                            <i class="fas fa-sign-in-alt"></i> Login to Create
                         {% endif %}
                     </a>
                     
                     {% if job.apply_url %}
-                        <a href="{{ job.apply_url }}" target="_blank" class="btn btn-outline btn-full">
-                            Apply Externally <i class="fas fa-external-link-alt"></i>
+                        <a href="{{ job.apply_url }}" target="_blank" class="btn btn-sm btn-outline btn-full">
+                            <i class="fas fa-external-link-alt"></i> Apply on Website
                         </a>
                     {% endif %}
                 </div>
@@ -211,30 +209,38 @@
 {% if similar_jobs %}
 <section class="similar-jobs-section">
     <div class="container">
-        <h2>Similar Jobs You Might Like</h2>
+        <h2><i class="fas fa-search"></i> Similar Jobs You Might Like</h2>
         
         <div class="similar-jobs-grid">
             {% for job in similar_jobs %}
-            <div class="job-card">
-                <div class="job-company-logo">
-                    {{ job.company_name[0]|upper if job.company_name else 'C' }}
-                </div>
-                <div class="job-details">
-                    <h3 class="job-title">
-                        <a href="{{ url_for('job_detail', slug=job.slug) }}">{{ job.title }}</a>
-                    </h3>
-                    <div class="job-company">{{ job.company_name }}</div>
-                    <div class="job-meta">
-                        <span class="job-location">
+            <div class="job-card" data-match="{% if job.match >= 90 %}high{% elif job.match >= 70 %}medium{% else %}standard{% endif %}">
+                <div class="job-card-header">
+                    <div class="job-company-logo">
+                        {{ job.company_name[0]|upper if job.company_name else 'C' }}
+                    </div>
+                    <div class="job-details">
+                        <h3 class="job-title">
+                            <a href="{{ url_for('job_detail', slug=job.slug) }}">{{ job.title }}</a>
+                        </h3>
+                        <div class="job-company">{{ job.company_name }}</div>
+                        <div class="job-location">
                             <i class="fas fa-map-marker-alt"></i> {{ job.location }}
-                        </span>
-                        {% if job.remote %}
-                            <span class="job-tag">Remote</span>
-                        {% endif %}
+                            {% if job.remote %}
+                                <span class="remote-badge">Remote</span>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
+                
+                {% if job.match %}
+                <div class="job-match">
+                    <div class="match-percentage">{{ job.match }}%</div>
+                    <div class="match-label">Match</div>
+                </div>
+                {% endif %}
+                
                 <div class="job-actions">
-                    <a href="{{ url_for('job_detail', slug=job.slug) }}" class="btn btn-sm btn-outline">View</a>
+                    <a href="{{ url_for('job_detail', slug=job.slug) }}" class="btn btn-sm btn-outline">View Job</a>
                 </div>
             </div>
             {% endfor %}
