@@ -2,7 +2,7 @@ import requests
 import spacy
 import re
 from collections import Counter
-
+from datetime import datetime
 def fetch_jobs(search_term=None, location=None, remote=None):
     """
     Fetch jobs from the Arbeitnow API with optional filters
@@ -25,7 +25,36 @@ def fetch_jobs(search_term=None, location=None, remote=None):
         print(f"API request error: {e}")
         return []
 
-
+def fetch_job_by_slug(slug):
+    """
+    Fetch a specific job from the Arbeitnow API using its slug
+    """
+    url = "https://www.arbeitnow.com/api/job-board-api"
+    
+   
+    params = {'slug': slug}
+    
+    try:
+        
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        data = response.json().get('data', [])
+        
+        matching_job = next((job for job in data if job.get('slug') == slug), None)
+        if matching_job:
+            return matching_job
+        print("matching_job")
+        print(matching_job)   
+        # If the API doesn't support slug filtering, we need to fetch all and filter
+        if not data or len(data) > 1:
+            print("API doesn't support direct slug lookup, fetching all jobs")
+            all_jobs = fetch_jobs()
+            return next((job for job in all_jobs if job.get('slug') == slug), None)
+            
+        return None
+    except requests.RequestException as e:
+        print(f"API request error when fetching job by slug: {e}")
+        return None
 
 
 def analyze_job_description(description):
@@ -126,7 +155,6 @@ def extract_skills_from_text(text):
     Extract skills from text using NLP techniques.
     Returns a dictionary of skills with their importance score.
     """
-
     # Load the spaCy model
     nlp = spacy.load('en_core_web_sm')
     # Common technical skills to look for
