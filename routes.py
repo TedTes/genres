@@ -683,9 +683,16 @@ def init_routes(flask_app):
         resume = Resume.query.get_or_404(resume_id)
         if resume.user_id != current_user.id:
             abort(403)
+        
+        # Import templates for the sidebar
         from resume_templates import RESUME_TEMPLATES
-        return render_template('resume_template.html', resume=resume, job=resume.job,templates=RESUME_TEMPLATES)
-
+        
+        return render_template(
+            'resume_template.html', 
+            resume=resume, 
+            job=resume.job,
+            templates=RESUME_TEMPLATES
+        )
     @app.route('/resume/<int:resume_id>/download')
     @login_required
     def resume_download(resume_id):
@@ -789,9 +796,24 @@ def init_routes(flask_app):
         - GET: Simple PDF generation with default settings
         - POST: Enhanced PDF generation with optional profile image upload
         """
-        # Import the PDF generator
-        from pdf_generator import generate_resume_pdf
+        resume = Resume.query.get_or_404(resume_id)
+    
+        # Check if the resume belongs to the current user
+        if resume.user_id != current_user.id:
+            flash('You do not have permission to access this resume.', 'danger')
+            return redirect(url_for('dashboard'))
         
+        # If this is a POST request from the template selection page
+        if request.method == 'POST':
+            # Update the template if selected
+            selected_template = request.form.get('template')
+            # If template was selected and is valid, update the resume
+            if selected_template and selected_template in RESUME_TEMPLATES:
+                resume.template = selected_template
+                db.session.commit()
+                flash('Template updated successfully!', 'success')
+        # Import the PDF generator       
+        from pdf_generator import generate_resume_pdf      
         # Generate the PDF
         pdf_buffer, result = generate_resume_pdf(resume_id, current_user, db, Resume)
         
@@ -822,18 +844,6 @@ def init_routes(flask_app):
         # Get available templates
         from resume_templates import RESUME_TEMPLATES
         
-        if request.method == 'POST':
-            # Process form submission for PDF settings
-            selected_template = request.form.get('template', resume.template)
-            
-            # Update the resume with selected template if changed
-            if selected_template != resume.template and selected_template in RESUME_TEMPLATES:
-                resume.template = selected_template
-                db.session.commit()
-                flash('Resume template updated successfully!', 'success')
-            
-            # Redirect to PDF generation with the form data
-            return redirect(url_for('generate_pdf', resume_id=resume_id))
         
         # Render settings page for GET request
         return render_template(
@@ -989,3 +999,29 @@ def init_routes(flask_app):
         timeline = []
         
         return render_template('application_details.html', application=application, form=form, timeline=timeline)
+
+
+    
+    @app.route('/resume/<int:resume_id>/update-template', methods=['POST'])
+    @login_required
+    def update_resume_template(resume_id):
+        """Update a resume's template and redirect back to the preview."""
+        resume = Resume.query.get_or_404(resume_id)
+        
+        # Check if the resume belongs to the current user
+        if resume.user_id != current_user.id:
+            flash('You do not have permission to modify this resume.', 'danger')
+            return redirect(url_for('dashboard'))
+        
+        # Get the selected template
+        template = request.form.get('template')
+        
+        # Update if valid template is selected
+        from resume_templates import RESUME_TEMPLATES
+        if template and template in RESUME_TEMPLATES:
+            # Update the resume with the new template
+            resume.template = template
+            db.session.commit()
+        
+        # Redirect back to resume preview
+        return redirect(url_for('resume_preview', resume_id=resume_id))
