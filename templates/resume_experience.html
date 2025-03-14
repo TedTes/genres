@@ -13,52 +13,55 @@
             <p>Add your work experience</p>
         </div>
         
-        <!-- Progress Bar -->
-        <div class="progress-container">
-            <div class="progress-info">
-                <span class="current-step">Step 3 of 5</span>
-                <span class="step-name">Experience</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 60%;"></div>
-            </div>
-            <div class="progress-steps">
-                <div class="step completed">
-                    <div class="step-icon">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <div class="step-label">Contact</div>
-                </div>
-                <div class="step completed">
-                    <div class="step-icon">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <div class="step-label">Skills</div>
-                </div>
-                <div class="step active">
-                    <div class="step-icon">
-                        <i class="fas fa-briefcase"></i>
-                    </div>
-                    <div class="step-label">Experience</div>
-                </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <div class="step-label">Education</div>
-                </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <div class="step-label">Summary</div>
-                </div>
-              
-            </div>
-        </div>
-        
         <div class="resume-form-container">
             <div class="resume-form-content">
+                <!-- Compact Progress Indicator -->
+                <div class="compact-progress">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 60%;"></div>
+                        </div>
+                        <div class="step-indicator">Step 3 of 5: Experience</div>
+                    </div>
+                    
+                    <div class="progress-steps-list">
+                        <a href="{{ url_for('resume_contact', resume_id=resume.id) }}" class="progress-step-link completed">
+                            <span class="step-number">1</span>
+                            <span class="step-name">Contact</span>
+                            <span class="step-check"><i class="fas fa-check"></i></span>
+                        </a>
+                        <a href="{{ url_for('resume_skills', resume_id=resume.id) }}" class="progress-step-link completed">
+                            <span class="step-number">2</span>
+                            <span class="step-name">Skills</span>
+                            <span class="step-check"><i class="fas fa-check"></i></span>
+                        </a>
+                        <a href="{{ url_for('resume_experience', resume_id=resume.id) }}" class="progress-step-link active">
+                            <span class="step-number">3</span>
+                            <span class="step-name">Experience</span>
+                        </a>
+                        <a href="{{ url_for('resume_education', resume_id=resume.id) }}" class="progress-step-link">
+                            <span class="step-number">4</span>
+                            <span class="step-name">Education</span>
+                        </a>
+                        <a href="{{ url_for('resume_summary', resume_id=resume.id) }}" class="progress-step-link">
+                            <span class="step-number">5</span>
+                            <span class="step-name">Summary</span>
+                        </a>
+                    </div>
+                </div>
+                
+                {% if resume and resume.job %}
+                <div class="job-match-alert">
+                    <div class="match-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <div class="match-content">
+                        <h3>Targeting: {{ resume.job.title }} at {{ resume.job.company }}</h3>
+                        <p>Tailor your experience to highlight skills and achievements relevant to this position.</p>
+                    </div>
+                </div>
+                {% endif %}
+                
                 <div id="experience-list" class="experience-list">
                     <!-- Experience positions will be added here -->
                     {% if experiences %}
@@ -66,7 +69,7 @@
                             <div class="experience-item" data-index="{{ loop.index0 }}">
                                 <div class="experience-header">
                                     <h3>{{ experience.title }} at {{ experience.company }}</h3>
-                                    <span class="experience-dates">{{ experience.start_date }} - {{ experience.end_date|default('Present') }}</span>
+                                    <span class="experience-dates">{{ experience.startDate }} - {{ experience.endDate|default('Present') }}</span>
                                     <div class="experience-actions">
                                         <button type="button" class="btn-edit" data-index="{{ loop.index0 }}">
                                             <i class="fas fa-edit"></i>
@@ -78,7 +81,7 @@
                                 </div>
                                 <div class="experience-description">
                                     <ul>
-                                        {% for bullet in experience.bullets.split('\n') if bullet.strip() %}
+                                        {% for bullet in experience.description.split('\n') if bullet.strip() %}
                                             <li>{{ bullet }}</li>
                                         {% endfor %}
                                     </ul>
@@ -266,15 +269,14 @@
         const jobDescription = document.getElementById('job-description');
         const experienceData = document.getElementById('experience-data');
         const mainForm = document.getElementById('main-form');
-        const form = document.querySelector('.resume-form');
+        
         // Array to store experiences
         let experiences = [];
         
-    
-        if (form) {
-        form.addEventListener('submit', function(e) {
+        // Form validation
+        positionForm.addEventListener('submit', function(e) {
             let isValid = true;
-            const requiredFields = form.querySelectorAll('[required]');
+            const requiredFields = positionForm.querySelectorAll('[required]');
             
             requiredFields.forEach(field => {
                 if (!field.value.trim()) {
@@ -303,7 +305,7 @@
         });
         
         // Clear error when field is filled
-        form.querySelectorAll('input, textarea').forEach(field => {
+        positionForm.querySelectorAll('input, textarea').forEach(field => {
             field.addEventListener('input', function() {
                 if (this.value.trim()) {
                     this.classList.remove('error-field');
@@ -314,7 +316,7 @@
                 }
             });
         });
-    }
+        
         // Initialize from existing data if available
         const initializeExperiences = () => {
             const items = document.querySelectorAll('.experience-item');
@@ -513,7 +515,7 @@
             }
         }
         
-        // AI help buttons (these would be connected to actual AI endpoints in a real implementation)
+        // AI help buttons
         const aiAchievementsBtn = document.getElementById('ai-achievements');
         const aiBulletPointsBtn = document.getElementById('ai-bullet-points');
         const aiTargetJobBtn = document.getElementById('ai-target-job');
@@ -575,8 +577,8 @@
                 });
             });
         }
-   
-
+        
+        // Form submission validation
         mainForm.addEventListener('submit', function(e) {
             if (experiences.length === 0) {
                 e.preventDefault();
