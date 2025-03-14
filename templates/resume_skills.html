@@ -13,51 +13,43 @@
             <p>Highlight your skills and expertise</p>
         </div>
         
-        <!-- Progress Bar -->
-        <div class="progress-container">
-            <div class="progress-info">
-                <span class="current-step">Step 2 of 5</span>
-                <span class="step-name">Skills</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 40%;"></div>
-            </div>
-            <div class="progress-steps">
-                <div class="step completed">
-                    <div class="step-icon">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <div class="step-label">Contact</div>
-                </div>
-                <div class="step active">
-                    <div class="step-icon">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                    <div class="step-label">Skills</div>
-                </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-briefcase"></i>
-                    </div>
-                    <div class="step-label">Experience</div>
-                </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <div class="step-label">Education</div>
-                </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <div class="step-label">Summary</div>
-                </div>
-            </div>
-        </div>
-        
         <div class="resume-form-container">
+            <!-- Main Content Area -->
             <div class="resume-form-content">
+                <!-- Compact Progress Indicator -->
+                <div class="compact-progress">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 40%;"></div>
+                        </div>
+                        <div class="step-indicator">Step 2 of 5: Skills</div>
+                    </div>
+                    
+                    <div class="progress-steps-list">
+                        <a href="{{ url_for('resume_contact', resume_id=resume.id) }}" class="progress-step-link completed">
+                            <span class="step-number">1</span>
+                            <span class="step-name">Contact</span>
+                            <span class="step-check"><i class="fas fa-check"></i></span>
+                        </a>
+                        <a href="{{ url_for('resume_skills', resume_id=resume.id) }}" class="progress-step-link active">
+                            <span class="step-number">2</span>
+                            <span class="step-name">Skills</span>
+                        </a>
+                        <a href="{{ url_for('resume_experience', resume_id=resume.id) }}" class="progress-step-link">
+                            <span class="step-number">3</span>
+                            <span class="step-name">Experience</span>
+                        </a>
+                        <a href="{{ url_for('resume_education', resume_id=resume.id) }}" class="progress-step-link">
+                            <span class="step-number">4</span>
+                            <span class="step-name">Education</span>
+                        </a>
+                        <a href="{{ url_for('resume_summary', resume_id=resume.id) }}" class="progress-step-link">
+                            <span class="step-number">5</span>
+                            <span class="step-name">Summary</span>
+                        </a>
+                    </div>
+                </div>
+                
                 {% if resume and resume.job %}
                 <div class="job-match-alert">
                     <div class="match-icon">
@@ -91,7 +83,7 @@
                         <label class="form-label">Skills <span class="required">*</span></label>
                         <div class="form-tip">
                             <i class="fas fa-lightbulb"></i>
-                            <span>Add your skills one by one or separate them with commas. Include both technical and soft skills relevant to the job.</span>
+                            <span>Add skills one by one or separate with commas. Include both technical and soft skills.</span>
                         </div>
                         
                         <div class="skills-input-container">
@@ -121,7 +113,6 @@
                                 <button type="button" class="skill-example" data-skill="SQL">SQL</button>
                                 <button type="button" class="skill-example" data-skill="AWS">AWS</button>
                                 <button type="button" class="skill-example" data-skill="Data Analysis">Data Analysis</button>
-                                <button type="button" class="skill-example" data-skill="UI/UX Design">UI/UX Design</button>
                             </div>
                         </div>
                         
@@ -132,8 +123,6 @@
                                 <button type="button" class="skill-example" data-skill="Leadership">Leadership</button>
                                 <button type="button" class="skill-example" data-skill="Problem Solving">Problem Solving</button>
                                 <button type="button" class="skill-example" data-skill="Team Collaboration">Team Collaboration</button>
-                                <button type="button" class="skill-example" data-skill="Time Management">Time Management</button>
-                                <button type="button" class="skill-example" data-skill="Project Management">Project Management</button>
                             </div>
                         </div>
                     </div>
@@ -156,37 +145,10 @@
                     </div>
                     
                     <div class="form-actions">
-                        <a href="{{ url_for('resume_skills', resume_id=resume.id) }}" class="btn btn-outline">Back: Skills</a>
+                        <a href="{{ url_for('resume_contact', resume_id=resume.id) }}" class="btn btn-outline">Back</a>
                         <button type="submit" class="btn btn-primary">Next: Experience</button>
                     </div>
                 </form>
-            </div>
-            
-            <div class="resume-form-sidebar">
-                <div class="sidebar-section">
-                    <h3>Why Skills Matter</h3>
-                    <p>Your skills section is crucial for passing through Applicant Tracking Systems (ATS). It's where you explicitly list the abilities that match job requirements.</p>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h3>Tips for a Strong Skills Section</h3>
-                    <ul class="tips-list">
-                        <li>Include a mix of technical/hard skills and soft skills</li>
-                        <li>Match skills mentioned in the job description</li>
-                        <li>Be specific (e.g., "React Native" instead of just "Mobile Development")</li>
-                        <li>Include proficiency level for technical skills if relevant</li>
-                        <li>Organize skills by categories for better readability</li>
-                        <li>Aim for 10-15 skills total</li>
-                    </ul>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h3>Example Skills</h3>
-                    <div class="example-box">
-                        <p><strong>Technical:</strong> Python, JavaScript, React, Node.js, SQL, AWS, Data Analysis, Git</p>
-                        <p><strong>Soft:</strong> Communication, Leadership, Problem Solving, Team Collaboration, Project Management</p>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -201,16 +163,48 @@
         const userDropdown = document.getElementById('user-dropdown');
         const form = document.querySelector('.resume-form');
         
-        if (userDropdownToggle && userDropdown) {
-            userDropdownToggle.addEventListener('click', function() {
-                userDropdown.classList.toggle('active');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                const requiredFields = form.querySelectorAll('[required]');
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        
+                        // Clear previous error
+                        const existingError = field.parentElement.querySelector('.field-error');
+                        if (existingError) {
+                            existingError.remove();
+                        }
+                        
+                        // Add error message
+                        const errorMsg = document.createElement('div');
+                        errorMsg.className = 'field-error';
+                        errorMsg.textContent = `Please enter your ${field.getAttribute('placeholder') || field.name}`;
+                        field.parentElement.appendChild(errorMsg);
+                        
+                        // Highlight field
+                        field.classList.add('error-field');
+                    }
+                });
+                
+                if (!isValid) {
+                    e.preventDefault();
+                }
             });
             
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!userDropdownToggle.contains(event.target) && !userDropdown.contains(event.target)) {
-                    userDropdown.classList.remove('active');
-                }
+            // Clear error when field is filled
+            form.querySelectorAll('input, textarea').forEach(field => {
+                field.addEventListener('input', function() {
+                    if (this.value.trim()) {
+                        this.classList.remove('error-field');
+                        const errorMsg = this.parentElement.querySelector('.field-error');
+                        if (errorMsg) {
+                            errorMsg.remove();
+                        }
+                    }
+                });
             });
         }
         
@@ -223,51 +217,6 @@
         // Array to store skills
         let skills = [];
         
-      
-        if (form) {
-        form.addEventListener('submit', function(e) {
-            let isValid = true;
-            const requiredFields = form.querySelectorAll('[required]');
-            
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    isValid = false;
-                    
-                    // Clear previous error
-                    const existingError = field.parentElement.querySelector('.field-error');
-                    if (existingError) {
-                        existingError.remove();
-                    }
-                    
-                    // Add error message
-                    const errorMsg = document.createElement('div');
-                    errorMsg.className = 'field-error';
-                    errorMsg.textContent = `Please enter your ${field.getAttribute('placeholder') || field.name}`;
-                    field.parentElement.appendChild(errorMsg);
-                    
-                    // Highlight field
-                    field.classList.add('error-field');
-                }
-            });
-            
-            if (!isValid) {
-                e.preventDefault();
-            }
-        });
-        
-        // Clear error when field is filled
-        form.querySelectorAll('input, textarea').forEach(field => {
-            field.addEventListener('input', function() {
-                if (this.value.trim()) {
-                    this.classList.remove('error-field');
-                    const errorMsg = this.parentElement.querySelector('.field-error');
-                    if (errorMsg) {
-                        errorMsg.remove();
-                    }
-                }
-            });
-        });
-    }
         // Initialize from existing data if available
         if (skillsHidden.value) {
             try {
@@ -388,7 +337,7 @@
             }
         });
         
-        // AI help buttons (these would be connected to actual AI endpoints in a real implementation)
+        // AI help buttons
         const aiExtractBtn = document.getElementById('ai-extract-skills');
         const aiRecommendBtn = document.getElementById('ai-recommend');
         const aiMatchJobBtn = document.getElementById('ai-match-job');
