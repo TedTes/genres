@@ -1,175 +1,151 @@
 {% extends "base.html" %}
 
-{% block title %}Contact Information - Resume Builder{% endblock %}
+{% block title %}Education - Resume Builder{% endblock %}
 
 {% block content %}
 <!-- Navigation Bar -->
-
 {% include 'partials/navbar.html' with context %}
-
 
 <section class="resume-builder">
     <div class="container">
         <div class="resume-builder-header">
             <h1>Create Your Resume</h1>
-            <p>Let's start with your contact information</p>
-        </div>
-        
-        <!-- Progress Bar -->
-        <div class="progress-container">
-            <div class="progress-info">
-                <span class="current-step">Step 1 of 5</span>
-                <span class="step-name">Contact Information</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 20%;"></div>
-            </div>
-            <div class="progress-steps">
-                <div class="step active">
-                    <div class="step-icon">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="step-label">Contact</div>
-                </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                    <div class="step-label">Skills</div>
-                </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-briefcase"></i>
-                    </div>
-                    <div class="step-label">Experience</div>
-                </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <div class="step-label">Education</div>
-                </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <div class="step-label">Summary</div>
-                </div>
-               
-            </div>
+            <p>Add your educational background</p>
         </div>
         
         <div class="resume-form-container">
             <div class="resume-form-content">
-                <form method="POST" class="resume-form">
-                    {{ form.hidden_tag() }}
-                    
-                    <div class="form-group">
-                        <label class="form-label">{{ form.name.label }}<span class="required">*</span></label>
-                        {{ form.name(class="form-control", placeholder="e.g. John Smith") }}
-                        <span class="field-tooltip" data-tooltip="Use your full professional name as you'd like it to appear on your resume">
-                            <i class="fas fa-info-circle"></i>
-                        </span>
-                        {% if form.name.errors %}
-                            <div class="error-feedback">
-                                {% for error in form.name.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        <div class="form-tip">
-                            <i class="fas fa-lightbulb"></i>
-                            <span>Use your full name as it should appear on your resume</span>
+                <!-- Compact Progress Indicator -->
+                <div class="compact-progress">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%;"></div>
                         </div>
+                        <div class="step-indicator">Step 4 of 5: Education</div>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">{{ form.email.label }}</label>
-                        {{ form.email(class="form-control", placeholder="e.g. johnsmith@example.com") }}
-                        {% if form.email.errors %}
-                            <div class="error-feedback">
-                                {% for error in form.email.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
+                    <div class="progress-steps-list">
+                        <a href="{{ url_for('resume_contact', resume_id=resume.id) }}" class="progress-step-link completed">
+                            <span class="step-number">1</span>
+                            <span class="step-name">Contact</span>
+                            <span class="step-check"><i class="fas fa-check"></i></span>
+                        </a>
+                        <a href="{{ url_for('resume_skills', resume_id=resume.id) }}" class="progress-step-link completed">
+                            <span class="step-number">2</span>
+                            <span class="step-name">Skills</span>
+                            <span class="step-check"><i class="fas fa-check"></i></span>
+                        </a>
+                        <a href="{{ url_for('resume_experience', resume_id=resume.id) }}" class="progress-step-link completed">
+                            <span class="step-number">3</span>
+                            <span class="step-name">Experience</span>
+                            <span class="step-check"><i class="fas fa-check"></i></span>
+                        </a>
+                        <a href="{{ url_for('resume_education', resume_id=resume.id) }}" class="progress-step-link active">
+                            <span class="step-number">4</span>
+                            <span class="step-name">Education</span>
+                        </a>
+                        <a href="{{ url_for('resume_summary', resume_id=resume.id) }}" class="progress-step-link">
+                            <span class="step-number">5</span>
+                            <span class="step-name">Summary</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div id="education-list" class="education-list">
+                    <!-- Education entries will be added here -->
+                    {% if educations %}
+                        {% for education in educations %}
+                            <div class="education-item" data-index="{{ loop.index0 }}">
+                                <div class="education-header">
+                                    <h3>{{ education.degree }}</h3>
+                                    <span class="education-school">{{ education.school }}</span>
+                                    <span class="education-dates">{{ education.startYear }} - {{ education.endYear|default('Present') }}</span>
+                                    <div class="education-actions">
+                                        <button type="button" class="btn-edit" data-index="{{ loop.index0 }}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn-delete" data-index="{{ loop.index0 }}">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {% if education.description %}
+                                <div class="education-description">
+                                    <p>{{ education.description }}</p>
+                                </div>
+                                {% endif %}
                             </div>
-                        {% endif %}
-                        <div class="form-tip">
-                            <i class="fas fa-lightbulb"></i>
-                            <span>Use a professional email address that you check regularly</span>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-education">
+                            <p>No education added yet. Click the button below to add your educational background.</p>
                         </div>
+                    {% endif %}
+                </div>
+                
+                <button type="button" id="add-education-btn" class="btn btn-outline btn-add">
+                    <i class="fas fa-plus"></i> Add Education
+                </button>
+                
+                <div id="education-form" class="education-form" style="display: none;">
+                    <div class="form-header">
+                        <h3 id="form-title">Add Education</h3>
+                        <button type="button" id="close-form-btn" class="btn-close">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">{{ form.phone.label }}</label>
-                        {{ form.phone(class="form-control", placeholder="e.g. (555) 123-4567") }}
-                        {% if form.phone.errors %}
-                            <div class="error-feedback">
-                                {% for error in form.phone.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
+                    <form id="education-entry-form" class="resume-form">
+                        <input type="hidden" id="education-index" value="-1">
+                        
+                        <div class="form-group">
+                            <label class="form-label">Degree / Certificate <span class="required">*</span></label>
+                            <input type="text" id="degree" class="form-control" placeholder="e.g. Bachelor of Science in Computer Science" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">School / University <span class="required">*</span></label>
+                            <input type="text" id="school" class="form-control" placeholder="e.g. University of California, Berkeley" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group form-group-half">
+                                <label class="form-label">Start Year <span class="required">*</span></label>
+                                <input type="text" id="start-year" class="form-control" placeholder="e.g. 2018" required>
                             </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group form-group-half">
-                            <label class="form-label">Location</label>
-                            <input type="text" name="location" class="form-control" placeholder="e.g. San Francisco, CA" 
-                                   value="{{ resume.resume_data.get('contact', {}).get('location', '') }}">
-                            <div class="form-tip">
-                                <i class="fas fa-lightbulb"></i>
-                                <span>City and state/country is usually sufficient</span>
+                            
+                            <div class="form-group form-group-half">
+                                <label class="form-label">End Year</label>
+                                <div class="end-year-group">
+                                    <input type="text" id="end-year" class="form-control" placeholder="e.g. 2022">
+                                    <label class="current-education-label">
+                                        <input type="checkbox" id="current-education"> Currently studying
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="form-group form-group-half">
-                            <label class="form-label">LinkedIn Profile</label>
-                            <input type="text" name="linkedin" class="form-control" placeholder="e.g. linkedin.com/in/johnsmith"
-                                   value="{{ resume.resume_data.get('contact', {}).get('linkedin', '') }}">
+                        <div class="form-group">
+                            <label class="form-label">Description (Optional)</label>
+                            <textarea id="education-description" class="form-control" rows="3" placeholder="e.g. Relevant coursework, achievements, or activities"></textarea>
                         </div>
-                    </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" id="cancel-btn" class="btn btn-outline">Cancel</button>
+                            <button type="submit" id="save-btn" class="btn btn-primary">Save Education</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <form method="POST" id="main-form" class="main-form">
+                    {{ form.hidden_tag() }}
+                    <input type="hidden" name="education_data" id="education-data" value="">
                     
-                    <div class="form-group">
-                        <label class="form-label">Website/Portfolio (Optional)</label>
-                        <input type="text" name="website" class="form-control" placeholder="e.g. johnsmith.com"
-                               value="{{ resume.resume_data.get('contact', {}).get('website', '') }}">
-                    </div>
-                    
-                    <div class="form-actions">
-                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline">Cancel</a>
-                        <button type="submit" class="btn btn-primary">Next: Skills</button>
+                    <div class="form-actions main-actions">
+                        <a href="{{ url_for('resume_experience', resume_id=resume.id) }}" class="btn btn-outline">Back: Experience</a>
+                        <button type="submit" class="btn btn-primary">Next: Summary</button>
                     </div>
                 </form>
-            </div>
-            
-            <div class="resume-form-sidebar">
-                <div class="sidebar-section">
-                    <h3>Why Contact Information Matters</h3>
-                    <p>Your contact information is the first thing employers see. Make sure it's professional and up-to-date so they can easily reach you.</p>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h3>Tips</h3>
-                    <ul class="tips-list">
-                        <li>Use a professional email address (avoid nicknames)</li>
-                        <li>Include a cell phone number that you check regularly</li>
-                        <li>Add your LinkedIn profile if it's up-to-date</li>
-                        <li>Include a portfolio or personal website if relevant to your field</li>
-                    </ul>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h3>Example</h3>
-                    <div class="example-box">
-                        <p class="example-name">Sarah Johnson</p>
-                        <p class="example-details">
-                            <i class="fas fa-envelope"></i> sarah.johnson@email.com<br>
-                            <i class="fas fa-phone"></i> (555) 123-4567<br>
-                            <i class="fas fa-map-marker-alt"></i> Chicago, IL<br>
-                            <i class="fab fa-linkedin"></i> linkedin.com/in/sarahjohnson
-                        </p>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -182,51 +158,7 @@
         // User dropdown toggle
         const userDropdownToggle = document.getElementById('user-dropdown-toggle');
         const userDropdown = document.getElementById('user-dropdown');
-        const form = document.querySelector('.resume-form');
-        if (form) {
-        form.addEventListener('submit', function(e) {
-            let isValid = true;
-            const requiredFields = form.querySelectorAll('[required]');
-            
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    isValid = false;
-                    
-                    // Clear previous error
-                    const existingError = field.parentElement.querySelector('.field-error');
-                    if (existingError) {
-                        existingError.remove();
-                    }
-                    
-                    // Add error message
-                    const errorMsg = document.createElement('div');
-                    errorMsg.className = 'field-error';
-                    errorMsg.textContent = `Please enter your ${field.getAttribute('placeholder') || field.name}`;
-                    field.parentElement.appendChild(errorMsg);
-                    
-                    // Highlight field
-                    field.classList.add('error-field');
-                }
-            });
-            
-            if (!isValid) {
-                e.preventDefault();
-            }
-        });
         
-        // Clear error when field is filled
-        form.querySelectorAll('input, textarea').forEach(field => {
-            field.addEventListener('input', function() {
-                if (this.value.trim()) {
-                    this.classList.remove('error-field');
-                    const errorMsg = this.parentElement.querySelector('.field-error');
-                    if (errorMsg) {
-                        errorMsg.remove();
-                    }
-                }
-            });
-        });
-    }
         if (userDropdownToggle && userDropdown) {
             userDropdownToggle.addEventListener('click', function() {
                 userDropdown.classList.toggle('active');
@@ -238,6 +170,347 @@
                     userDropdown.classList.remove('active');
                 }
             });
+        }
+        
+        // Education form handling
+        const educationList = document.getElementById('education-list');
+        const addEducationBtn = document.getElementById('add-education-btn');
+        const educationForm = document.getElementById('education-form');
+        const educationEntryForm = document.getElementById('education-entry-form');
+        const closeFormBtn = document.getElementById('close-form-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const formTitle = document.getElementById('form-title');
+        const educationIndex = document.getElementById('education-index');
+        const degree = document.getElementById('degree');
+        const school = document.getElementById('school');
+        const startYear = document.getElementById('start-year');
+        const endYear = document.getElementById('end-year');
+        const currentEducation = document.getElementById('current-education');
+        const educationDescription = document.getElementById('education-description');
+        const educationData = document.getElementById('education-data');
+        const mainForm = document.getElementById('main-form');
+        
+        // Array to store education entries
+        let educations = [];
+        
+        // Initialize from existing data if available
+        const initializeEducations = () => {
+            const items = document.querySelectorAll('.education-item');
+            
+            if (items.length > 0) {
+                items.forEach(item => {
+                    const index = parseInt(item.dataset.index);
+                    const degree = item.querySelector('h3').textContent;
+                    const school = item.querySelector('.education-school').textContent;
+                    const dates = item.querySelector('.education-dates').textContent.split(' - ');
+                    const startYear = dates[0];
+                    const endYear = dates[1] === 'Present' ? '' : dates[1];
+                    
+                    let description = '';
+                    const descriptionEl = item.querySelector('.education-description p');
+                    if (descriptionEl) {
+                        description = descriptionEl.textContent;
+                    }
+                    
+                    educations[index] = {
+                        degree: degree,
+                        school: school,
+                        startYear: startYear,
+                        endYear: endYear,
+                        current: endYear === 'Present',
+                        description: description
+                    };
+                });
+            }
+            
+            // Update hidden input with JSON data
+            educationData.value = JSON.stringify(educations);
+        };
+        
+        // Call initialization
+        initializeEducations();
+        
+        // Show add education form
+        addEducationBtn.addEventListener('click', function() {
+            formTitle.textContent = 'Add Education';
+            educationIndex.value = -1;
+            educationEntryForm.reset();
+            educationForm.style.display = 'block';
+            addEducationBtn.style.display = 'none';
+        });
+        
+        // Close form buttons
+        closeFormBtn.addEventListener('click', function() {
+            educationForm.style.display = 'none';
+            addEducationBtn.style.display = 'block';
+        });
+        
+        cancelBtn.addEventListener('click', function() {
+            educationForm.style.display = 'none';
+            addEducationBtn.style.display = 'block';
+        });
+        
+        // Current education checkbox handler
+        currentEducation.addEventListener('change', function() {
+            if (this.checked) {
+                endYear.value = '';
+                endYear.disabled = true;
+            } else {
+                endYear.disabled = false;
+            }
+        });
+        
+        // Save education
+        educationEntryForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate form
+            if (!degree.value || !school.value || !startYear.value) {
+                alert('Please fill out all required fields.');
+                return;
+            }
+            
+            const index = parseInt(educationIndex.value);
+            const isNewEducation = index === -1;
+            
+            const education = {
+                degree: degree.value,
+                school: school.value,
+                startYear: startYear.value,
+                endYear: currentEducation.checked ? '' : endYear.value,
+                current: currentEducation.checked,
+                description: educationDescription.value
+            };
+            
+            if (isNewEducation) {
+                educations.push(education);
+            } else {
+                educations[index] = education;
+            }
+            
+            // Update hidden input with JSON data
+            educationData.value = JSON.stringify(educations);
+            
+            // Rebuild education list
+            renderEducations();
+            
+            // Close form
+            educationForm.style.display = 'none';
+            addEducationBtn.style.display = 'block';
+        });
+        
+        // Render education list
+        function renderEducations() {
+            educationList.innerHTML = '';
+            
+            if (educations.length === 0) {
+                educationList.innerHTML = `
+                    <div class="no-education">
+                        <p>No education added yet. Click the button below to add your educational background.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            educations.forEach((edu, index) => {
+                let html = `
+                    <div class="education-item" data-index="${index}">
+                        <div class="education-header">
+                            <h3>${edu.degree}</h3>
+                            <span class="education-school">${edu.school}</span>
+                            <span class="education-dates">${edu.startYear} - ${edu.current ? 'Present' : edu.endYear}</span>
+                            <div class="education-actions">
+                                <button type="button" class="btn-edit" data-index="${index}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn-delete" data-index="${index}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                `;
+                
+                if (edu.description) {
+                    html += `
+                        <div class="education-description">
+                            <p>${edu.description}</p>
+                        </div>
+                    `;
+                }
+                
+                html += `</div>`;
+                
+                educationList.innerHTML += html;
+            });
+            
+            // Add edit and delete button event listeners
+            document.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.addEventListener('click', editEducation);
+            });
+            
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', deleteEducation);
+            });
+        }
+        
+        // Edit education
+        function editEducation() {
+            const index = this.dataset.index;
+            const education = educations[index];
+            
+            formTitle.textContent = 'Edit Education';
+            educationIndex.value = index;
+            
+            degree.value = education.degree;
+            school.value = education.school;
+            startYear.value = education.startYear;
+            
+            if (education.current) {
+                currentEducation.checked = true;
+                endYear.value = '';
+                endYear.disabled = true;
+            } else {
+                currentEducation.checked = false;
+                endYear.value = education.endYear;
+                endYear.disabled = false;
+            }
+            
+            educationDescription.value = education.description;
+            
+            educationForm.style.display = 'block';
+            addEducationBtn.style.display = 'none';
+        }
+        
+        // Delete education
+        function deleteEducation() {
+            if (confirm('Are you sure you want to delete this education entry?')) {
+                const index = this.dataset.index;
+                educations.splice(index, 1);
+                
+                // Update hidden input with JSON data
+                educationData.value = JSON.stringify(educations);
+                
+                // Rebuild education list
+                renderEducations();
+            }
+        }
+        
+        // Function to handle reusing previous education data
+        function handlePreviousEducation(previousEducation) {
+            if (!previousEducation || 
+                (!Array.isArray(previousEducation) && typeof previousEducation !== 'object') || 
+                (Array.isArray(previousEducation) && previousEducation.length === 0)) {
+                return;
+            }
+            
+            // Convert to array if it's a single object
+            if (!Array.isArray(previousEducation)) {
+                previousEducation = [previousEducation];
+            }
+            
+            // If there are no educations yet, show reuse option
+            if (document.querySelector('.no-education')) {
+                // Create reuse interface
+                const reuseContainer = document.createElement('div');
+                reuseContainer.className = 'reuse-previous-data';
+                reuseContainer.innerHTML = `
+                    <div class="reuse-header">
+                        <h3><i class="fas fa-history"></i> Reuse Previous Education Data</h3>
+                        <p>We found ${previousEducation.length} education entries from your previous resumes. Would you like to reuse them?</p>
+                    </div>
+                    <div class="reuse-actions">
+                        <button type="button" class="btn btn-primary btn-sm" id="reuse-all-edu">Reuse All</button>
+                        <button type="button" class="btn btn-outline btn-sm" id="reuse-select-edu">Select Items</button>
+                        <button type="button" class="btn btn-outline btn-sm" id="reuse-cancel-edu">Start Fresh</button>
+                    </div>
+                    <div class="reuse-selection" style="display: none;"></div>
+                `;
+                
+                // Insert before add button
+                addEducationBtn.parentNode.insertBefore(reuseContainer, addEducationBtn);
+                
+                // Handle reuse all button
+                document.getElementById('reuse-all-edu').addEventListener('click', function() {
+                    // Add all previous education entries
+                    previousEducation.forEach(edu => {
+                        educations.push(edu);
+                    });
+                    
+                    // Update the UI
+                    renderEducations();
+                    
+                    // Update hidden input with JSON data
+                    educationData.value = JSON.stringify(educations);
+                    
+                    // Remove the reuse interface
+                    reuseContainer.remove();
+                });
+                
+                // Handle select items button
+                document.getElementById('reuse-select-edu').addEventListener('click', function() {
+                    const selectionContainer = document.querySelector('.reuse-selection');
+                    selectionContainer.style.display = 'block';
+                    
+                    // Create selection interface
+                    selectionContainer.innerHTML = `
+                        <div class="reuse-items">
+                            ${previousEducation.map((edu, index) => `
+                                <div class="reuse-item">
+                                    <label class="reuse-checkbox">
+                                        <input type="checkbox" class="reuse-item-check" data-index="${index}">
+                                        <span class="checkmark"></span>
+                                        <div class="reuse-item-details">
+                                            <strong>${edu.degree}</strong>
+                                            <div class="reuse-item-school">${edu.school}</div>
+                                            <div class="reuse-item-date">${edu.startYear} - ${edu.current ? 'Present' : edu.endYear}</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="reuse-selection-actions">
+                            <button type="button" class="btn btn-primary btn-sm" id="reuse-selected-edu">Add Selected</button>
+                        </div>
+                    `;
+                    
+                    // Handle add selected button
+                    document.getElementById('reuse-selected-edu').addEventListener('click', function() {
+                        const selectedItems = document.querySelectorAll('.reuse-item-check:checked');
+                        
+                        if (selectedItems.length === 0) {
+                            alert('Please select at least one item to reuse.');
+                            return;
+                        }
+                        
+                        // Add selected education entries
+                        selectedItems.forEach(item => {
+                            const index = parseInt(item.dataset.index);
+                            educations.push(previousEducation[index]);
+                        });
+                        
+                        // Update the UI
+                        renderEducations();
+                        
+                        // Update hidden input with JSON data
+                        educationData.value = JSON.stringify(educations);
+                        
+                        // Remove the reuse interface
+                        reuseContainer.remove();
+                    });
+                });
+                
+                // Handle cancel button
+                document.getElementById('reuse-cancel-edu').addEventListener('click', function() {
+                    // Remove the reuse interface
+                    reuseContainer.remove();
+                });
+            }
+        }
+        
+        // Check if there's previous education data passed from the server
+        if (typeof previousEducation !== 'undefined' && previousEducation) {
+            handlePreviousEducation(previousEducation);
         }
     });
 </script>
