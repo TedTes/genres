@@ -26,6 +26,7 @@ class ResumePDFGenerator:
         self.template_class = template_info.get('css_class', 'template-standard')
         self.primary_color = self._get_template_color()
         self.page_size = A4  # Default to A4, can be customized
+        self.doc = None  # Will be set up in _setup_document
         
     def _get_template_color(self):
         """Get the primary color for the template."""
@@ -41,6 +42,10 @@ class ResumePDFGenerator:
     
     def _setup_document(self):
         """Set up the PDF document with appropriate margins based on template."""
+        # If we already have a document created, return it
+        if self.doc is not None:
+            return self.doc
+            
         # Adjust margins based on template
         if self.template_class == 'template-minimal':
             margins = (0.5*inch, 0.5*inch, 0.5*inch, 0.5*inch)
@@ -49,7 +54,8 @@ class ResumePDFGenerator:
         else:
             margins = (0.75*inch, 0.75*inch, 0.75*inch, 0.75*inch)
             
-        return SimpleDocTemplate(
+        # Create a new document
+        self.doc = SimpleDocTemplate(
             self.buffer,
             pagesize=self.page_size,
             rightMargin=margins[0],
@@ -58,6 +64,8 @@ class ResumePDFGenerator:
             bottomMargin=margins[3],
             title=self._get_resume_title()
         )
+        
+        return self.doc
     
     def _get_resume_title(self):
         """Generate a title for the PDF document."""
@@ -328,8 +336,12 @@ class ResumePDFGenerator:
                             table_style.add('BACKGROUND', (j, i), (j, i), colors.Color(0.9, 0.9, 0.9))
                             table_style.add('TEXTCOLOR', (j, i), (j, i), self.primary_color)
             
-            # Create table with even width distribution
-            col_width = (self.page_size[0] - self.buffer._doc.leftMargin - self.buffer._doc.rightMargin) / 3
+            # Create table with appropriate width distribution
+            # Get document margins from our document object
+            doc = self._setup_document()
+            available_width = self.page_size[0] - doc.leftMargin - doc.rightMargin
+            col_width = available_width / 3
+            
             skills_table = Table(skill_rows, colWidths=[col_width] * 3)
             skills_table.setStyle(table_style)
             
@@ -344,8 +356,8 @@ class ResumePDFGenerator:
         Returns:
             BytesIO: Buffer containing the generated PDF
         """
-        # Setup document
-        doc = self._setup_document()
+        # Setup document first to initialize self.doc
+        self._setup_document()
         
         # Create styles
         styles = self._create_styles()
@@ -365,7 +377,7 @@ class ResumePDFGenerator:
         self._add_skills(elements, styles)
         
         # Build document
-        doc.build(elements)
+        self.doc.build(elements)
         
         # Reset buffer position to beginning
         self.buffer.seek(0)
@@ -416,4 +428,6 @@ def generate_resume_pdf(resume_id, current_user, db, Resume):
     
     except Exception as e:
         print(f"Error generating PDF: {str(e)}")
+        import traceback
+        traceback.print_exc()  # Print full traceback for debugging
         return None, str(e)
