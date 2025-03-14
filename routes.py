@@ -637,12 +637,28 @@ def init_routes(flask_app):
                 db.session.rollback()
                 print(f"Error processing education data: {str(e)}")
                 flash(f"Error saving education: {str(e)}", 'danger')
+                
+        # Find existing educations to pass to the template
+        educations = []
+        if resume.resume_data and 'education' in resume.resume_data:
+            edu_data = resume.resume_data['education']
+            if isinstance(edu_data, list):
+                educations = edu_data
+            elif isinstance(edu_data, dict):
+                educations = [edu_data]  # Convert single education to list format
+                
+        
         if resume.resume_data and 'education' in resume.resume_data:
             edu = resume.resume_data['education']
-            form.degree.data = edu.get('degree', '')
-            form.school.data = edu.get('school', '')
-            form.year.data = edu.get('year', '')
-        return render_template('resume_education.html', form=form, resume=resume)
+            # Handle different formats properly
+            if isinstance(edu, dict):
+                # Single education as dictionary
+                form.degree.data = edu.get('degree', '')
+                form.school.data = edu.get('school', '')
+                form.year.data = edu.get('year', '')
+         
+                
+        return render_template('resume_education.html', form=form, resume=resume, educations=educations)
 
     @app.route('/resume/<int:resume_id>/skills', methods=['GET', 'POST'])
     @login_required
