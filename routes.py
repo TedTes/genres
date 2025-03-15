@@ -1020,3 +1020,61 @@ def init_routes(flask_app):
         
         # Redirect back to resume preview
         return redirect(url_for('resume_preview', resume_id=resume_id))
+
+    @app.route('/resume/<int:resume_id>/save-field', methods=['POST'])
+    @login_required
+    def save_resume_field(resume_id):
+        """Save a single field from a resume form via AJAX."""
+        resume = Resume.query.get_or_404(resume_id)
+        
+        # Check if the resume belongs to the current user
+        if resume.user_id != current_user.id:
+            return jsonify({"success": False, "error": "Unauthorized"}), 403
+        
+        # Get field data from request
+        data = request.get_json()
+        if not data or 'field_name' not in data or 'field_value' not in data:
+            return jsonify({"success": False, "error": "Missing field data"}), 400
+        
+        field_name = data['field_name']
+        field_value = data['field_value']
+        
+        try:
+            # Initialize resume_data if it doesn't exist
+            if resume.resume_data is None:
+                resume.resume_data = {}
+            
+            # Determine the section based on field name
+            if field_name in ['name', 'email', 'phone', 'location', 'linkedin', 'website']:
+                # Contact fields
+                if 'contact' not in resume.resume_data:
+                    resume.resume_data['contact'] = {}
+                resume.resume_data['contact'][field_name] = field_value
+            
+            elif field_name == 'skills':
+                # Skills field
+                resume.resume_data['skills'] = field_value
+            
+            elif field_name == 'summary':
+                # Summary field
+                if isinstance(resume.resume_data.get('summary'), dict):
+                    resume.resume_data['summary']['content'] = field_value
+                else:
+                    resume.resume_data['summary'] = {
+                        'content': field_value,
+                        'last_updated': datetime.now().isoformat()
+                    }
+            
+            # Flag the resume_data field as modified so SQLAlchemy detects the change
+            attributes.flag_modified(resume, 'resume_data')
+            
+            # Save changes
+            db.session.commit()
+            
+            return jsonify({"success": True})
+        
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error saving field: {str(e)}")
+            return jsonify({"success": False, "error": str(e)}), 500
+
