@@ -35,10 +35,12 @@
 }
 
 .step-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1e293b;
-    margin: 0 0 0.75rem 0;
+    font-size: .84rem;
+    font-weight: 400; 
+    color: #64748b; 
+    margin: 0;
+    padding: 0;
+    font-style: italic; 
 }
 
 /* Progress Bar */
@@ -48,6 +50,7 @@
     border-radius: 2px;
     overflow: hidden;
     margin-bottom: 1.5rem;
+    margin-top: 0.75rem;
 }
 
 .progress-fill {
