@@ -2133,27 +2133,7 @@ body.modal-open {
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: var(--space-6);}
-.resume-form-sidebar {
-    position: sticky;
-    top: 6rem;
-    height: fit-content;}
-.sidebar-section {
-    background-color: var(--white);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: var(--space-5);
-    margin-bottom: var(--space-5);}
-.sidebar-section h3 {
-    font-size: var(--space-4);
-    font-weight: 600;
-    margin-bottom: var(--space-4);
-    color: var(--dark);
-    padding-bottom: var(--space-2);
-    border-bottom: 1px solid var(--border);}
-.sidebar-section p {
-    font-size: 0.875rem;
-    color: var(--text);
-    margin-bottom: var(--space-4);}
+
 .tips-list {
     list-style-type: none;
     padding: 0;
