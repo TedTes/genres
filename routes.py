@@ -474,13 +474,34 @@ def init_routes(flask_app):
     @login_required
     def start_resume(job_id):
         job = Job.query.get_or_404(job_id)
-        resume = Resume(user_id=current_user.id, job_id=job.id, resume_data={})
-        db.session.add(resume)
-        db.session.commit()
+        
+        # Get user's previous resume data for pre-population
+        last_resume = Resume.query.filter_by(user_id=current_user.id).order_by(Resume.updated_at.desc()).first()
+        # Initialize with empty or previous data
+        resume_data = {}
+        if last_resume and last_resume.resume_data:
+            resume_data = last_resume.resume_data.copy()
+            # Create new resume with pre-populated data
+            last_resume = Resume(user_id=current_user.id, job_id=job.id, resume_data=resume_data)
+            db.session.add(last_resume)
+            db.session.commit()
+        else: 
+            # Create a new resume without a job_id
+            last_resume = Resume(
+                user_id=current_user.id,
+                resume_data={},
+                title=job.title
+            )
+            
+            # Add to database
+            db.session.add(last_resume)
+            db.session.commit()
+        # Extract relevant skills from job description
         skills = analyze_job_description(job.description)
         session['skills'] = skills
-        flash('Resume creation started! Let\'s add your contact information.', 'success')
-        return redirect(url_for('resume_contact', resume_id=resume.id))
+        
+        flash('Resume created with your information! Customize it for this job posting.', 'success')
+        return redirect(url_for('resume_contact', resume_id=last_resume.id))
 
     @app.route('/resume/<int:resume_id>/contact', methods=['GET', 'POST'])
     @login_required
@@ -510,7 +531,7 @@ def init_routes(flask_app):
               db.session.rollback()
               print(f"Error saving contact info: {str(e)}")
               flash(f"Error saving contact information: {str(e)}", 'danger')
-
+    
         if resume.resume_data and 'contact' in resume.resume_data:
             form.name.data = resume.resume_data['contact'].get('name', '')
             form.email.data = resume.resume_data['contact'].get('email', '')
