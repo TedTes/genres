@@ -1,213 +1,143 @@
-{% extends "base.html" %}
+{% extends "resume_form_base.html" %}
 
-{% block title %}Skills - Resume Builder{% endblock %}
+{% set current_step = 'skills' %}
 
-{% block content %}
-<!-- Navigation Bar -->
-{% include 'partials/navbar.html' with context %}
+{% block form_title %}Skills{% endblock %}
+{% block header_title %}Create Your Resume{% endblock %}
+{% block header_subtitle %}Highlight your skills and expertise{% endblock %}
 
-<section class="resume-builder">
-    <div class="container">
-        <div class="resume-builder-header">
-            <h1>Create Your Resume</h1>
-            <p>Highlight your skills and expertise</p>
+{% block job_targeting_message %}
+Skills that match this job posting will be highlighted to improve your chances.
+{% endblock %}
+
+{% block form_content %}
+{% if suggested_skills %}
+<div class="suggested-skills">
+    <h3>Skills Detected from Job</h3>
+    <p>Click to add these skills detected from the job posting:</p>
+    <div class="skill-suggestions">
+        {% for skill in suggested_skills %}
+        <button type="button" class="skill-suggestion" data-skill="{{ skill }}">
+            <i class="fas fa-plus"></i> {{ skill }}
+        </button>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<form method="POST" class="resume-form" id="skills-form">
+    {{ form.hidden_tag() }}
+    
+    <div class="form-group">
+        <label class="form-label">Skills <span class="required">*</span></label>
+        <div class="form-tip">
+            <i class="fas fa-lightbulb"></i>
+            <span>Add skills one by one or separate with commas. Include both technical and soft skills.</span>
         </div>
         
-        <div class="resume-form-container">
-            <!-- Main Content Area -->
-            <div class="resume-form-content">
-                <!-- Compact Progress Indicator -->
-                <div class="compact-progress">
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 40%;"></div>
-                        </div>
-                        <div class="step-indicator">Step 2 of 5: Skills</div>
-                    </div>
-                    
-                    <div class="progress-steps-list">
-                        <a href="{{ url_for('resume_contact', resume_id=resume.id) }}" class="progress-step-link completed">
-                            <span class="step-number">1</span>
-                            <span class="step-name">Contact</span>
-                            <span class="step-check"><i class="fas fa-check"></i></span>
-                        </a>
-                        <a href="{{ url_for('resume_skills', resume_id=resume.id) }}" class="progress-step-link active">
-                            <span class="step-number">2</span>
-                            <span class="step-name">Skills</span>
-                        </a>
-                        <a href="{{ url_for('resume_experience', resume_id=resume.id) }}" class="progress-step-link">
-                            <span class="step-number">3</span>
-                            <span class="step-name">Experience</span>
-                        </a>
-                        <a href="{{ url_for('resume_education', resume_id=resume.id) }}" class="progress-step-link">
-                            <span class="step-number">4</span>
-                            <span class="step-name">Education</span>
-                        </a>
-                        <a href="{{ url_for('resume_summary', resume_id=resume.id) }}" class="progress-step-link">
-                            <span class="step-number">5</span>
-                            <span class="step-name">Summary</span>
-                        </a>
-                    </div>
-                </div>
-                
-                {% if resume and resume.job %}
-                <div class="job-match-alert">
-                    <div class="match-icon">
-                        <i class="fas fa-bullseye"></i>
-                    </div>
-                    <div class="match-content">
-                        <h3>Targeting: {{ resume.job.title }} at {{ resume.job.company }}</h3>
-                        <p>Skills that match this job posting will be highlighted in green.</p>
-                    </div>
-                </div>
-                {% endif %}
-                
-                <form method="POST" class="resume-form" id="skills-form">
-                    {{ form.hidden_tag() }}
-                    
-                    {% if suggested_skills %}
-                    <div class="suggested-skills">
-                        <h3>Skills Detected from Job</h3>
-                        <p>Click to add these skills detected from the job posting:</p>
-                        <div class="skill-suggestions">
-                            {% for skill in suggested_skills %}
-                            <button type="button" class="skill-suggestion" data-skill="{{ skill }}">
-                                <i class="fas fa-plus"></i> {{ skill }}
-                            </button>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
-                    
-                    <div class="form-group">
-                        <label class="form-label">Skills <span class="required">*</span></label>
-                        <div class="form-tip">
-                            <i class="fas fa-lightbulb"></i>
-                            <span>Add skills one by one or separate with commas. Include both technical and soft skills.</span>
-                        </div>
-                        
-                        <div class="skills-input-container">
-                            <div id="skills-tags" class="skills-tags">
-                                <!-- Skills tags will be added here dynamically -->
-                            </div>
-                            <input type="text" id="skills-input" class="skills-input" placeholder="Type a skill and press Enter">
-                        </div>
-                        
-                        {{ form.skills(id="skills-hidden", style="display: none;") }}
-                        {% if form.skills.errors %}
-                            <div class="error-feedback">
-                                {% for error in form.skills.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="skills-categories">
-                        <div class="skills-category">
-                            <h4>Technical Skills</h4>
-                            <div class="category-examples">
-                                <button type="button" class="skill-example" data-skill="Python">Python</button>
-                                <button type="button" class="skill-example" data-skill="JavaScript">JavaScript</button>
-                                <button type="button" class="skill-example" data-skill="React">React</button>
-                                <button type="button" class="skill-example" data-skill="SQL">SQL</button>
-                                <button type="button" class="skill-example" data-skill="AWS">AWS</button>
-                                <button type="button" class="skill-example" data-skill="Data Analysis">Data Analysis</button>
-                            </div>
-                        </div>
-                        
-                        <div class="skills-category">
-                            <h4>Soft Skills</h4>
-                            <div class="category-examples">
-                                <button type="button" class="skill-example" data-skill="Communication">Communication</button>
-                                <button type="button" class="skill-example" data-skill="Leadership">Leadership</button>
-                                <button type="button" class="skill-example" data-skill="Problem Solving">Problem Solving</button>
-                                <button type="button" class="skill-example" data-skill="Team Collaboration">Team Collaboration</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="ai-help-section">
-                        <h3><i class="fas fa-robot"></i> Need help with your skills?</h3>
-                        <div class="ai-options">
-                            <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-extract-skills">
-                                <i class="fas fa-magic"></i> Extract from Experience
-                            </button>
-                            <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-recommend">
-                                <i class="fas fa-lightbulb"></i> Get Recommendations
-                            </button>
-                            {% if resume and resume.job %}
-                            <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-match-job">
-                                <i class="fas fa-bullseye"></i> Match with Job
-                            </button>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <a href="{{ url_for('resume_contact', resume_id=resume.id) }}" class="btn btn-outline">Back</a>
-                        <button type="submit" class="btn btn-primary">Next: Experience</button>
-                    </div>
-                </form>
+        <div class="skills-input-container">
+            <div id="skills-tags" class="skills-tags">
+                <!-- Skills tags will be added here dynamically -->
+            </div>
+            <input type="text" id="skills-input" class="skills-input" placeholder="Type a skill and press Enter">
+        </div>
+        
+        {{ form.skills(id="skills-hidden", style="display: none;") }}
+        {% if form.skills.errors %}
+            <div class="error-feedback">
+                {% for error in form.skills.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="skills-categories">
+        <div class="skills-category">
+            <h4>Technical Skills</h4>
+            <div class="category-examples">
+                <button type="button" class="skill-example" data-skill="Python">Python</button>
+                <button type="button" class="skill-example" data-skill="JavaScript">JavaScript</button>
+                <button type="button" class="skill-example" data-skill="React">React</button>
+                <button type="button" class="skill-example" data-skill="SQL">SQL</button>
+                <button type="button" class="skill-example" data-skill="AWS">AWS</button>
+                <button type="button" class="skill-example" data-skill="Data Analysis">Data Analysis</button>
+            </div>
+        </div>
+        
+        <div class="skills-category">
+            <h4>Soft Skills</h4>
+            <div class="category-examples">
+                <button type="button" class="skill-example" data-skill="Communication">Communication</button>
+                <button type="button" class="skill-example" data-skill="Leadership">Leadership</button>
+                <button type="button" class="skill-example" data-skill="Problem Solving">Problem Solving</button>
+                <button type="button" class="skill-example" data-skill="Team Collaboration">Team Collaboration</button>
             </div>
         </div>
     </div>
-</section>
+    
+    <div class="ai-help-section">
+        <h3><i class="fas fa-robot"></i> Need help with your skills?</h3>
+        <div class="ai-options">
+            <button type="button" class="btn btn-outline btn-sm ai-option" 
+                    id="ai-extract-skills" data-action="extract" data-target="skills-hidden">
+                <i class="fas fa-magic"></i> Extract from Experience
+            </button>
+            <button type="button" class="btn btn-outline btn-sm ai-option" 
+                    id="ai-recommend" data-action="recommend" data-target="skills-hidden">
+                <i class="fas fa-lightbulb"></i> Get Recommendations
+            </button>
+            {% if resume and resume.job %}
+            <button type="button" class="btn btn-outline btn-sm ai-option" 
+                    id="ai-match-job" data-action="match" data-target="skills-hidden">
+                <i class="fas fa-bullseye"></i> Match with Job
+            </button>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="form-actions">
+        <a href="{{ url_for('resume_contact', resume_id=resume.id) }}" class="btn btn-outline">Back</a>
+        <button type="submit" class="btn btn-primary">Next: Experience</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block sidebar_content %}
+<div class="sidebar-section">
+    <h3>Why Skills Matter</h3>
+    <p>Skills are one of the first things recruiters and ATS systems look for. The right mix of technical and soft skills can significantly increase your chances of getting an interview.</p>
+</div>
+
+<div class="sidebar-section">
+    <h3>Tips for Great Skills Section</h3>
+    <ul class="tips-list">
+        <li>Include a mix of technical and soft skills</li>
+        <li>Be specific with technical skills (e.g., "React Native" instead of just "Mobile Development")</li>
+        <li>Match skills from the job description when possible</li>
+        <li>Avoid listing too many skills - focus on quality over quantity</li>
+        <li>Order your most relevant skills first</li>
+        <li>Include proficiency level when appropriate</li>
+    </ul>
+</div>
+
+<div class="sidebar-section">
+    <h3>In-Demand Skills</h3>
+    <p>These skills are frequently requested in job postings:</p>
+    <div class="skills-list">
+        <span class="skill-tag">Problem Solving</span>
+        <span class="skill-tag">Communication</span>
+        <span class="skill-tag">Teamwork</span>
+        <span class="skill-tag">Adaptability</span>
+        <span class="skill-tag">Project Management</span>
+        <span class="skill-tag">Data Analysis</span>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // User dropdown toggle
-        const userDropdownToggle = document.getElementById('user-dropdown-toggle');
-        const userDropdown = document.getElementById('user-dropdown');
-        const form = document.querySelector('.resume-form');
-        
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                let isValid = true;
-                const requiredFields = form.querySelectorAll('[required]');
-                
-                requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        isValid = false;
-                        
-                        // Clear previous error
-                        const existingError = field.parentElement.querySelector('.field-error');
-                        if (existingError) {
-                            existingError.remove();
-                        }
-                        
-                        // Add error message
-                        const errorMsg = document.createElement('div');
-                        errorMsg.className = 'field-error';
-                        errorMsg.textContent = `Please enter your ${field.getAttribute('placeholder') || field.name}`;
-                        field.parentElement.appendChild(errorMsg);
-                        
-                        // Highlight field
-                        field.classList.add('error-field');
-                    }
-                });
-                
-                if (!isValid) {
-                    e.preventDefault();
-                }
-            });
-            
-            // Clear error when field is filled
-            form.querySelectorAll('input, textarea').forEach(field => {
-                field.addEventListener('input', function() {
-                    if (this.value.trim()) {
-                        this.classList.remove('error-field');
-                        const errorMsg = this.parentElement.querySelector('.field-error');
-                        if (errorMsg) {
-                            errorMsg.remove();
-                        }
-                    }
-                });
-            });
-        }
-        
         // Skills input handling
         const skillsInput = document.getElementById('skills-input');
         const skillsTags = document.getElementById('skills-tags');
@@ -333,32 +263,9 @@
         skillsForm.addEventListener('submit', function(e) {
             if (skills.length === 0) {
                 e.preventDefault();
-                alert('Please add at least one skill before continuing.');
+                showNotification('Please add at least one skill before continuing.', 'warning');
             }
         });
-        
-        // AI help buttons
-        const aiExtractBtn = document.getElementById('ai-extract-skills');
-        const aiRecommendBtn = document.getElementById('ai-recommend');
-        const aiMatchJobBtn = document.getElementById('ai-match-job');
-        
-        if (aiExtractBtn) {
-            aiExtractBtn.addEventListener('click', function() {
-                alert('This feature would extract skills from your experience section. Implement API call here.');
-            });
-        }
-        
-        if (aiRecommendBtn) {
-            aiRecommendBtn.addEventListener('click', function() {
-                alert('This feature would recommend skills based on your profile and industry. Implement API call here.');
-            });
-        }
-        
-        if (aiMatchJobBtn) {
-            aiMatchJobBtn.addEventListener('click', function() {
-                alert('This feature would analyze the job description and suggest matching skills. Implement API call here.');
-            });
-        }
     });
 </script>
 {% endblock %}
