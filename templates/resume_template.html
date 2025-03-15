@@ -8,34 +8,57 @@
 
 <section class="resume-preview-section">
     <div class="container">
-        <div class="preview-header">
-            <a href="{{ url_for('dashboard') }}" class="back-link">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
+        <!-- Fixed header with actions -->
+        <div class="preview-header fixed-header">
+            <div class="header-left">
+                <a href="{{ url_for('dashboard') }}" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
             
             <div class="header-actions">
-                <div class="template-switcher">
-                    <button class="btn-template" id="switch-template-btn">
-                       <a href = "{{url_for('pdf_settings',resume_id=resume.id)}}">
-                        <i class="fas fa-palette"></i> Change Template
-                       </a> 
-                    </button>
-                    
-                </div>
-                
-                <div class="pdf-actions">
-                    <a href="{{ url_for('pdf_settings', resume_id=resume.id) }}" class="btn-settings">
-                        <i class="fas fa-cog"></i> PDF Settings
-                    </a>
-                    <a href="{{ url_for('generate_pdf', resume_id=resume.id) }}" class="btn-download">
-                        <i class="fas fa-download"></i> Download PDF
-                    </a>
-                </div>
-
+                <a href="{{ url_for('preview_pdf', resume_id=resume.id) }}" class="btn btn-outline btn-sm" target="_blank">
+                    <i class="fas fa-eye"></i> Preview PDF
+                </a>
+                <a href="{{ url_for('generate_pdf', resume_id=resume.id) }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-download"></i> Download PDF
+                </a>
             </div>
         </div>
         
-        <div class="resume-preview-container">
+   <!-- Resume Preview Container -->
+<div class="resume-preview-container">
+    <div class="preview-layout">
+        <!-- Fixed left sidebar -->
+        <div class="template-sidebar">
+            <div class="sidebar-inner">
+                <h3 class="sidebar-title">Select Template</h3>
+                
+                <form id="template-form" method="POST" action="{{ url_for('update_resume_template', resume_id=resume.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="templates-list">
+                        {% for template_id, template in templates.items() %}
+                        <div class="template-option">
+                            <input type="radio" name="template" id="template-{{ template_id }}" 
+                                value="{{ template_id }}" {% if resume.template == template_id %}checked{% endif %}
+                                onchange="document.getElementById('template-form').submit();">
+                            <label for="template-{{ template_id }}" class="template-label">
+                                <div class="template-color-indicator {{ template.css_class }}"></div>
+                                <div class="template-info">
+                                    <span class="template-name">{{ template.name }}</span>
+                                    <span class="template-description">{{ template.description }}</span>
+                                </div>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Resume content that scrolls with main window -->
+        <div class="resume-content-area">
             <div class="resume-paper {{ templates[resume.template]['css_class'] if resume.template in templates else 'template-standard' }}">
                 {% if resume.resume_data %}
                     <!-- Contact Information -->
@@ -150,28 +173,36 @@
             </div>
         </div>
     </div>
+</div>
+    </div>
 </section>
 {% endblock %}
 
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // User dropdown toggle
-        const userDropdownToggle = document.getElementById('user-dropdown-toggle');
-        const userDropdown = document.getElementById('user-dropdown');
+        // Template selection highlighting
+        const templateRadios = document.querySelectorAll('input[name="template"]');
+        const templateLabels = document.querySelectorAll('.template-label');
         
-        if (userDropdownToggle && userDropdown) {
-            userDropdownToggle.addEventListener('click', function() {
-                userDropdown.classList.toggle('active');
-            });
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!userDropdownToggle.contains(event.target) && !userDropdown.contains(event.target)) {
-                    userDropdown.classList.remove('active');
+        templateRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Remove active class from all labels
+                templateLabels.forEach(label => {
+                    label.classList.remove('active');
+                });
+                
+                // Add active class to selected template
+                if (this.checked) {
+                    document.querySelector(`label[for="${this.id}"]`).classList.add('active');
                 }
             });
-        }
+        });
+        
+        // Initially set active class for selected template
+        document.querySelectorAll('input[name="template"]:checked').forEach(radio => {
+            document.querySelector(`label[for="${radio.id}"]`).classList.add('active');
+        });
     });
 </script>
 {% endblock %}
