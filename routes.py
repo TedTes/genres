@@ -846,28 +846,7 @@ def init_routes(flask_app):
             download_name=result
         )
 
-    @app.route('/resume/<int:resume_id>/pdf-settings', methods=['GET', 'POST'])
-    @login_required
-    def pdf_settings(resume_id):
-        """Page for customizing PDF export options."""
-        resume = Resume.query.get_or_404(resume_id)
-        
-        # Check if the resume belongs to the current user
-        if resume.user_id != current_user.id:
-            flash('You do not have permission to access this resume.', 'danger')
-            return redirect(url_for('dashboard'))
-        
-        # Get available templates
-        from resume_templates import RESUME_TEMPLATES
-        
-        
-        # Render settings page for GET request
-        return render_template(
-            'resume_pdf_settings.html',
-            resume=resume,
-            templates=RESUME_TEMPLATES
-        )
-   
+
     @app.route('/resume/create/general')
     @login_required
     def create_general_resume():
