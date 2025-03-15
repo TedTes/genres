@@ -447,22 +447,7 @@ ul, ol {
     text-align: center;
     position: relative;
     padding: 0 var(--space-4);}
-.step-number {
-    position: absolute;
-    top: -var(--space-5);
-    left: 50%;
-    transform: translateX(-50%);
-    width: var(--space-8);
-    height: var(--space-8);
-    background-color: var(--primary-light);
-    color: var(--white);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--space-5);
-    font-weight: 700;
-    z-index: 2;}
+
 .step-icon {
     width: 2.5rem;
     height: 2.5rem;
@@ -2697,7 +2682,7 @@ body.modal-open {
     width: auto;
 }
 
-.step-number {
+.home-step-number {
     position: absolute;
     top: -1.5rem;
     left: 50%;
