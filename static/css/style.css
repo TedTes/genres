@@ -872,10 +872,6 @@ ul, ol {
     margin-top: 3.5rem;}
 
      
-.resume-preview-container {
-    background-color: var(--light-gray);
-    padding: var(--space-6);
-    border-radius: var(--radius);}
 .resume-paper {
     width: 100%;
     max-width: 800px;
@@ -2431,9 +2427,7 @@ body.modal-open {
     }
     
   
-    .resume-preview-container {
-        padding: var(--space-4);
-    }
+ 
     
     .resume-paper {
         padding: var(--space-4);
@@ -2819,12 +2813,17 @@ body.modal-open {
 Preview Header Styles
 =============================== */
 .preview-header {
+    position: sticky;
+    top: 67px;
+    background-color: white;
+    z-index: 1000;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1rem 0;
     margin-bottom: 1.5rem;
     border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
   }
 
   
@@ -4002,4 +4001,293 @@ Job Details page
   .btn-success:hover {
     background-color: #0e9f6e;
     color: white;
+  }
+
+
+
+
+
+
+  /* 
+  ============================
+  side bar styles 
+  =============================
+   */
+
+
+.resume-preview-container {
+    width: 100%;
+    background-color: #f8fafc;
+  }
+  
+  .preview-layout {
+    display: flex;
+    width: 100%;
+    position: relative;
+  }
+  
+  /* Template Sidebar Styles */
+  .template-sidebar {
+    width: 280px;
+    min-width: 280px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    z-index: 5;
+  }
+  
+  .sidebar-inner {
+    background-color: white;
+    border-right: 1px solid #e2e8f0;
+    padding: 1.5rem;
+    height: 100%;
+    max-height: 100vh;
+    overflow-y: auto; /* Sidebar content scrolls independently */
+  }
+  
+  .sidebar-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .templates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .template-option {
+    position: relative;
+  }
+  
+  .template-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .template-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .template-label:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+  }
+  
+  .template-option input[type="radio"]:checked + .template-label {
+    border-color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.05);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+  
+  .template-color-indicator {
+    width: 1.25rem;
+    height: 2.5rem;
+    border-radius: 0.125rem;
+  }
+  
+  .template-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  
+  .template-name {
+    font-weight: 600;
+    color: #334155;
+    font-size: 0.875rem;
+  }
+  
+  .template-description {
+    font-size: 0.75rem;
+    color: #64748b;
+  }
+  
+  /* Template-specific color indicators */
+  .template-standard {
+    background-color: #3b82f6; /* Blue */
+  }
+  
+  .template-modern {
+    background-color: #10b981; /* Green */
+  }
+  
+  .template-minimal {
+    background-color: #4b5563; /* Gray */
+  }
+  
+  .template-executive {
+    background-color: #1e40af; /* Dark Blue */
+  }
+  
+  .template-creative {
+    background-color: #ec4899; /* Pink */
+  }
+  
+  .template-technical {
+    background-color: #6366f1; /* Indigo */
+  }
+  
+  /* Resume Content Styles */
+  .resume-content-area {
+    flex: 1;
+    padding: 2rem;
+    background-color: #f1f5f9;
+    /* No overflow or height restrictions - scrolls with main window */
+  }
+  
+  .resume-paper {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    background-color: white;
+    padding: 2.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+    border-radius: 0.375rem;
+    min-height: 1100px; /* A4 size approximation */
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 1024px) {
+    .preview-layout {
+      flex-direction: column;
+    }
+    
+    .template-sidebar {
+      width: 100%;
+      min-width: 100%;
+      height: auto;
+      position: relative;
+      top: 0;
+    }
+    
+    .sidebar-inner {
+      max-height: 300px;
+      border-right: none;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .resume-content-area {
+      padding: 1.5rem;
+    }
+    
+    .resume-paper {
+      padding: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .resume-content-area {
+      padding: 1rem;
+    }
+    
+    .resume-paper {
+      padding: 1rem;
+    }
+  }
+
+  /* Template-specific styling for the resume paper */
+  .resume-paper.template-standard h3 {
+    color: #3b82f6;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .resume-paper.template-modern h3 {
+    color: #10b981;
+    padding-left: 0.5rem;
+    border-left: 3px solid #10b981;
+  }
+  
+  .resume-paper.template-minimal h3 {
+    color: #4b5563;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .resume-paper.template-executive h3 {
+    color: #1e40af;
+    font-family: 'Times New Roman', Times, serif;
+    border-bottom: 1px solid #1e40af;
+  }
+  
+  .resume-paper.template-creative h3 {
+    color: #ec4899;
+    position: relative;
+    padding-bottom: 0.5rem;
+  }
+  
+  .resume-paper.template-creative h3:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 3rem;
+    height: 3px;
+    background-color: #ec4899;
+  }
+  
+  .resume-paper.template-technical h3 {
+    color: #6366f1;
+    background-color: rgba(99, 102, 241, 0.1);
+    padding: 0.5rem;
+    border-radius: 4px;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 1024px) {
+    .preview-layout {
+      grid-template-columns: 200px 1fr;
+      gap: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .preview-layout {
+      grid-template-columns: 1fr;
+    }
+    
+    .template-sidebar {
+      position: static;
+      margin-bottom: 1.5rem;
+    }
+    
+    .templates-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+    
+    .template-actions {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+    
+    .template-actions .btn {
+      flex: 1;
+      min-width: 120px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .templates-list {
+      grid-template-columns: 1fr;
+    }
+    
+    .template-actions {
+      flex-direction: column;
+    }
   }
