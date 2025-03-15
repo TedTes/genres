@@ -3,7 +3,6 @@
 {% set current_step = 'experience' %}
 
 {% block form_title %}Work Experience{% endblock %}
-{% block header_title %}Create Your Resume{% endblock %}
 {% block header_subtitle %}Add your work experience{% endblock %}
 
 {% block job_targeting_message %}
@@ -142,39 +141,6 @@ Tailor your experience to highlight skills and achievements relevant to this pos
 </form>
 {% endblock %}
 
-{% block sidebar_content %}
-<div class="sidebar-section">
-    <h3>Why Work Experience Matters</h3>
-    <p>Your work history demonstrates your skills in action and shows career progression. It's the most important section on your resume.</p>
-</div>
-
-<div class="sidebar-section">
-    <h3>Tips for Great Work Experience</h3>
-    <ul class="tips-list">
-        <li>Focus on achievements rather than just duties</li>
-        <li>Use numbers and metrics to quantify your impact</li>
-        <li>Start bullet points with strong action verbs</li>
-        <li>Tailor your descriptions to highlight skills relevant to the job</li>
-        <li>List experiences in reverse chronological order (newest first)</li>
-        <li>Include 3-5 bullet points per position</li>
-    </ul>
-</div>
-
-<div class="sidebar-section">
-    <h3>Example</h3>
-    <div class="example-box">
-        <p class="example-position">Senior Software Engineer</p>
-        <p class="example-company">TechCorp Inc.</p>
-        <p class="example-dates">Jan 2020 - Present</p>
-        <ul class="example-bullets">
-            <li>Led the development of a payment processing system that reduced transaction errors by 35%</li>
-            <li>Mentored 5 junior developers, improving team productivity by 20%</li>
-            <li>Optimized database queries, decreasing load times by 40%</li>
-            <li>Implemented automated testing, reducing bugs in production by 25%</li>
-        </ul>
-    </div>
-</div>
-{% endblock %}
 
 {% block extra_js %}
 <script>

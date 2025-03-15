@@ -3,7 +3,6 @@
 {% set current_step = 'education' %}
 
 {% block form_title %}Education{% endblock %}
-{% block header_title %}Create Your Resume{% endblock %}
 {% block header_subtitle %}Add your educational background{% endblock %}
 
 {% block job_targeting_message %}
@@ -129,34 +128,7 @@ Highlight education and coursework relevant to this position.
 </form>
 {% endblock %}
 
-{% block sidebar_content %}
-<div class="sidebar-section">
-    <h3>Education on Your Resume</h3>
-    <p>Your educational background demonstrates your knowledge foundation and academic achievements, which can be especially important for recent graduates or career changers.</p>
-</div>
 
-<div class="sidebar-section">
-    <h3>Tips for Education Section</h3>
-    <ul class="tips-list">
-        <li>List your highest level of education first</li>
-        <li>Include relevant certifications and professional development</li>
-        <li>For recent graduates, add relevant coursework, projects, or academic achievements</li>
-        <li>If you have extensive work experience, keep education brief</li>
-        <li>Include GPA if it's above 3.5 (and you graduated recently)</li>
-        <li>List degrees in progress with expected graduation date</li>
-    </ul>
-</div>
-
-<div class="sidebar-section">
-    <h3>Example</h3>
-    <div class="example-box">
-        <p class="example-degree">Bachelor of Science in Computer Science</p>
-        <p class="example-school">University of Washington</p>
-        <p class="example-dates">2018 - 2022</p>
-        <p class="example-description">Graduated cum laude (GPA: 3.7/4.0). Relevant coursework: Data Structures, Algorithms, Machine Learning, Web Development. Recipient of Dean's Scholar Award.</p>
-    </div>
-</div>
-{% endblock %}
 
 {% block extra_js %}
 <script>
