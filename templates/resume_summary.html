@@ -1,211 +1,137 @@
-{% extends "base.html" %}
+{% extends "resume_form_base.html" %}
 
-{% block title %}Professional Summary - Resume Builder{% endblock %}
+{% set current_step = 'summary' %}
 
-{% block content %}
-<!-- Navigation Bar -->
-{% include 'partials/navbar.html' with context %}
+{% block form_title %}Professional Summary{% endblock %}
+{% block header_title %}Create Your Resume{% endblock %}
+{% block header_subtitle %}Craft a compelling professional summary{% endblock %}
 
-<section class="resume-builder">
-    <div class="container">
-        <div class="resume-builder-header">
-            <h1>Create Your Resume</h1>
-            <p>Craft a compelling professional summary</p>
+{% block job_targeting_message %}
+Your summary should highlight skills and experiences that match this position.
+{% endblock %}
+
+{% block form_content %}
+{% if skills %}
+<div class="job-skills-match">
+    <h3>Matching Skills for This Job</h3>
+    <p>We've detected these skills in the job description. Consider highlighting them in your summary:</p>
+    <div class="skills-tags">
+        {% for skill in skills %}
+        <span class="skill-tag" data-skill="{{ skill }}">{{ skill }}</span>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<form method="POST" class="resume-form" id="summary-form">
+    {{ form.hidden_tag() }}
+    
+    <div class="form-group">
+        <label class="form-label">{{ form.summary.label }} <span class="required">*</span></label>
+        <div class="form-tip">
+            <i class="fas fa-lightbulb"></i>
+            <span>Keep your summary concise (3-5 sentences) and focused on your professional value</span>
         </div>
+        {{ form.summary(class="form-control", rows=6, placeholder="Write a concise summary of your professional background, skills, and career goals...", id="summary-textarea") }}
+        {% if form.summary.errors %}
+            <div class="error-feedback">
+                {% for error in form.summary.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="auto-generate-section">
+        <h3><i class="fas fa-magic"></i> Auto-Generate Summary</h3>
+        <p>Let us create a professional summary for you based on your resume information.</p>
         
-        <div class="resume-form-container">
-            <div class="resume-form-content">
-                <!-- Compact Progress Indicator -->
-                <div class="compact-progress">
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 100%;"></div>
-                        </div>
-                        <div class="step-indicator">Step 5 of 5: Summary</div>
-                    </div>
-                    
-                    <div class="progress-steps-list">
-                        <a href="{{ url_for('resume_contact', resume_id=resume.id) }}" class="progress-step-link completed">
-                            <span class="step-number">1</span>
-                            <span class="step-name">Contact</span>
-                            <span class="step-check"><i class="fas fa-check"></i></span>
-                        </a>
-                        <a href="{{ url_for('resume_skills', resume_id=resume.id) }}" class="progress-step-link completed">
-                            <span class="step-number">2</span>
-                            <span class="step-name">Skills</span>
-                            <span class="step-check"><i class="fas fa-check"></i></span>
-                        </a>
-                        <a href="{{ url_for('resume_experience', resume_id=resume.id) }}" class="progress-step-link completed">
-                            <span class="step-number">3</span>
-                            <span class="step-name">Experience</span>
-                            <span class="step-check"><i class="fas fa-check"></i></span>
-                        </a>
-                        <a href="{{ url_for('resume_education', resume_id=resume.id) }}" class="progress-step-link completed">
-                            <span class="step-number">4</span>
-                            <span class="step-name">Education</span>
-                            <span class="step-check"><i class="fas fa-check"></i></span>
-                        </a>
-                        <a href="{{ url_for('resume_summary', resume_id=resume.id) }}" class="progress-step-link active">
-                            <span class="step-number">5</span>
-                            <span class="step-name">Summary</span>
-                        </a>
-                    </div>
+        <div class="generator-options">
+            <div class="option-group">
+                <label class="option-label">Style:</label>
+                <div class="option-buttons">
+                    <button type="button" class="option-btn active" data-style="professional">Professional</button>
+                    <button type="button" class="option-btn" data-style="concise">Concise</button>
+                    <button type="button" class="option-btn" data-style="achievement">Achievement-Focused</button>
                 </div>
-                
-                {% if resume and resume.job %}
-                <div class="job-match-alert">
-                    <div class="match-icon">
-                        <i class="fas fa-bullseye"></i>
-                    </div>
-                    <div class="match-content">
-                        <h3>Targeting: {{ resume.job.title }} at {{ resume.job.company }}</h3>
-                        <p>Your summary should highlight skills and experiences that match this position.</p>
-                    </div>
-                </div>
-                {% endif %}
-                
-                {% if skills %}
-                <div class="job-skills-match">
-                    <h3>Matching Skills for This Job</h3>
-                    <p>We've detected these skills in the job description. Consider highlighting them in your summary:</p>
-                    <div class="skills-tags">
-                        {% for skill in skills %}
-                        <span class="skill-tag" data-skill="{{ skill }}">{{ skill }}</span>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-                
-                <form method="POST" class="resume-form" id="summary-form">
-                    {{ form.hidden_tag() }}
-                    
-                    <div class="form-group">
-                        <label class="form-label">{{ form.summary.label }} <span class="required">*</span></label>
-                        <div class="form-tip">
-                            <i class="fas fa-lightbulb"></i>
-                            <span>Keep your summary concise (3-5 sentences) and focused on your professional value</span>
-                        </div>
-                        {{ form.summary(class="form-control", rows=6, placeholder="Write a concise summary of your professional background, skills, and career goals...", id="summary-textarea") }}
-                        {% if form.summary.errors %}
-                            <div class="error-feedback">
-                                {% for error in form.summary.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="auto-generate-section">
-                        <h3><i class="fas fa-magic"></i> Auto-Generate Summary</h3>
-                        <p>Let us create a professional summary for you based on your resume information.</p>
-                        
-                        <div class="generator-options">
-                            <div class="option-group">
-                                <label class="option-label">Style:</label>
-                                <div class="option-buttons">
-                                    <button type="button" class="option-btn active" data-style="professional">Professional</button>
-                                    <button type="button" class="option-btn" data-style="concise">Concise</button>
-                                    <button type="button" class="option-btn" data-style="achievement">Achievement-Focused</button>
-                                </div>
-                            </div>
-                            
-                            <div class="option-group">
-                                <label class="option-label">Length:</label>
-                                <div class="option-buttons">
-                                    <button type="button" class="option-btn" data-length="short">Short</button>
-                                    <button type="button" class="option-btn active" data-length="medium">Medium</button>
-                                    <button type="button" class="option-btn" data-length="long">Long</button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <button type="button" id="generate-summary-btn" class="btn btn-primary btn-generate">
-                            <i class="fas fa-robot"></i> Generate Summary
-                        </button>
-                    </div>
-                    
-                    <div class="generated-summaries" style="display: none;">
-                        <h3>Choose a Summary</h3>
-                        <p>Select one of these AI-generated summaries or edit them to your liking:</p>
-                        
-                        <div class="summary-options">
-                            <!-- Summary options will be added here by JavaScript -->
-                        </div>
-                    </div>
-                    
-                    <div class="ai-help-section">
-                        <h3><i class="fas fa-robot"></i> Need help with your summary?</h3>
-                        <div class="ai-options">
-                            <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-rewrite">
-                                <i class="fas fa-magic"></i> Improve Writing
-                            </button>
-                            <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-tailor">
-                                <i class="fas fa-bullseye"></i> Tailor to Job
-                            </button>
-                            <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-keywords">
-                                <i class="fas fa-key"></i> Add Keywords
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <a href="{{ url_for('resume_education', resume_id=resume.id) }}" class="btn btn-outline">Back: Education</a>
-                        <button type="submit" class="btn btn-primary">Finish Resume</button>
-                    </div>
-                </form>
             </div>
             
-            <div class="resume-form-sidebar">
-                <div class="sidebar-section">
-                    <h3>Why Your Summary Matters</h3>
-                    <p>Your professional summary is often the first thing recruiters read. It's your chance to make a strong first impression and highlight what makes you unique.</p>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h3>Tips for a Great Summary</h3>
-                    <ul class="tips-list">
-                        <li>Keep it concise (3-5 sentences)</li>
-                        <li>Tailor it to the specific job you're applying for</li>
-                        <li>Highlight your years of experience and key skills</li>
-                        <li>Include notable achievements or specializations</li>
-                        <li>Avoid generic phrases like "hard worker" or "team player"</li>
-                        <li>Start with a strong statement about your professional identity</li>
-                        <li>End with your career goals or what you bring to the table</li>
-                    </ul>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h3>Example Summary</h3>
-                    <div class="example-box">
-                        <p>Results-driven Software Engineer with 5+ years of experience developing scalable web applications using JavaScript, React, and Node.js. Specialized in building intuitive user interfaces and optimizing application performance. Contributed to projects that increased user engagement by 35% and reduced load times by 40%. Passionate about creating clean, maintainable code and solving complex technical challenges.</p>
-                    </div>
+            <div class="option-group">
+                <label class="option-label">Length:</label>
+                <div class="option-buttons">
+                    <button type="button" class="option-btn" data-length="short">Short</button>
+                    <button type="button" class="option-btn active" data-length="medium">Medium</button>
+                    <button type="button" class="option-btn" data-length="long">Long</button>
                 </div>
             </div>
         </div>
+        
+        <button type="button" id="generate-summary-btn" class="btn btn-primary btn-generate">
+            <i class="fas fa-robot"></i> Generate Summary
+        </button>
     </div>
-</section>
+    
+    <div class="generated-summaries" style="display: none;">
+        <h3>Choose a Summary</h3>
+        <p>Select one of these AI-generated summaries or edit them to your liking:</p>
+        
+        <div class="summary-options">
+            <!-- Summary options will be added here by JavaScript -->
+        </div>
+    </div>
+    
+    <div class="ai-help-section">
+        <h3><i class="fas fa-robot"></i> Need help with your summary?</h3>
+        <div class="ai-options">
+            <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-rewrite">
+                <i class="fas fa-magic"></i> Improve Writing
+            </button>
+            <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-tailor">
+                <i class="fas fa-bullseye"></i> Tailor to Job
+            </button>
+            <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-keywords">
+                <i class="fas fa-key"></i> Add Keywords
+            </button>
+        </div>
+    </div>
+    
+    <div class="form-actions">
+        <a href="{{ url_for('resume_education', resume_id=resume.id) }}" class="btn btn-outline">Back: Education</a>
+        <button type="submit" class="btn btn-primary">Finish Resume</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block sidebar_content %}
+<div class="sidebar-section">
+    <h3>Why Your Summary Matters</h3>
+    <p>Your professional summary is often the first thing recruiters read. It's your chance to make a strong first impression and highlight what makes you unique.</p>
+</div>
+
+<div class="sidebar-section">
+    <h3>Tips for a Great Summary</h3>
+    <ul class="tips-list">
+        <li>Keep it concise (3-5 sentences)</li>
+        <li>Tailor it to the specific job you're applying for</li>
+        <li>Highlight your years of experience and key skills</li>
+        <li>Include notable achievements or specializations</li>
+        <li>Avoid generic phrases like "hard worker" or "team player"</li>
+        <li>Start with a strong statement about your professional identity</li>
+        <li>End with your career goals or what you bring to the table</li>
+    </ul>
+</div>
+
+<div class="sidebar-section">
+    <h3>Example Summary</h3>
+    <div class="example-box">
+        <p>Results-driven Software Engineer with 5+ years of experience developing scalable web applications using JavaScript, React, and Node.js. Specialized in building intuitive user interfaces and optimizing application performance. Contributed to projects that increased user engagement by 35% and reduced load times by 40%. Passionate about creating clean, maintainable code and solving complex technical challenges.</p>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // User dropdown toggle
-        const userDropdownToggle = document.getElementById('user-dropdown-toggle');
-        const userDropdown = document.getElementById('user-dropdown');
-        
-        if (userDropdownToggle && userDropdown) {
-            userDropdownToggle.addEventListener('click', function() {
-                userDropdown.classList.toggle('active');
-            });
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!userDropdownToggle.contains(event.target) && !userDropdown.contains(event.target)) {
-                    userDropdown.classList.remove('active');
-                }
-            });
-        }
-        
         // Form validation
         const form = document.querySelector('.resume-form');
         
@@ -632,14 +558,15 @@
     });
 </script>
 
+
 <style>
-/* Additional styles for the summary page */
+
 .auto-generate-section {
     background-color: #f0f7ff;
     border-radius: var(--radius);
     padding: 1.5rem;
-    margin: 1.5rem 0;
     border-left: 4px solid var(--primary);
+ 
 }
 
 .auto-generate-section h3 {

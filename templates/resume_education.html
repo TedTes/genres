@@ -1,239 +1,166 @@
-{% extends "base.html" %}
+{% extends "resume_form_base.html" %}
 
-{% block title %}Education - Resume Builder{% endblock %}
+{% set current_step = 'education' %}
 
-{% block content %}
-<!-- Navigation Bar -->
-{% include 'partials/navbar.html' with context %}
+{% block form_title %}Education{% endblock %}
+{% block header_title %}Create Your Resume{% endblock %}
+{% block header_subtitle %}Add your educational background{% endblock %}
 
-<section class="resume-builder">
-    <div class="container">
-        <div class="resume-builder-header">
-            <h1>Create Your Resume</h1>
-            <p>Add your educational background</p>
-        </div>
-        
-        <div class="resume-form-container">
-            <div class="resume-form-content">
-                <!-- Compact Progress Indicator -->
-                <div class="compact-progress">
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 80%;"></div>
-                        </div>
-                        <div class="step-indicator">Step 4 of 5: Education</div>
-                    </div>
-                    
-                    <div class="progress-steps-list">
-                        <a href="{{ url_for('resume_contact', resume_id=resume.id) }}" class="progress-step-link completed">
-                            <span class="step-number">1</span>
-                            <span class="step-name">Contact</span>
-                            <span class="step-check"><i class="fas fa-check"></i></span>
-                        </a>
-                        <a href="{{ url_for('resume_skills', resume_id=resume.id) }}" class="progress-step-link completed">
-                            <span class="step-number">2</span>
-                            <span class="step-name">Skills</span>
-                            <span class="step-check"><i class="fas fa-check"></i></span>
-                        </a>
-                        <a href="{{ url_for('resume_experience', resume_id=resume.id) }}" class="progress-step-link completed">
-                            <span class="step-number">3</span>
-                            <span class="step-name">Experience</span>
-                            <span class="step-check"><i class="fas fa-check"></i></span>
-                        </a>
-                        <a href="{{ url_for('resume_education', resume_id=resume.id) }}" class="progress-step-link active">
-                            <span class="step-number">4</span>
-                            <span class="step-name">Education</span>
-                        </a>
-                        <a href="{{ url_for('resume_summary', resume_id=resume.id) }}" class="progress-step-link">
-                            <span class="step-number">5</span>
-                            <span class="step-name">Summary</span>
-                        </a>
-                    </div>
-                </div>
-                
-                {% if resume and resume.job %}
-                <div class="job-match-alert">
-                    <div class="match-icon">
-                        <i class="fas fa-bullseye"></i>
-                    </div>
-                    <div class="match-content">
-                        <h3>Targeting: {{ resume.job.title }} at {{ resume.job.company }}</h3>
-                        <p>Highlight education and coursework relevant to this position.</p>
-                    </div>
-                </div>
-                {% endif %}
-                
-                <div id="education-list" class="education-list">
-                    <!-- Education entries will be added here -->
-                    {% if educations %}
-                        {% for education in educations %}
-                            <div class="education-item" data-index="{{ loop.index0 }}">
-                                <div class="education-header">
-                                    <h3>{{ education.degree }}</h3>
-                                    <span class="education-school">{{ education.school }}</span>
-                                    <span class="education-dates">{{ education.startYear }} - {{ education.endYear|default('Present') }}</span>
-                                    <div class="education-actions">
-                                        <button type="button" class="btn-edit" data-index="{{ loop.index0 }}">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button type="button" class="btn-delete" data-index="{{ loop.index0 }}">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                {% if education.description %}
-                                <div class="education-description">
-                                    <p>{{ education.description }}</p>
-                                </div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="no-education">
-                            <p>No education added yet. Click the button below to add your educational background.</p>
-                        </div>
-                    {% endif %}
-                </div>
-                
-                <button type="button" id="add-education-btn" class="btn btn-outline btn-add">
-                    <i class="fas fa-plus"></i> Add Education
-                </button>
-                
-                <div id="education-form" class="education-form" style="display: none;">
-                    <div class="form-header">
-                        <h3 id="form-title">Add Education</h3>
-                        <button type="button" id="close-form-btn" class="btn-close">
-                            <i class="fas fa-times"></i>
+{% block job_targeting_message %}
+Highlight education and coursework relevant to this position.
+{% endblock %}
+
+{% block form_content %}
+<div id="education-list" class="education-list">
+    <!-- Education entries will be added here -->
+    {% if educations %}
+        {% for education in educations %}
+            <div class="education-item" data-index="{{ loop.index0 }}">
+                <div class="education-header">
+                    <h3>{{ education.degree }}</h3>
+                    <span class="education-school">{{ education.school }}</span>
+                    <span class="education-dates">{{ education.startYear }} - {{ education.endYear|default('Present') }}</span>
+                    <div class="education-actions">
+                        <button type="button" class="btn-edit" data-index="{{ loop.index0 }}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn-delete" data-index="{{ loop.index0 }}">
+                            <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
-                    
-                    <form id="education-entry-form" class="resume-form">
-                        <input type="hidden" id="education-index" value="-1">
-                        
-                        <div class="form-group">
-                            <label class="form-label">Degree / Certificate <span class="required">*</span></label>
-                            <input type="text" id="degree" class="form-control" placeholder="e.g. Bachelor of Science in Computer Science" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">School / University <span class="required">*</span></label>
-                            <input type="text" id="school" class="form-control" placeholder="e.g. University of California, Berkeley" required>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group form-group-half">
-                                <label class="form-label">Start Year <span class="required">*</span></label>
-                                <input type="text" id="start-year" class="form-control" placeholder="e.g. 2018" required>
-                            </div>
-                            
-                            <div class="form-group form-group-half">
-                                <label class="form-label">End Year</label>
-                                <div class="end-year-group">
-                                    <input type="text" id="end-year" class="form-control" placeholder="e.g. 2022">
-                                    <label class="current-education-label">
-                                        <input type="checkbox" id="current-education"> Currently studying
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Description (Optional)</label>
-                            <div class="form-tip">
-                                <i class="fas fa-lightbulb"></i>
-                                <span>Add relevant coursework, achievements, honors, or activities</span>
-                            </div>
-                            <textarea id="education-description" class="form-control" rows="4" placeholder="e.g. Relevant coursework: Data Structures, Algorithms, Machine Learning. Graduated with honors (GPA: 3.8/4.0)."></textarea>
-                        </div>
-                        
-                        <div class="ai-help-section">
-                            <h3><i class="fas fa-robot"></i> Need help with your education section?</h3>
-                            <div class="ai-options">
-                                <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-coursework">
-                                    <i class="fas fa-book"></i> Suggest Coursework
-                                </button>
-                                <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-format">
-                                    <i class="fas fa-pencil-alt"></i> Improve Description
-                                </button>
-                                {% if resume and resume.job %}
-                                <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-relevance">
-                                    <i class="fas fa-bullseye"></i> Highlight Relevance
-                                </button>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button type="button" id="cancel-btn" class="btn btn-outline">Cancel</button>
-                            <button type="submit" id="save-btn" class="btn btn-primary">Save Education</button>
-                        </div>
-                    </form>
                 </div>
-                
-                <form method="POST" id="main-form" class="main-form">
-                    {{ form.hidden_tag() }}
-                    <input type="hidden" name="education_data" id="education-data" value="">
-                    
-                    <div class="form-actions main-actions">
-                        <a href="{{ url_for('resume_experience', resume_id=resume.id) }}" class="btn btn-outline">Back: Experience</a>
-                        <button type="submit" class="btn btn-primary">Next: Summary</button>
-                    </div>
-                </form>
+                {% if education.description %}
+                <div class="education-description">
+                    <p>{{ education.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-education">
+            <p>No education added yet. Click the button below to add your educational background.</p>
+        </div>
+    {% endif %}
+</div>
+
+<button type="button" id="add-education-btn" class="btn btn-outline btn-add">
+    <i class="fas fa-plus"></i> Add Education
+</button>
+
+<div id="education-form" class="education-form" style="display: none;">
+    <div class="form-header">
+        <h3 id="form-title">Add Education</h3>
+        <button type="button" id="close-form-btn" class="btn-close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <form id="education-entry-form" class="resume-form">
+        <input type="hidden" id="education-index" value="-1">
+        
+        <div class="form-group">
+            <label class="form-label">Degree / Certificate <span class="required">*</span></label>
+            <input type="text" id="degree" class="form-control" placeholder="e.g. Bachelor of Science in Computer Science" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">School / University <span class="required">*</span></label>
+            <input type="text" id="school" class="form-control" placeholder="e.g. University of California, Berkeley" required>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group form-group-half">
+                <label class="form-label">Start Year <span class="required">*</span></label>
+                <input type="text" id="start-year" class="form-control" placeholder="e.g. 2018" required>
             </div>
             
-            <div class="resume-form-sidebar">
-                <div class="sidebar-section">
-                    <h3>Education on Your Resume</h3>
-                    <p>Your educational background demonstrates your knowledge foundation and academic achievements, which can be especially important for recent graduates or career changers.</p>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h3>Tips for Education Section</h3>
-                    <ul class="tips-list">
-                        <li>List your highest level of education first</li>
-                        <li>Include relevant certifications and professional development</li>
-                        <li>For recent graduates, add relevant coursework, projects, or academic achievements</li>
-                        <li>If you have extensive work experience, keep education brief</li>
-                        <li>Include GPA if it's above 3.5 (and you graduated recently)</li>
-                        <li>List degrees in progress with expected graduation date</li>
-                    </ul>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h3>Example</h3>
-                    <div class="example-box">
-                        <p class="example-degree">Bachelor of Science in Computer Science</p>
-                        <p class="example-school">University of Washington</p>
-                        <p class="example-dates">2018 - 2022</p>
-                        <p class="example-description">Graduated cum laude (GPA: 3.7/4.0). Relevant coursework: Data Structures, Algorithms, Machine Learning, Web Development. Recipient of Dean's Scholar Award.</p>
-                    </div>
+            <div class="form-group form-group-half">
+                <label class="form-label">End Year</label>
+                <div class="end-year-group">
+                    <input type="text" id="end-year" class="form-control" placeholder="e.g. 2022">
+                    <label class="current-education-label">
+                        <input type="checkbox" id="current-education"> Currently studying
+                    </label>
                 </div>
             </div>
         </div>
+        
+        <div class="form-group">
+            <label class="form-label">Description (Optional)</label>
+            <div class="form-tip">
+                <i class="fas fa-lightbulb"></i>
+                <span>Add relevant coursework, achievements, honors, or activities</span>
+            </div>
+            <textarea id="education-description" class="form-control" rows="4" placeholder="e.g. Relevant coursework: Data Structures, Algorithms, Machine Learning. Graduated with honors (GPA: 3.8/4.0)."></textarea>
+        </div>
+        
+        <div class="ai-help-section">
+            <h3><i class="fas fa-robot"></i> Need help with your education section?</h3>
+            <div class="ai-options">
+                <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-coursework">
+                    <i class="fas fa-book"></i> Suggest Coursework
+                </button>
+                <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-format">
+                    <i class="fas fa-pencil-alt"></i> Improve Description
+                </button>
+                {% if resume and resume.job %}
+                <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-relevance">
+                    <i class="fas fa-bullseye"></i> Highlight Relevance
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="button" id="cancel-btn" class="btn btn-outline">Cancel</button>
+            <button type="submit" id="save-btn" class="btn btn-primary">Save Education</button>
+        </div>
+    </form>
+</div>
+
+<form method="POST" id="main-form" class="main-form">
+    {{ form.hidden_tag() }}
+    <input type="hidden" name="education_data" id="education-data" value="">
+    
+    <div class="form-actions main-actions">
+        <a href="{{ url_for('resume_experience', resume_id=resume.id) }}" class="btn btn-outline">Back: Experience</a>
+        <button type="submit" class="btn btn-primary">Next: Summary</button>
     </div>
-</section>
+</form>
+{% endblock %}
+
+{% block sidebar_content %}
+<div class="sidebar-section">
+    <h3>Education on Your Resume</h3>
+    <p>Your educational background demonstrates your knowledge foundation and academic achievements, which can be especially important for recent graduates or career changers.</p>
+</div>
+
+<div class="sidebar-section">
+    <h3>Tips for Education Section</h3>
+    <ul class="tips-list">
+        <li>List your highest level of education first</li>
+        <li>Include relevant certifications and professional development</li>
+        <li>For recent graduates, add relevant coursework, projects, or academic achievements</li>
+        <li>If you have extensive work experience, keep education brief</li>
+        <li>Include GPA if it's above 3.5 (and you graduated recently)</li>
+        <li>List degrees in progress with expected graduation date</li>
+    </ul>
+</div>
+
+<div class="sidebar-section">
+    <h3>Example</h3>
+    <div class="example-box">
+        <p class="example-degree">Bachelor of Science in Computer Science</p>
+        <p class="example-school">University of Washington</p>
+        <p class="example-dates">2018 - 2022</p>
+        <p class="example-description">Graduated cum laude (GPA: 3.7/4.0). Relevant coursework: Data Structures, Algorithms, Machine Learning, Web Development. Recipient of Dean's Scholar Award.</p>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // User dropdown toggle
-        const userDropdownToggle = document.getElementById('user-dropdown-toggle');
-        const userDropdown = document.getElementById('user-dropdown');
-        
-        if (userDropdownToggle && userDropdown) {
-            userDropdownToggle.addEventListener('click', function() {
-                userDropdown.classList.toggle('active');
-            });
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!userDropdownToggle.contains(event.target) && !userDropdown.contains(event.target)) {
-                    userDropdown.classList.remove('active');
-                }
-            });
-        }
-        
         // Form validation helper
         const validateForm = form => {
             let isValid = true;
