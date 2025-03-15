@@ -2065,59 +2065,27 @@ body.modal-open {
     display: flex;
     justify-content: space-between;
     margin-bottom: var(--space-2);}
-.current-step {
-    font-weight: 600;
-    color: var(--primary);}
+
 .step-name {
     color: var(--text);}
 .progress-container {
     margin-bottom: 2.5rem;}
-.progress-bar {
-    height: var(--space-2);
-    background-color: var(--light-gray);
-    border-radius: var(--space-1);
-    overflow: hidden;
-    margin-bottom: var(--space-5);}
-.progress-fill {
-    height: 100%;
-    background-color: var(--primary);
-    border-radius: var(--space-1);
-    transition: width 0.3s ease;}
-.progress-steps {
-    display: flex;
-    justify-content: space-between;}
+
 .step {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: var(--space-10);}
-.step.active .step-icon {
-    background-color: var(--primary);
-    color: var(--white);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);}
+
 .step.completed .step-icon {
     background-color: var(--success);
     color: var(--white);}
-.step-label {
-    font-size: var(--space-3);
-    color: var(--text-light);
-    font-weight: 500;
-    text-align: center;}
-.step.active .step-label {
-    color: var(--primary);
-    font-weight: 600;}
-.step.completed .step-label {
-    color: var(--success);}
+
+
+
 /* Resume Form Container */
-.resume-form-container {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: var(--space-6);}
-.resume-form-content {
-    background-color: var(--white);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: var(--space-6);}
+
+
 
 .tips-list {
     list-style-type: none;
@@ -2269,10 +2237,7 @@ body.modal-open {
     }
     
 
-    
-    .resume-form-container {
-        grid-template-columns: 1fr;
-    }
+
  }
  
  @media (max-width: 768px) {
@@ -2429,9 +2394,7 @@ body.modal-open {
         width: 3rem;
     }
     
-    .step-label {
-        font-size: 0.625rem;
-    }
+   
     
     .step-icon {
         width: 2rem;
