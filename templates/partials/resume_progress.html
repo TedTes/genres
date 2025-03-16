@@ -6,6 +6,13 @@
     {'id': 'summary', 'name': 'Summary', 'message':'Craft a compelling professional summary', 'url': url_for('resume_summary', resume_id=resume.id)}
 ] %}
 
+{% set step_completion = {
+    'contact': resume.resume_data and 'contact' in resume.resume_data and resume.resume_data['contact'].get('name') and resume.resume_data['contact'].get('email') and resume.resume_data['contact'].get('phone'),
+    'skills': resume.resume_data and 'skills' in resume.resume_data and resume.resume_data['skills'],
+    'experience': resume.resume_data and 'experience' in resume.resume_data and resume.resume_data['experience']|length > 0,
+    'education': resume.resume_data and 'education' in resume.resume_data,
+    'summary': resume.resume_data and 'summary' in resume.resume_data and (resume.resume_data['summary'] if resume.resume_data['summary'] is string else resume.resume_data['summary'].get('content'))
+} %}
 {% set current_step = current_step|default('contact') %}
 {% set step_index = {'contact': 0, 'skills': 1, 'experience': 2, 'education': 3, 'summary': 4}[current_step] %}
 {% set progress_percentage = (step_index / 4 * 100)|int %}
@@ -25,7 +32,7 @@
         {% for step in steps %}
             <a href="{{ step.url }}" class="progress-step {% if step.id == current_step %}active{% endif %}" data-step="{{ step.id }}">
                 <div class="step-circle">
-                    {% if step_index > steps.index(step) %}
+                    {% if step_completion[step.id] %}
                         <span class="step-check">✓</span>
                     {% else %}
                         <span class="step-number">{{ loop.index }}</span>
