@@ -10,7 +10,7 @@
     'contact': resume.resume_data and 'contact' in resume.resume_data and resume.resume_data['contact'].get('name') and resume.resume_data['contact'].get('email') and resume.resume_data['contact'].get('phone'),
     'skills': resume.resume_data and 'skills' in resume.resume_data and resume.resume_data['skills'],
     'experience': resume.resume_data and 'experience' in resume.resume_data and resume.resume_data['experience']|length > 0,
-    'education': resume.resume_data and 'education' in resume.resume_data,
+    'education': resume.resume_data and 'education' in resume.resume_data and resume.resume_data['education']|length > 0,
     'summary': resume.resume_data and 'summary' in resume.resume_data and (resume.resume_data['summary'] if resume.resume_data['summary'] is string else resume.resume_data['summary'].get('content'))
 } %}
 {% set current_step = current_step|default('contact') %}
