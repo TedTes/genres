@@ -1,0 +1,7 @@
+# documents/__init__.py
+from documents.templates.classic_one_column.document import ClassicOneColumnDocument
+from documents.templates.classic_one_column.template import ClassicOneColumnTemplate
+from documents.templates.minimal_sidebar.document import MinimalResumeDocument
+from documents.templates.minimal_sidebar.template import MinimalTemplate
+from documents.templates.modern_two_column.document import ModernTwoColumnDocument
+from documents.templates.modern_two_column.template import ModernTwoColumnTemplate
