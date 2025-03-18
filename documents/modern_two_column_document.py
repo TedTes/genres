@@ -7,7 +7,7 @@ from io import BytesIO
 import json
 import os
 import copy
-
+from resume_document_base import ResumeDocumentBase
 class ModernTwoColumnDocument(ResumeDocumentBase):
     """Document class for modern two-column resume template"""
     

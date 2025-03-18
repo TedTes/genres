@@ -8,7 +8,8 @@ import json
 import os
 import copy
 
-
+from base_resume_template import BaseResumeTemplate
+from modern_two_column_document import ModernTwoColumnDocument
 class ModernTwoColumnTemplate(BaseResumeTemplate):
     """Modern two-column resume template with header"""
     

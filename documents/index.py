@@ -8,8 +8,17 @@ import json
 import os
 import copy
 
-
-
+from base_resume_template import BaseResumeTemplate
+from classic_one_column_document import ClassicOneColumnDocument
+from classic_one_column_template import ClassicOneColumnTemplate
+from minimal_resume_document import MinimalResumeDocument
+from minimal_template import MinimalTemplate
+from modern_two_column_document import ModernTwoColumnDocument
+from modern_two_column_template import ModernTwoColumnTemplate
+from resume_data_validator import ResumeDataValidator
+from resume_document_base import ResumeDocumentBase
+from resume_template_registry import ResumeTemplateRegistry
+from section_processor import SectionProcessor
 
 def load_template_config(config_file):
     """Load template configuration from JSON file"""

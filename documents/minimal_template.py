@@ -8,7 +8,8 @@ from io import BytesIO
 import json
 import os
 import copy
-
+from base_resume_template import BaseResumeTemplate
+from minimal_resume_document import MinimalResumeDocument
 class MinimalTemplate(BaseResumeTemplate):
     """Minimal resume template with sidebar"""
     
@@ -114,7 +115,27 @@ class MinimalTemplate(BaseResumeTemplate):
         ))
         
         return styles
-    
+    def _add_design_elements(self, canvas, doc):
+        """Add design elements to the page"""
+        # Get page dimensions
+        page_width, page_height = doc.pagesize
+        
+        # Get colors from metadata
+        colors_data = self.metadata.get('colors', {})
+        primary_color = colors.Color(*colors_data.get('primary', [0.1, 0.4, 0.7]))
+        
+        # Add subtle header background
+        canvas.setFillColor(colors.Color(0.97, 0.97, 0.97))
+        canvas.rect(0, page_height-2*inch, page_width, 2*inch, fill=1, stroke=0)
+        
+        # Add thin accent line
+        canvas.setStrokeColor(primary_color)
+        canvas.setLineWidth(3)
+        canvas.line(inch, page_height-2.1*inch, page_width-inch, page_height-2.1*inch)
+        
+        # Add subtle footer
+        canvas.setFillColor(colors.Color(0.9, 0.9, 0.9))
+        canvas.rect(0, 0, page_width, 0.5*inch, fill=1, stroke=0)
     def _create_document(self, output_path):
         """Create the document with frames"""
         buffer = BytesIO() if output_path is None else output_path
