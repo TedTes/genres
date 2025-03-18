@@ -1,0 +1,43 @@
+{
+    "template_id": "classic-one-column",
+    "template_class": "ClassicOneColumnTemplate",
+    "document_class": "ClassicOneColumnDocument",
+    "version": "1.0.0",
+    "default": false,
+    "name": "Classic Professional",
+    "description": "Traditional single-column layout perfect for academic and executive positions.",
+    "category": "Traditional",
+    "tags": ["classic", "professional", "academic", "executive"],
+    "colors": {
+      "primary": [0.0, 0.0, 0.0],
+      "secondary": [0.4, 0.4, 0.4]
+    },
+    "fonts": {
+      "name": {"family": "Times-Bold", "size": 20},
+      "heading": {"family": "Times-Bold", "size": 14},
+      "normal": {"family": "Times-Roman", "size": 10}
+    },
+    "margins": {
+      "left": 1.0,
+      "right": 1.0,
+      "top": 1.0,
+      "bottom": 1.0
+    },
+    "spacing": {
+      "sectionGap": 1.75,
+      "lineHeight": 1.3,
+      "paragraphSpacing": 1.0
+    },
+    "layout": "one-column",
+    "header_height": 2.0,
+    "ui": {
+      "name": "Classic Professional",
+      "description": "A timeless single-column layout that emphasizes clarity and readability. Ideal for academic positions, legal professions, and executive roles.",
+      "thumbnail": "/static/images/templates/classic-preview.png",
+      "preview_image": "/static/images/templates/classic-full.png",
+      "category": "Traditional",
+      "tags": ["classic", "professional", "academic", "executive"],
+      "popularity": 65,
+      "rating": 4.6
+    }
+  }

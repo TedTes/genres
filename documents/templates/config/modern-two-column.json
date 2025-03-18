@@ -1,0 +1,47 @@
+{
+    "template_id": "modern-two-column",
+    "template_class": "ModernTwoColumnTemplate",
+    "document_class": "ModernTwoColumnDocument",
+    "version": "1.0.0",
+    "default": true,
+    "name": "Modern Professional",
+    "description": "Clean, modern two-column layout ideal for showcasing your skills and experience. Perfect for tech roles.",
+    "category": "Professional",
+    "tags": ["tech", "modern", "professional", "two-column"],
+    "colors": {
+      "primary": [0.1, 0.4, 0.7],
+      "secondary": [0.2, 0.2, 0.2],
+      "accent": [0.0, 0.5, 0.8],
+      "background": [1.0, 1.0, 1.0]
+    },
+    "fonts": {
+      "name": {"family": "Helvetica-Bold", "size": 28},
+      "heading": {"family": "Helvetica-Bold", "size": 14},
+      "subheading": {"family": "Helvetica", "size": 12},
+      "normal": {"family": "Helvetica", "size": 10}
+    },
+    "margins": {
+      "left": 0.5,
+      "right": 0.5,
+      "top": 0.5,
+      "bottom": 0.5
+    },
+    "spacing": {
+      "sectionGap": 1.5,
+      "lineHeight": 1.2,
+      "paragraphSpacing": 0.8
+    },
+    "layout": "two-column",
+    "header_height": 1.5,
+    "column_ratio": 0.65,
+    "ui": {
+      "name": "Modern Professional",
+      "description": "Clean, contemporary design with a two-column layout that maximizes space efficiency. Particularly effective for technical roles.",
+      "thumbnail": "/static/images/templates/modern-preview.png",
+      "preview_image": "/static/images/templates/modern-full.png",
+      "category": "Professional",
+      "tags": ["tech", "modern", "professional", "two-column"],
+      "popularity": 89,
+      "rating": 4.7
+    }
+  }
