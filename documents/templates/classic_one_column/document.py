@@ -7,7 +7,9 @@ from io import BytesIO
 import json
 import os
 import copy
-from resume_document_base import ResumeDocumentBase
+
+from documents.core.resume_document_base import ResumeDocumentBase
+
 class ClassicOneColumnDocument(ResumeDocumentBase):
     """Document class for classic one-column resume template"""
     

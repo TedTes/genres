@@ -7,8 +7,10 @@ from io import BytesIO
 import json
 import os
 import copy
-from base_resume_template import BaseResumeTemplate
-from classic_one_column_document import ClassicOneColumnDocument
+
+from documents.core.base_resume_template import BaseResumeTemplate
+from documents.templates.classic_one_column.document import ClassicOneColumnDocument
+
 class ClassicOneColumnTemplate(BaseResumeTemplate):
     """Classic one-column resume template"""
     
@@ -126,6 +128,7 @@ class ClassicOneColumnTemplate(BaseResumeTemplate):
         )
         doc.build_callback = self._add_design_elements
         return doc
+    
     def _add_design_elements(self, canvas, doc):
         """Add design elements to the page"""
         # Get page dimensions
