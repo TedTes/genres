@@ -12,17 +12,12 @@ from models import  User, Job, Resume,Application
 import json
 from flask import jsonify
 
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib.units import inch
 from io import BytesIO
 
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 import os
-from TemplateRegistry import TemplateRegistry
+from template_registry import TemplateRegistry
 from weasyprint import HTML, CSS
 # Import NLP analyzer 
 import spacy
