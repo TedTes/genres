@@ -22,7 +22,8 @@ from io import BytesIO
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 import os
-
+from TemplateRegistry import TemplateRegistry
+from weasyprint import HTML, CSS
 # Import NLP analyzer 
 import spacy
 nlp = spacy.load('en_core_web_sm')
@@ -721,28 +722,95 @@ def init_routes(flask_app):
         if resume.user_id != current_user.id:
             abort(403)
         
-        # Import templates for the sidebar
-        from resume_templates import RESUME_TEMPLATES
+        # Get all available templates
+        template_registry = TemplateRegistry('./templates')
+        templates = template_registry.get_all_templates()
         
         return render_template(
-            'resume_template.html', 
-            resume=resume, 
-            job=resume.job,
-            templates=RESUME_TEMPLATES
+            'resume_preview.html', 
+            resume=resume,
+            templates=templates,
+            selected_template=resume.template or 'standard'  # Default to modern if none selected
         )
     @app.route('/resume/<int:resume_id>/download')
     @login_required
-    def resume_download(resume_id):
+    def download_resume(resume_id):
+        
         resume = Resume.query.get_or_404(resume_id)
         if resume.user_id != current_user.id:
             abort(403)
-        html = render_template('resume_template.html', **resume.resume_data, job=resume.job)
-        pdf = generate_pdf(html)
-        return send_file(
-            io.BytesIO(pdf),
-            mimetype='application/pdf',
-            as_attachment=True,
-            download_name=f'resume_for_{resume.job.slug}.pdf'
+        
+        # Get template ID
+        template_id = resume.template or 'standard'
+        
+        try:
+            
+            # Generate absolute CSS file path
+            css_path = os.path.join(app.root_path, 'static', 'css', 'templates', template_id, 'style.css')
+            css_path = css_path.replace('\\', '/')
+            css_absolute_path = f"file://{css_path}"  # Ensure cross-platform compatibility
+           
+            # Render the HTML template, embedding the CSS content
+            html_string = render_template(
+                f'{template_id}/template.html',
+                resume=resume.resume_data,
+                template=template_id,
+            )
+            # Create a BytesIO object to store the PDF
+            pdf_file = BytesIO()
+            
+            html = HTML(string=html_string, base_url=request.url_root)
+            
+            html.write_pdf(pdf_file, stylesheets=[css_absolute_path])
+            pdf_file.seek(0)
+             # Create a filename
+            name = resume.resume_data.get('contact', {}).get('name', 'resume')
+            filename = f"{name.replace(' ', '_').lower()}_resume.pdf"
+            # Send the PDF as a response
+            return send_file(
+                pdf_file,
+                as_attachment=True,
+                download_name=filename,
+                mimetype='application/pdf'
+            )
+        except Exception as e:
+            print("error from exception")
+            print(e)
+            flash(f"Error generating PDF: {str(e)}", 'danger')
+            return redirect(url_for('resume_preview', resume_id=resume_id))
+
+    @app.route('/resume/<int:resume_id>/update-template', methods=['POST'])
+    @login_required
+    def update_resume_template(resume_id):
+        resume = Resume.query.get_or_404(resume_id)
+        if resume.user_id != current_user.id:
+            abort(403)
+        
+        # Get the selected template
+        template = request.form.get('template')
+        
+        # Update the resume with the new template
+        if template:
+            resume.template = template
+            db.session.commit()
+            flash('Template updated successfully!', 'success')
+        
+        return redirect(url_for('resume_preview', resume_id=resume_id))
+    
+    @app.route('/resume/<int:resume_id>/render')
+    @login_required
+    def resume_render(resume_id):
+        resume = Resume.query.get_or_404(resume_id)
+        if resume.user_id != current_user.id:
+            abort(403)
+        
+        # Default to standard template if none specified
+        template_id = resume.template or 'standard'
+        # Render the resume template
+        return render_template(
+            f'{template_id}/template.html',
+            resume=resume.resume_data,
+            template=template_id
         )
 
     @app.route('/resume/<int:resume_id>/delete', methods=['POST'])
@@ -1018,29 +1086,6 @@ def init_routes(flask_app):
 
 
     
-    @app.route('/resume/<int:resume_id>/update-template', methods=['POST'])
-    @login_required
-    def update_resume_template(resume_id):
-        """Update a resume's template and redirect back to the preview."""
-        resume = Resume.query.get_or_404(resume_id)
-        
-        # Check if the resume belongs to the current user
-        if resume.user_id != current_user.id:
-            flash('You do not have permission to modify this resume.', 'danger')
-            return redirect(url_for('dashboard'))
-        
-        # Get the selected template
-        template = request.form.get('template')
-        
-        # Update if valid template is selected
-        from resume_templates import RESUME_TEMPLATES
-        if template and template in RESUME_TEMPLATES:
-            # Update the resume with the new template
-            resume.template = template
-            db.session.commit()
-        
-        # Redirect back to resume preview
-        return redirect(url_for('resume_preview', resume_id=resume_id))
 
     @app.route('/resume/<int:resume_id>/save-field', methods=['POST'])
     @login_required
@@ -1099,3 +1144,31 @@ def init_routes(flask_app):
             print(f"Error saving field: {str(e)}")
             return jsonify({"success": False, "error": str(e)}), 500
 
+
+    @app.route('/resume/<int:resume_id>/customize', methods=['POST'])
+    @login_required
+    def customize_template(resume_id):
+        resume = Resume.query.get_or_404(resume_id)
+        if resume.user_id != current_user.id:
+            abort(403)
+        
+        # Get customization options from form
+        primary_color = request.form.get('primary_color')
+        font_family = request.form.get('font_family')
+        
+        # Store customization options
+        if not resume.customization:
+            resume.customization = {}
+        
+        resume.customization['colors'] = {
+            'primary': primary_color
+        }
+        
+        resume.customization['fonts'] = {
+            'primary': font_family
+        }
+        
+        db.session.commit()
+        
+        flash('Template customized successfully!', 'success')
+        return redirect(url_for('resume_preview', resume_id=resume.id))
