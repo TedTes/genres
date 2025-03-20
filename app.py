@@ -24,6 +24,7 @@ supabase_key = os.environ.get('SUPABASE_KEY')
 
 supabase: Client = create_client(supabase_url, supabase_key)
 
+os.environ['DYLD_LIBRARY_PATH'] = '/opt/homebrew/lib:' + os.environ.get('DYLD_LIBRARY_PATH', '')
 db.init_app(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
