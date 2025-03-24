@@ -4,7 +4,7 @@
 
 {% block extra_css %}
 <style>
-    /* Improved layout for resume preview */
+    /* Base styles */
     .resume-preview-container {
         display: flex;
         height: calc(100vh - 80px);
@@ -12,34 +12,59 @@
         position: relative;
     }
     
-    /* Template sidebar with enhanced styling */
+    /* Template sidebar */
     .template-sidebar {
-        width: 250px;
+        width: 280px;
         background-color: #f8fafc;
         border-right: 1px solid #e2e8f0;
-        padding: 1rem;
+        padding: 1.25rem;
         overflow-y: auto;
         height: 100%;
         position: fixed;
         left: 0;
         top: 80px;
         bottom: 0;
-        z-index: 10;
+        z-index: 50;
         box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease-in-out;
     }
     
-    /* Sidebar title with improved typography */
+    /* Sidebar header */
+    .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
     .sidebar-title {
         font-size: 1.125rem;
         font-weight: 600;
         color: #1e293b;
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 1px solid #e2e8f0;
         letter-spacing: -0.01em;
+        margin: 0;
     }
     
-    /* Templates list with better spacing */
+    .sidebar-close {
+        display: none;
+        background: none;
+        border: none;
+        color: #64748b;
+        cursor: pointer;
+        font-size: 1.25rem;
+        padding: 0.25rem;
+        border-radius: 0.25rem;
+        transition: all 0.2s ease;
+    }
+    
+    .sidebar-close:hover {
+        color: #ef4444;
+        background-color: rgba(239, 68, 68, 0.1);
+    }
+    
+    /* Templates list */
     .templates-list {
         display: flex;
         flex-direction: column;
@@ -59,7 +84,7 @@
         height: 0;
     }
     
-    /* Template label with enhanced styling */
+    /* Template label styling */
     .template-label {
         display: flex;
         align-items: center;
@@ -71,32 +96,23 @@
         transition: all 0.2s ease;
     }
     
-    /* Hover state for template option */
     .template-label:hover {
         background-color: #f1f5f9;
         border-color: #cbd5e1;
     }
     
-    /* Selected template styling */
     .template-option input[type="radio"]:checked + .template-label {
         border-color: #3b82f6;
         background-color: rgba(59, 130, 246, 0.05);
         box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
     }
     
-    /* Improved template selection accessibility for touch */
-    .template-option input[type="radio"]:active + .template-label {
-        background-color: rgba(59, 130, 246, 0.15);
-        transform: scale(0.98);
-    }
-    
-    /* Focus state for accessibility */
     .template-option input[type="radio"]:focus + .template-label {
         outline: 2px solid rgba(59, 130, 246, 0.5);
         outline-offset: 2px;
     }
     
-    /* Template color indicator/preview */
+    /* Template preview thumbnail */
     .template-color-indicator {
         width: 60px;
         height: 80px;
@@ -155,7 +171,6 @@
         min-width: 0;
     }
     
-    /* Template name styling */
     .template-name {
         font-weight: 600;
         color: #334155;
@@ -163,7 +178,6 @@
         margin-bottom: 0.375rem;
     }
     
-    /* Template description styling */
     .template-description {
         font-size: 0.75rem;
         line-height: 1.4;
@@ -171,30 +185,94 @@
         display: -webkit-box;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        -webkit-line-clamp: 2;
     }
     
-    /* Resume preview area - maximized */
+    /* Resume preview area */
     .resume-preview-area {
         flex: 1;
         padding: 0.75rem;
         background-color: #f1f5f9;
         overflow-y: auto;
-        margin-left: 250px;
+        margin-left: 280px;
         min-height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
     }
     
+    /* Preview iframe */
+    .preview-iframe {
+        width: 100%;
+        max-width: 98%;
+        height: calc(100vh - 90px);
+        border: 1px solid #e2e8f0;
+        border-radius: 0.375rem;
+        background-color: white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 
+                    0 10px 15px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+        margin-top: 0.5rem;
+    }
+    
+    /* Hamburger menu button for mobile */
+    .template-toggle {
+        display: none;
+        position: fixed;
+        top: 90px;
+        left: 15px;
+        z-index: 60;
+        width: 40px;
+        height: 40px;
+        background-color: white;
+        border-radius: 50%;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        border: 1px solid #e2e8f0;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .template-toggle:hover {
+        background-color: #f8fafc;
+        transform: scale(1.05);
+    }
+    
+    .template-toggle i {
+        font-size: 1.125rem;
+        color: #334155;
+    }
+    
+    /* Template name pill on mobile */
+    .current-template-pill {
+        display: none;
+        position: fixed;
+        top: 90px;
+        left: 65px;
+        background-color: white;
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        font-size: 0.875rem;
+        color: #334155;
+        max-width: calc(100% - 120px);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        z-index: 49;
+    }
+    
     /* Floating action buttons */
     .floating-controls {
         position: fixed;
-        top: 100px;
-        right: 20px;
+        top: 90px;
+        right: 15px;
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        z-index: 20;
+        z-index: 50;
         background-color: white;
         padding: 0.5rem;
         border-radius: 0.5rem;
@@ -216,8 +294,12 @@
         font-size: 1rem;
     }
     
-    /* Standard tooltip styling */
-    .floating-controls .btn-tooltip {
+    /* Tooltip styling */
+    .tooltip-container {
+        position: relative;
+    }
+    
+    .btn-tooltip {
         position: absolute;
         right: 100%;
         top: 50%;
@@ -232,10 +314,26 @@
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.15s ease;
+        z-index: 100;
     }
     
-    .floating-controls .btn:hover .btn-tooltip {
+    .tooltip-container:hover .btn-tooltip {
         opacity: 1;
+    }
+    
+    /* Overlay for mobile sidebar */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 40;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
     }
     
     /* Info tooltip with resume details */
@@ -255,7 +353,7 @@
         pointer-events: none;
         transition: opacity 0.2s ease, transform 0.2s ease;
         transform: translateX(10px);
-        z-index: 30;
+        z-index: 60;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
     }
     
@@ -296,59 +394,45 @@
         line-height: 1.3;
     }
     
-    /* Preview iframe - full-width maximized */
-    .preview-iframe {
-        width: 100%;
-        max-width: 98%;
-        height: calc(100vh - 60px);
-        border: 1px solid #e2e8f0;
-        border-radius: 0.375rem;
-        background-color: white;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 
-                    0 10px 15px rgba(0, 0, 0, 0.1);
-        transition: box-shadow 0.3s ease;
-        margin-top: 0.5rem;
-    }
-    
-    .preview-iframe:hover {
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08), 
-                    0 20px 30px rgba(0, 0, 0, 0.12);
-    }
-    
-    /* Responsive styles for different screen sizes */
+    /* Responsive styles */
     @media (max-width: 1024px) {
         .template-sidebar {
-            position: static;
-            width: 100%;
-            height: auto;
-            max-height: 300px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: translateX(-100%);
+            width: 320px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
         
-        .resume-preview-container {
-            flex-direction: column;
+        .template-sidebar.active {
+            transform: translateX(0);
+        }
+        
+        .sidebar-close {
+            display: block;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .template-toggle {
+            display: flex;
+        }
+        
+        .current-template-pill {
+            display: block;
         }
         
         .resume-preview-area {
             margin-left: 0;
+            padding-top: 3rem;
+            max-height: 100vh;
+            overflow-y: auto;
         }
         
-        .templates-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-        
-        .floating-controls {
-            top: auto;
-            bottom: 20px;
-            right: 20px;
-            flex-direction: row;
-            border-radius: 2rem;
-        }
-        
-        .floating-controls .btn {
-            border-radius: 50%;
+        .preview-iframe {
+            height: calc(100vh - 150px);
         }
         
         .info-tooltip {
@@ -365,8 +449,39 @@
         .info-btn:hover .info-tooltip {
             transform: translateY(0) translateX(-50%);
         }
+    }
+    
+    @media (max-width: 768px) {
+        .template-sidebar {
+            width: 85%;
+            max-width: 350px;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            position: fixed;
+        }
         
-        .floating-controls .btn-tooltip {
+        .resume-preview-container {
+            height: auto;
+            min-height: calc(100vh - 80px);
+        }
+        
+        .floating-controls {
+            flex-direction: row;
+            padding: 0.375rem;
+            border-radius: 2rem;
+            top: auto;
+            bottom: 20px;
+        }
+        
+        .floating-controls .btn {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 50%;
+        }
+        
+        .btn-tooltip {
             right: auto;
             top: auto;
             bottom: 100%;
@@ -375,125 +490,61 @@
             margin-right: 0;
             margin-bottom: 0.5rem;
         }
+        
+        .preview-iframe {
+            height: calc(100vh - 180px);
+            max-width: 100%;
+        }
+        
+        .template-toggle {
+            top: 15px;
+            left: 15px;
+        }
+        
+        .current-template-pill {
+            top: 15px;
+            left: 65px;
+        }
+        
+        .resume-preview-area {
+            padding-bottom: 80px; /* Space for floating controls */
+        }
     }
     
-    /* Mobile optimizations for template selection */
-    @media (max-width: 768px) {
+    @media (max-width: 480px) {
         .template-sidebar {
-            max-height: 450px;
+            width: 100%;
+            max-width: none;
+        }
+        
+        .template-label {
             padding: 1rem;
+        }
+        
+        .template-color-indicator {
+            width: 50px;
+            height: 70px;
+        }
+        
+        .floating-controls {
+            left: 15px;
+            right: 15px;
+            justify-content: space-around;
+            width: calc(100% - 30px);
+        }
+        
+        .current-template-pill {
+            max-width: calc(100% - 100px);
         }
         
         .templates-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+            padding-bottom: 2rem;
         }
         
-        .template-label {
-            padding: 1rem;
-        }
-        
-        .template-color-indicator {
-            width: 70px;
-            height: 90px;
-        }
-        
-        .template-name {
-            font-size: 1rem;
-        }
-        
-        .template-description {
-            font-size: 0.875rem;
-        }
-        
-        .preview-iframe {
-            height: 500px;
-        }
-        
-        .floating-controls {
-            right: 10px;
-            bottom: 10px;
-            padding: 0.625rem;
-        }
-        
-        .floating-controls .btn {
-            width: 3rem;
-            height: 3rem;
-        }
-        
-        .floating-controls .btn i {
-            font-size: 1.25rem;
-        }
-    }
-    
-    /* Enhanced mobile layout for template selection */
-    @media (max-width: 480px) {
-        .sidebar-title {
-            font-size: 1.25rem;
-            padding-bottom: 1rem;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        
-        .template-option {
-            margin-bottom: 1rem;
-        }
-        
-        /* Make labels even larger on very small screens */
-        .template-label {
-            padding: 1.25rem;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 1rem;
-        }
-        
-        .template-color-indicator {
-            width: 100px;
-            height: 120px;
-            margin-bottom: 0.5rem;
-        }
-        
-        .template-info {
-            text-align: center;
-            padding: 0 0.5rem;
-        }
-        
-        .template-name {
-            font-size: 1.125rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .template-description {
-            font-size: 0.875rem;
-        }
-        
-        /* Radio button enhancer - more visible */
-        .template-option input[type="radio"]:checked + .template-label {
-            border-width: 2px;
-            background-color: rgba(59, 130, 246, 0.1);
-        }
-        
-        /* Larger mobile action buttons */
-        .floating-controls {
-            bottom: 15px;
-            left: 15px;
-            right: 15px;
-            flex-direction: row;
-            justify-content: space-around;
-            width: calc(100% - 30px);
-            padding: 0.75rem;
-        }
-        
-        .floating-controls .btn {
-            width: 3.5rem;
-            height: 3.5rem;
-        }
-        
-        .info-tooltip {
-            width: 90vw;
-            max-width: 300px;
+        html, body {
+            overflow-x: hidden;
+            position: relative;
+            height: 100%;
         }
     }
 </style>
@@ -503,10 +554,28 @@
 <!-- Navigation Bar -->
 {% include 'partials/navbar.html' with context %}
 
+<!-- Mobile template toggle button -->
+<button class="template-toggle" id="template-toggle" aria-label="Choose Template">
+    <i class="fas fa-palette"></i>
+</button>
+
+<!-- Current template pill for mobile -->
+<div class="current-template-pill">
+    Template: <strong>{{ templates[selected_template].name if selected_template in templates else 'Standard' }}</strong>
+</div>
+
+<!-- Overlay for mobile sidebar -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
 <div class="resume-preview-container">
     <!-- Template Sidebar -->
-    <div class="template-sidebar">
-        <h3 class="sidebar-title">Choose a Template</h3>
+    <div class="template-sidebar" id="template-sidebar">
+        <div class="sidebar-header">
+            <h3 class="sidebar-title">Choose a Template</h3>
+            <button class="sidebar-close" id="sidebar-close" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
         
         <form id="template-form" method="POST" action="{{ url_for('update_resume_template', resume_id=resume.id) }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -517,7 +586,7 @@
                     <input type="radio" name="template" id="template-{{ template_id }}" 
                         value="{{ template_id }}" {% if selected_template == template_id %}checked{% endif %}
                         onchange="document.getElementById('template-form').submit();">
-                    <label for="template-{{ template_id }}" class="template-label">
+                    <label for="template-{{ template_id }}" class="template-label" data-template-name="{{ template.name }}">
                         <div class="template-color-indicator {{ template_id }}"></div>
                         <div class="template-info">
                             <span class="template-name">{{ template.name }}</span>
@@ -534,25 +603,39 @@
     <div class="resume-preview-area">
         <!-- Floating Action Buttons -->
         <div class="floating-controls">
-            <a href="{{ url_for('dashboard') }}" class="btn btn-outline">
-                <i class="fas fa-arrow-left"></i>
-                <span class="btn-tooltip">Back to Dashboard</span>
-            </a>
-            <a href="{{ url_for('resume_contact', resume_id=resume.id) }}" class="btn btn-outline">
-                <i class="fas fa-edit"></i>
-                <span class="btn-tooltip">Edit Resume</span>
-            </a>
-            <a href="{{ url_for('preview_pdf', resume_id=resume.id) }}" class="btn btn-outline" target="_blank">
-                <i class="fas fa-eye"></i>
-                <span class="btn-tooltip">Preview PDF</span>
-            </a>
-            <a href="{{ url_for('download_resume', resume_id=resume.id) }}" class="btn btn-primary">
-                <i class="fas fa-download"></i>
-                <span class="btn-tooltip">Download PDF</span>
-            </a>
+            <div class="tooltip-container">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div class="btn-tooltip">Back to Dashboard</div>
+            </div>
+            
+            <div class="tooltip-container">
+                <a href="{{ url_for('resume_contact', resume_id=resume.id) }}" class="btn btn-outline">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <div class="btn-tooltip">Edit Resume</div>
+            </div>
+            
+            <div class="tooltip-container">
+                <a href="{{ url_for('preview_pdf', resume_id=resume.id) }}" class="btn btn-outline" target="_blank">
+                    <i class="fas fa-eye"></i>
+                </a>
+                <div class="btn-tooltip">Preview PDF</div>
+            </div>
+            
+            <div class="tooltip-container">
+                <a href="{{ url_for('download_resume', resume_id=resume.id) }}" class="btn btn-primary">
+                    <i class="fas fa-download"></i>
+                </a>
+                <div class="btn-tooltip">Download PDF</div>
+            </div>
+            
             <!-- Info button with tooltip -->
-            <button type="button" class="btn btn-outline info-btn">
-                <i class="fas fa-info-circle"></i>
+            <div class="tooltip-container info-btn">
+                <button type="button" class="btn btn-outline">
+                    <i class="fas fa-info-circle"></i>
+                </button>
                 <div class="info-tooltip">
                     <div class="info-tooltip-title">Resume Information</div>
                     <div class="info-tooltip-grid">
@@ -583,9 +666,10 @@
                         </div>
                     </div>
                 </div>
-            </button>
+            </div>
         </div>
         
+        <!-- Resume iframe preview -->
         <iframe src="{{ url_for('resume_render', resume_id=resume.id) }}" class="preview-iframe" frameborder="0"></iframe>
     </div>
 </div>
@@ -594,90 +678,179 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Auto-submit form when template is selected
-        const templateRadios = document.querySelectorAll('input[name="template"]');
+        // Mobile sidebar elements
+        const templateToggle = document.getElementById('template-toggle');
+        const templateSidebar = document.getElementById('template-sidebar');
+        const sidebarClose = document.getElementById('sidebar-close');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const currentTemplatePill = document.querySelector('.current-template-pill');
         
-        templateRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                document.getElementById('template-form').submit();
+        // Separate open and close functions instead of toggle
+        function openSidebar() {
+            templateSidebar.classList.add('active');
+            sidebarOverlay.classList.add('active');
+            document.body.classList.add('sidebar-open');
+        }
+        
+        function closeSidebar() {
+            templateSidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+            document.body.classList.remove('sidebar-open');
+        }
+        
+        // Event listeners for sidebar control
+        if (templateToggle) {
+            templateToggle.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent event from bubbling
+                openSidebar();
+            });
+        }
+        
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent event from bubbling
+                closeSidebar();
+            });
+        }
+        
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent event from bubbling
+                closeSidebar();
+            });
+        }
+         // Prevent sidebar from closing when clicking inside it
+    templateSidebar.addEventListener('click', function (e) {
+        e.stopPropagation();
+    });
+        // Update current template pill text when template changes
+        const templateLabels = document.querySelectorAll('.template-label');
+        const templateInputs = document.querySelectorAll('input[name="template"]');
+        
+        templateInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                if (this.checked && currentTemplatePill) {
+                    const label = document.querySelector(`label[for="${this.id}"]`);
+                    if (label) {
+                        const templateName = label.dataset.templateName || 'Standard';
+                        currentTemplatePill.innerHTML = `Template: <strong>${templateName}</strong>`;
+                    }
+                    
+                    // Close sidebar after selection on mobile
+                    if (window.innerWidth <= 1024) {
+                        closeSidebar();
+                    }
+                }
             });
         });
         
-        // Adjust iframe height on window resize to maximize space
+        // Adjust iframe height
         function adjustIframeHeight() {
             const iframe = document.querySelector('.preview-iframe');
             if (iframe) {
                 const viewportHeight = window.innerHeight;
                 const offsetTop = iframe.getBoundingClientRect().top;
                 const desiredHeight = viewportHeight - offsetTop - 20; // 20px buffer
-                iframe.style.height = Math.max(600, desiredHeight) + 'px';
+                iframe.style.height = Math.max(400, desiredHeight) + 'px';
             }
         }
         
-        // Handle window resize and initial load
+        // Handle window resize
         adjustIframeHeight();
         window.addEventListener('resize', adjustIframeHeight);
         
-        // Mobile-friendly interaction handling
+        // Handle touch events for better mobile experience
         if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-            // Touch handling for template selection
-            const templateLabels = document.querySelectorAll('.template-label');
+            // Better touch handling for template options
             templateLabels.forEach(label => {
-                label.addEventListener('touchstart', function() {
-                    this.style.backgroundColor = 'rgba(59, 130, 246, 0.15)';
+                label.addEventListener('touchstart', function(e) {
+                    e.stopPropagation(); // Prevent event from bubbling
+                    this.classList.add('touch-active');
                 });
                 
-                label.addEventListener('touchend', function() {
-                    this.style.backgroundColor = '';
-                    // Find the associated radio button and simulate a click
+                label.addEventListener('touchend', function(e) {
+                    e.stopPropagation(); // Prevent event from bubbling
+                    this.classList.remove('touch-active');
+                    // Trigger the radio button
                     const radioId = this.getAttribute('for');
                     const radio = document.getElementById(radioId);
                     if (radio) {
                         radio.checked = true;
-                        // Trigger the form submission
+                        // Submit the form
                         document.getElementById('template-form').submit();
                     }
                 });
             });
             
-            // Handle info tooltip on touch devices
-            const infoBtn = document.querySelector('.info-btn');
-            if (infoBtn) {
-                // Toggle tooltip visibility on touch
-                let isTooltipVisible = false;
-                
-                infoBtn.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    const tooltip = this.querySelector('.info-tooltip');
-                    
-                    if (!isTooltipVisible) {
-                        // Hide any other visible tooltips first
-                        document.querySelectorAll('.btn-tooltip, .info-tooltip').forEach(tip => {
-                            tip.style.opacity = '0';
+            // Hide tooltips on touch outside
+            document.addEventListener('touchstart', function(e) {
+                // Only hide tooltips if not touching a tooltip container
+                if (!e.target.closest('.tooltip-container') && !e.target.closest('.info-tooltip')) {
+                    const tooltips = document.querySelectorAll('.btn-tooltip, .info-tooltip');
+                    tooltips.forEach(tooltip => {
+                        tooltip.style.opacity = '0';
+                    });
+                }
+            });
+            
+            // Show tooltip on button touch
+            const tooltipButtons = document.querySelectorAll('.tooltip-container:not(.info-btn)');
+            tooltipButtons.forEach(container => {
+                container.addEventListener('touchstart', function(e) {
+                    e.stopPropagation();
+                    const tooltip = this.querySelector('.btn-tooltip');
+                    if (tooltip) {
+                        // Reset all tooltips
+                        document.querySelectorAll('.btn-tooltip').forEach(t => {
+                            t.style.opacity = '0';
                         });
                         
                         // Show this tooltip
-                        if (tooltip) {
-                            tooltip.style.opacity = '1';
-                            if (window.innerWidth <= 1024) {
-                                tooltip.style.transform = 'translateY(0) translateX(-50%)';
-                            } else {
-                                tooltip.style.transform = 'translateX(0)';
-                            }
-                            isTooltipVisible = true;
-                            
-                            // Add a click event listener to the document to close the tooltip
-                            setTimeout(() => {
-                                document.addEventListener('touchstart', closeTooltip);
-                            }, 100);
+                        tooltip.style.opacity = '1';
+                        
+                        // Auto-hide after 1.5 seconds
+                        setTimeout(() => {
+                            tooltip.style.opacity = '0';
+                        }, 1500);
+                    }
+                });
+            });
+            
+            // Info button tooltip handling
+            const infoBtn = document.querySelector('.info-btn');
+            if (infoBtn) {
+                let infoTooltipVisible = false;
+                
+                infoBtn.addEventListener('touchstart', function(e) {
+                    e.stopPropagation();
+                    const tooltip = this.querySelector('.info-tooltip');
+                    
+                    if (!infoTooltipVisible && tooltip) {
+                        // Hide other tooltips
+                        document.querySelectorAll('.btn-tooltip').forEach(t => {
+                            t.style.opacity = '0';
+                        });
+                        
+                        // Show info tooltip
+                        tooltip.style.opacity = '1';
+                        if (window.innerWidth <= 1024) {
+                            tooltip.style.transform = 'translateY(0) translateX(-50%)';
+                        } else {
+                            tooltip.style.transform = 'translateX(0)';
                         }
+                        infoTooltipVisible = true;
+                        
+                        // Add event listener to close on touch outside
+                        setTimeout(() => {
+                            document.addEventListener('touchstart', closeInfoTooltip);
+                        }, 100);
                     } else {
-                        closeTooltip(e);
+                        closeInfoTooltip(e);
                     }
                 });
                 
-                function closeTooltip(e) {
-                    // Only close if clicking outside the tooltip
+                function closeInfoTooltip(e) {
+                    // Close if clicking outside the tooltip
                     if (!infoBtn.contains(e.target)) {
                         const tooltip = infoBtn.querySelector('.info-tooltip');
                         if (tooltip) {
@@ -687,29 +860,37 @@
                             } else {
                                 tooltip.style.transform = 'translateX(10px)';
                             }
-                            isTooltipVisible = false;
+                            infoTooltipVisible = false;
                         }
-                        document.removeEventListener('touchstart', closeTooltip);
+                        document.removeEventListener('touchstart', closeInfoTooltip);
                     }
                 }
             }
-            
-            // Regular button tooltips on touch
-            const floatingButtons = document.querySelectorAll('.floating-controls .btn:not(.info-btn)');
-            floatingButtons.forEach(btn => {
-                btn.addEventListener('touchstart', function(e) {
-                    // Don't prevent default here to allow the button to be clicked
-                    // Show tooltip
-                    const tooltip = this.querySelector('.btn-tooltip');
-                    if (tooltip) {
-                        tooltip.style.opacity = '1';
-                        setTimeout(() => {
-                            tooltip.style.opacity = '0';
-                        }, 1500);
-                    }
-                });
-            });
         }
+        
+        // Prevent default body events from accidentally triggering the sidebar
+        document.body.addEventListener('click', function(e) {
+            // Only close the sidebar if it's open and if clicking outside the sidebar
+            if (templateSidebar.classList.contains('active') && 
+                !templateSidebar.contains(e.target) && 
+                !templateToggle.contains(e.target)) {
+                closeSidebar();
+            }
+        });
+        
+        // Fix for iOS touch handling - prevent scroll blocking
+        document.addEventListener('touchmove', function(e) {
+            // Allow scrolling inside the sidebar
+            if (templateSidebar.contains(e.target)) {
+                e.stopPropagation();
+            }
+        }, { passive: true });
+          // Prevent unwanted clicks from triggering sidebar
+    document.addEventListener('click', function (e) {
+        if (!templateSidebar.contains(e.target) && !templateToggle.contains(e.target)) {
+            closeSidebar();
+        }
+    });
     });
 </script>
 {% endblock %}
