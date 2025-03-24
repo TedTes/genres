@@ -19,8 +19,10 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 import os
 from template_registry import TemplateRegistry
 from weasyprint import HTML, CSS
+import weasyprint
 # Import NLP analyzer 
 import spacy
+weasyprint.DEBUG = True
 nlp = spacy.load('en_core_web_sm')
 
 app = None
@@ -742,25 +744,27 @@ def init_routes(flask_app):
             
             # Generate absolute CSS file path
             css_path = os.path.join(app.root_path, 'static', 'css', 'templates', template_id, 'style.css')
-            css_path = css_path.replace('\\', '/')
-            css_absolute_path = f"file://{css_path}"  # Ensure cross-platform compatibility
-           
-            # Render the HTML template, embedding the CSS content
+            
+            with open(css_path, 'r') as f:
+                css_content = f.read()
+            # Render HTML template without embedded CSS
             html_string = render_template(
                 f'{template_id}/template.html',
                 resume=resume.resume_data,
                 template=template_id,
+                css_content=css_content
             )
             # Create a BytesIO object to store the PDF
             pdf_file = BytesIO()
             
             html = HTML(string=html_string, base_url=request.url_root)
-            
-            html.write_pdf(pdf_file, stylesheets=[css_absolute_path])
+            html.write_pdf(pdf_file)
             pdf_file.seek(0)
-             # Create a filename
+
+            # Create a filename
             name = resume.resume_data.get('contact', {}).get('name', 'resume')
             filename = f"{name.replace(' ', '_').lower()}_resume.pdf"
+           
             # Send the PDF as a response
             return send_file(
                 pdf_file,
@@ -769,8 +773,7 @@ def init_routes(flask_app):
                 mimetype='application/pdf'
             )
         except Exception as e:
-            print("error from exception")
-            print(e)
+            print(f"Error generating PDF: {e}")
             flash(f"Error generating PDF: {str(e)}", 'danger')
             return redirect(url_for('resume_preview', resume_id=resume_id))
 
@@ -788,7 +791,7 @@ def init_routes(flask_app):
         if template:
             resume.template = template
             db.session.commit()
-            flash('Template updated successfully!', 'success')
+            # flash('Template updated successfully!', 'success')
         
         return redirect(url_for('resume_preview', resume_id=resume_id))
     
