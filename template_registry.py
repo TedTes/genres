@@ -23,14 +23,14 @@ class TemplateRegistry:
                     try:
                         with open(config_file, 'r') as f:
                             config = json.load(f)
-                            template_id = config.get('id') or template_dir.name
+                            template_id = config.get('id')
                             self.templates[template_id] = config
                     except Exception as e:
                         print(f"Error loading template config {config_file}: {e}")
     
     def get_template(self, template_id):
         """Get a template by ID, defaulting to 'standard' if not found"""
-        return self.templates.get(template_id) or self.templates.get('standard')
+        return self.templates.get(template_id) or self.templates.get('1')
     
     def get_all_templates(self):
         """Get all available templates"""

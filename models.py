@@ -31,7 +31,7 @@ class Resume(db.Model):
     job_id = db.Column(db.Integer, db.ForeignKey('job.id'), nullable=True)  # Changed to nullable
     title = db.Column(db.String(200), nullable=False, default="Untitled Resume")
     resume_data = db.Column(db.JSON)  # Stores resume sections as JSON
-    template = db.Column(db.String(50), default="standard")
+    template = db.Column(db.String(50), default="1")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

@@ -727,7 +727,7 @@ def init_routes(flask_app):
             'resume_preview.html', 
             resume=resume,
             templates=templates,
-            selected_template=resume.template or 'standard'  # Default to modern if none selected
+            selected_template=resume.template or '1'  # Default to modern if none selected
         )
     @app.route('/resume/<int:resume_id>/download')
     @login_required
@@ -738,7 +738,7 @@ def init_routes(flask_app):
             abort(403)
         
         # Get template ID
-        template_id = resume.template or 'standard'
+        template_id = resume.template or '1'
         
         try:
             
@@ -803,7 +803,7 @@ def init_routes(flask_app):
             abort(403)
         
         # Default to standard template if none specified
-        template_id = resume.template or 'standard'
+        template_id = resume.template or '1'
         # Render the resume template
         return render_template(
             f'{template_id}/template.html',
