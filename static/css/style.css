@@ -159,7 +159,6 @@ ul, ol {
     color: var(--primary);
     border: 2px solid var(--primary);}
 .btn-outline:hover {
-    background-color: var(--primary);
     color: var(--white);}
 .btn-white {
     background-color: var(--white);
