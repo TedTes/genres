@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% include 'partials/header.html' with context %}
+<body>
+    {% if resume.resume_data %}
+    <div class="resume-container">
+        <!-- Header with name and contact info -->
+        <div class="resume-header">
+            <div class="header-bg"></div>
+            <div class="header-content">
+                <h1 class="person-name">{{ resume.resume_data.get('contact', {}).get('name', 'Your Name') }}</h1>
+                
+                <div class="contact-info">
+                    {% set contact = resume.resume_data.get('contact', {}) %}
+                    
+                    {% if contact.get('email') %}
+                    <div class="contact-item">
+                        <span class="contact-icon">✉</span>
+                        {{ contact.get('email') }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if contact.get('phone') %}
+                    <div class="contact-item">
+                        <span class="contact-icon">☏</span>
+                        {{ contact.get('phone') }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if contact.get('location') %}
+                    <div class="contact-item">
+                        <span class="contact-icon">⌖</span>
+                        {{ contact.get('location') }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if contact.get('linkedin') %}
+                    <div class="contact-item">
+                        <span class="contact-icon">in</span>
+                        {{ contact.get('linkedin') }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if contact.get('website') %}
+                    <div class="contact-item">
+                        <span class="contact-icon">🌐</span>
+                        {{ contact.get('website') }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="resume-body">
+            <!-- Left Column -->
+            <div class="resume-main">
+                <!-- Professional Summary -->
+                {% if resume.resume_data.get('summary') %}
+                <div class="resume-section">
+                    <h2 class="section-title">Professional Summary</h2>
+                    <div class="summary-content">
+                        {% if resume.resume_data.get('summary') is string %}
+                            {{ resume.resume_data.get('summary') }}
+                        {% else %}
+                            {{ resume.resume_data.get('summary', {}).get('content', '') }}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Work Experience -->
+                {% if resume.resume_data.get('experience') %}
+                <div class="resume-section">
+                    <h2 class="section-title">Professional Experience</h2>
+                    
+                    {% for exp in resume.resume_data.get('experience') %}
+                        <div class="experience-item">
+                            <div class="item-header">
+                                <h3 class="item-title">{{ exp.title }}</h3>
+                                <div class="item-subtitle">{{ exp.company }}</div>
+                                <div class="item-date">{{ exp.startDate }} - {% if exp.current %}Present{% else %}{{ exp.endDate }}{% endif %}</div>
+                            </div>
+                            
+                            <div class="item-details">
+                                <ul>
+                                {% for line in exp.description.split('\n') if line.strip() %}
+                                    <li>{{ line }}</li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Right Column -->
+            <div class="resume-sidebar">
+                <!-- Skills -->
+                {% if resume.resume_data.get('skills') %}
+                <div class="resume-section">
+                    <h2 class="section-title">Skills</h2>
+                    <div class="skills-list">
+                        {% if resume.resume_data.get('skills') is string %}
+                            {% for skill in resume.resume_data.get('skills').split(',') %}
+                                <span class="skill-item">{{ skill.strip() }}</span>
+                            {% endfor %}
+                        {% elif resume.resume_data.get('skills') is iterable %}
+                            {% for skill in resume.resume_data.get('skills') %}
+                                <span class="skill-item">{{ skill }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Education -->
+                {% if resume.resume_data.get('education') %}
+                <div class="resume-section">
+                    <h2 class="section-title">Education</h2>
+                    
+                    {% if resume.resume_data.get('education') is mapping %}
+                        <!-- Single education entry as dictionary -->
+                        <div class="education-item">
+                            <div class="item-header">
+                                <h3 class="item-title">{{ resume.resume_data.get('education').get('degree', '') }}</h3>
+                                <div class="item-subtitle">{{ resume.resume_data.get('education').get('school', '') }}</div>
+                                <div class="item-date">{{ resume.resume_data.get('education').get('year', '') }}</div>
+                            </div>
+                        </div>
+                    {% elif resume.resume_data.get('education') is iterable and resume.resume_data.get('education') is not string %}
+                        <!-- Multiple education entries as list -->
+                        {% for edu in resume.resume_data.get('education') %}
+                            <div class="education-item">
+                                <div class="item-header">
+                                    <h3 class="item-title">{{ edu.degree }}</h3>
+                                    <div class="item-subtitle">{{ edu.school }}</div>
+                                    <div class="item-date">{{ edu.startYear }} - {% if edu.current %}Present{% else %}{{ edu.endYear }}{% endif %}</div>
+                                </div>
+                                
+                                {% if edu.description %}
+                                    <div class="education-details">
+                                        {{ edu.description }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <!-- Additional sections could be added here -->
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</body>
+</html>
