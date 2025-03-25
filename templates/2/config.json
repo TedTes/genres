@@ -1,0 +1,20 @@
+{
+  "id": "2",
+  "name": "2",
+  "thumbnail_url": "/static/images/thumbnails/2.png",
+  "description": "Clean and modern design with blue accents, perfect for tech professionals",
+  "preview": "modern/preview.png",
+  "author": "ResumeMatch",
+  "version": "1.0",
+  "colors": {
+    "primary": "#3b82f6",
+    "secondary": "#6b7280",
+    "background": "#ffffff"
+  },
+  "fonts": {
+    "primary": "Roboto, Arial, sans-serif",
+    "secondary": "Roboto, Arial, sans-serif"
+  },
+  "customizable": true,
+  "tags": ["modern", "professional", "tech", "clean"]
+}
