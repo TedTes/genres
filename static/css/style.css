@@ -448,48 +448,8 @@ ul, ol {
 }
 .step p {
     color: var(--text-light);}
-/* Templates Section */
-.templates {
-    padding: 6rem 0;
-    background-color: var(--light-gray);}
-.templates-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: var(--space-6);
-    margin-bottom: var(--space-8);}
-.template-card {
-    background-color: var(--white);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
-    position: relative;}
-.template-card:hover {
-    transform: translateY(-10px);
-    box-shadow: var(--shadow-lg);}
-.template-preview {
-    height: 400px;
-    overflow: hidden;
-    position: relative;}
-.template-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: var(--transition);}
-.template-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(30, 41, 59, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: var(--transition);}
-.template-card:hover .template-overlay {
-    opacity: 1;}
+
+
 .template-info {
     padding: var(--space-5);}
 .template-info h3 {
@@ -2040,7 +2000,6 @@ body.modal-open {
         font-size: 3rem;
     }
     
-    .templates-grid,
     .features-grid,
     .reviews-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -2199,7 +2158,6 @@ body.modal-open {
         width: auto;
     }
     
-    .templates-grid,
     .features-grid,
     .reviews-grid {
         grid-template-columns: 1fr;
@@ -2488,12 +2446,6 @@ body.modal-open {
     background-color: var(--light-gray);
 }
 
-.templates-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-bottom: 3rem;
-}
 
 .template-card {
     background-color: var(--white);
@@ -4142,13 +4094,6 @@ Job Details page
   border-color: var(--primary);
 }
 
-/* Enhanced Template Grid */
-.templates-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-bottom: 3rem;
-}
 
 .template-card {
   background-color: white;
@@ -4185,35 +4130,6 @@ Job Details page
   transform: scale(1.05);
 }
 
-.template-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.template-overlay .btn-white {
-  background-color: white;
-  color: var(--primary);
-  padding: 0.75rem 1.5rem;
-  font-weight: 600;
-  border-radius: 2rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-  animation: pulse 2s infinite;
-}
-
-.template-overlay .btn-white:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
-}
 
 @keyframes pulse {
   0% {
@@ -4310,10 +4226,7 @@ Job Details page
       flex-shrink: 0;
   }
   
-  .templates-grid {
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 1.5rem;
-  }
+
   
   .template-preview {
       height: 350px;
@@ -4321,9 +4234,7 @@ Job Details page
 }
 
 @media (max-width: 480px) {
-  .templates-grid {
-      grid-template-columns: 1fr;
-  }
+
   
   .template-preview {
       height: 400px;
@@ -4659,5 +4570,161 @@ input:checked + .toggle-slider:before {
   .popular-badge {
       font-size: 12px;
       padding: 4px 12px;
+  }
+}
+
+/* Updated Templates Section CSS */
+
+/* Remove template categories */
+.template-categories {
+  display: none;
+}
+
+/* Updated template card */
+.template-card {
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.template-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Template preview */
+.template-preview {
+  position: relative;
+  overflow: hidden;
+  padding-top: 140%; /* Maintain aspect ratio */
+}
+
+.template-preview img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.template-card:hover .template-preview img {
+  transform: scale(1.03);
+}
+
+/* Template overlay */
+.template-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.template-card:hover .template-overlay {
+  opacity: 1;
+}
+
+/* Template info */
+.template-info {
+  padding: 16px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.template-info p {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Badge styling */
+.template-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: #3b82f6;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.template-badge.popular {
+  background-color: #10b981;
+}
+
+/* Templates grid layout adjustments */
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+/* Templates footer with CTA */
+.templates-footer {
+  text-align: center;
+  margin-top: 20px;
+  padding: 30px 0;
+}
+
+.templates-note {
+  margin: 15px 0 25px;
+  color: #64748b;
+}
+
+.view-all-templates {
+  margin-top: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.view-all-templates i {
+  transition: transform 0.3s ease;
+}
+
+.view-all-templates:hover i {
+  transform: translateX(4px);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .templates-grid {
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+  }
+  
+  .template-badge {
+      font-size: 10px;
+      padding: 4px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .templates-grid {
+      grid-template-columns: 1fr;
+      max-width: 320px;
+      margin: 0 auto 40px;
   }
 }
