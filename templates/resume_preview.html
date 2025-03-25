@@ -125,31 +125,6 @@
         position: relative;
     }
     
-    /* Template-specific styling */
-    .template-color-indicator.standard {
-        border-top: 12px solid #000000;
-    }
-    
-    .template-color-indicator.modern {
-        border-top: 12px solid #3b82f6;
-    }
-    
-    .template-color-indicator.minimal {
-        border-top: 12px solid #4b5563;
-    }
-    
-    .template-color-indicator.executive {
-        border-top: 12px solid #1e40af;
-    }
-    
-    .template-color-indicator.creative {
-        border-top: 12px solid #ec4899;
-    }
-    
-    .template-color-indicator.technical {
-        border-top: 12px solid #6366f1;
-    }
-    
     /* Tiny preview lines inside template indicator */
     .template-color-indicator::after {
         content: "";
@@ -561,7 +536,7 @@
 
 <!-- Current template pill for mobile -->
 <div class="current-template-pill">
-    Template: <strong>{{ templates[selected_template].name if selected_template in templates else 'Standard' }}</strong>
+    Template: <strong>{{ templates[selected_template].name if selected_template in templates else '1' }}</strong>
 </div>
 
 <!-- Overlay for mobile sidebar -->
@@ -587,7 +562,9 @@
                         value="{{ template_id }}" {% if selected_template == template_id %}checked{% endif %}
                         onchange="document.getElementById('template-form').submit();">
                     <label for="template-{{ template_id }}" class="template-label" data-template-name="{{ template.name }}">
-                        <div class="template-color-indicator {{ template_id }}"></div>
+                        <div class="template-color-indicator {{ template_id }}">
+                            <img src="{{ template.thumbnail_url }}" alt="{{ template.name }} Thumbnail" class="template-thumbnail">
+                        </div>
                         <div class="template-info">
                             <span class="template-name">{{ template.name }}</span>
                             <span class="template-description">{{ template.description }}</span>
@@ -651,7 +628,7 @@
                         
                         <div class="info-tooltip-item">
                             <span class="info-tooltip-label">Template</span>
-                            <span class="info-tooltip-value">{{ templates[selected_template].name if selected_template in templates else 'Standard' }}</span>
+                            <span class="info-tooltip-value">{{ templates[selected_template].name if selected_template in templates else '1' }}</span>
                         </div>
                         
                         <div class="info-tooltip-item">
@@ -732,7 +709,7 @@
                 if (this.checked && currentTemplatePill) {
                     const label = document.querySelector(`label[for="${this.id}"]`);
                     if (label) {
-                        const templateName = label.dataset.templateName || 'Standard';
+                        const templateName = label.dataset.templateName || '1';
                         currentTemplatePill.innerHTML = `Template: <strong>${templateName}</strong>`;
                     }
                     

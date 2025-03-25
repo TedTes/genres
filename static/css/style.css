@@ -92,27 +92,7 @@ ul, ol {
 /* =============================================
    Flash Messages & Notifications
 ============================================= */
-.success, .danger, .warning, .info {
-    padding: var(--space-4);
-    margin-bottom: var(--space-4);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);}
-.success {
-    background-color: rgba(16, 185, 129, 0.1);
-    color: var(--success);
-    border-left: 4px solid var(--success);}
-.danger {
-    background-color: rgba(239, 68, 68, 0.1);
-    color: var(--danger);
-    border-left: 4px solid var(--danger);}
-.warning {
-    background-color: rgba(245, 158, 11, 0.1);
-    color: var(--warning);
-    border-left: 4px solid var(--warning);}
-.info {
-    background-color: rgba(59, 130, 246, 0.1);
-    color: var(--primary);
-    border-left: 4px solid var(--primary);}
+
 /* Notifications */
 .notification {
     position: fixed;
@@ -946,26 +926,7 @@ ul, ol {
     color: var(--text);}
 .required {
     color: var(--danger);}
-.field-tooltip {
-    position: relative;
-    cursor: help;
-    color: var(--primary);
-    margin-left: var(--space-2);}
-.field-tooltip:hover::before {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--dark);
-    color: white;
-    padding: var(--space-2);
-    border-radius: var(--radius);
-    font-size: var(--space-3);
-    width: max-content;
-    max-width: 200px;
-    z-index: 10;
-    box-shadow: var(--shadow);}
+
 /* AI Help Section */
 .ai-help-section {
     background-color: var(--light-gray);
@@ -1802,63 +1763,7 @@ Resume Cards
     font-size: 1.125rem;
     margin-bottom: 0;}
 
-.filter-input {
-    width: 100%;
-    padding: var(--space-3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    font-size: 0.875rem;
-    transition: var(--transition);}
-.filter-input:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);}
-
-.filter-checkbox {
-    display: flex;
-    align-items: center;
-    font-size: 0.875rem;
-    color: var(--text);
-    cursor: pointer;
-    position: relative;
-    padding-left: 1.75rem;}
-.filter-checkbox input {
-    position: absolute;
-    opacity: 0;
-    height: 0;
-    width: 0;}
-.filter-checkbox .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 1.125rem;
-    width: 1.125rem;
-    background-color: var(--light);
-    border: 1px solid var(--border);
-    border-radius: 4px;}
-.filter-checkbox:hover input ~ .checkmark {
-    background-color: var(--light-gray);}
-.filter-checkbox input:checked ~ .checkmark {
-    background-color: var(--primary);
-    border-color: var(--primary);}
-.filter-checkbox .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;}
-.filter-checkbox input:checked ~ .checkmark:after {
-    display: block;}
-.filter-checkbox .checkmark:after {
-    left: 0.var(--space-10);
-    top: 0.var(--space-6);
-    width: var(--space-1);
-    height: var(--space-2);
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);}
-
 /* Jobs List */
-
-
 
 .job-meta {
     display: flex;
