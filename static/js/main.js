@@ -185,6 +185,54 @@ if (localStorage.getItem('formSubmitted') === 'true') {
     showSaveIndicator();
     localStorage.removeItem('formSubmitted');
 }
+
+const billingToggle = document.getElementById('billing-toggle');
+if (billingToggle) {
+    const monthlyPrices = document.querySelectorAll('.monthly-price');
+    const annualPrices = document.querySelectorAll('.annual-price');
+    const monthlyPeriods = document.querySelectorAll('.monthly-period');
+    const annualPeriods = document.querySelectorAll('.annual-period');
+    
+    billingToggle.addEventListener('change', function() {
+        if (this.checked) {
+            // Annual billing
+            monthlyPrices.forEach(el => el.style.display = 'none');
+            annualPrices.forEach(el => el.style.display = 'inline');
+            monthlyPeriods.forEach(el => el.style.display = 'none');
+            annualPeriods.forEach(el => el.style.display = 'inline');
+        } else {
+            // Monthly billing
+            monthlyPrices.forEach(el => el.style.display = 'inline');
+            annualPrices.forEach(el => el.style.display = 'none');
+            monthlyPeriods.forEach(el => el.style.display = 'inline');
+            annualPeriods.forEach(el => el.style.display = 'none');
+        }
+    });
+}
+
+// Highlight the most popular plan on hover
+const planCards = document.querySelectorAll('.plan-card');
+planCards.forEach(card => {
+    card.addEventListener('mouseover', function() {
+        if (!this.classList.contains('popular')) {
+            planCards.forEach(c => {
+                if (c.classList.contains('popular')) {
+                    c.classList.add('temporarily-unpopular');
+                    c.classList.remove('popular');
+                }
+            });
+        }
+    });
+    
+    card.addEventListener('mouseout', function() {
+        planCards.forEach(c => {
+            if (c.classList.contains('temporarily-unpopular')) {
+                c.classList.add('popular');
+                c.classList.remove('temporarily-unpopular');
+            }
+        });
+    });
+});
 // Add CSS for JavaScript-dependent styles
 document.head.insertAdjacentHTML('beforeend', `
 <style>

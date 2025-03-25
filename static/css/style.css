@@ -4329,3 +4329,335 @@ Job Details page
       height: 400px;
   }
 }
+
+/* Pricing Plans Section */
+.pricing-plans {
+  padding: 80px 0;
+  background-color: #f8fafc;
+}
+
+/* Pricing Toggle */
+.pricing-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 30px 0 50px;
+}
+
+.toggle-option {
+  font-size: 16px;
+  font-weight: 500;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-option:first-child {
+  margin-right: 12px;
+}
+
+.toggle-option:last-child {
+  margin-left: 12px;
+}
+
+.save-badge {
+  background-color: #10b981;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 6px;
+  border-radius: 12px;
+  margin-left: 8px;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #e2e8f0;
+  transition: .4s;
+  border-radius: 30px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: #3b82f6;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(30px);
+}
+
+/* Plans Container */
+.plans-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 60px;
+}
+
+/* Plan Card */
+.plan-card {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid #e2e8f0;
+}
+
+.plan-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.plan-card.popular {
+  border: 2px solid #3b82f6;
+  transform: scale(1.05);
+}
+
+.plan-card.popular:hover {
+  transform: scale(1.05) translateY(-5px);
+}
+
+.popular-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #3b82f6;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 5px 15px;
+  border-radius: 20px;
+}
+
+/* Plan Header */
+.plan-header {
+  padding: 30px;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.plan-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 15px;
+}
+
+.plan-price {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.price {
+  font-size: 40px;
+  font-weight: 700;
+  color: #3b82f6;
+  margin-bottom: 5px;
+}
+
+.period {
+  font-size: 16px;
+  color: #64748b;
+}
+
+/* Plan Features */
+.plan-features {
+  padding: 30px;
+  flex-grow: 1;
+}
+
+.plan-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.plan-features li {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  color: #1e293b;
+}
+
+.plan-features li:last-child {
+  margin-bottom: 0;
+}
+
+.plan-features li.disabled {
+  color: #94a3b8;
+}
+
+.plan-features i {
+  margin-right: 12px;
+  font-size: 16px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.plan-features .fa-check {
+  color: #10b981;
+}
+
+.plan-features .fa-times {
+  color: #ef4444;
+}
+
+/* Plan Footer */
+.plan-footer {
+  padding: 0 30px 30px;
+}
+
+.btn-full {
+  width: 100%;
+  text-align: center;
+}
+
+/* Pricing Guarantee */
+.pricing-guarantee {
+  display: flex;
+  align-items: center;
+  max-width: 700px;
+  margin: 0 auto 60px;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.guarantee-icon {
+  margin-right: 20px;
+  font-size: 36px;
+  color: #3b82f6;
+}
+
+.guarantee-text h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.guarantee-text p {
+  color: #64748b;
+  margin: 0;
+}
+
+/* Pricing FAQ */
+.pricing-faq {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.pricing-faq h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.faq-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+
+.faq-item h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+.faq-item p {
+  color: #64748b;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .plans-container {
+      gap: 20px;
+  }
+  
+  .plan-card.popular {
+      transform: scale(1.03);
+  }
+  
+  .plan-card.popular:hover {
+      transform: scale(1.03) translateY(-5px);
+  }
+}
+
+@media (max-width: 768px) {
+  .faq-grid {
+      grid-template-columns: 1fr;
+  }
+  
+  .pricing-guarantee {
+      flex-direction: column;
+      text-align: center;
+  }
+  
+  .guarantee-icon {
+      margin: 0 0 15px 0;
+  }
+  
+  .plans-container {
+      flex-direction: column;
+      align-items: center;
+  }
+  
+  .plan-card, .plan-card.popular {
+      max-width: 100%;
+      transform: none;
+  }
+  
+  .plan-card:hover, .plan-card.popular:hover {
+      transform: translateY(-5px);
+  }
+  
+  .popular-badge {
+      font-size: 12px;
+      padding: 4px 12px;
+  }
+}
