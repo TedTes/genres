@@ -338,7 +338,8 @@ ul, ol {
 .hero-image {
     flex: 1;
     position: relative;
-    padding: var(--space-4);}
+    margin-top:2em;
+  }
 .hero-image img {
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
@@ -4108,3 +4109,223 @@ Job Details page
       flex-direction: column;
     }
   }
+
+/* Template Categories Navigation */
+.template-categories {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+}
+
+.category-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 2rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.category-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.category-btn.active {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Enhanced Template Grid */
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.template-card {
+  background-color: white;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.template-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.template-card.hover {
+  border-color: var(--primary);
+}
+
+.template-preview {
+  height: 400px;
+  overflow: hidden;
+  position: relative;
+}
+
+.template-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.template-card:hover .template-preview img {
+  transform: scale(1.05);
+}
+
+.template-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.template-overlay .btn-white {
+  background-color: white;
+  color: var(--primary);
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border-radius: 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  animation: pulse 2s infinite;
+}
+
+.template-overlay .btn-white:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes pulse {
+  0% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+  }
+  70% {
+      box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+  }
+  100% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+.template-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: var(--primary);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.template-info {
+  padding: 1.5rem;
+  background-color: white;
+}
+
+.template-info h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--dark);
+}
+
+.template-info p {
+  font-size: 0.875rem;
+  color: var(--text-light);
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.template-rating {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stars {
+  color: #F59E0B;
+  letter-spacing: 1px;
+  font-size: 0.875rem;
+}
+
+.count {
+  font-size: 0.75rem;
+  color: var(--text-light);
+}
+
+/* Enhanced Footer */
+.templates-footer {
+  text-align: center;
+  margin-top: 2.5rem;
+}
+
+.templates-note {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: var(--text-light);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .template-categories {
+      overflow-x: auto;
+      padding-bottom: 1rem;
+      justify-content: flex-start;
+      -webkit-overflow-scrolling: touch;
+  }
+  
+  .template-categories::-webkit-scrollbar {
+      height: 4px;
+  }
+  
+  .template-categories::-webkit-scrollbar-thumb {
+      background-color: var(--border);
+      border-radius: 4px;
+  }
+  
+  .category-btn {
+      flex-shrink: 0;
+  }
+  
+  .templates-grid {
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+  }
+  
+  .template-preview {
+      height: 350px;
+  }
+}
+
+@media (max-width: 480px) {
+  .templates-grid {
+      grid-template-columns: 1fr;
+  }
+  
+  .template-preview {
+      height: 400px;
+  }
+}
