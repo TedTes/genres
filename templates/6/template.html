@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include 'partials/header.html' with context %}
+
+<body>
+    <div class="resume-container">
+        <!-- Header Section -->
+        <div class="header">
+            <h1 class="name">{{ resume.contact.name|default('FULL NAME') }}</h1>
+            <p class="title">{{ resume.contact.title|default('Professional Title') }}</p>
+            
+            <div class="contact-info">
+                {% if resume.contact.phone %}
+                <div class="contact-item">
+                    <span class="contact-icon"><i class="fas fa-phone-alt"></i></span>
+                    <span>{{ resume.contact.phone }}</span>
+                </div>
+                {% endif %}
+                
+                {% if resume.contact.email %}
+                <div class="contact-item">
+                    <span class="contact-icon"><i class="fas fa-envelope"></i></span>
+                    <span>{{ resume.contact.email }}</span>
+                </div>
+                {% endif %}
+                
+                {% if resume.contact.website %}
+                <div class="contact-item">
+                    <span class="contact-icon"><i class="fas fa-globe"></i></span>
+                    <span>{{ resume.contact.website }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <!-- Main Content -->
+        <div class="resume-content">
+            <!-- Column Separator -->
+            <div class="column-separator"></div>
+            
+            <!-- Left Column -->
+            <div class="left-column">
+                <!-- Education Section -->
+                <div class="section education-section">
+                    <h2 class="section-title">Education</h2>
+                    
+                    {% if resume.education %}
+                        {% if resume.education is iterable and resume.education is not string %}
+                            {% for edu in resume.education %}
+                                <div class="education-item">
+                                    <div class="education-degree">{{ edu.degree }}</div>
+                                    <div class="education-school">{{ edu.school }}</div>
+                                    <div class="education-years">{{ edu.startYear }} - {{ edu.endYear|default('Present') if edu.current else edu.endYear }}</div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="education-item">
+                                <div class="education-degree">{{ resume.education.degree }}</div>
+                                <div class="education-school">{{ resume.education.school }}</div>
+                                <div class="education-years">{{ resume.education.startYear }} - {{ resume.education.endYear|default('Present') if resume.education.current else resume.education.endYear }}</div>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <!-- Sample Education Items -->
+                        <div class="education-item">
+                            <div class="education-degree">Bachelor of Design</div>
+                            <div class="education-school">Westdale University</div>
+                            <div class="education-years">2005 - 2008</div>
+                        </div>
+                        <div class="education-item">
+                            <div class="education-degree">Bachelor of Arts</div>
+                            <div class="education-school">Westdale University</div>
+                            <div class="education-years">2008 - 2008</div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Expertise/Skills Section -->
+                <div class="section expertise-section">
+                    <h2 class="section-title">Expertise</h2>
+                    
+                    {% if resume.skills %}
+                        <ul class="expertise-list">
+                            {% if resume.skills is string %}
+                                {% for skill in resume.skills.split(',') %}
+                                    <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> {{ skill.strip() }}</li>
+                                {% endfor %}
+                            {% elif resume.skills is iterable %}
+                                {% for skill in resume.skills %}
+                                    <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> {{ skill }}</li>
+                                {% endfor %}
+                            {% endif %}
+                        </ul>
+                    {% else %}
+                        <!-- Sample Skills -->
+                        <ul class="expertise-list">
+                            <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> Management Skills</li>
+                            <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> Digital Marketing</li>
+                            <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> Web Development</li>
+                            <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> Critical Thinking</li>
+                            <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> Communication Skills</li>
+                            <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> Negotiation</li>
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <!-- Language Section -->
+                <div class="section language-section">
+                    <h2 class="section-title">Language</h2>
+                    
+                    {% if resume.languages %}
+                        <ul class="language-list">
+                            {% for language in resume.languages %}
+                                <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> {{ language }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <!-- Sample Languages -->
+                        <ul class="language-list">
+                            <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> English</li>
+                            <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> Spanish</li>
+                            <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> French</li>
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Right Column -->
+            <div class="right-column">
+                <!-- Profile Section -->
+                <div class="section profile-section">
+                    <h2 class="section-title">Profile</h2>
+                    <div class="profile-content">
+                        {% if resume.summary %}
+                            {% if resume.summary is string %}
+                                <p>{{ resume.summary }}</p>
+                            {% else %}
+                                <p>{{ resume.summary.content }}</p>
+                            {% endif %}
+                        {% else %}
+                            <!-- Sample Profile -->
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Work Experience Section -->
+                <div class="section experience-section">
+                    <h2 class="section-title">Work Experience</h2>
+                    
+                    {% if resume.experience %}
+                        {% for exp in resume.experience %}
+                            <div class="experience-item">
+                                <div class="experience-header">
+                                    <div class="experience-years">{{ exp.startDate }} - {{ exp.endDate|default('Present') if exp.current else exp.endDate }}</div>
+                                    <div class="experience-title">{{ exp.company }}</div>
+                                    <div class="experience-company">{{ exp.title }}</div>
+                                </div>
+                                <div class="experience-details">
+                                    <ul>
+                                        {% for line in exp.description.split('\n') if line.strip() %}
+                                            <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> {{ line }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Sample Work Experience -->
+                        <div class="experience-item">
+                            <div class="experience-header">
+                                <div class="experience-years">2018 - 2023</div>
+                                <div class="experience-title">Shipyard International Co.</div>
+                                <div class="experience-company">Product Design Manager</div>
+                            </div>
+                            <div class="experience-details">
+                                <ul>
+                                    <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> Working with the entire development team.</li>
+                                    <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> Manage website design, content, and branding.</li>
+                                    <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> Branding and logo design.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="experience-item">
+                            <div class="experience-header">
+                                <div class="experience-years">2016 - 2018</div>
+                                <div class="experience-title">Arexwel Industries</div>
+                                <div class="experience-company">Product Design Manager</div>
+                            </div>
+                            <div class="experience-details">
+                                <ul>
+                                    <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> Working with the entire development team.</li>
+                                    <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> Manage website design, content, and branding.</li>
+                                    <li><span class="list-bullet"><i class="fas fa-circle fa-xs"></i></span> Branding and logo design.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- References Section -->
+                <div class="section references-section">
+                    <h2 class="section-title">References</h2>
+                    
+                    <div class="references-grid">
+                        {% if resume.references %}
+                            {% for ref in resume.references %}
+                                <div class="reference-item">
+                                    <div class="reference-name">{{ ref.name }}</div>
+                                    <div class="reference-title">{{ ref.title }} {% if ref.company %}/ {{ ref.company }}{% endif %}</div>
+                                    {% if ref.phone %}
+                                        <div class="reference-contact"><i class="fas fa-phone-alt fa-fw"></i> {{ ref.phone }}</div>
+                                    {% endif %}
+                                    {% if ref.email %}
+                                        <div class="reference-contact"><i class="fas fa-envelope fa-fw"></i> {{ ref.email }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <!-- Sample References -->
+                            <div class="reference-item">
+                                <div class="reference-name">Bailey Guichard</div>
+                                <div class="reference-title">Web Dev Inc. / CEO</div>
+                                <div class="reference-contact"><i class="fas fa-phone-alt fa-fw"></i> +01-456-7890</div>
+                                <div class="reference-contact"><i class="fas fa-envelope fa-fw"></i> hello@bailey@gmail.com</div>
+                            </div>
+                            
+                            <div class="reference-item">
+                                <div class="reference-name">Harumi Kobayashi</div>
+                                <div class="reference-title">Westdale Inc. / CEO</div>
+                                <div class="reference-contact"><i class="fas fa-phone-alt fa-fw"></i> +01-456-7890</div>
+                                <div class="reference-contact"><i class="fas fa-envelope fa-fw"></i> info@harley@gmail.com</div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
