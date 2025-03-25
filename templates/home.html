@@ -531,7 +531,191 @@
         </div>
     </div>
 </section>
-
+<!-- Pricing Plans Section -->
+<section class="pricing-plans">
+    <div class="container">
+        <h2 class="section-title">Choose Your Plan</h2>
+        <p class="section-subtitle">Select the perfect plan for your job search needs</p>
+        
+        <div class="pricing-toggle">
+            <span class="toggle-option">Monthly</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="billing-toggle">
+                <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-option">Annual <span class="save-badge">Save 20%</span></span>
+        </div>
+        
+        <div class="plans-container">
+            <!-- Free Plan -->
+            <div class="plan-card">
+                <div class="plan-header">
+                    <h3 class="plan-name">Basic</h3>
+                    <div class="plan-price">
+                        <span class="price">Free</span>
+                        <span class="period">forever</span>
+                    </div>
+                </div>
+                <div class="plan-features">
+                    <ul>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>1 resume template</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Basic ATS optimization</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>PDF download</span>
+                        </li>
+                        <li class="disabled">
+                            <i class="fas fa-times"></i>
+                            <span>AI keyword suggestions</span>
+                        </li>
+                        <li class="disabled">
+                            <i class="fas fa-times"></i>
+                            <span>Multiple versions</span>
+                        </li>
+                        <li class="disabled">
+                            <i class="fas fa-times"></i>
+                            <span>Priority support</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="plan-footer">
+                    <a href="{{ url_for('register') }}" class="btn btn-outline btn-large btn-full">Get Started</a>
+                </div>
+            </div>
+            
+            <!-- Standard Plan -->
+            <div class="plan-card popular">
+                <div class="popular-badge">Most Popular</div>
+                <div class="plan-header">
+                    <h3 class="plan-name">Standard</h3>
+                    <div class="plan-price">
+                        <span class="price monthly-price">$12</span>
+                        <span class="price annual-price" style="display: none;">$9.60</span>
+                        <span class="period monthly-period">per month</span>
+                        <span class="period annual-period" style="display: none;">per month, billed annually</span>
+                    </div>
+                </div>
+                <div class="plan-features">
+                    <ul>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>All basic features</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>20+ premium templates</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Advanced ATS optimization</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>AI keyword suggestions</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Up to 3 resume versions</span>
+                        </li>
+                        <li class="disabled">
+                            <i class="fas fa-times"></i>
+                            <span>Priority support</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="plan-footer">
+                    <a href="{{ url_for('register') }}" class="btn btn-primary btn-large btn-full">Choose Plan</a>
+                </div>
+            </div>
+            
+            <!-- Premium Plan -->
+            <div class="plan-card">
+                <div class="plan-header">
+                    <h3 class="plan-name">Premium</h3>
+                    <div class="plan-price">
+                        <span class="price monthly-price">$29</span>
+                        <span class="price annual-price" style="display: none;">$23.20</span>
+                        <span class="period monthly-period">per month</span>
+                        <span class="period annual-period" style="display: none;">per month, billed annually</span>
+                    </div>
+                </div>
+                <div class="plan-features">
+                    <ul>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>All standard features</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>All 40+ premium templates</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Cover letter generator</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Unlimited resume versions</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>LinkedIn profile optimization</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Priority email support</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="plan-footer">
+                    <a href="{{ url_for('register') }}" class="btn btn-outline btn-large btn-full">Choose Plan</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="pricing-guarantee">
+            <div class="guarantee-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="guarantee-text">
+                <h4>30-Day Money-Back Guarantee</h4>
+                <p>If you're not satisfied with our service, we'll refund your payment. No questions asked.</p>
+            </div>
+        </div>
+        
+        <div class="pricing-faq">
+            <h3>Frequently Asked Questions</h3>
+            
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h4>Can I change plans later?</h4>
+                    <p>Yes, you can upgrade or downgrade your plan at any time. If you upgrade, you'll be charged the prorated difference. If you downgrade, you'll receive credit towards your next billing cycle.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h4>Do you offer refunds?</h4>
+                    <p>Yes, we offer a 30-day money-back guarantee. If you're not satisfied with our service within the first 30 days, we'll provide a full refund.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h4>What payment methods do you accept?</h4>
+                    <p>We accept all major credit cards (Visa, Mastercard, American Express), PayPal, and Apple Pay.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h4>Is there a student discount?</h4>
+                    <p>Yes, we offer a 50% discount for students with a valid .edu email address. Contact our support team to apply for the discount.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 <!-- CTA Section -->
 <section class="cta">
     <div class="container">
