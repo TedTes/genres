@@ -1,7 +1,7 @@
 from flask import current_app, url_for
-from ..payments.factory import PaymentGatewayFactory
-from ..models import Subscription, User, db
-from ..payments.exceptions import *
+from payments.factory import PaymentGatewayFactory
+from models import Subscription, User, db
+from payments.exceptions import *
 import logging
 
 class SubscriptionService:
