@@ -29,6 +29,8 @@ db.init_app(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+from routes.payment_routes import payment_bp
+app.register_blueprint(payment_bp)
 
 @app.context_processor
 def inject_current_year():
@@ -38,7 +40,7 @@ def inject_current_year():
 def load_user(user_id):
     return User.query.get(int(user_id))
 # Import and register routes
-from routes import init_routes
+from routes.routes import init_routes
 init_routes(app)
 
 # Create database tables
