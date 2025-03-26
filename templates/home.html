@@ -604,7 +604,28 @@
                     </ul>
                 </div>
                 <div class="plan-footer">
-                    <a href="{{ url_for('register') }}" class="btn btn-primary btn-large btn-full">Choose Plan</a>
+                    {% if current_user.is_authenticated %}
+                    <form action="{{ url_for('payment.checkout', plan_id='3month') }}" method="get">
+                        <div class="payment-methods">
+                            <div class="payment-method">
+                                <input type="radio" name="gateway" id="stripe-{{ plan.id }}" value="stripe" checked>
+                                <label for="stripe-{{ plan.id }}">
+                                    <img src="{{ url_for('static', filename='images/stripe.png') }}" alt="Credit Card">
+                                </label>
+                            </div>
+                            <div class="payment-method">
+                                <input type="radio" name="gateway" id="paypal-{{ plan.id }}" value="paypal">
+                                <label for="paypal-{{ plan.id }}">
+                                    <img src="{{ url_for('static', filename='images/paypal.png') }}" alt="PayPal">
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-large btn-full">Choose Plan</button>
+                    </form>
+        {% else %}
+            <a href="{{ url_for('login', next=url_for('payment.checkout', plan_id='3month')) }}" 
+               class="btn btn-primary btn-large btn-full">Choose Plan</a>
+        {% endif %}
                 </div>
             </div>
             
