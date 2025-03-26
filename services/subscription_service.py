@@ -1,6 +1,8 @@
 from flask import current_app, url_for
 from ..payments.factory import PaymentGatewayFactory
 from ..models import Subscription, User, db
+from ..payments.exceptions import *
+import logging
 
 class SubscriptionService:
     """Service for handling subscription-related operations."""
@@ -18,17 +20,25 @@ class SubscriptionService:
         Returns:
             URL to redirect the user to for checkout.
         """
-        user = User.query.get(user_id)
-        
-        success_url = url_for('payment_success', _external=True)
-        cancel_url = url_for('payment_cancel', _external=True)
-        
-        return self.gateway.create_checkout_session(
-            plan_id=plan_id,
-            user_id=user_id,
-            success_url=success_url,
-            cancel_url=cancel_url
-        )
+        try:
+            user = User.query.get(user_id)
+            
+            success_url = url_for('payment_success', _external=True)
+            cancel_url = url_for('payment_cancel', _external=True)
+            
+            return self.gateway.create_checkout_session(
+                plan_id=plan_id,
+                user_id=user_id,
+                success_url=success_url,
+                cancel_url=cancel_url
+            )
+        except Exception as e:
+            logging.error(f"Payment error for user {user_id}: {str(e)}")
+            # Categorize the error if possible
+            if "connection" in str(e).lower():
+                raise GatewayConnectionError(f"Could not connect to payment provider: {str(e)}")
+            else:
+                raise PaymentError(f"Payment error: {str(e)}")
     
     def process_subscription_event(self, event_data, gateway_type=None):
         """Process a subscription-related webhook event.
