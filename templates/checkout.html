@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Complete Your Purchase - ResumeMatch{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar (same as other pages) -->
+{% include 'partials/navbar.html' with context %}
+
+<section class="checkout-section">
+    <div class="container">
+        <div class="checkout-header">
+            <h1>Complete Your Purchase</h1>
+            <p>You're just one step away from creating perfect, job-specific resumes</p>
+        </div>
+        
+        <div class="checkout-container">
+            <div class="checkout-content">
+                <!-- Plan Summary -->
+                <div class="plan-summary">
+                    <h2>Order Summary</h2>
+                    <div class="plan-details">
+                        <div class="plan-name">{{ plan.name }}</div>
+                        <div class="plan-description">{{ plan.description }}</div>
+                        <div class="plan-price-details">
+                            <span class="plan-price">${{ plan.price }}</span>
+                            <span class="plan-period">for {{ plan.period }}</span>
+                        </div>
+                        {% if plan.savings %}
+                        <div class="plan-savings">{{ plan.savings }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="purchase-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Subtotal</span>
+                            <span class="detail-value">${{ plan.price }}</span>
+                        </div>
+                        <div class="detail-row total">
+                            <span class="detail-label">Total</span>
+                            <span class="detail-value">${{ plan.price }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payment Method Selection -->
+                <div class="payment-selection">
+                    <h2>Select Payment Method</h2>
+                    <form action="{{ url_for('payment.process_checkout', plan_id=plan_id) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="payment-methods">
+                            <div class="payment-method">
+                                <input type="radio" name="gateway" id="stripe" value="stripe" checked>
+                                <label for="stripe">
+                                    <img src="{{ url_for('static', filename='images/credit-cards.png') }}" alt="Credit Card">
+                                    <span>Credit Card</span>
+                                </label>
+                            </div>
+                            <div class="payment-method">
+                                <input type="radio" name="gateway" id="paypal" value="paypal">
+                                <label for="paypal">
+                                    <img src="{{ url_for('static', filename='images/paypal.png') }}" alt="PayPal">
+                                    <span>PayPal</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="checkout-actions">
+                            <button type="submit" class="btn btn-primary btn-large btn-full">
+                                Proceed to Payment
+                            </button>
+                            <a href="{{ url_for('home') }}#pricing" class="btn-text">
+                                Return to Plans
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="checkout-sidebar">
+                <div class="security-info">
+                    <div class="security-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="security-text">
+                        <h3>Secure Checkout</h3>
+                        <p>Your payment information is encrypted and secure. We use industry-standard security measures to protect your data.</p>
+                    </div>
+                </div>
+                
+                <div class="guarantee-info">
+                    <div class="guarantee-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="guarantee-text">
+                        <h3>30-Day Money-Back Guarantee</h3>
+                        <p>If you're not satisfied with our service, we'll refund your payment. No questions asked.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-preview">
+                    <h3>Frequently Asked Questions</h3>
+                    <div class="faq-item">
+                        <h4>When will I be charged?</h4>
+                        <p>Your card will be charged immediately upon completing checkout.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Can I change plans later?</h4>
+                        <p>Yes, you can upgrade or downgrade your plan at any time from your account settings.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
