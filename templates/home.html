@@ -514,20 +514,12 @@
         </div>
     </div>
 </section>
+
 <!-- Pricing Plans Section -->
 <section class="pricing-plans">
     <div class="container">
         <h2 class="section-title">Choose Your Plan</h2>
         <p class="section-subtitle">Select the perfect plan for your job search needs</p>
-        
-        <div class="pricing-toggle">
-            <span class="toggle-option">Monthly</span>
-            <label class="toggle-switch">
-                <input type="checkbox" id="billing-toggle">
-                <span class="toggle-slider"></span>
-            </label>
-            <span class="toggle-option">Annual <span class="save-badge">Save 20%</span></span>
-        </div>
         
         <div class="plans-container">
             <!-- Free Plan -->
@@ -553,17 +545,17 @@
                             <i class="fas fa-check"></i>
                             <span>PDF download</span>
                         </li>
-                        <li class="disabled">
-                            <i class="fas fa-times"></i>
-                            <span>AI keyword suggestions</span>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Browse job listings</span>
                         </li>
                         <li class="disabled">
                             <i class="fas fa-times"></i>
-                            <span>Multiple versions</span>
+                            <span>Job-specific tailoring</span>
                         </li>
                         <li class="disabled">
                             <i class="fas fa-times"></i>
-                            <span>Priority support</span>
+                            <span>Multiple resume versions</span>
                         </li>
                     </ul>
                 </div>
@@ -572,17 +564,16 @@
                 </div>
             </div>
             
-            <!-- Standard Plan -->
+            <!-- 3-Month Bundle Plan -->
             <div class="plan-card popular">
                 <div class="popular-badge">Most Popular</div>
                 <div class="plan-header">
-                    <h3 class="plan-name">Standard</h3>
+                    <h3 class="plan-name">3-Month Plan</h3>
                     <div class="plan-price">
-                        <span class="price monthly-price">$12</span>
-                        <span class="price annual-price" style="display: none;">$9.60</span>
-                        <span class="period monthly-period">per month</span>
-                        <span class="period annual-period" style="display: none;">per month, billed annually</span>
+                        <span class="price">$30</span>
+                        <span class="period">for 3 months</span>
                     </div>
+                    <div class="price-savings">Only $10/month</div>
                 </div>
                 <div class="plan-features">
                     <ul>
@@ -600,15 +591,15 @@
                         </li>
                         <li>
                             <i class="fas fa-check"></i>
-                            <span>AI keyword suggestions</span>
+                            <span>AI keyword matching</span>
                         </li>
                         <li>
                             <i class="fas fa-check"></i>
-                            <span>Up to 3 resume versions</span>
+                            <span>Up to 5 resume versions</span>
                         </li>
-                        <li class="disabled">
-                            <i class="fas fa-times"></i>
-                            <span>Priority support</span>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Job-specific customization</span>
                         </li>
                     </ul>
                 </div>
@@ -617,22 +608,21 @@
                 </div>
             </div>
             
-            <!-- Premium Plan -->
+            <!-- 6-Month Bundle Plan -->
             <div class="plan-card">
                 <div class="plan-header">
-                    <h3 class="plan-name">Premium</h3>
+                    <h3 class="plan-name">6-Month Plan</h3>
                     <div class="plan-price">
-                        <span class="price monthly-price">$29</span>
-                        <span class="price annual-price" style="display: none;">$23.20</span>
-                        <span class="period monthly-period">per month</span>
-                        <span class="period annual-period" style="display: none;">per month, billed annually</span>
+                        <span class="price">$48</span>
+                        <span class="period">for 6 months</span>
                     </div>
+                    <div class="price-savings">Only $8/month</div>
                 </div>
                 <div class="plan-features">
                     <ul>
                         <li>
                             <i class="fas fa-check"></i>
-                            <span>All standard features</span>
+                            <span>All features from 3-Month Plan</span>
                         </li>
                         <li>
                             <i class="fas fa-check"></i>
@@ -640,11 +630,55 @@
                         </li>
                         <li>
                             <i class="fas fa-check"></i>
-                            <span>Cover letter generator</span>
+                            <span>Enhanced job matching</span>
                         </li>
                         <li>
                             <i class="fas fa-check"></i>
-                            <span>Unlimited resume versions</span>
+                            <span>Up to 8 tailored resumes</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Save job application history</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Priority email support</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="plan-footer">
+                    <a href="{{ url_for('register') }}" class="btn btn-outline btn-large btn-full">Choose Plan</a>
+                </div>
+            </div>
+            
+            <!-- Annual Bundle Plan -->
+            <div class="plan-card">
+                <div class="best-value-badge">Best Value</div>
+                <div class="plan-header">
+                    <h3 class="plan-name">Annual Plan</h3>
+                    <div class="plan-price">
+                        <span class="price">$80</span>
+                        <span class="period">for 12 months</span>
+                    </div>
+                    <div class="price-savings">Only $6.67/month</div>
+                </div>
+                <div class="plan-features">
+                    <ul>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>All features from 6-Month Plan</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>AI cover letter generator</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Unlimited tailored resumes</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Advanced job application tracking</span>
                         </li>
                         <li>
                             <i class="fas fa-check"></i>
@@ -652,7 +686,7 @@
                         </li>
                         <li>
                             <i class="fas fa-check"></i>
-                            <span>Priority email support</span>
+                            <span>Priority email & phone support</span>
                         </li>
                     </ul>
                 </div>
@@ -699,6 +733,7 @@
         </div>
     </div>
 </section>
+
 <!-- CTA Section -->
 <section class="cta">
     <div class="container">
