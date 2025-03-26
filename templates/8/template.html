@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+{% include 'partials/header.html' with context %}
+<body>
+    <!-- Main Table Container -->
+    <table class="main-container">
+        <!-- Header Row -->
+        <tr>
+            <td class="header">
+                <table class="header-table">
+                    <tr>
+                        <td class="profile-cell">
+                            <div class="profile-image-container">
+                                {% if resume.profile_image %}
+                                <img src="{{ resume.profile_image }}" alt="{{ resume.contact.name }}" class="profile-image">
+                                {% else %}
+                                <div class="profile-initials">
+                                    {% if resume.contact.name %}
+                                        {% set name = resume.contact.name %}
+                                        {% set initials = (name.split()[0][0] + name.split()[-1][0])|upper if name.split()|length >= 2 else name[0:2]|upper %}
+                                        {{ initials }}
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="header-content-cell">
+                            <h1 class="name">{{ resume.contact.name|default('Your Name') }}</h1>
+                            <div class="title">{{ resume.contact.title|default('Professional Title') }}</div>
+                            <table class="contact-table">
+                                <tr>
+                                    {% if resume.contact.email %}
+                                    <td><span class="contact-icon"><i class="fas fa-envelope"></i></span><span class="contact-text">{{ resume.contact.email }}</span></td>
+                                    {% endif %}
+                                    {% if resume.contact.phone %}
+                                    <td><span class="contact-icon"><i class="fas fa-phone-alt"></i></span><span class="contact-text">{{ resume.contact.phone }}</span></td>
+                                    {% endif %}
+                                </tr>
+                                <tr>
+                                    {% if resume.contact.location %}
+                                    <td><span class="contact-icon"><i class="fas fa-map-marker-alt"></i></span><span class="contact-text">{{ resume.contact.location }}</span></td>
+                                    {% endif %}
+                                    {% if resume.contact.linkedin %}
+                                    <td><span class="contact-icon"><i class="fab fa-linkedin-in"></i></span><span class="contact-text">{{ resume.contact.linkedin }}</span></td>
+                                    {% endif %}
+                                </tr>
+                                {% if resume.contact.website %}
+                                <tr>
+                                    <td colspan="2"><span class="contact-icon"><i class="fas fa-globe"></i></span><span class="contact-text">{{ resume.contact.website }}</span></td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        
+        <!-- Content Row -->
+        <tr>
+            <td>
+                <table class="content-table">
+                    <tr>
+                        <!-- Left Column -->
+                        <td class="left-column">
+                            {% if resume.summary %}
+                            <div class="section">
+                                <h2 class="section-title">Professional Summary</h2>
+                                <div class="summary">
+                                    {% if resume.summary is string %}
+                                        {{ resume.summary }}
+                                    {% else %}
+                                        {{ resume.summary.content|default('') }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if resume.experience %}
+                            <div class="section">
+                                <h2 class="section-title">Professional Experience</h2>
+                                <div class="experience-container">
+                                    {% for exp in resume.experience %}
+                                    <table class="experience-table">
+                                        <tr>
+                                            <td class="marker-cell">
+                                                <div class="timeline-dot"></div>
+                                            </td>
+                                            <td class="experience-content">
+                                                <div class="job-title">{{ exp.title }}</div>
+                                                <table class="company-date-table">
+                                                    <tr>
+                                                        <td class="company">{{ exp.company }}</td>
+                                                        <td class="date">{{ exp.startDate }} - {% if exp.current %}Present{% else %}{{ exp.endDate }}{% endif %}</td>
+                                                    </tr>
+                                                </table>
+                                                
+                                                <ul class="bullet-list">
+                                                {% for line in exp.description.split('\n') if line.strip() %}
+                                                    <li>{{ line }}</li>
+                                                {% endfor %}
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if resume.projects %}
+                            <div class="section">
+                                <h2 class="section-title">Notable Projects</h2>
+                                {% for project in resume.projects %}
+                                <div class="project-item">
+                                    <div class="project-title">{{ project.name }}</div>
+                                    <div class="project-description">{{ project.description }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </td>
+                        
+                        <!-- Right Column -->
+                        <td class="right-column">
+                            {% if resume.skills %}
+                            <div class="section">
+                                <h2 class="section-title">Core Competencies</h2>
+                                <div class="skills-container">
+                                    {% if resume.skills is string %}
+                                        {% for skill in resume.skills.split(',') %}
+                                            {% if skill.strip() %}
+                                                <div class="skill-tag">{{ skill.strip() }}</div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% elif resume.skills is iterable %}
+                                        {% for skill in resume.skills %}
+                                            <div class="skill-tag">{{ skill }}</div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if resume.education %}
+                            <div class="section">
+                                <h2 class="section-title">Education</h2>
+                                
+                                {% if resume.education is mapping %}
+                                    <!-- Single education entry as dictionary -->
+                                    <div class="education-item">
+                                        <div class="degree">{{ resume.education.degree }}</div>
+                                        <table class="school-date-table">
+                                            <tr>
+                                                <td class="school">{{ resume.education.school }}</td>
+                                                <td class="education-date">{{ resume.education.year }}</td>
+                                            </tr>
+                                        </table>
+                                        {% if resume.education.description %}
+                                        <div class="education-description">{{ resume.education.description }}</div>
+                                        {% endif %}
+                                    </div>
+                                {% elif resume.education is iterable and resume.education is not string %}
+                                    <!-- Multiple education entries as list -->
+                                    {% for edu in resume.education %}
+                                    <div class="education-item">
+                                        <div class="degree">{{ edu.degree }}</div>
+                                        <table class="school-date-table">
+                                            <tr>
+                                                <td class="school">{{ edu.school }}</td>
+                                                <td class="education-date">{{ edu.startYear }} - {% if edu.current %}Present{% else %}{{ edu.endYear }}{% endif %}</td>
+                                            </tr>
+                                        </table>
+                                        {% if edu.description %}
+                                        <div class="education-description">{{ edu.description }}</div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            {% if resume.languages %}
+                            <div class="section">
+                                <h2 class="section-title">Languages</h2>
+                                {% if resume.languages is string %}
+                                    <ul class="simple-list">
+                                        {% for language in resume.languages.split(',') %}
+                                            <li class="list-item">{{ language.strip() }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% elif resume.languages is iterable and resume.languages is not mapping %}
+                                    <ul class="simple-list">
+                                        {% for language in resume.languages %}
+                                            <li class="list-item">{{ language }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <table class="language-table">
+                                        {% for lang in resume.languages %}
+                                        <tr>
+                                            <td class="language-name">{{ lang.language }}</td>
+                                            <td class="language-level">{{ lang.level }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </table>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            {% if resume.certifications %}
+                            <div class="section">
+                                <h2 class="section-title">Certifications</h2>
+                                <ul class="simple-list">
+                                    {% if resume.certifications is string %}
+                                        {% for cert in resume.certifications.split(',') %}
+                                            <li class="list-item">{{ cert.strip() }}</li>
+                                        {% endfor %}
+                                    {% elif resume.certifications is iterable %}
+                                        {% for cert in resume.certifications %}
+                                            {% if cert is string %}
+                                                <li class="list-item">{{ cert }}</li>
+                                            {% else %}
+                                                <li class="list-item">{{ cert.name }}{% if cert.date %} ({{ cert.date }}){% endif %}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            
+                            {% if resume.interests %}
+                            <div class="section">
+                                <h2 class="section-title">Interests</h2>
+                                <ul class="simple-list">
+                                    {% if resume.interests is string %}
+                                        {% for interest in resume.interests.split(',') %}
+                                            <li class="list-item">{{ interest.strip() }}</li>
+                                        {% endfor %}
+                                    {% elif resume.interests is iterable %}
+                                        {% for interest in resume.interests %}
+                                            <li class="list-item">{{ interest }}</li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            
+                            {% if resume.references %}
+                            <div class="section">
+                                <h2 class="section-title">References</h2>
+                                {% for ref in resume.references %}
+                                <div class="reference-item">
+                                    <div class="reference-name">{{ ref.name }}</div>
+                                    <div class="reference-title">{{ ref.title }}{% if ref.company %}, {{ ref.company }}{% endif %}</div>
+                                    {% if ref.contact %}
+                                    <div class="reference-contact">{{ ref.contact }}</div>
+                                    {% elif ref.email or ref.phone %}
+                                    <div class="reference-contact">
+                                        {% if ref.email %}{{ ref.email }}{% endif %}
+                                        {% if ref.email and ref.phone %} | {% endif %}
+                                        {% if ref.phone %}{{ ref.phone }}{% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
