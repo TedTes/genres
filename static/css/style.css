@@ -4250,33 +4250,46 @@ Job Details page
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 30px 0 50px;
+  margin-bottom: 2.5rem;
+  gap: 1rem;
 }
+.price-savings {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #10b981;
+  margin-top: 0.5rem;
+  display: inline-block;
+  background-color: rgba(16, 185, 129, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
 
 .toggle-option {
-  font-size: 16px;
   font-weight: 500;
   color: #64748b;
-  display: flex;
-  align-items: center;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
 }
 
-.toggle-option:first-child {
-  margin-right: 12px;
-}
-
-.toggle-option:last-child {
-  margin-left: 12px;
+.toggle-option.active {
+  font-weight: 600;
+  color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.1);
 }
 
 .save-badge {
-  background-color: #10b981;
+  display: inline-block;
+  background-color: #ef4444;
   color: white;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
-  padding: 3px 6px;
-  border-radius: 12px;
-  margin-left: 8px;
+  padding: 0.125rem 0.375rem;
+  border-radius: 1rem;
+  margin-left: 0.5rem;
+  vertical-align: middle;
 }
 
 .toggle-switch {
@@ -4326,54 +4339,53 @@ input:checked + .toggle-slider:before {
 
 /* Plans Container */
 .plans-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 30px;
-  margin-bottom: 60px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
 }
 
 /* Plan Card */
 .plan-card {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  width: 100%;
-  max-width: 340px;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   position: relative;
-  transition: transform 0.3s, box-shadow 0.3s;
-  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
 }
-
 .plan-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-.plan-card.popular {
-  border: 2px solid #3b82f6;
-  transform: scale(1.05);
-}
+
 
 .plan-card.popular:hover {
   transform: scale(1.05) translateY(-5px);
 }
-
-.popular-badge {
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #3b82f6;
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 5px 15px;
-  border-radius: 20px;
+.popular .plan-card {
+  border-color: #3b82f6;
 }
 
+.popular-badge, .best-value-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: #3b82f6;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.best-value-badge {
+  background-color: #10b981;
+}
 /* Plan Header */
 .plan-header {
   padding: 30px;
@@ -4446,11 +4458,6 @@ input:checked + .toggle-slider:before {
 
 .plan-features .fa-times {
   color: #ef4444;
-}
-
-/* Plan Footer */
-.plan-footer {
-  padding: 0 30px 30px;
 }
 
 .btn-full {
@@ -4528,9 +4535,7 @@ input:checked + .toggle-slider:before {
       gap: 20px;
   }
   
-  .plan-card.popular {
-      transform: scale(1.03);
-  }
+
   
   .plan-card.popular:hover {
       transform: scale(1.03) translateY(-5px);
@@ -4538,36 +4543,11 @@ input:checked + .toggle-slider:before {
 }
 
 @media (max-width: 768px) {
-  .faq-grid {
-      grid-template-columns: 1fr;
-  }
-  
-  .pricing-guarantee {
-      flex-direction: column;
-      text-align: center;
-  }
-  
-  .guarantee-icon {
-      margin: 0 0 15px 0;
-  }
-  
   .plans-container {
-      flex-direction: column;
-      align-items: center;
-  }
-  
-  .plan-card, .plan-card.popular {
-      max-width: 100%;
-      transform: none;
-  }
-  
-  .plan-card:hover, .plan-card.popular:hover {
-      transform: translateY(-5px);
-  }
-  
-  .popular-badge {
-      font-size: 12px;
-      padding: 4px 12px;
+      grid-template-columns: 1fr;
+      max-width: 450px;
+      margin-left: auto;
+      margin-right: auto;
   }
 }
 
@@ -4663,9 +4643,7 @@ input:checked + .toggle-slider:before {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-.template-badge.popular {
-  background-color: #10b981;
-}
+
 
 /* Templates grid layout adjustments */
 .templates-grid {
