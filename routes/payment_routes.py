@@ -45,3 +45,19 @@ def paypal_webhook():
     """Handle PayPal webhook events."""
     # Similar implementation for PayPal webhook handling
     pass
+
+
+
+@payment_bp.route('/checkout/<plan_id>', methods=['GET'])
+@login_required
+def checkout(plan_id):
+    """Initiate checkout for a subscription plan."""
+    # Allow users to choose gateway, default to system configuration
+    gateway_type = request.args.get('gateway', current_app.config.get('DEFAULT_PAYMENT_GATEWAY'))
+    
+    # Store the gateway choice in session so we can use it later
+    session['payment_gateway'] = gateway_type
+    
+    service = SubscriptionService(gateway_type=gateway_type)
+    checkout_url = service.initiate_checkout(current_user.id, plan_id)
+    return redirect(checkout_url)
