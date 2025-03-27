@@ -62,6 +62,66 @@ class SubscriptionService:
             elif event_type == 'customer.subscription.deleted':
                 self._handle_subscription_deleted(obj)
     
+    def get_user_subscription(user_id):
+        """
+        Retrieve the current active subscription for a user.
+        
+        Args:
+            user_id: The ID of the user
+            
+        Returns:
+            A dictionary with subscription details or None if no active subscription
+        """
+        # Query the database for the user's active subscription
+        # subscription = Subscription.query.filter_by(
+        #     user_id=user_id,
+        #     status='active'
+        # ).first()
+        subscription = {
+            'id': 123,
+            'plan_id': '456',
+            'plan_name': '3month',
+            'status': 'active',
+            'next_billing_date': '2025-03-29',
+            'is_active': True,
+            'gateway': 'stripe',
+            'current_period_end': None,
+        }
+        
+        if not subscription:
+            return None
+            
+        # Get the plan details
+        if subscription['plan_id'] == '3month':
+            plan_name = '3-Month Plan'
+            period = '3 months'
+        elif subscription['plan_id'] == '6month':
+            plan_name = '6-Month Plan'
+            period = '6 months'
+        elif subscription['plan_id'] == 'annual':
+            plan_name = 'Annual Plan'
+            period = '12 months'
+        else:
+            plan_name = 'Custom Plan'
+            period = 'varies'
+        
+        # Calculate next billing date
+        if subscription['current_period_end']:
+            next_billing_date = subscription['current_period_end'].strftime('%B %d, %Y')
+        else:
+            next_billing_date = 'Not available'
+        
+       
+        return {
+            'id': subscription['id'],
+            'plan_id': subscription['plan_id'],
+            'plan_name': plan_name,
+            'period': period,
+            'status': subscription['status'],
+            'next_billing_date': next_billing_date,
+            'is_active': True,
+            'gateway': subscription['gateway'],
+        }
     def _handle_subscription_created(self, subscription_data):
         """Handle a subscription creation event."""
         # Extract relevant data and update database

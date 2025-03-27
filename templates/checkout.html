@@ -48,6 +48,7 @@
                     <!-- Plan Summary -->
                     <div class="plan-summary">
                         <h2>Order Summary</h2>
+                        {% if plan %}
                         <div class="plan-details">
                             <div class="plan-name">{{ plan.name }}</div>
                             <div class="plan-description">{{ plan.description }}</div>
@@ -70,6 +71,7 @@
                                 <span class="detail-value">${{ plan.price }}</span>
                             </div>
                         </div>
+                        {% endif %}
                     </div>
                     
                     <!-- Action Buttons - Moved to here from payment section -->
