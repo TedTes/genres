@@ -42,6 +42,23 @@
 </nav>
 
 <section class="dashboard-header">
+    {% if show_upgrade_banner %}
+<div class="upgrade-banner">
+    <div class="upgrade-content">
+        <div class="upgrade-icon">
+            <i class="fas fa-crown"></i>
+        </div>
+        <div class="upgrade-text">
+            <h3>Unlock Premium Features</h3>
+            <p>Get unlimited resume versions, AI-powered tailoring, and more with a ResumeMatch subscription.</p>
+        </div>
+    </div>
+    <div class="upgrade-actions">
+        <a href="{{ url_for('pricing') }}" class="btn btn-primary">View Plans</a>
+        <button class="upgrade-dismiss" title="Dismiss"><i class="fas fa-times"></i></button>
+    </div>
+</div>
+{% endif %}
     <div class="container">
         <div class="dashboard-welcome">
             <h1>Welcome, {{ current_user.username }}!</h1>
@@ -304,6 +321,25 @@
         const userDropdownToggle = document.getElementById('user-dropdown-toggle');
         const userDropdown = document.getElementById('user-dropdown');
         
+        const upgradeBanner = document.querySelector('.upgrade-banner');
+        const dismissButton = document.querySelector('.upgrade-dismiss');
+
+        if (dismissButton && upgradeBanner) {
+            dismissButton.addEventListener('click', function() {
+                upgradeBanner.style.animation = 'fadeOut 0.3s forwards';
+                setTimeout(() => {
+                    upgradeBanner.style.display = 'none';
+                }, 300);
+                
+                // Set a cookie to remember dismissal
+                localStorage.setItem('upgrade_banner_dismissed', 'true');
+            });
+            
+            // Check if banner was previously dismissed
+            if (localStorage.getItem('upgrade_banner_dismissed') === 'true') {
+                upgradeBanner.style.display = 'none';
+            }
+        }
         if (userDropdownToggle && userDropdown) {
             userDropdownToggle.addEventListener('click', function() {
                 userDropdown.classList.toggle('active');
