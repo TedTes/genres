@@ -5,11 +5,11 @@
 <nav class="main-nav dashboard-nav">
     <div class="container nav-container">
         <div class="logo">
-            <a href="{{ url_for('home') }}">ResumeMatch</a>
+            <a href="{{ url_for('root.home') }}">ResumeMatch</a>
         </div>
         <div class="nav-links">
-            <a href="{{ url_for('dashboard') }}" class="active">Dashboard</a>
-            <a href="{{ url_for('jobs') }}">Browse Jobs</a>
+            <a href="{{ url_for('root.dashboard') }}" class="active">Dashboard</a>
+            <a href="{{ url_for('job.job') }}">Browse Jobs</a>
             <a href="#" id="create-resume-btn">Create Resume</a>
         </div>
         <div class="user-menu">
@@ -28,7 +28,7 @@
                     <i class="fas fa-cog"></i> Settings
                 </a>
                 <div class="dropdown-divider"></div>
-                <a href="{{ url_for('logout') }}" class="dropdown-item">
+                <a href="{{ url_for('auth.logout') }}" class="dropdown-item">
                     <i class="fas fa-sign-out-alt"></i> Log Out
                 </a>
             </div>
@@ -54,7 +54,7 @@
         </div>
     </div>
     <div class="upgrade-actions">
-        <a href="{{ url_for('pricing') }}" class="btn btn-primary">View Plans</a>
+        <a href="{{ url_for('payment.pricing') }}" class="btn btn-primary">View Plans</a>
         <button class="upgrade-dismiss" title="Dismiss"><i class="fas fa-times"></i></button>
     </div>
 </div>
@@ -99,7 +99,7 @@
 <section class="dashboard-content">
     <div class="container">
         <div class="dashboard-actions">
-            <a href="{{ url_for('jobs') }}" class="btn btn-primary">
+            <a href="{{ url_for('job.job') }}" class="btn btn-primary">
                 <i class="fas fa-search"></i> Find Jobs
             </a>
             <a href="#" class="btn btn-outline" id="create-resume-modal-btn">
@@ -139,19 +139,19 @@
                                 </div>
                             </div>
                             <div class="resume-actions">
-                                <a href="{{ url_for('view_resume', resume_id=resume.id) }}" class="resume-action" title="Preview">
+                                <a href="{{ url_for('resume.view_resume', resume_id=resume.id) }}" class="resume-action" title="Preview">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="{{ url_for('generate_pdf', resume_id=resume.id) }}" class="resume-action" title="Download PDF">
+                                <a href="{{ url_for('resume.generate_pdf', resume_id=resume.id) }}" class="resume-action" title="Download PDF">
                                     <i class="fas fa-download"></i>
                                 </a>
-                                <a href="{{ url_for('resume_contact', resume_id=resume.id) }}" class="resume-action" title="Edit">
+                                <a href="{{ url_for('resume.resume_contact', resume_id=resume.id) }}" class="resume-action" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <a href="#" class="resume-action delete" title="Delete">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
-                                <a href="{{ url_for('resume_preview', resume_id=resume.id) }}" class="resume-action" title="Change Template">
+                                <a href="{{ url_for('resume.resume_preview', resume_id=resume.id) }}" class="resume-action" title="Change Template">
                                     <i class="fas fa-palette"></i>
                                 </a>                            
                             </div>
@@ -204,7 +204,7 @@
                 </div>
                 <h2>No resumes yet</h2>
                 <p>Create your first resume to get started on your job search journey.</p>
-                <a href="{{ url_for('jobs') }}" class="btn btn-primary">
+                <a href="{{ url_for('job.job') }}" class="btn btn-primary">
                     Browse Jobs
                 </a>
             </div>
@@ -213,7 +213,7 @@
         <div class="dashboard-section">
             <div class="section-header">
                 <h2>Recent Job Matches</h2>
-                <a href="{{ url_for('jobs') }}" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+                <a href="{{ url_for('job.job') }}" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
             </div>
             
             <div class="job-matches">
@@ -242,14 +242,14 @@
                         </div>
                         
                         <div class="job-actions">
-                            <a href="{{ url_for('job_detail', slug=job.slug) }}" class="btn btn-sm btn-outline">View Job</a>
+                            <a href="{{ url_for('job.job_detail', slug=job.slug) }}" class="btn btn-sm btn-outline">View Job</a>
                         </div>
                     </div>
                     {% endfor %}
                 {% else %}
                     <div class="empty-jobs">
                         <p>No job matches found. Browse available jobs to find matches for your skills.</p>
-                        <a href="{{ url_for('jobs') }}" class="btn btn-outline btn-sm">Browse Jobs</a>
+                        <a href="{{ url_for('job.job') }}" class="btn btn-outline btn-sm">Browse Jobs</a>
                     </div>
                 {% endif %}
             </div>
@@ -275,7 +275,7 @@
                         <div class="option-details">
                             <h4>Target a Specific Job</h4>
                             <p>Create a resume optimized for a specific job posting</p>
-                            <a href="{{ url_for('jobs') }}" class="btn btn-primary btn-sm">Browse Jobs</a>
+                            <a href="{{ url_for('job.job') }}" class="btn btn-primary btn-sm">Browse Jobs</a>
                         </div>
                     </div>
 
@@ -286,7 +286,7 @@
                     <div class="option-details">
                         <h4>Create General Resume</h4>
                         <p>Create a versatile resume you can use for multiple applications</p>
-                        <a href="{{ url_for('create_general_resume') }}" class="btn btn-outline btn-sm">Create Resume</a>
+                        <a href="{{ url_for('resume.create_general_resume') }}" class="btn btn-outline btn-sm">Create Resume</a>
                     </div>
                 </div>
                 </div>

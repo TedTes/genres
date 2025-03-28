@@ -1,9 +1,9 @@
 {% set steps = [
-    {'id': 'contact', 'name': 'Contact', 'message':'Let\'s start with your contact information', 'url': url_for('resume_contact', resume_id=resume.id)},
-    {'id': 'skills', 'name': 'Skills', 'message':'Highlight your key skills and expertise', 'url': url_for('resume_skills', resume_id=resume.id)},
-    {'id': 'experience', 'name': 'Experience', 'message':'Add your work history and achievements', 'url': url_for('resume_experience', resume_id=resume.id)},
-    {'id': 'education', 'name': 'Education', 'message':'Include your educational background', 'url': url_for('resume_education', resume_id=resume.id)},
-    {'id': 'summary', 'name': 'Summary', 'message':'Craft a compelling professional summary', 'url': url_for('resume_summary', resume_id=resume.id)}
+    {'id': 'contact', 'name': 'Contact', 'message':'Let\'s start with your contact information', 'url': url_for('resume.resume_contact', resume_id=resume.id)},
+    {'id': 'skills', 'name': 'Skills', 'message':'Highlight your key skills and expertise', 'url': url_for('resume.resume_skills', resume_id=resume.id)},
+    {'id': 'experience', 'name': 'Experience', 'message':'Add your work history and achievements', 'url': url_for('resume.resume_experience', resume_id=resume.id)},
+    {'id': 'education', 'name': 'Education', 'message':'Include your educational background', 'url': url_for('resume.resume_education', resume_id=resume.id)},
+    {'id': 'summary', 'name': 'Summary', 'message':'Craft a compelling professional summary', 'url': url_for('resume.resume_summary', resume_id=resume.id)}
 ] %}
 
 {% set step_completion = {

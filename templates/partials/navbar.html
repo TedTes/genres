@@ -2,11 +2,11 @@
 <nav class="main-nav dashboard-nav">
     <div class="container nav-container">
         <div class="logo">
-            <a href="{{ url_for('home') }}">ResumeMatch</a>
+            <a href="{{ url_for('root.home') }}">ResumeMatch</a>
         </div>
         <div class="nav-links">
-            <a href="{{ url_for('dashboard') }}" {% if active_page == 'dashboard' %}class="active"{% endif %}>Dashboard</a>
-            <a href="{{ url_for('jobs') }}" {% if active_page == 'jobs' %}class="active"{% endif %}>Browse Jobs</a>
+            <a href="{{ url_for('root.dashboard') }}" {% if active_page == 'dashboard' %}class="active"{% endif %}>Dashboard</a>
+            <a href="{{ url_for('job.job') }}" {% if active_page == 'jobs' %}class="active"{% endif %}>Browse Jobs</a>
             {% if extra_nav_item %}
                 <a href="{{ extra_nav_item.url }}" {% if active_page == extra_nav_item.id %}class="active"{% endif %}>{{ extra_nav_item.text }}</a>
             {% endif %}
@@ -21,18 +21,18 @@
             </div>
             <div class="user-dropdown" id="user-dropdown">
                 {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('dashboard') }}" class="dropdown-item">
+                    <a href="{{ url_for('root.dashboard') }}" class="dropdown-item">
                         <i class="fas fa-tachometer-alt"></i> Dashboard
                     </a>
                     <div class="dropdown-divider"></div>
-                    <a href="{{ url_for('logout') }}" class="dropdown-item">
+                    <a href="{{ url_for('auth.logout') }}" class="dropdown-item">
                         <i class="fas fa-sign-out-alt"></i> Log Out
                     </a>
                 {% else %}
-                    <a href="{{ url_for('login') }}" class="dropdown-item">
+                    <a href="{{ url_for('auth.login') }}" class="dropdown-item">
                         <i class="fas fa-sign-in-alt"></i> Log In
                     </a>
-                    <a href="{{ url_for('register') }}" class="dropdown-item">
+                    <a href="{{ url_for('auth.register') }}" class="dropdown-item">
                         <i class="fas fa-user-plus"></i> Sign Up
                     </a>
                 {% endif %}

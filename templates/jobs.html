@@ -4,7 +4,7 @@
 
 {% block content %}
 <!-- Navigation Bar -->
-{% with active_page='jobs', extra_nav_item={'id': 'create_resume', 'url': url_for('create_general_resume'), 'text': 'Create Resume'} %}
+{% with active_page='jobs', extra_nav_item={'id': 'create_resume', 'url': url_for('resume.create_general_resume'), 'text': 'Create Resume'} %}
     {% include 'partials/navbar.html' with context %}
 {% endwith %}
 
@@ -84,7 +84,7 @@
                                 </div>
                                 <div class="job-search-details">
                                     <h3 class="job-search-title">
-                                        <a href="{{ url_for('job_detail', slug=job.slug) }}">{{ job.title }}</a>
+                                        <a href="{{ url_for('job.job_detail', slug=job.slug) }}">{{ job.title }}</a>
                                     </h3>
                                     <div class="job-search-company">{{ job.company_name }}</div>
                                     <div class="job-search-meta">
@@ -106,7 +106,7 @@
                                     </div>
                                 </div>
                                 <div class="job-search-actions">
-                                    <a href="{{ url_for('job_detail', slug=job.slug) }}" class="btn btn-outline btn-sm">View Job</a>
+                                    <a href="{{ url_for('job.job_detail', slug=job.slug) }}" class="btn btn-outline btn-sm">View Job</a>
                                     {% if current_user.is_authenticated %}
                                         <button class="job-search-save-btn" data-job-id="{{ job.id }}" title="Save Job">
                                             <i class="far fa-bookmark"></i>

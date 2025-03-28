@@ -7,11 +7,11 @@
 <nav class="main-nav">
     <div class="container nav-container">
         <div class="logo">
-            <a href="{{ url_for('home') }}">ResumeMatch</a>
+            <a href="{{ url_for('root.home') }}">ResumeMatch</a>
         </div>
         <div class="nav-links">
-            <a href="{{ url_for('jobs') }}">Browse Jobs</a>
-            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('job.job') }}">Browse Jobs</a>
+            <a href="{{ url_for('auth.login') }}">Login</a>
         </div>
     </div>
 </nav>
@@ -23,7 +23,7 @@
                 <h1 class="auth-title">Resend Verification Email</h1>
                 <p class="auth-subtitle">Enter your email address and we'll send you a new verification link.</p>
 
-                <form method="POST" action="{{ url_for('process_resend_verification') }}" class="auth-form">
+                <form method="POST" action="{{ url_for('auth.process_resend_verification') }}" class="auth-form">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     
                     <div class="form-group">
@@ -37,7 +37,7 @@
                 </form>
                 
                 <div class="auth-footer">
-                    <p>Remember your password? <a href="{{ url_for('login') }}">Log in here</a></p>
+                    <p>Remember your password? <a href="{{ url_for('auth.login') }}">Log in here</a></p>
                 </div>
             </div>
         </div>

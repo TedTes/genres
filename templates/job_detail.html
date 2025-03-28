@@ -4,14 +4,14 @@
 
 {% block content %}
 <!-- Navigation Bar -->
-{% with active_page='jobs', extra_nav_item={'id': 'create_resume', 'url': url_for('create_general_resume'), 'text': 'Create Resume'} %}
+{% with active_page='jobs', extra_nav_item={'id': 'create_resume', 'url': url_for('resume.create_general_resume'), 'text': 'Create Resume'} %}
     {% include 'partials/navbar.html' with context %}
 {% endwith %}
 
 <section class="job-detail-header">
     <div class="container">
         <div class="back-link">
-            <a href="{{ url_for('jobs') }}">
+            <a href="{{ url_for('job.job') }}">
                 <i class="fas fa-arrow-left"></i> Back to Jobs
             </a>
         </div>
@@ -40,12 +40,12 @@
             </div>
             
             <div class="job-actions-header">
-                <a href="{{ url_for('start_resume', job_id=job.id) if current_user.is_authenticated else url_for('login') }}" class="btn btn-sm btn-primary">
+                <a href="{{ url_for('resume.start_resume', job_id=job.id) if current_user.is_authenticated else url_for('auth.login') }}" class="btn btn-sm btn-primary">
                     <i class="fas fa-file-alt"></i> Create
                 </a>
                 
                 {% if current_user.is_authenticated %}
-                  <a href="{{ url_for('apply_to_job', slug=job.slug) }}" class="btn btn-sm btn-success">
+                  <a href="{{ url_for('application.apply_to_job', slug=job.slug) }}" class="btn btn-sm btn-success">
                      <i class="fas fa-clipboard-check"></i> Track
                   </a>
                 {% endif %}
@@ -105,7 +105,7 @@
                     </div>
                     
                     <div class="match-cta">
-                        <a href="{{ url_for('start_resume', job_id=job.id) }}" class="btn btn-primary">
+                        <a href="{{ url_for('resume.start_resume', job_id=job.id) }}" class="btn btn-primary">
                             <i class="fas fa-file-alt"></i> Create Tailored Resume
                         </a>
                     </div>
@@ -187,7 +187,7 @@
                 </div>
                 
                 <div class="job-actions-sidebar">
-                    <a href="{{ url_for('start_resume', job_id=job.id) if current_user.is_authenticated else url_for('login') }}" class="btn btn-sm btn-primary btn-full">
+                    <a href="{{ url_for('resume.start_resume', job_id=job.id) if current_user.is_authenticated else url_for('auth.login') }}" class="btn btn-sm btn-primary btn-full">
                         {% if current_user.is_authenticated %}
                             <i class="fas fa-file-alt"></i> Create Resume
                         {% else %}
@@ -220,7 +220,7 @@
                     </div>
                     <div class="job-details">
                         <h3 class="job-title">
-                            <a href="{{ url_for('job_detail', slug=job.slug) }}">{{ job.title }}</a>
+                            <a href="{{ url_for('job.job_detail', slug=job.slug) }}">{{ job.title }}</a>
                         </h3>
                         <div class="job-company">{{ job.company_name }}</div>
                         <div class="job-location">
@@ -240,7 +240,7 @@
                 {% endif %}
                 
                 <div class="job-actions">
-                    <a href="{{ url_for('job_detail', slug=job.slug) }}" class="btn btn-sm btn-outline">View Job</a>
+                    <a href="{{ url_for('job.job_detail', slug=job.slug) }}" class="btn btn-sm btn-outline">View Job</a>
                 </div>
             </div>
             {% endfor %}

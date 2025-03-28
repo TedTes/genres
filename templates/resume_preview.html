@@ -552,7 +552,7 @@
             </button>
         </div>
         
-        <form id="template-form" method="POST" action="{{ url_for('update_resume_template', resume_id=resume.id) }}">
+        <form id="template-form" method="POST" action="{{ url_for('resume.update_resume_template', resume_id=resume.id) }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             
             <div class="templates-list">
@@ -581,28 +581,28 @@
         <!-- Floating Action Buttons -->
         <div class="floating-controls">
             <div class="tooltip-container">
-                <a href="{{ url_for('dashboard') }}" class="btn btn-outline">
+                <a href="{{ url_for('root.dashboard') }}" class="btn btn-outline">
                     <i class="fas fa-arrow-left"></i>
                 </a>
                 <div class="btn-tooltip">Back to Dashboard</div>
             </div>
             
             <div class="tooltip-container">
-                <a href="{{ url_for('resume_contact', resume_id=resume.id) }}" class="btn btn-outline">
+                <a href="{{ url_for('resume.resume_contact', resume_id=resume.id) }}" class="btn btn-outline">
                     <i class="fas fa-edit"></i>
                 </a>
                 <div class="btn-tooltip">Edit Resume</div>
             </div>
             
             <div class="tooltip-container">
-                <a href="{{ url_for('preview_pdf', resume_id=resume.id) }}" class="btn btn-outline" target="_blank">
+                <a href="{{ url_for('resume.preview_pdf', resume_id=resume.id) }}" class="btn btn-outline" target="_blank">
                     <i class="fas fa-eye"></i>
                 </a>
                 <div class="btn-tooltip">Preview PDF</div>
             </div>
             
             <div class="tooltip-container">
-                <a href="{{ url_for('download_resume', resume_id=resume.id) }}" class="btn btn-primary">
+                <a href="{{ url_for('resume.download_resume', resume_id=resume.id) }}" class="btn btn-primary">
                     <i class="fas fa-download"></i>
                 </a>
                 <div class="btn-tooltip">Download PDF</div>
@@ -647,7 +647,7 @@
         </div>
         
         <!-- Resume iframe preview -->
-        <iframe src="{{ url_for('resume_render', resume_id=resume.id) }}" class="preview-iframe" frameborder="0"></iframe>
+        <iframe src="{{ url_for('resume.resume_render', resume_id=resume.id) }}" class="preview-iframe" frameborder="0"></iframe>
     </div>
 </div>
 {% endblock %}

@@ -135,7 +135,7 @@ Tailor your experience to highlight skills and achievements relevant to this pos
     <input type="hidden" name="experience_data" id="experience-data" value="">
     
     <div class="form-actions main-actions">
-        <a href="{{ url_for('resume_skills', resume_id=resume.id) }}" class="btn btn-outline">Back: Skills</a>
+        <a href="{{ url_for('resume.resume_skills', resume_id=resume.id) }}" class="btn btn-outline">Back: Skills</a>
         <button type="submit" class="btn btn-primary">Next: Education</button>
     </div>
 </form>

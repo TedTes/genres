@@ -6,11 +6,11 @@
 <nav class="main-nav dashboard-nav">
     <div class="container nav-container">
         <div class="logo">
-            <a href="{{ url_for('home') }}">ResumeMatch</a>
+            <a href="{{ url_for('root.home') }}">ResumeMatch</a>
         </div>
         <div class="nav-links">
-            <a href="{{ url_for('dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('jobs') }}">Browse Jobs</a>
+            <a href="{{ url_for('root.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('job.job') }}">Browse Jobs</a>
         </div>
         <div class="user-menu">
             <div class="user-info" id="user-dropdown-toggle">
@@ -21,11 +21,11 @@
                 <i class="fas fa-chevron-down"></i>
             </div>
             <div class="user-dropdown" id="user-dropdown">
-                <a href="{{ url_for('dashboard') }}" class="dropdown-item">
+                <a href="{{ url_for('root.dashboard') }}" class="dropdown-item">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
                 <div class="dropdown-divider"></div>
-                <a href="{{ url_for('logout') }}" class="dropdown-item">
+                <a href="{{ url_for('auth.logout')  }}" class="dropdown-item">
                     <i class="fas fa-sign-out-alt"></i> Log Out
                 </a>
             </div>
@@ -153,7 +153,7 @@
             
             <div class="details-sidebar">
                 <div class="job-actions">
-                    <a href="{{ url_for('job_detail', slug=application.job.slug) }}" class="btn btn-outline btn-full">
+                    <a href="{{ url_for('job.job_detail', slug=application.job.slug) }}" class="btn btn-outline btn-full">
                         <i class="fas fa-briefcase"></i> View Job Details
                     </a>
                     
