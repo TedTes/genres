@@ -35,7 +35,7 @@ def checkout(plan_id):
     # Check if the plan exists
     if plan_id not in plans:
         flash('Invalid plan selected.', 'error')
-        return redirect(url_for('home'))
+        return redirect(url_for('root.home'))
     return render_template(
         'checkout.html', 
         plan=plans[plan_id], 
@@ -100,3 +100,24 @@ def process_checkout(plan_id):
     except PaymentError as e:
         flash(f"Payment error: {str(e)}", "error")
         return redirect(url_for('payment.checkout', plan_id=plan_id))
+
+
+
+
+@payment_bp.route('/pricing')
+def pricing():
+  return render_template('pricing.html')
+
+
+
+@payment_bp.route('/account/subscription')
+@login_required
+def account_subscription():
+    
+    subscription = SubscriptionService.get_user_subscription(current_user.id)
+
+    # Show subscription management page
+    return render_template(
+        'account/subscription.html',
+        subscription=subscription
+    )
