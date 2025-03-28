@@ -12,9 +12,14 @@ from supabase import create_client, Client
 from db import db
 from models import  User
 from flask_wtf.csrf import CSRFProtect, CSRFError
+from routes import register_routes 
+
 app = Flask(__name__)
 csrf = CSRFProtect(app)
 load_dotenv(dotenv_path='python-dotenv.env')
+
+# Register all routes
+register_routes(app)
 
 app.config['SECRET_KEY'] = secrets.token_hex(16) #TODOO Replace with a secure key
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
@@ -28,9 +33,6 @@ os.environ['DYLD_LIBRARY_PATH'] = '/opt/homebrew/lib:' + os.environ.get('DYLD_LI
 db.init_app(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-
-from routes.payment_routes import payment_bp
-app.register_blueprint(payment_bp)
 
 @app.context_processor
 def inject_current_year():
