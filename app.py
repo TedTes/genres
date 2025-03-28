@@ -55,6 +55,15 @@ def handle_csrf_error(e):
     else:
         return render_template('error.html', error=e.description), 400
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error.html', error=str(e), error_code=404), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    return render_template('error.html', error_code=500), 500
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 
