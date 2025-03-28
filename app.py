@@ -1,6 +1,6 @@
 
 from dotenv import load_dotenv
-from flask import Flask, abort
+from flask import Flask,request,render_template,jsonify
 from flask_login import LoginManager
 import os
 import io
@@ -12,13 +12,15 @@ from supabase import create_client, Client
 from db import db
 from models import  User
 from flask_wtf.csrf import CSRFProtect, CSRFError
-from routes import register_routes 
+
+os.environ['DYLD_LIBRARY_PATH'] = '/opt/homebrew/lib:' + os.environ.get('DYLD_LIBRARY_PATH', '')
 
 app = Flask(__name__)
 csrf = CSRFProtect(app)
 load_dotenv(dotenv_path='python-dotenv.env')
 
 # Register all routes
+from routes import register_routes 
 register_routes(app)
 
 app.config['SECRET_KEY'] = secrets.token_hex(16) #TODOO Replace with a secure key
@@ -29,10 +31,10 @@ supabase_key = os.environ.get('SUPABASE_KEY')
 
 supabase: Client = create_client(supabase_url, supabase_key)
 
-os.environ['DYLD_LIBRARY_PATH'] = '/opt/homebrew/lib:' + os.environ.get('DYLD_LIBRARY_PATH', '')
 db.init_app(app)
 login_manager = LoginManager(app)
-login_manager.login_view = 'login'
+login_manager.login_view = 'auth.login'
+
 
 @app.context_processor
 def inject_current_year():
@@ -41,9 +43,6 @@ def inject_current_year():
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-# Import and register routes
-from routes.routes import init_routes
-init_routes(app)
 
 # Create database tables
 with app.app_context():
