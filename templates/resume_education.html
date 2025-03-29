@@ -122,7 +122,7 @@ Highlight education and coursework relevant to this position.
     <input type="hidden" name="education_data" id="education-data" value="">
     
     <div class="form-actions main-actions">
-        <a href="{{ url_for('resume_experience', resume_id=resume.id) }}" class="btn btn-outline">Back: Experience</a>
+        <a href="{{ url_for('resume.resume_experience', resume_id=resume.id) }}" class="btn btn-outline">Back: Experience</a>
         <button type="submit" class="btn btn-primary">Next: Summary</button>
     </div>
 </form>

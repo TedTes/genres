@@ -1,4 +1,4 @@
-from flask import Blueprint, request, abort,jsonify,render_template,flash,request,redirect,url_for,send_file,session,make_response
+from flask import Blueprint, current_app,request, abort,jsonify,render_template,flash,request,redirect,url_for,send_file,session,make_response
 from flask_login import login_user,  current_user, login_required
 from weasyprint import HTML, CSS
 from template_registry import TemplateRegistry
@@ -291,7 +291,7 @@ def download_resume(resume_id):
     try:
         
         # Generate absolute CSS file path
-        css_path = os.path.join(resume_bp.root_path, 'static', 'css', 'templates', template_id, 'style.css')
+        css_path = os.path.join(current_app.root_path, 'static', 'css', 'templates', template_id, 'style.css')
         
         with open(css_path, 'r') as f:
             css_content = f.read()
