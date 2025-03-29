@@ -164,7 +164,7 @@
                     {% endif %}
                     
                     {% if application.resume %}
-                    <a href="{{ url_for('resume_preview', resume_id=application.resume.id) }}" class="btn btn-outline btn-full">
+                    <a href="{{ url_for('resume.resume_preview', resume_id=application.resume.id) }}" class="btn btn-outline btn-full">
                         <i class="fas fa-file-alt"></i> View Resume Used
                     </a>
                     {% endif %}
