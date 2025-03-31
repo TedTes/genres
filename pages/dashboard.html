@@ -1,0 +1,533 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - ResumeMatch{% endblock %}
+{% block content %}
+<!-- Dashboard Navigation -->
+<nav class="main-nav dashboard-nav">
+    <div class="container nav-container">
+        <div class="logo">
+            <a href="{{ url_for('root.home') }}">ResumeMatch</a>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('root.dashboard') }}" class="active">Dashboard</a>
+            <a href="{{ url_for('job.job') }}">Browse Jobs</a>
+            <a href="#" id="create-resume-btn">Create Resume</a>
+        </div>
+        <div class="user-menu">
+            <div class="user-info" id="user-dropdown-toggle">
+                <div class="user-avatar">
+                    <span>{{ current_user.username[0].upper() }}</span>
+                </div>
+                <span class="user-name">{{ current_user.username }}</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="user-dropdown" id="user-dropdown">
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="{{ url_for('auth.logout') }}" class="dropdown-item">
+                    <i class="fas fa-sign-out-alt"></i> Log Out
+                </a>
+            </div>
+        </div>
+        <div class="mobile-nav-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</nav>
+
+<section class="dashboard-header">
+    {% if show_upgrade_banner %}
+<div class="upgrade-banner">
+    <div class="upgrade-content">
+        <div class="upgrade-icon">
+            <i class="fas fa-crown"></i>
+        </div>
+        <div class="upgrade-text">
+            <h3>Unlock Premium Features</h3>
+            <p>Get unlimited resume versions, AI-powered tailoring, and more with a ResumeMatch subscription.</p>
+        </div>
+    </div>
+    <div class="upgrade-actions">
+        <a href="{{ url_for('payment.pricing') }}" class="btn btn-primary">View Plans</a>
+        <button class="upgrade-dismiss" title="Dismiss"><i class="fas fa-times"></i></button>
+    </div>
+</div>
+{% endif %}
+    <div class="container">
+        <div class="dashboard-welcome">
+            <h1>Welcome, {{ current_user.username }}!</h1>
+            <p>Manage your resumes and track your job applications all in one place.</p>
+        </div>
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ resumes|length }}</h3>
+                    <p>Resumes</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ job_matches|default(0) }}</h3>
+                    <p>Job Matches</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ applications|default(0) }}</h3>
+                    <p>Applications</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="dashboard-content">
+    <div class="container">
+        <div class="dashboard-actions">
+            <a href="{{ url_for('job.job') }}" class="btn btn-primary">
+                <i class="fas fa-search"></i> Find Jobs
+            </a>
+            <a href="#" class="btn btn-outline" id="create-resume-modal-btn">
+                <i class="fas fa-plus"></i> New Resume
+            </a>
+        </div>
+
+        {% if resumes %}
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2>Your Resumes</h2>
+                    <div class="section-actions">
+                        <div class="search-box">
+                            <input type="text" placeholder="Search resumes..." id="resume-search">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="sort-by">
+                            <select id="resume-sort">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="name">Name (A-Z)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resumes-grid">
+                    {% for resume in resumes %}
+                    <div class="resume-card" data-id="{{ resume.id }}">
+                        <div class="resume-preview">
+                            <div class="resume-template-preview template-{{ resume.template|default('toronto') }}">
+                                <div class="template-header"></div>
+                                <div class="template-content">
+                                    <div class="template-line"></div>
+                                    <div class="template-line"></div>
+                                    <div class="template-line short"></div>
+                                </div>
+                            </div>
+                            <div class="resume-actions">
+                                <a href="{{ url_for('resume.view_resume', resume_id=resume.id) }}" class="resume-action" title="Preview">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('resume.generate_pdf', resume_id=resume.id) }}" class="resume-action" title="Download PDF">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                <a href="{{ url_for('resume.resume_contact', resume_id=resume.id) }}" class="resume-action" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="#" class="resume-action delete" title="Delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                                <a href="{{ url_for('resume.resume_preview', resume_id=resume.id) }}" class="resume-action" title="Change Template">
+                                    <i class="fas fa-palette"></i>
+                                </a>                            
+                            </div>
+                        </div>
+                        <div class="resume-details">
+                            
+                            <div class="resume-info">
+                                <div class="resume-job">
+                                    {% if resume.job %}
+                                        <span class="job-title">{{ resume.job.title }}</span>
+                                        <span class="job-company">{{ resume.job.company | default('Multiple Companies') }}</span>
+                                    {% elif resume.job_info %}
+                                        <span class="job-title">{{ resume.job_info.title }}</span>
+                                        <span class="job-company">{{ resume.job_info.company }}</span>
+                                        {% else %}
+                                <span class="job-title">General Resume</span>
+                                <span class="job-company">Multiple Companies</span>
+                                    {% endif %}
+                                </div>
+                                <div class="resume-meta">
+                                    <span class="resume-date" title="Creation Date">
+                                        <i class="far fa-calendar-alt"></i>
+                                        {{ resume.created_at.strftime('%b %d, %Y') if resume.created_at else 'No date' }}
+                                    </span>
+                                    <span class="resume-template" title="Template Style">
+                                        <i class="fas fa-file-alt"></i>
+                                        {{ resume.template|default('Toronto')|capitalize }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="match-score-container">
+                                <div class="match-score-header">
+                                    <div class="score-label">Match Score</div>
+                                    <div class="score-value">{{ resume.display_match }}%</div>
+                                </div>
+                                <div class="score-bar">
+                                    <div class="score-fill" style="width:30%"></div>
+                                </div>
+                            </div>
+                        </div>
+                 </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h2>No resumes yet</h2>
+                <p>Create your first resume to get started on your job search journey.</p>
+                <a href="{{ url_for('job.job') }}" class="btn btn-primary">
+                    Browse Jobs
+                </a>
+            </div>
+        {% endif %}
+
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Recent Job Matches</h2>
+                <a href="{{ url_for('job.job') }}" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="job-matches">
+                {% if job_matches_list %}
+                    {% for job in job_matches_list %}
+                    <div class="job-card" data-match="{% if job.match >= 90 %}high{% elif job.match >= 70 %}medium{% else %}standard{% endif %}">
+                        <div class="job-card-header">
+                            <div class="job-company-logo">
+                                {{ job.company_name[0]|upper if job.company_name else 'C' }}
+                            </div>
+                            <div class="job-details">
+                                <h3 class="job-title">{{ job.title }}</h3>
+                                <div class="job-company">{{ job.company_name }}</div>
+                                <div class="job-location">
+                                    <i class="fas fa-map-marker-alt"></i> {{ job.location }}
+                                    {% if job.remote %}
+                                    <span class="remote-badge">Remote</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="job-match">
+                            <div class="match-percentage">{{ job.match }}%</div>
+                            <div class="match-label">Match</div>
+                        </div>
+                        
+                        <div class="job-actions">
+                            <a href="{{ url_for('job.job_detail', slug=job.slug) }}" class="btn btn-sm btn-outline">View Job</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-jobs">
+                        <p>No job matches found. Browse available jobs to find matches for your skills.</p>
+                        <a href="{{ url_for('job.job') }}" class="btn btn-outline btn-sm">Browse Jobs</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Create Resume Modal -->
+<div class="modal" id="create-resume-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Create New Resume</h2>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-section">
+                <h3>Choose an Option</h3>
+                <div class="resume-options">
+                    <div class="resume-option">
+                        <div class="option-icon">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="option-details">
+                            <h4>Target a Specific Job</h4>
+                            <p>Create a resume optimized for a specific job posting</p>
+                            <a href="{{ url_for('job.job') }}" class="btn btn-primary btn-sm">Browse Jobs</a>
+                        </div>
+                    </div>
+
+                <div class="resume-option">
+                    <div class="option-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="option-details">
+                        <h4>Create General Resume</h4>
+                        <p>Create a versatile resume you can use for multiple applications</p>
+                        <a href="{{ url_for('resume.create_general_resume') }}" class="btn btn-outline btn-sm">Create Resume</a>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal" id="delete-resume-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Delete Resume</h2>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete this resume? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" id="cancel-delete">Cancel</button>
+                <button class="btn btn-danger" id="confirm-delete">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // User dropdown toggle
+        const userDropdownToggle = document.getElementById('user-dropdown-toggle');
+        const userDropdown = document.getElementById('user-dropdown');
+        
+        const upgradeBanner = document.querySelector('.upgrade-banner');
+        const dismissButton = document.querySelector('.upgrade-dismiss');
+
+        if (dismissButton && upgradeBanner) {
+            dismissButton.addEventListener('click', function() {
+                upgradeBanner.style.animation = 'fadeOut 0.3s forwards';
+                setTimeout(() => {
+                    upgradeBanner.style.display = 'none';
+                }, 300);
+                
+                // Set a cookie to remember dismissal
+                localStorage.setItem('upgrade_banner_dismissed', 'true');
+            });
+            
+            // Check if banner was previously dismissed
+            if (localStorage.getItem('upgrade_banner_dismissed') === 'true') {
+                upgradeBanner.style.display = 'none';
+            }
+        }
+        if (userDropdownToggle && userDropdown) {
+            userDropdownToggle.addEventListener('click', function() {
+                userDropdown.classList.toggle('active');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!userDropdownToggle.contains(event.target) && !userDropdown.contains(event.target)) {
+                    userDropdown.classList.remove('active');
+                }
+            });
+        }
+        
+        // Create resume modal
+        const createResumeBtn = document.getElementById('create-resume-modal-btn');
+        const createResumeModal = document.getElementById('create-resume-modal');
+        const modalClose = document.querySelectorAll('.modal-close');
+        
+        if (createResumeBtn && createResumeModal) {
+            createResumeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                createResumeModal.classList.add('active');
+                document.body.classList.add('modal-open');
+            });
+            
+            modalClose.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    createResumeModal.classList.remove('active');
+                    document.body.classList.remove('modal-open');
+                });
+            });
+        }
+        
+        // Delete resume modal
+        const deleteButtons = document.querySelectorAll('.resume-action.delete');
+        const deleteModal = document.getElementById('delete-resume-modal');
+        const cancelDelete = document.getElementById('cancel-delete');
+        const confirmDelete = document.getElementById('confirm-delete');
+        let resumeToDelete = null;
+        
+        if (deleteButtons.length && deleteModal) {
+            deleteButtons.forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    resumeToDelete = this.closest('.resume-card').dataset.id;
+                    deleteModal.classList.add('active');
+                    document.body.classList.add('modal-open');
+                });
+            });
+            
+            if (cancelDelete) {
+                cancelDelete.addEventListener('click', function() {
+                    deleteModal.classList.remove('active');
+                    document.body.classList.remove('modal-open');
+                    resumeToDelete = null;
+                });
+            }
+            
+            if (confirmDelete) {
+                confirmDelete.addEventListener('click', function() {
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+                    if (resumeToDelete) {
+                        fetch(`/resume/${resumeToDelete}/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the resume card from the DOM
+                    const resumeCard = document.querySelector(`.resume-card[data-id="${resumeToDelete}"]`);
+                    if (resumeCard) {
+                            resumeCard.remove();
+                        }
+                    showNotification('Resume deleted successfully', 'success');
+                } else {
+                    showNotification('Error: ' + (data.error || 'Could not delete resume'), 'error');
+                    
+                }
+                // Close the modal
+                deleteModal.classList.remove('active');
+                document.body.classList.remove('modal-open');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error deleting resume. Please try again.', 'error');
+                deleteModal.classList.remove('active');
+                document.body.classList.remove('modal-open');
+            });
+                    }
+                });
+            }
+        }
+        
+        // Resume search functionality
+        const resumeSearch = document.getElementById('resume-search');
+        const resumeCards = document.querySelectorAll('.resume-card');
+        
+        if (resumeSearch && resumeCards.length) {
+            resumeSearch.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                resumeCards.forEach(function(card) {
+                    const title = card.querySelector('.resume-title').textContent.toLowerCase();
+                    const job = card.querySelector('.job-title').textContent.toLowerCase();
+                    const company = card.querySelector('.job-company').textContent.toLowerCase();
+                    
+                    if (title.includes(searchTerm) || job.includes(searchTerm) || company.includes(searchTerm)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        // Resume sorting
+        const resumeSort = document.getElementById('resume-sort');
+        const resumesGrid = document.querySelector('.resumes-grid');
+        
+        if (resumeSort && resumesGrid && resumeCards.length) {
+            resumeSort.addEventListener('change', function() {
+                const sortValue = this.value;
+                const cardsArray = Array.from(resumeCards);
+                
+                cardsArray.sort(function(a, b) {
+                    if (sortValue === 'newest') {
+                        const dateA = new Date(a.querySelector('.resume-date').textContent.trim());
+                        const dateB = new Date(b.querySelector('.resume-date').textContent.trim());
+                        return dateB - dateA;
+                    } else if (sortValue === 'oldest') {
+                        const dateA = new Date(a.querySelector('.resume-date').textContent.trim());
+                        const dateB = new Date(b.querySelector('.resume-date').textContent.trim());
+                        return dateA - dateB;
+                    } else if (sortValue === 'name') {
+                        const nameA = a.querySelector('.resume-title').textContent.trim();
+                        const nameB = b.querySelector('.resume-title').textContent.trim();
+                        return nameA.localeCompare(nameB);
+                    }
+                });
+                
+                // Remove existing cards
+                resumeCards.forEach(function(card) {
+                    card.remove();
+                });
+                
+                // Append sorted cards
+                cardsArray.forEach(function(card) {
+                    resumesGrid.appendChild(card);
+                });
+            });
+        }
+    });
+    function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <div class="notification-message">${message}</div>
+            <button class="notification-close">&times;</button>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Show notification
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+    
+    // Close button functionality
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    });
+}
+</script>
+{% endblock %}

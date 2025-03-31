@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Resend Verification Email - ResumeMatch{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="main-nav">
+    <div class="container nav-container">
+        <div class="logo">
+            <a href="{{ url_for('root.home') }}">ResumeMatch</a>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('job.job') }}">Browse Jobs</a>
+            <a href="{{ url_for('auth.login') }}">Login</a>
+        </div>
+    </div>
+</nav>
+
+<section class="auth-section">
+    <div class="container">
+        <div class="auth-container">
+            <div class="auth-box">
+                <h1 class="auth-title">Resend Verification Email</h1>
+                <p class="auth-subtitle">Enter your email address and we'll send you a new verification link.</p>
+
+                <form method="POST" action="{{ url_for('auth.process_resend_verification') }}" class="auth-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" name="email" class="form-control" placeholder="Your email address" required value="{{ email or '' }}">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-full">Send Verification Email</button>
+                    </div>
+                </form>
+                
+                <div class="auth-footer">
+                    <p>Remember your password? <a href="{{ url_for('auth.login') }}">Log in here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

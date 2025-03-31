@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ resume.resume_data.get('contact', {}).get('name', 'Resume') }}</title>
+</head>
+<body>
+    {% if resume.resume_data %}
+    <div class="resume-container">
+        <!-- Header with name and contact info -->
+        <div class="resume-header">
+            <h1>{{ resume.resume_data.get('contact', {}).get('name', 'Your Name') }}</h1>
+            <div class="contact-info">
+                {% set contact = resume.resume_data.get('contact', {}) %}
+                {% if contact.get('email') %}{{ contact.get('email') }}{% endif %}
+                {% if contact.get('phone') %} | {{ contact.get('phone') }}{% endif %}
+                {% if contact.get('location') %} | {{ contact.get('location') }}{% endif %}
+                {% if contact.get('linkedin') or contact.get('website') %}<br>{% endif %}
+                {% if contact.get('linkedin') %}{{ contact.get('linkedin') }}{% endif %}
+                {% if contact.get('website') %}{% if contact.get('linkedin') %} | {% endif %}{{ contact.get('website') }}{% endif %}
+            </div>
+        </div>
+        
+        <!-- Professional Summary -->
+        {% if resume.resume_data.get('summary') %}
+        <div class="resume-section">
+            <h2>Professional Summary</h2>
+            {% if resume.resume_data.get('summary') is string %}
+                <p>{{ resume.resume_data.get('summary') }}</p>
+            {% else %}
+                <p>{{ resume.resume_data.get('summary', {}).get('content', '') }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <!-- Work Experience -->
+        {% if resume.resume_data.get('experience') %}
+        <div class="resume-section">
+            <h2>Work Experience</h2>
+            {% for exp in resume.resume_data.get('experience') %}
+                <div class="experience-item">
+                    <div class="experience-header">
+                        <h3>{{ exp.title }} - {{ exp.company }}</h3>
+                        <div class="experience-dates">{{ exp.startDate }} - {% if exp.current %}Present{% else %}{{ exp.endDate }}{% endif %}</div>
+                    </div>
+                    <div class="experience-description">
+                        <ul>
+                        {% for line in exp.description.split('\n') if line.strip() %}
+                            <li>{{ line }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Education -->
+        {% if resume.resume_data.get('education') %}
+        <div class="resume-section">
+            <h2>Education</h2>
+            {% if resume.resume_data.get('education') is mapping %}
+                <!-- Single education entry as dictionary -->
+                <div class="education-item">
+                    <div class="education-header">
+                        <h3>{{ resume.resume_data.get('education').get('degree', '') }}</h3>
+                        <div class="education-school">{{ resume.resume_data.get('education').get('school', '') }}</div>
+                        <div class="education-dates">{{ resume.resume_data.get('education').get('year', '') }}</div>
+                    </div>
+                </div>
+            {% elif resume.resume_data.get('education') is iterable and resume.resume_data.get('education') is not string %}
+                <!-- Multiple education entries as list -->
+                {% for edu in resume.resume_data.get('education') %}
+                    <div class="education-item">
+                        <div class="education-header">
+                            <h3>{{ edu.degree }}</h3>
+                            <div class="education-school">{{ edu.school }}</div>
+                            <div class="education-dates">{{ edu.startYear }} - {% if edu.current %}Present{% else %}{{ edu.endYear }}{% endif %}</div>
+                        </div>
+                        {% if edu.description %}
+                            <div class="education-description">
+                                <p>{{ edu.description }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <!-- Skills -->
+        {% if resume.resume_data.get('skills') %}
+        <div class="resume-section">
+            <h2>Skills</h2>
+            <div class="skills-list">
+                {% if resume.resume_data.get('skills') is string %}
+                    {% for skill in resume.resume_data.get('skills').split(',') %}
+                        <span class="skill-tag">{{ skill.strip() }}</span>
+                    {% endfor %}
+                {% elif resume.resume_data.get('skills') is iterable %}
+                    {% for skill in resume.resume_data.get('skills') %}
+                        <span class="skill-tag">{{ skill }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</body>
+</html>

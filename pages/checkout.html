@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Complete Your Purchase - ResumeMatch{% endblock %}
+
+
+{% block content %}
+<!-- Navigation Bar (same as other pages) -->
+{% include 'partials/navbar.html' with context %}
+
+<section class="checkout-section">
+    <div class="container">
+    
+        
+        <div class="checkout-layout">
+            <!-- Vertical Timeline for Checkout Stages -->
+            <div class="checkout-stages">
+                <div class="vertical-timeline">
+                    <div class="stage completed">
+                        <div class="stage-marker">
+                            <i class="fas fa-check" style="font-size: 0.7rem;"></i>
+                        </div>
+                        <div class="stage-content">
+                            <div class="stage-title">Plan Selection</div>
+                            <div class="stage-desc">{{ plan.name }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stage active">
+                        <div class="stage-marker">2</div>
+                        <div class="stage-content">
+                            <div class="stage-title">Payment</div>
+                            <div class="stage-desc">Secure checkout</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stage">
+                        <div class="stage-marker">3</div>
+                        <div class="stage-content">
+                            <div class="stage-title">Confirmation</div>
+                            <div class="stage-desc">Start creating</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checkout-container">
+                <div class="checkout-content">
+                    <!-- Plan Summary -->
+                    <div class="plan-summary">
+                        <h2>Order Summary</h2>
+                        {% if plan %}
+                        <div class="plan-details">
+                            <div class="plan-name">{{ plan.name }}</div>
+                            <div class="plan-description">{{ plan.description }}</div>
+                            <div class="plan-price-details">
+                                <span class="plan-price">${{ plan.price }}</span>
+                                <span class="plan-period">for {{ plan.period }}</span>
+                            </div>
+                            {% if plan.savings %}
+                            <div class="plan-savings">{{ plan.savings }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="purchase-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Subtotal</span>
+                                <span class="detail-value">${{ plan.price }}</span>
+                            </div>
+                            <div class="detail-row total">
+                                <span class="detail-label">Total</span>
+                                <span class="detail-value">${{ plan.price }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Action Buttons - Moved to here from payment section -->
+                    <div class="checkout-actions">
+                        <button type="submit" form="payment-form" class="btn btn-primary btn-large btn-full">
+                            <i class="fas fa-lock"></i> Complete Secure Payment
+                        </button>
+                        <a href="{{ url_for('root.home') }}#pricing" class="btn-text">
+                            Return to Plans
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Payment Method moved to sidebar -->
+                <div class="checkout-sidebar">
+                    <div class="payment-selection">
+                        <h2>Payment Method</h2>
+                        
+                        <div class="payment-methods-header">
+                            <h3>Select your payment option</h3>
+                            <div class="payment-security">
+                                <span class="security-badge">
+                                    <i class="fas fa-lock"></i> Secure payment
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <form id="payment-form" action="{{ url_for('payment.process_checkout', plan_id=plan_id) }}" method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            
+                            <div class="payment-methods">
+                                <div class="payment-method">
+                                    <input type="radio" name="gateway" id="stripe" value="stripe" checked>
+                                    <label for="stripe">
+                                        <img src="{{ url_for('static', filename='images/stripe.png') }}" alt="Credit Card" onerror="this.src='https://via.placeholder.com/120x40?text=Credit+Card'">
+                                        <span>Credit Card</span>
+                                    </label>
+                                </div>
+                                <div class="payment-method">
+                                    <input type="radio" name="gateway" id="paypal" value="paypal">
+                                    <label for="paypal">
+                                        <img src="{{ url_for('static', filename='images/paypal.png') }}" alt="PayPal" onerror="this.src='https://via.placeholder.com/120x40?text=PayPal'">
+                                        <span>PayPal</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="security-info">
+                        <div class="security-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="security-text">
+                            <h3>Secure Checkout</h3>
+                            <p>Your payment information is encrypted and secure. We use industry-standard security measures to protect your data.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="guarantee-info">
+                        <div class="guarantee-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="guarantee-text">
+                            <h3>30-Day Money-Back Guarantee</h3>
+                            <p>If you're not satisfied with our service, we'll refund your payment. No questions asked.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

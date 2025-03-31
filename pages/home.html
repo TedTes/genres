@@ -1,0 +1,912 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="main-nav">
+    <div class="container nav-container">
+        <div class="logo">
+            <a href="{{ url_for('root.home') }}">ResumeMatch</a>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('job.job') }}">Browse Jobs</a>
+            <a href="#templates">Templates</a>
+            <a href="#features">Features</a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('root.dashboard') }}" class="btn btn-outline">Dashboard</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}">Login</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Get Started</a>
+            {% endif %}
+        </div>
+        <div class="mobile-nav-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">Land your dream job with an ATS-optimized resume</h1>
+                <p class="hero-subtitle">Create professional resumes tailored to specific job listings with AI-powered skills matching</p>
+                
+                <div class="stats-highlights">
+                    <div class="stat-highlight">
+                        <span class="highlight-number">39%</span>
+                        <span class="highlight-text">more likely to get interviews</span>
+                    </div>
+                    <div class="stat-highlight">
+                        <span class="highlight-number">8%</span>
+                        <span class="highlight-text">higher salary offers</span>
+                    </div>
+                </div>
+
+                <div class="hero-cta">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-large">
+                        Build my resume now
+                    </a>
+                    <a href="{{ url_for('job.job') }}" class="btn btn-outline btn-large">
+                        Browse jobs
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <svg  viewBox="0 0 580 600" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Definitions -->
+                    <defs>
+                      <!-- Drop shadow filter for depth -->
+                      <filter id="drop-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+                        <feOffset dx="2" dy="4" result="offsetblur" />
+                        <feComponentTransfer>
+                          <feFuncA type="linear" slope="0.2" />
+                        </feComponentTransfer>
+                        <feMerge>
+                          <feMergeNode />
+                          <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                      </filter>
+                      <!-- Gradient for overlay -->
+                      <linearGradient id="overlay-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgba(59, 130, 246, 0.1)" />
+                        <stop offset="50%" style="stop-color:rgba(59, 130, 246, 0)" />
+                        <stop offset="100%" style="stop-color:rgba(59, 130, 246, 0.1)" />
+                      </linearGradient>
+                      <!-- Gradient for the gradient template header -->
+                      <linearGradient id="header-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#6c5ce7" />
+                        <stop offset="100%" style="stop-color:#00cec9" />
+                      </linearGradient>
+                    </defs>
+                  
+                    <!-- Background layers -->
+                    <rect x="0" y="0" width="700" height="500" fill="#f8fafc" />
+                    <rect x="570" y="20" width="100" height="440" rx="8" fill="#e2e8f0" opacity="0.5" />
+                    <rect x="30" y="20" width="100" height="440" rx="8" fill="#e2e8f0" opacity="0.5" />
+                  
+                    <!-- Minimal Template (side, left) -->
+                    <g transform="translate(50, 120) scale(0.4) rotate(-15)">
+                      <rect width="350" height="450" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1" filter="url(#drop-shadow)" />
+                      <text x="175" y="50" font-family="Arial" font-size="22" fill="#2c3e50" text-anchor="middle" font-weight="bold">EMMA WILSON</text>
+                      <line x1="125" y1="70" x2="225" y2="70" stroke="#2c3e50" stroke-width="2" />
+                      <text x="175" y="90" font-family="Arial" font-size="12" fill="#64748b" text-anchor="middle">emma@example.com | 555-123-4567 | New York, NY</text>
+                      <text x="40" y="130" font-family="Arial" font-size="16" fill="#2c3e50" font-weight="bold">PROFESSIONAL SUMMARY</text>
+                      <rect x="40" y="140" width="270" height="2" fill="#2c3e50" />
+                      <rect x="40" y="155" width="270" height="6" rx="3" fill="#e2e8f0" />
+                      <rect x="40" y="170" width="270" height="6" rx="3" fill="#e2e8f0" />
+                      <rect x="40" y="185" width="200" height="6" rx="3" fill="#e2e8f0" />
+                      <text x="40" y="220" font-family="Arial" font-size="16" fill="#2c3e50" font-weight="bold">EXPERIENCE</text>
+                      <rect x="40" y="230" width="270" height="2" fill="#2c3e50" />
+                      <text x="40" y="250" font-family="Arial" font-size="14" fill="#2c3e50" font-weight="bold">Marketing Manager</text>
+                      <text x="40" y="270" font-family="Arial" font-size="12" fill="#64748b">Global Marketing Inc. | 2019 - Present</text>
+                      <rect x="40" y="285" width="270" height="5" rx="2.5" fill="#e2e8f0" />
+                      <rect x="40" y="300" width="270" height="5" rx="2.5" fill="#e2e8f0" />
+                      <rect x="40" y="315" width="200" height="5" rx="2.5" fill="#e2e8f0" />
+                      <text x="40" y="350" font-family="Arial" font-size="16" fill="#2c3e50" font-weight="bold">SKILLS</text>
+                      <rect x="40" y="360" width="270" height="2" fill="#2c3e50" />
+                      <rect x="40" y="375" width="80" height="25" rx="4" stroke="#2c3e50" stroke-width="1" fill="white" />
+                      <rect x="130" y="375" width="80" height="25" rx="4" stroke="#2c3e50" stroke-width="1" fill="white" />
+                      <rect x="220" y="375" width="80" height="25" rx="4" stroke="#2c3e50" stroke-width="1" fill="white" />
+                    </g>
+                  
+                    <!-- Gradient Template (side, right) -->
+                    <g transform="translate(480, 120) scale(0.4) rotate(15)">
+                      <rect width="350" height="450" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1" filter="url(#drop-shadow)" />
+                      <path d="M0,0 L350,0 L350,120 Q350,130 340,140 L10,140 Q0,130 0,120 Z" fill="url(#header-gradient)" />
+                      <text x="175" y="40" font-family="Arial" font-size="20" fill="white" text-anchor="middle" font-weight="bold">ALEX JOHNSON</text>
+                      <text x="175" y="60" font-family="Arial" font-size="12" fill="white" text-anchor="middle">UX Designer</text>
+                      <g transform="translate(80, 80)">
+                        <circle cx="8" cy="8" r="8" fill="rgba(255,255,255,0.3)" />
+                        <text x="25" y="12" font-family="Arial" font-size="10" fill="white">alex@example.com</text>
+                      </g>
+                      <g transform="translate(220, 80)">
+                        <circle cx="8" cy="8" r="8" fill="rgba(255,255,255,0.3)" />
+                        <text x="25" y="12" font-family="Arial" font-size="10" fill="white">555-987-6543</text>
+                      </g>
+                      <text x="30" y="170" font-family="Arial" font-size="16" fill="#2c3e50" font-weight="bold">PROFILE</text>
+                      <rect x="30" y="180" width="290" height="40" rx="5" fill="#f8fafc" />
+                      <text x="30" y="240" font-family="Arial" font-size="16" fill="#2c3e50" font-weight="bold">EXPERIENCE</text>
+                      <rect x="30" y="250" width="290" height="100" rx="5" fill="#f8fafc" />
+                      <text x="30" y="370" font-family="Arial" font-size="16" fill="#2c3e50" font-weight="bold">SKILLS</text>
+                      <rect x="30" y="380" width="60" height="24" rx="12" fill="#e2e8f0" />
+                      <rect x="100" y="380" width="60" height="24" rx="12" fill="#e2e8f0" />
+                      <rect x="170" y="380" width="60" height="24" rx="12" fill="#e2e8f0" />
+                      <rect x="240" y="380" width="60" height="24" rx="12" fill="#e2e8f0" />
+                    </g>
+                  
+                    <!-- Main Resume Template (center) -->
+                    <g transform="translate(180, 20) scale(0.9)">
+                      <rect width="350" height="460" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1" filter="url(#drop-shadow)" />
+                      <rect x="0" y="0" width="120" height="460" rx="10 0 0 10" fill="#2c3e50" />
+                      <circle cx="60" cy="70" r="35" fill="#3498db" />
+                      <text x="60" y="80" font-family="Arial" font-size="28" fill="white" text-anchor="middle">TR</text>
+                      <text x="60" y="140" font-family="Arial" font-size="16" fill="white" text-anchor="middle" font-weight="bold">Taylor Resume</text>
+                      <text x="60" y="160" font-family="Arial" font-size="12" fill="#ecf0f1" text-anchor="middle" opacity="0.9">Product Designer</text>
+                      <text x="30" y="200" font-family="Arial" font-size="14" fill="white" font-weight="bold">CONTACT</text>
+                      <line x1="30" y1="210" x2="90" y2="210" stroke="#3498db" stroke-width="2" />
+                      <g transform="translate(30, 230)">
+                        <circle cx="8" cy="8" r="8" fill="rgba(255,255,255,0.2)" />
+                        <text x="25" y="12" font-family="Arial" font-size="10" fill="white">email@example.com</text>
+                      </g>
+                      <g transform="translate(30, 260)">
+                        <circle cx="8" cy="8" r="8" fill="rgba(255,255,255,0.2)" />
+                        <text x="25" y="12" font-family="Arial" font-size="10" fill="white">+1 (555) 123-4567</text>
+                      </g>
+                      <g transform="translate(30, 290)">
+                        <circle cx="8" cy="8" r="8" fill="rgba(255,255,255,0.2)" />
+                        <text x="25" y="12" font-family="Arial" font-size="10" fill="white">San Francisco, CA</text>
+                      </g>
+                      <text x="30" y="330" font-family="Arial" font-size="14" fill="white" font-weight="bold">SKILLS</text>
+                      <line x1="30" y1="340" x2="90" y2="340" stroke="#3498db" stroke-width="2" />
+                      <rect x="30" y="355" width="60" height="20" rx="10" fill="rgba(255,255,255,0.1)" />
+                      <text x="60" y="368" font-family="Arial" font-size="9" fill="white" text-anchor="middle">Design</text>
+                      <rect x="30" y="380" width="60" height="20" rx="10" fill="rgba(255,255,255,0.1)" />
+                      <text x="60" y="393" font-family="Arial" font-size="9" fill="white" text-anchor="middle">UI/UX</text>
+                      <rect x="30" y="405" width="60" height="20" rx="10" fill="rgba(255,255,255,0.1)" />
+                      <text x="60" y="418" font-family="Arial" font-size="9" fill="white" text-anchor="middle">Figma</text>
+                      <text x="140" y="50" font-family="Arial" font-size="16" fill="#2c3e50" font-weight="bold">PROFESSIONAL SUMMARY</text>
+                      <line x1="140" y1="60" x2="330" y2="60" stroke="#3498db" stroke-width="2" />
+                      <rect x="140" y="70" width="190" height="8" rx="4" fill="#e2e8f0" />
+                      <rect x="140" y="85" width="190" height="8" rx="4" fill="#e2e8f0" />
+                      <rect x="140" y="100" width="140" height="8" rx="4" fill="#e2e8f0" />
+                      <text x="140" y="140" font-family="Arial" font-size="16" fill="#2c3e50" font-weight="bold">EXPERIENCE</text>
+                      <line x1="140" y1="150" x2="330" y2="150" stroke="#3498db" stroke-width="2" />
+                      <text x="140" y="175" font-family="Arial" font-size="14" fill="#2c3e50" font-weight="bold">Senior Product Designer</text>
+                      <text x="140" y="195" font-family="Arial" font-size="12" fill="#64748b">Design Studio Inc.</text>
+                      <text x="140" y="210" font-family="Arial" font-size="10" fill="#94a3b8">2020 - Present</text>
+                      <circle cx="145" cy="230" r="2" fill="#64748b" />
+                      <rect x="155" y="226" width="175" height="6" rx="3" fill="#e2e8f0" />
+                      <circle cx="145" cy="245" r="2" fill="#64748b" />
+                      <rect x="155" y="241" width="175" height="6" rx="3" fill="#e2e8f0" />
+                      <circle cx="145" cy="260" r="2" fill="#64748b" />
+                      <rect x="155" y="256" width="140" height="6" rx="3" fill="#e2e8f0" />
+                      <text x="140" y="290" font-family="Arial" font-size="14" fill="#2c3e50" font-weight="bold">Product Designer</text>
+                      <text x="140" y="310" font-family="Arial" font-size="12" fill="#64748b">Tech Company</text>
+                      <text x="140" y="325" font-family="Arial" font-size="10" fill="#94a3b8">2018 - 2020</text>
+                      <circle cx="145" cy="345" r="2" fill="#64748b" />
+                      <rect x="155" y="341" width="175" height="6" rx="3" fill="#e2e8f0" />
+                      <circle cx="145" cy="360" r="2" fill="#64748b" />
+                      <rect x="155" y="356" width="175" height="6" rx="3" fill="#e2e8f0" />
+                      <text x="140" y="390" font-family="Arial" font-size="16" fill="#2c3e50" font-weight="bold">EDUCATION</text>
+                      <line x1="140" y1="400" x2="330" y2="400" stroke="#3498db" stroke-width="2" />
+                      <text x="140" y="425" font-family="Arial" font-size="14" fill="#2c3e50" font-weight="bold">Bachelor of Design</text>
+                      <text x="140" y="440" font-family="Arial" font-size="12" fill="#64748b">University of Design Arts</text>
+                    </g>
+                  
+                    <!-- Gradient Overlay -->
+                    <rect x="0" y="0" width="700" height="500" fill="url(#overlay-gradient)" />
+                  
+                    <!-- Enhanced ATS-Friendly Badge -->
+                    <g transform="translate(480, 60) rotate(20)">
+                      <rect x="0" y="0" width="140" height="36" rx="18" fill="#10b981" />
+                      <text x="60" y="24" font-family="Arial" font-size="14" fill="white" text-anchor="middle" font-weight="bold">ATS-FRIENDLY</text>
+                      <circle cx="110" cy="18" r="8" fill="white" />
+                      <path d="M106,18 L109,21 L114,16" stroke="#10b981" stroke-width="2" fill="none" />
+                    </g>
+                </svg>
+            </div>
+        </div>
+
+        <div class="resume-counter">
+            <div class="counter-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div>
+                <div class="counter-number">{{ resume_count|default('47,832') }}</div>
+                <div class="counter-text">resumes created this month</div>
+            </div>
+        </div>
+
+        <div class="trusted-by">
+            <p>Our users have been hired at top companies worldwide</p>
+            <div class="company-logos">
+                <div class="logo-item">Google</div>
+                <div class="logo-item">Apple</div>
+                <div class="logo-item">Microsoft</div>
+                <div class="logo-item">Amazon</div>
+                <div class="logo-item">Meta</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works">
+    <div class="container">
+        <h2 class="section-title">How it works</h2>
+        <p class="section-subtitle">Three simple steps to your perfect resume</p>
+        
+        <div class="steps">
+            <div class="step">
+                <div class="home-step-number">1</div>
+                <div class="step-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>Find a job</h3>
+                <p>Browse our database of current job listings or paste a job description you're interested in.</p>
+            </div>
+            
+            <div class="step">
+                <div class="home-step-number">2</div>
+                <div class="step-icon">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <h3>Create your resume</h3>
+                <p>Our AI analyzes the job description and helps you highlight your most relevant skills and experience.</p>
+            </div>
+            
+            <div class="step">
+                <div class="home-step-number">3</div>
+                <div class="step-icon">
+                    <i class="fas fa-file-download"></i>
+                </div>
+                <h3>Download & apply</h3>
+                <p>Get a professionally formatted, ATS-friendly PDF resume ready to submit to employers.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Templates Section (Enhanced) -->
+<section class="templates" id="templates">
+    <div class="container">
+        <h2 class="section-title">Professional resume templates</h2>
+        <p class="section-subtitle">Choose from our collection of ATS-friendly designs proven to get past applicant tracking systems</p>
+        
+        <!-- Template Category Navigation -->
+        <div class="template-categories">
+            <button class="category-btn active" data-category="all">All Templates</button>
+            <button class="category-btn" data-category="professional">Professional</button>
+            <button class="category-btn" data-category="creative">Creative</button>
+            <button class="category-btn" data-category="modern">Modern</button>
+            <button class="category-btn" data-category="technical">Technical</button>
+        </div>
+        
+        <div class="templates-grid">
+            <!-- Template 1 -->
+            <div class="template-card" data-category="professional modern">
+                <div class="template-preview">
+                    <img src="{{ url_for('static', filename='images/thumbnails/1.png') }}" alt="Modern Blue Template"
+                        onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'300\' height=\'420\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 420\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23555555;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:21pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'300\' height=\'420\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'90\' y=\'210\'%3EModern Blue%3C/text%3E%3Ctext x=\'90\' y=\'250\'%3ETemplate%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
+                    <div class="template-overlay">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+                        <div class="template-badge">Popular</div>
+                    </div>
+                </div>
+                <div class="template-info">
+                    <h3>Modern Blue</h3>
+                    <p>Clean, professional design with sidebar for technical roles</p>
+                    <div class="template-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="count">3.2M+ users</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Template 2 -->
+            <div class="template-card" data-category="professional">
+                <div class="template-preview">
+                    <img src="{{ url_for('static', filename='images/thumbnails/2.png') }}" alt="Classic Professional Template"
+                        onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'300\' height=\'420\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 420\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23555555;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:21pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'300\' height=\'420\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'75\' y=\'210\'%3EClassic Pro%3C/text%3E%3Ctext x=\'90\' y=\'250\'%3ETemplate%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
+                    <div class="template-overlay">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+                    </div>
+                </div>
+                <div class="template-info">
+                    <h3>Classic Professional</h3>
+                    <p>Traditional layout ideal for corporate and business roles</p>
+                    <div class="template-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="count">2.5M+ users</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Template 3 -->
+            <div class="template-card" data-category="modern creative">
+                <div class="template-preview">
+                    <img src="{{ url_for('static', filename='images/thumbnails/3.png') }}" alt="Executive Blue Template"
+                        onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'300\' height=\'420\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 420\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23555555;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:21pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'300\' height=\'420\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'90\' y=\'210\'%3EExecutive%3C/text%3E%3Ctext x=\'90\' y=\'250\'%3ETemplate%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
+                    <div class="template-overlay">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+                        <div class="template-badge">Trending</div>
+                    </div>
+                </div>
+                <div class="template-info">
+                    <h3>Executive Blue</h3>
+                    <p>Modern header design with clean sections for executives</p>
+                    <div class="template-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="count">1.8M+ users</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Template 4 -->
+            <div class="template-card" data-category="creative technical">
+                <div class="template-preview">
+                    <img src="{{ url_for('static', filename='images/thumbnails/4.png') }}" alt="Modern Gradient Template"
+                        onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'300\' height=\'420\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 420\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23555555;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:21pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'300\' height=\'420\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'90\' y=\'210\'%3EModern%3C/text%3E%3Ctext x=\'90\' y=\'250\'%3EGradient%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
+                    <div class="template-overlay">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+                    </div>
+                </div>
+                <div class="template-info">
+                    <h3>Modern Gradient</h3>
+                    <p>Contemporary design with gradient header for tech roles</p>
+                    <div class="template-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="count">1.5M+ users</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Template 5 -->
+            <div class="template-card" data-category="modern professional">
+                <div class="template-preview">
+                    <img src="{{ url_for('static', filename='images/thumbnails/5.png') }}" alt="Professional Plus Template"
+                        onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'300\' height=\'420\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 420\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23555555;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:21pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'300\' height=\'420\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'75\' y=\'210\'%3EProfessional%3C/text%3E%3Ctext x=\'90\' y=\'250\'%3EPlus%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
+                    <div class="template-overlay">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+                    </div>
+                </div>
+                <div class="template-info">
+                    <h3>Professional Plus</h3>
+                    <p>Elegant two-column design with professional avatar</p>
+                    <div class="template-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="count">1.4M+ users</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Template 6 -->
+            <div class="template-card" data-category="professional">
+                <div class="template-preview">
+                    <img src="{{ url_for('static', filename='images/thumbnails/6.png') }}" alt="Traditional CV Template"
+                        onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'300\' height=\'420\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 420\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23555555;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:21pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'300\' height=\'420\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'90\' y=\'210\'%3ETraditional%3C/text%3E%3Ctext x=\'90\' y=\'250\'%3ECV%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
+                    <div class="template-overlay">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+                    </div>
+                </div>
+                <div class="template-info">
+                    <h3>Traditional CV</h3>
+                    <p>Classic layout with formal styling for academic positions</p>
+                    <div class="template-rating">
+                        <span class="stars">★★★★☆</span>
+                        <span class="count">950K+ users</span>
+                    </div>
+                </div>
+            </div>
+            
+      
+        </div>
+        
+        <div class="templates-footer">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Create your resume now</a>
+            <p class="templates-note">All templates are ATS-friendly and fully customizable</p>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features" id="features">
+    <div class="container">
+        <h2 class="section-title">AI-powered resume building</h2>
+        <p class="section-subtitle">Our intelligent tools help you create the perfect resume for each job application</p>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>Smart skill matching</h3>
+                <p>Our AI analyzes job descriptions to identify key skills and requirements, ensuring your resume targets exactly what employers are looking for.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>ATS optimization</h3>
+                <p>All templates are built to pass through Applicant Tracking Systems with proper formatting that machines can read.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Quick content generation</h3>
+                <p>Stuck writing about yourself? Our AI suggests professional phrasing for your experience and accomplishments.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <h3>Instant PDF download</h3>
+                <p>Download your perfectly formatted resume as a PDF, ready to submit to employers immediately.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Reviews Section -->
+<section class="reviews">
+    <div class="container">
+        <div class="reviews-header">
+            <h2 class="section-title">Trusted by job seekers worldwide</h2>
+            <div class="rating">
+                <div class="stars">★★★★★</div>
+                <span class="rating-score">4.8 out of 5</span>
+                <span class="rating-base">based on 53,280 reviews</span>
+            </div>
+        </div>
+        
+        <div class="reviews-grid">
+            <div class="review-card">
+                <div class="review-content">
+                    <p>"I was looking for a job for 6 months with no luck. After using ResumeMatch, I got 3 interviews in just 2 weeks and landed my dream position!"</p>
+                </div>
+                <div class="reviewer">
+                    <div class="reviewer-avatar">
+                        <div class="avatar-placeholder">J</div>
+                    </div>
+                    <div class="reviewer-info">
+                        <h4>James T.</h4>
+                        <p>Software Engineer</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="review-card">
+                <div class="review-content">
+                    <p>"The AI skill matching was incredibly helpful. It picked up keywords from the job description that I would have missed and helped me tailor my resume perfectly."</p>
+                </div>
+                <div class="reviewer">
+                    <div class="reviewer-avatar">
+                        <div class="avatar-placeholder">S</div>
+                    </div>
+                    <div class="reviewer-info">
+                        <h4>Sarah M.</h4>
+                        <p>Marketing Specialist</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="review-card">
+                <div class="review-content">
+                    <p>"As someone who struggles with formatting, the templates were a lifesaver. Professional-looking and ATS-friendly. Worth every penny!"</p>
+                </div>
+                <div class="reviewer">
+                    <div class="reviewer-avatar">
+                        <div class="avatar-placeholder">D</div>
+                    </div>
+                    <div class="reviewer-info">
+                        <h4>David L.</h4>
+                        <p>Financial Analyst</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Plans Section -->
+<section class="pricing-plans">
+    <div class="container">
+        <h2 class="section-title">Choose Your Plan</h2>
+        <p class="section-subtitle">Select the perfect plan for your job search needs</p>
+        
+        <div class="plans-container">
+            <!-- Free Plan -->
+            <div class="plan-card">
+                <div class="plan-header">
+                    <h3 class="plan-name">Basic</h3>
+                    <div class="plan-price">
+                        <span class="price">Free</span>
+                        <span class="period">forever</span>
+                    </div>
+                </div>
+                <div class="plan-features">
+                    <ul>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>1 resume template</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Basic ATS optimization</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>PDF download</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Browse job listings</span>
+                        </li>
+                        <li class="disabled">
+                            <i class="fas fa-times"></i>
+                            <span>Job-specific tailoring</span>
+                        </li>
+                        <li class="disabled">
+                            <i class="fas fa-times"></i>
+                            <span>Multiple resume versions</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="plan-footer">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline btn-large btn-full">Get Started</a>
+                </div>
+            </div>
+            
+            <!-- 3-Month Bundle Plan -->
+            <div class="plan-card popular">
+                <div class="popular-badge">Most Popular</div>
+                <div class="plan-header">
+                    <h3 class="plan-name">3-Month Plan</h3>
+                    <div class="plan-price">
+                        <span class="price">$30</span>
+                        <span class="period">for 3 months</span>
+                    </div>
+                    <div class="price-savings">Only $10/month</div>
+                </div>
+                <div class="plan-features">
+                    <ul>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>All basic features</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>20+ premium templates</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Advanced ATS optimization</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>AI keyword matching</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Up to 5 resume versions</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Job-specific customization</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="plan-footer">
+                    {% if current_user.is_authenticated %}
+                    <form action="{{ url_for('payment.checkout', plan_id='3month') }}" method="get">
+                        <div class="payment-methods">
+                            <div class="payment-method">
+                                <input type="radio" name="gateway" id="stripe-{{ plan.id }}" value="stripe" checked>
+                                <label for="stripe-{{ plan.id }}">
+                                    <img src="{{ url_for('static', filename='images/stripe.png') }}" alt="Credit Card">
+                                </label>
+                            </div>
+                            <div class="payment-method">
+                                <input type="radio" name="gateway" id="paypal-{{ plan.id }}" value="paypal">
+                                <label for="paypal-{{ plan.id }}">
+                                    <img src="{{ url_for('static', filename='images/paypal.png') }}" alt="PayPal">
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-large btn-full">Choose Plan</button>
+                    </form>
+        {% else %}
+            <a href="{{ url_for('auth.login', next=url_for('payment.checkout', plan_id='3month')) }}" 
+               class="btn btn-primary btn-large btn-full">Choose Plan</a>
+        {% endif %}
+                </div>
+            </div>
+            
+            <!-- 6-Month Bundle Plan -->
+            <div class="plan-card">
+                <div class="plan-header">
+                    <h3 class="plan-name">6-Month Plan</h3>
+                    <div class="plan-price">
+                        <span class="price">$48</span>
+                        <span class="period">for 6 months</span>
+                    </div>
+                    <div class="price-savings">Only $8/month</div>
+                </div>
+                <div class="plan-features">
+                    <ul>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>All features from 3-Month Plan</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>All 40+ premium templates</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Enhanced job matching</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Up to 8 tailored resumes</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Save job application history</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Priority email support</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="plan-footer">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline btn-large btn-full">Choose Plan</a>
+                </div>
+            </div>
+            
+            <!-- Annual Bundle Plan -->
+            <div class="plan-card">
+                <div class="best-value-badge">Best Value</div>
+                <div class="plan-header">
+                    <h3 class="plan-name">Annual Plan</h3>
+                    <div class="plan-price">
+                        <span class="price">$80</span>
+                        <span class="period">for 12 months</span>
+                    </div>
+                    <div class="price-savings">Only $6.67/month</div>
+                </div>
+                <div class="plan-features">
+                    <ul>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>All features from 6-Month Plan</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>AI cover letter generator</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Unlimited tailored resumes</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Advanced job application tracking</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>LinkedIn profile optimization</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Priority email & phone support</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="plan-footer">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline btn-large btn-full">Choose Plan</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="pricing-guarantee">
+            <div class="guarantee-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="guarantee-text">
+                <h4>30-Day Money-Back Guarantee</h4>
+                <p>If you're not satisfied with our service, we'll refund your payment. No questions asked.</p>
+            </div>
+        </div>
+        
+        <div class="pricing-faq">
+            <h3>Frequently Asked Questions</h3>
+            
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h4>Can I change plans later?</h4>
+                    <p>Yes, you can upgrade or downgrade your plan at any time. If you upgrade, you'll be charged the prorated difference. If you downgrade, you'll receive credit towards your next billing cycle.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h4>Do you offer refunds?</h4>
+                    <p>Yes, we offer a 30-day money-back guarantee. If you're not satisfied with our service within the first 30 days, we'll provide a full refund.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h4>What payment methods do you accept?</h4>
+                    <p>We accept all major credit cards (Visa, Mastercard, American Express), PayPal, and Apple Pay.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h4>Is there a student discount?</h4>
+                    <p>Yes, we offer a 50% discount for students with a valid .edu email address. Contact our support team to apply for the discount.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta">
+    <div class="container">
+        <h2 class="cta-title">Ready to land your next job?</h2>
+        <p class="cta-subtitle">Create an ATS-optimized resume in minutes</p>
+        
+        <div class="cta-buttons">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-white btn-large">
+                Get started free
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            <a href="{{ url_for('job.job') }}" class="btn btn-outline-white btn-large">
+                Browse jobs
+            </a>
+        </div>
+        
+        <p class="cta-note">No credit card required</p>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="main-footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <h3>ResumeMatch</h3>
+                <p>The AI-powered resume builder</p>
+            </div>
+            
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#templates">Templates</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="{{ url_for('job.job') }}">Jobs</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Resume Guide</a></li>
+                        <li><a href="#">Career Blog</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; {{ current_year }} ResumeMatch. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Font Awesome for icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Template filtering functionality
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const templateCards = document.querySelectorAll('.template-card');
+        
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                categoryButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Get selected category
+                const selectedCategory = this.getAttribute('data-category');
+                
+                // Show/hide templates based on category
+                templateCards.forEach(card => {
+                    if (selectedCategory === 'all') {
+                        card.style.display = 'block';
+                    } else {
+                        const cardCategories = card.getAttribute('data-category').split(' ');
+                        if (cardCategories.includes(selectedCategory)) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        });
+        
+        // Template card hover effects
+        templateCards.forEach(card => {
+            const overlay = card.querySelector('.template-overlay');
+            
+            card.addEventListener('mouseenter', function() {
+                overlay.style.opacity = '1';
+                card.classList.add('hover');
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                overlay.style.opacity = '0';
+                card.classList.remove('hover');
+            });
+        });
+        
+        // Animated counter functionality
+        const counterElement = document.querySelector('.counter-number');
+        if (counterElement) {
+            const finalValue = parseInt(counterElement.textContent.replace(/,/g, ''));
+            const duration = 2000; // 2 seconds
+            const framesPerSecond = 60;
+            const totalFrames = duration / 1000 * framesPerSecond;
+            const increment = finalValue / totalFrames;
+            
+            let currentValue = 0;
+            let currentFrame = 0;
+            
+            const animate = () => {
+                currentFrame++;
+                currentValue += increment;
+                
+                if (currentFrame <= totalFrames) {
+                    counterElement.textContent = Math.floor(currentValue).toLocaleString();
+                    requestAnimationFrame(animate);
+                } else {
+                    counterElement.textContent = finalValue.toLocaleString();
+                }
+            };
+            
+            // Start animation when element is in view
+            const counterObserver = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    animate();
+                    counterObserver.unobserve(counterElement);
+                }
+            }, { threshold: 0.5 });
+            
+            counterObserver.observe(counterElement);
+        }
+    })
+    </script>
+{% endblock %}

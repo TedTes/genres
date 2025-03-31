@@ -1,0 +1,484 @@
+{% extends "resume_form_base.html" %}
+
+{% set current_step = 'experience' %}
+
+{% block form_title %}Work Experience{% endblock %}
+
+
+{% block job_targeting_message %}
+Tailor your experience to highlight skills and achievements relevant to this position.
+{% endblock %}
+
+{% block form_content %}
+<div id="experience-list" class="experience-list">
+    <!-- Experience positions will be added here -->
+    {% if experiences %}
+        {% for experience in experiences %}
+            <div class="experience-item" data-index="{{ loop.index0 }}">
+                <div class="experience-header">
+                    <h3>{{ experience.title }} at {{ experience.company }}</h3>
+                    <span class="experience-dates">{{ experience.startDate }} - {{ experience.endDate|default('Present') }}</span>
+                    <div class="experience-actions">
+                        <button type="button" class="btn-edit" data-index="{{ loop.index0 }}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn-delete" data-index="{{ loop.index0 }}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="experience-description">
+                    <ul>
+                        {% for bullet in experience.description.split('\n') if bullet.strip() %}
+                            <li>{{ bullet }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-experiences">
+            <p>No work experience added yet. Click the button below to add your first position.</p>
+        </div>
+    {% endif %}
+</div>
+
+<button type="button" id="add-experience-btn" class="btn btn-outline btn-add">
+    <i class="fas fa-plus"></i> Add Work Experience
+</button>
+
+<div id="experience-form" class="experience-form" style="display: none;">
+    <div class="form-header">
+        <h3 id="form-title">Add Work Experience</h3>
+        <button type="button" id="close-form-btn" class="btn-close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <form id="position-form" class="resume-form">
+        <input type="hidden" id="experience-index" value="-1">
+        
+        <div class="form-group">
+            <label class="form-label">Job Title <span class="required">*</span></label>
+            <input type="text" id="job-title" class="form-control" placeholder="e.g. Software Engineer" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Company <span class="required">*</span></label>
+            <input type="text" id="company" class="form-control" placeholder="e.g. Acme Corporation" required>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group form-group-half">
+                <label class="form-label">Start Date <span class="required">*</span></label>
+                <input type="text" id="start-date" class="form-control" placeholder="e.g. Jan 2020" required>
+            </div>
+            
+            <div class="form-group form-group-half">
+                <label class="form-label">End Date</label>
+                <div class="end-date-group">
+                    <input type="text" id="end-date" class="form-control" placeholder="e.g. Dec 2022">
+                    <label class="current-job-label">
+                        <input type="checkbox" id="current-job"> Current job
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Key Responsibilities & Achievements <span class="required">*</span></label>
+            <div class="form-tip">
+                <i class="fas fa-lightbulb"></i>
+                <span>Use bullet points to highlight achievements. Start with action verbs and include measurable results.</span>
+            </div>
+            <textarea id="job-description" class="form-control" rows="6" placeholder="• Developed a new feature that increased user engagement by 25%
+• Managed a team of 5 developers to deliver projects on time
+• Reduced server costs by 30% through optimization" required></textarea>
+        </div>
+        
+        {% if skills %}
+        <div class="relevant-skills">
+            <h4>Relevant Skills for This Job</h4>
+            <p>Consider mentioning these skills in your job description:</p>
+            <div class="skills-tags">
+                {% for skill in skills %}
+                <span class="skill-tag" data-skill="{{ skill }}">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="ai-help-section">
+            <h3><i class="fas fa-robot"></i> Need help with your job description?</h3>
+            <div class="ai-options">
+                <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-achievements">
+                    <i class="fas fa-medal"></i> Add Achievements
+                </button>
+                <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-bullet-points">
+                    <i class="fas fa-list"></i> Format Bullets
+                </button>
+                <button type="button" class="btn btn-outline btn-sm ai-option" id="ai-target-job">
+                    <i class="fas fa-bullseye"></i> Tailor to Job
+                </button>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="button" id="cancel-btn" class="btn btn-outline">Cancel</button>
+            <button type="submit" id="save-btn" class="btn btn-primary">Save Position</button>
+        </div>
+    </form>
+</div>
+
+<form method="POST" id="main-form" class="main-form">
+    {{ form.hidden_tag() }}
+    <input type="hidden" name="experience_data" id="experience-data" value="">
+    
+    <div class="form-actions main-actions">
+        <a href="{{ url_for('resume.resume_skills', resume_id=resume.id) }}" class="btn btn-outline">Back: Skills</a>
+        <button type="submit" class="btn btn-primary">Next: Education</button>
+    </div>
+</form>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Experience form handling
+        const experienceList = document.getElementById('experience-list');
+        const addExperienceBtn = document.getElementById('add-experience-btn');
+        const experienceForm = document.getElementById('experience-form');
+        const positionForm = document.getElementById('position-form');
+        const closeFormBtn = document.getElementById('close-form-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const formTitle = document.getElementById('form-title');
+        const experienceIndex = document.getElementById('experience-index');
+        const jobTitle = document.getElementById('job-title');
+        const company = document.getElementById('company');
+        const startDate = document.getElementById('start-date');
+        const endDate = document.getElementById('end-date');
+        const currentJob = document.getElementById('current-job');
+        const jobDescription = document.getElementById('job-description');
+        const experienceData = document.getElementById('experience-data');
+        const mainForm = document.getElementById('main-form');
+        
+        // Array to store experiences
+        let experiences = [];
+        
+        // Form validation
+        positionForm.addEventListener('submit', function(e) {
+            let isValid = true;
+            const requiredFields = positionForm.querySelectorAll('[required]');
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    
+                    // Clear previous error
+                    const existingError = field.parentElement.querySelector('.field-error');
+                    if (existingError) {
+                        existingError.remove();
+                    }
+                    
+                    // Add error message
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'field-error';
+                    errorMsg.textContent = `Please enter your ${field.getAttribute('placeholder') || field.name}`;
+                    field.parentElement.appendChild(errorMsg);
+                    
+                    // Highlight field
+                    field.classList.add('error-field');
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+        
+        // Clear error when field is filled
+        positionForm.querySelectorAll('input, textarea').forEach(field => {
+            field.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.classList.remove('error-field');
+                    const errorMsg = this.parentElement.querySelector('.field-error');
+                    if (errorMsg) {
+                        errorMsg.remove();
+                    }
+                }
+            });
+        });
+        
+        // Initialize from existing data if available
+        const initializeExperiences = () => {
+            const items = document.querySelectorAll('.experience-item');
+
+            if (items.length > 0) {
+                items.forEach(item => {
+                    const index = parseInt(item.dataset.index);
+                    const title = item.querySelector('h3').textContent.split(' at ')[0];
+                    const company = item.querySelector('h3').textContent.split(' at ')[1];
+                    const dates = item.querySelector('.experience-dates').textContent.split(' - ');
+                    const startDate = dates[0];
+                    const endDate = dates[1] === 'Present' ? '' : dates[1];
+                    
+                    // Get bullet points
+                    const bullets = [];
+                    item.querySelectorAll('.experience-description li').forEach(li => {
+                        bullets.push(li.textContent);
+                    });
+                    
+                    experiences[index] = {
+                        title: title,
+                        company: company,
+                        startDate: startDate,
+                        endDate: endDate,
+                        current: endDate === 'Present',
+                        description: bullets.join('\n')
+                    };
+                });
+            }
+            
+            // Update hidden input with JSON data
+            experienceData.value = JSON.stringify(experiences);
+        };
+
+        // Call initialization
+        initializeExperiences();
+
+        // Show add experience form
+        addExperienceBtn.addEventListener('click', function() {
+            formTitle.textContent = 'Add Work Experience';
+            experienceIndex.value = -1;
+            positionForm.reset();
+            experienceForm.style.display = 'block';
+            addExperienceBtn.style.display = 'none';
+        });
+        
+        // Close form buttons
+        closeFormBtn.addEventListener('click', function() {
+            experienceForm.style.display = 'none';
+            addExperienceBtn.style.display = 'block';
+        });
+        
+        cancelBtn.addEventListener('click', function() {
+            experienceForm.style.display = 'none';
+            addExperienceBtn.style.display = 'block';
+        });
+        
+        // Current job checkbox handler
+        currentJob.addEventListener('change', function() {
+            if (this.checked) {
+                endDate.value = '';
+                endDate.disabled = true;
+            } else {
+                endDate.disabled = false;
+            }
+        });
+        
+        // Save position
+        positionForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate form
+            if (!jobTitle.value || !company.value || !startDate.value || !jobDescription.value) {
+                alert('Please fill out all required fields.');
+                return;
+            }
+            
+            const index = parseInt(experienceIndex.value);
+            const isNewExperience = index === -1;
+            
+            const experience = {
+                title: jobTitle.value,
+                company: company.value,
+                startDate: startDate.value,
+                endDate: currentJob.checked ? '' : endDate.value,
+                current: currentJob.checked,
+                description: jobDescription.value
+            };
+            
+            if (isNewExperience) {
+                experiences.push(experience);
+            } else {
+                experiences[index] = experience;
+            }
+            
+            // Update hidden input with JSON data
+            experienceData.value = JSON.stringify(experiences);
+            
+            // Rebuild experience list
+            renderExperiences();
+            
+            // Close form
+            experienceForm.style.display = 'none';
+            addExperienceBtn.style.display = 'block';
+        });
+        
+        // Render experiences list
+        function renderExperiences() {
+            experienceList.innerHTML = '';
+            
+            if (experiences.length === 0) {
+                experienceList.innerHTML = `
+                    <div class="no-experiences">
+                        <p>No work experience added yet. Click the button below to add your first position.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            experiences.forEach((exp, index) => {
+                const bullets = exp.description.split('\n').filter(bullet => bullet.trim());
+                const bulletsList = bullets.map(bullet => `<li>${bullet}</li>`).join('');
+                
+                const html = `
+                    <div class="experience-item" data-index="${index}">
+                        <div class="experience-header">
+                            <h3>${exp.title} at ${exp.company}</h3>
+                            <span class="experience-dates">${exp.startDate} - ${exp.current ? 'Present' : exp.endDate}</span>
+                            <div class="experience-actions">
+                                <button type="button" class="btn-edit" data-index="${index}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn-delete" data-index="${index}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="experience-description">
+                            <ul>${bulletsList}</ul>
+                        </div>
+                    </div>
+                `;
+                
+                experienceList.innerHTML += html;
+            });
+            
+            // Add edit and delete button event listeners
+            document.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.addEventListener('click', editExperience);
+            });
+            
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', deleteExperience);
+            });
+        }
+        
+        // Edit experience
+        function editExperience() {
+            const index = this.dataset.index;
+            const experience = experiences[index];
+            
+            formTitle.textContent = 'Edit Work Experience';
+            experienceIndex.value = index;
+            
+            jobTitle.value = experience.title;
+            company.value = experience.company;
+            startDate.value = experience.startDate;
+            
+            if (experience.current) {
+                currentJob.checked = true;
+                endDate.value = '';
+                endDate.disabled = true;
+            } else {
+                currentJob.checked = false;
+                endDate.value = experience.endDate;
+                endDate.disabled = false;
+            }
+            
+            jobDescription.value = experience.description;
+            
+            experienceForm.style.display = 'block';
+            addExperienceBtn.style.display = 'none';
+        }
+        
+        // Delete experience
+        function deleteExperience() {
+            if (confirm('Are you sure you want to delete this experience?')) {
+                const index = this.dataset.index;
+                experiences.splice(index, 1);
+                
+                // Update hidden input with JSON data
+                experienceData.value = JSON.stringify(experiences);
+                
+                // Rebuild experience list
+                renderExperiences();
+            }
+        }
+        
+        // AI help buttons
+        const aiAchievementsBtn = document.getElementById('ai-achievements');
+        const aiBulletPointsBtn = document.getElementById('ai-bullet-points');
+        const aiTargetJobBtn = document.getElementById('ai-target-job');
+        
+        if (aiAchievementsBtn && jobDescription) {
+            aiAchievementsBtn.addEventListener('click', function() {
+                if (jobDescription.value.trim() === '') {
+                    alert('Please write some job responsibilities first.');
+                    return;
+                }
+                
+                // In a real implementation, this would call an API
+                alert('This feature would suggest achievements based on your job description. Implement API call here.');
+            });
+        }
+        
+        if (aiBulletPointsBtn && jobDescription) {
+            aiBulletPointsBtn.addEventListener('click', function() {
+                if (jobDescription.value.trim() === '') {
+                    alert('Please write some job responsibilities first.');
+                    return;
+                }
+                
+                alert('This feature would format your text into proper bullet points with action verbs. Implement API call here.');
+            });
+        }
+        
+        if (aiTargetJobBtn && jobDescription) {
+            aiTargetJobBtn.addEventListener('click', function() {
+                if (jobDescription.value.trim() === '') {
+                    alert('Please write some job responsibilities first.');
+                    return;
+                }
+                
+                alert('This feature would tailor your job description to the target position. Implement API call here.');
+            });
+        }
+        
+        // Skill tag click to insert into job description
+        const skillTags = document.querySelectorAll('.skill-tag');
+        
+        if (skillTags.length && jobDescription) {
+            skillTags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    const skill = this.dataset.skill;
+                    const currentText = jobDescription.value;
+                    
+                    // Add bullet with the skill if it's not already mentioned
+                    if (!currentText.toLowerCase().includes(skill.toLowerCase())) {
+                        if (currentText && !currentText.endsWith('\n')) {
+                            jobDescription.value = currentText + '\n• Utilized ' + skill + ' to improve project outcomes';
+                        } else {
+                            jobDescription.value = currentText + '• Utilized ' + skill + ' to improve project outcomes';
+                        }
+                    }
+                    
+                    // Mark this skill as used
+                    this.classList.add('used');
+                });
+            });
+        }
+        
+        // Form submission validation
+        mainForm.addEventListener('submit', function(e) {
+            if (experiences.length === 0) {
+                e.preventDefault();
+                alert('Please add at least one work experience before continuing.');
+            } 
+        });
+    });
+</script>
+{% endblock %}
