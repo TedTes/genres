@@ -1,0 +1,3202 @@
+{
+  "professional_classic": {
+    "id": "professional_classic",
+    "filename": "professional_classic.html",
+    "path": "generated_resumes/professional_classic.html",
+    "theme": {
+      "id": "professional",
+      "name": "Professional",
+      "colors": {
+        "primary": "#2c3e50",
+        "secondary": "#3498db",
+        "text": "#333333",
+        "text_light": "#666666",
+        "background": "#ffffff",
+        "accent": "#e74c3c",
+        "border": "#dddddd"
+      },
+      "typography": {
+        "font_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "classic",
+      "name": "Classic",
+      "description": "Traditional single-column layout"
+    },
+    "thumbnail": "thumbnails/professional_classic.png",
+    "created": "2025-03-31T12:01:29.586854"
+  },
+  "professional_modern": {
+    "id": "professional_modern",
+    "filename": "professional_modern.html",
+    "path": "generated_resumes/professional_modern.html",
+    "theme": {
+      "id": "professional",
+      "name": "Professional",
+      "colors": {
+        "primary": "#2c3e50",
+        "secondary": "#3498db",
+        "text": "#333333",
+        "text_light": "#666666",
+        "background": "#ffffff",
+        "accent": "#e74c3c",
+        "border": "#dddddd"
+      },
+      "typography": {
+        "font_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "modern",
+      "name": "Modern",
+      "description": "Two-column modern layout"
+    },
+    "thumbnail": "thumbnails/professional_modern.png",
+    "created": "2025-03-31T12:01:29.593183"
+  },
+  "professional_sidebar": {
+    "id": "professional_sidebar",
+    "filename": "professional_sidebar.html",
+    "path": "generated_resumes/professional_sidebar.html",
+    "theme": {
+      "id": "professional",
+      "name": "Professional",
+      "colors": {
+        "primary": "#2c3e50",
+        "secondary": "#3498db",
+        "text": "#333333",
+        "text_light": "#666666",
+        "background": "#ffffff",
+        "accent": "#e74c3c",
+        "border": "#dddddd"
+      },
+      "typography": {
+        "font_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "description": "Two-column layout with left sidebar"
+    },
+    "thumbnail": "thumbnails/professional_sidebar.png",
+    "created": "2025-03-31T12:01:29.599832"
+  },
+  "professional_minimalist": {
+    "id": "professional_minimalist",
+    "filename": "professional_minimalist.html",
+    "path": "generated_resumes/professional_minimalist.html",
+    "theme": {
+      "id": "professional",
+      "name": "Professional",
+      "colors": {
+        "primary": "#2c3e50",
+        "secondary": "#3498db",
+        "text": "#333333",
+        "text_light": "#666666",
+        "background": "#ffffff",
+        "accent": "#e74c3c",
+        "border": "#dddddd"
+      },
+      "typography": {
+        "font_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "description": "Clean and minimal single-column layout"
+    },
+    "thumbnail": "thumbnails/professional_minimalist.png",
+    "created": "2025-03-31T12:01:29.605729"
+  },
+  "professional_professional": {
+    "id": "professional_professional",
+    "filename": "professional_professional.html",
+    "path": "generated_resumes/professional_professional.html",
+    "theme": {
+      "id": "professional",
+      "name": "Professional",
+      "colors": {
+        "primary": "#2c3e50",
+        "secondary": "#3498db",
+        "text": "#333333",
+        "text_light": "#666666",
+        "background": "#ffffff",
+        "accent": "#e74c3c",
+        "border": "#dddddd"
+      },
+      "typography": {
+        "font_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "professional",
+      "name": "Professional",
+      "description": "Professional two-column layout with header"
+    },
+    "thumbnail": "thumbnails/professional_professional.png",
+    "created": "2025-03-31T12:01:29.611593"
+  },
+  "professional_timeline": {
+    "id": "professional_timeline",
+    "filename": "professional_timeline.html",
+    "path": "generated_resumes/professional_timeline.html",
+    "theme": {
+      "id": "professional",
+      "name": "Professional",
+      "colors": {
+        "primary": "#2c3e50",
+        "secondary": "#3498db",
+        "text": "#333333",
+        "text_light": "#666666",
+        "background": "#ffffff",
+        "accent": "#e74c3c",
+        "border": "#dddddd"
+      },
+      "typography": {
+        "font_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "timeline",
+      "name": "Timeline",
+      "description": "Experience presented as a visual timeline"
+    },
+    "thumbnail": "thumbnails/professional_timeline.png",
+    "created": "2025-03-31T12:01:29.619196"
+  },
+  "professional_cards": {
+    "id": "professional_cards",
+    "filename": "professional_cards.html",
+    "path": "generated_resumes/professional_cards.html",
+    "theme": {
+      "id": "professional",
+      "name": "Professional",
+      "colors": {
+        "primary": "#2c3e50",
+        "secondary": "#3498db",
+        "text": "#333333",
+        "text_light": "#666666",
+        "background": "#ffffff",
+        "accent": "#e74c3c",
+        "border": "#dddddd"
+      },
+      "typography": {
+        "font_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "cards",
+      "name": "Cards",
+      "description": "Card-based components for each section"
+    },
+    "thumbnail": "thumbnails/professional_cards.png",
+    "created": "2025-03-31T12:01:29.626069"
+  },
+  "professional_grid": {
+    "id": "professional_grid",
+    "filename": "professional_grid.html",
+    "path": "generated_resumes/professional_grid.html",
+    "theme": {
+      "id": "professional",
+      "name": "Professional",
+      "colors": {
+        "primary": "#2c3e50",
+        "secondary": "#3498db",
+        "text": "#333333",
+        "text_light": "#666666",
+        "background": "#ffffff",
+        "accent": "#e74c3c",
+        "border": "#dddddd"
+      },
+      "typography": {
+        "font_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "grid",
+      "name": "Modern Grid",
+      "description": "A responsive grid layout with modern styling"
+    },
+    "thumbnail": "thumbnails/professional_grid.png",
+    "created": "2025-03-31T12:01:29.634740"
+  },
+  "professional_portfolio": {
+    "id": "professional_portfolio",
+    "filename": "professional_portfolio.html",
+    "path": "generated_resumes/professional_portfolio.html",
+    "theme": {
+      "id": "professional",
+      "name": "Professional",
+      "colors": {
+        "primary": "#2c3e50",
+        "secondary": "#3498db",
+        "text": "#333333",
+        "text_light": "#666666",
+        "background": "#ffffff",
+        "accent": "#e74c3c",
+        "border": "#dddddd"
+      },
+      "typography": {
+        "font_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "portfolio",
+      "name": "Portfolio",
+      "description": "Design that highlights projects for creative professionals"
+    },
+    "thumbnail": "thumbnails/professional_portfolio.png",
+    "created": "2025-03-31T12:01:29.642598"
+  },
+  "professional_compact": {
+    "id": "professional_compact",
+    "filename": "professional_compact.html",
+    "path": "generated_resumes/professional_compact.html",
+    "theme": {
+      "id": "professional",
+      "name": "Professional",
+      "colors": {
+        "primary": "#2c3e50",
+        "secondary": "#3498db",
+        "text": "#333333",
+        "text_light": "#666666",
+        "background": "#ffffff",
+        "accent": "#e74c3c",
+        "border": "#dddddd"
+      },
+      "typography": {
+        "font_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "compact",
+      "name": "One-Page Compact",
+      "description": "Compact layout designed to fit everything on one page"
+    },
+    "thumbnail": "thumbnails/professional_compact.png",
+    "created": "2025-03-31T12:01:29.650183"
+  },
+  "modern_classic": {
+    "id": "modern_classic",
+    "filename": "modern_classic.html",
+    "path": "generated_resumes/modern_classic.html",
+    "theme": {
+      "id": "modern",
+      "name": "Modern",
+      "colors": {
+        "primary": "#3b82f6",
+        "secondary": "#10b981",
+        "text": "#1f2937",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#f59e0b",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "classic",
+      "name": "Classic",
+      "description": "Traditional single-column layout"
+    },
+    "thumbnail": "thumbnails/modern_classic.png",
+    "created": "2025-03-31T12:01:29.655749"
+  },
+  "modern_modern": {
+    "id": "modern_modern",
+    "filename": "modern_modern.html",
+    "path": "generated_resumes/modern_modern.html",
+    "theme": {
+      "id": "modern",
+      "name": "Modern",
+      "colors": {
+        "primary": "#3b82f6",
+        "secondary": "#10b981",
+        "text": "#1f2937",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#f59e0b",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "modern",
+      "name": "Modern",
+      "description": "Two-column modern layout"
+    },
+    "thumbnail": "thumbnails/modern_modern.png",
+    "created": "2025-03-31T12:01:29.661447"
+  },
+  "modern_sidebar": {
+    "id": "modern_sidebar",
+    "filename": "modern_sidebar.html",
+    "path": "generated_resumes/modern_sidebar.html",
+    "theme": {
+      "id": "modern",
+      "name": "Modern",
+      "colors": {
+        "primary": "#3b82f6",
+        "secondary": "#10b981",
+        "text": "#1f2937",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#f59e0b",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "description": "Two-column layout with left sidebar"
+    },
+    "thumbnail": "thumbnails/modern_sidebar.png",
+    "created": "2025-03-31T12:01:29.667594"
+  },
+  "modern_minimalist": {
+    "id": "modern_minimalist",
+    "filename": "modern_minimalist.html",
+    "path": "generated_resumes/modern_minimalist.html",
+    "theme": {
+      "id": "modern",
+      "name": "Modern",
+      "colors": {
+        "primary": "#3b82f6",
+        "secondary": "#10b981",
+        "text": "#1f2937",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#f59e0b",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "description": "Clean and minimal single-column layout"
+    },
+    "thumbnail": "thumbnails/modern_minimalist.png",
+    "created": "2025-03-31T12:01:29.673272"
+  },
+  "modern_professional": {
+    "id": "modern_professional",
+    "filename": "modern_professional.html",
+    "path": "generated_resumes/modern_professional.html",
+    "theme": {
+      "id": "modern",
+      "name": "Modern",
+      "colors": {
+        "primary": "#3b82f6",
+        "secondary": "#10b981",
+        "text": "#1f2937",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#f59e0b",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "professional",
+      "name": "Professional",
+      "description": "Professional two-column layout with header"
+    },
+    "thumbnail": "thumbnails/modern_professional.png",
+    "created": "2025-03-31T12:01:29.679578"
+  },
+  "modern_timeline": {
+    "id": "modern_timeline",
+    "filename": "modern_timeline.html",
+    "path": "generated_resumes/modern_timeline.html",
+    "theme": {
+      "id": "modern",
+      "name": "Modern",
+      "colors": {
+        "primary": "#3b82f6",
+        "secondary": "#10b981",
+        "text": "#1f2937",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#f59e0b",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "timeline",
+      "name": "Timeline",
+      "description": "Experience presented as a visual timeline"
+    },
+    "thumbnail": "thumbnails/modern_timeline.png",
+    "created": "2025-03-31T12:01:29.686834"
+  },
+  "modern_cards": {
+    "id": "modern_cards",
+    "filename": "modern_cards.html",
+    "path": "generated_resumes/modern_cards.html",
+    "theme": {
+      "id": "modern",
+      "name": "Modern",
+      "colors": {
+        "primary": "#3b82f6",
+        "secondary": "#10b981",
+        "text": "#1f2937",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#f59e0b",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "cards",
+      "name": "Cards",
+      "description": "Card-based components for each section"
+    },
+    "thumbnail": "thumbnails/modern_cards.png",
+    "created": "2025-03-31T12:01:29.693433"
+  },
+  "modern_grid": {
+    "id": "modern_grid",
+    "filename": "modern_grid.html",
+    "path": "generated_resumes/modern_grid.html",
+    "theme": {
+      "id": "modern",
+      "name": "Modern",
+      "colors": {
+        "primary": "#3b82f6",
+        "secondary": "#10b981",
+        "text": "#1f2937",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#f59e0b",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "grid",
+      "name": "Modern Grid",
+      "description": "A responsive grid layout with modern styling"
+    },
+    "thumbnail": "thumbnails/modern_grid.png",
+    "created": "2025-03-31T12:01:29.700724"
+  },
+  "modern_portfolio": {
+    "id": "modern_portfolio",
+    "filename": "modern_portfolio.html",
+    "path": "generated_resumes/modern_portfolio.html",
+    "theme": {
+      "id": "modern",
+      "name": "Modern",
+      "colors": {
+        "primary": "#3b82f6",
+        "secondary": "#10b981",
+        "text": "#1f2937",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#f59e0b",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "portfolio",
+      "name": "Portfolio",
+      "description": "Design that highlights projects for creative professionals"
+    },
+    "thumbnail": "thumbnails/modern_portfolio.png",
+    "created": "2025-03-31T12:01:29.707940"
+  },
+  "modern_compact": {
+    "id": "modern_compact",
+    "filename": "modern_compact.html",
+    "path": "generated_resumes/modern_compact.html",
+    "theme": {
+      "id": "modern",
+      "name": "Modern",
+      "colors": {
+        "primary": "#3b82f6",
+        "secondary": "#10b981",
+        "text": "#1f2937",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#f59e0b",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "compact",
+      "name": "One-Page Compact",
+      "description": "Compact layout designed to fit everything on one page"
+    },
+    "thumbnail": "thumbnails/modern_compact.png",
+    "created": "2025-03-31T12:01:29.715410"
+  },
+  "minimalist_classic": {
+    "id": "minimalist_classic",
+    "filename": "minimalist_classic.html",
+    "path": "generated_resumes/minimalist_classic.html",
+    "theme": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "colors": {
+        "primary": "#000000",
+        "secondary": "#555555",
+        "text": "#333333",
+        "text_light": "#777777",
+        "background": "#ffffff",
+        "accent": "#000000",
+        "border": "#eeeeee"
+      },
+      "typography": {
+        "font_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.5",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "classic",
+      "name": "Classic",
+      "description": "Traditional single-column layout"
+    },
+    "thumbnail": "thumbnails/minimalist_classic.png",
+    "created": "2025-03-31T12:01:29.720778"
+  },
+  "minimalist_modern": {
+    "id": "minimalist_modern",
+    "filename": "minimalist_modern.html",
+    "path": "generated_resumes/minimalist_modern.html",
+    "theme": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "colors": {
+        "primary": "#000000",
+        "secondary": "#555555",
+        "text": "#333333",
+        "text_light": "#777777",
+        "background": "#ffffff",
+        "accent": "#000000",
+        "border": "#eeeeee"
+      },
+      "typography": {
+        "font_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.5",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "modern",
+      "name": "Modern",
+      "description": "Two-column modern layout"
+    },
+    "thumbnail": "thumbnails/minimalist_modern.png",
+    "created": "2025-03-31T12:01:29.726337"
+  },
+  "minimalist_sidebar": {
+    "id": "minimalist_sidebar",
+    "filename": "minimalist_sidebar.html",
+    "path": "generated_resumes/minimalist_sidebar.html",
+    "theme": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "colors": {
+        "primary": "#000000",
+        "secondary": "#555555",
+        "text": "#333333",
+        "text_light": "#777777",
+        "background": "#ffffff",
+        "accent": "#000000",
+        "border": "#eeeeee"
+      },
+      "typography": {
+        "font_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.5",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "description": "Two-column layout with left sidebar"
+    },
+    "thumbnail": "thumbnails/minimalist_sidebar.png",
+    "created": "2025-03-31T12:01:29.732665"
+  },
+  "minimalist_minimalist": {
+    "id": "minimalist_minimalist",
+    "filename": "minimalist_minimalist.html",
+    "path": "generated_resumes/minimalist_minimalist.html",
+    "theme": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "colors": {
+        "primary": "#000000",
+        "secondary": "#555555",
+        "text": "#333333",
+        "text_light": "#777777",
+        "background": "#ffffff",
+        "accent": "#000000",
+        "border": "#eeeeee"
+      },
+      "typography": {
+        "font_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.5",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "description": "Clean and minimal single-column layout"
+    },
+    "thumbnail": "thumbnails/minimalist_minimalist.png",
+    "created": "2025-03-31T12:01:29.738173"
+  },
+  "minimalist_professional": {
+    "id": "minimalist_professional",
+    "filename": "minimalist_professional.html",
+    "path": "generated_resumes/minimalist_professional.html",
+    "theme": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "colors": {
+        "primary": "#000000",
+        "secondary": "#555555",
+        "text": "#333333",
+        "text_light": "#777777",
+        "background": "#ffffff",
+        "accent": "#000000",
+        "border": "#eeeeee"
+      },
+      "typography": {
+        "font_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.5",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "professional",
+      "name": "Professional",
+      "description": "Professional two-column layout with header"
+    },
+    "thumbnail": "thumbnails/minimalist_professional.png",
+    "created": "2025-03-31T12:01:29.743572"
+  },
+  "minimalist_timeline": {
+    "id": "minimalist_timeline",
+    "filename": "minimalist_timeline.html",
+    "path": "generated_resumes/minimalist_timeline.html",
+    "theme": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "colors": {
+        "primary": "#000000",
+        "secondary": "#555555",
+        "text": "#333333",
+        "text_light": "#777777",
+        "background": "#ffffff",
+        "accent": "#000000",
+        "border": "#eeeeee"
+      },
+      "typography": {
+        "font_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.5",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "timeline",
+      "name": "Timeline",
+      "description": "Experience presented as a visual timeline"
+    },
+    "thumbnail": "thumbnails/minimalist_timeline.png",
+    "created": "2025-03-31T12:01:29.750812"
+  },
+  "minimalist_cards": {
+    "id": "minimalist_cards",
+    "filename": "minimalist_cards.html",
+    "path": "generated_resumes/minimalist_cards.html",
+    "theme": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "colors": {
+        "primary": "#000000",
+        "secondary": "#555555",
+        "text": "#333333",
+        "text_light": "#777777",
+        "background": "#ffffff",
+        "accent": "#000000",
+        "border": "#eeeeee"
+      },
+      "typography": {
+        "font_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.5",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "cards",
+      "name": "Cards",
+      "description": "Card-based components for each section"
+    },
+    "thumbnail": "thumbnails/minimalist_cards.png",
+    "created": "2025-03-31T12:01:29.757481"
+  },
+  "minimalist_grid": {
+    "id": "minimalist_grid",
+    "filename": "minimalist_grid.html",
+    "path": "generated_resumes/minimalist_grid.html",
+    "theme": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "colors": {
+        "primary": "#000000",
+        "secondary": "#555555",
+        "text": "#333333",
+        "text_light": "#777777",
+        "background": "#ffffff",
+        "accent": "#000000",
+        "border": "#eeeeee"
+      },
+      "typography": {
+        "font_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.5",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "grid",
+      "name": "Modern Grid",
+      "description": "A responsive grid layout with modern styling"
+    },
+    "thumbnail": "thumbnails/minimalist_grid.png",
+    "created": "2025-03-31T12:01:29.764717"
+  },
+  "minimalist_portfolio": {
+    "id": "minimalist_portfolio",
+    "filename": "minimalist_portfolio.html",
+    "path": "generated_resumes/minimalist_portfolio.html",
+    "theme": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "colors": {
+        "primary": "#000000",
+        "secondary": "#555555",
+        "text": "#333333",
+        "text_light": "#777777",
+        "background": "#ffffff",
+        "accent": "#000000",
+        "border": "#eeeeee"
+      },
+      "typography": {
+        "font_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.5",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "portfolio",
+      "name": "Portfolio",
+      "description": "Design that highlights projects for creative professionals"
+    },
+    "thumbnail": "thumbnails/minimalist_portfolio.png",
+    "created": "2025-03-31T12:01:29.771465"
+  },
+  "minimalist_compact": {
+    "id": "minimalist_compact",
+    "filename": "minimalist_compact.html",
+    "path": "generated_resumes/minimalist_compact.html",
+    "theme": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "colors": {
+        "primary": "#000000",
+        "secondary": "#555555",
+        "text": "#333333",
+        "text_light": "#777777",
+        "background": "#ffffff",
+        "accent": "#000000",
+        "border": "#eeeeee"
+      },
+      "typography": {
+        "font_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "base_size": "14px",
+        "line_height": "1.5",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "compact",
+      "name": "One-Page Compact",
+      "description": "Compact layout designed to fit everything on one page"
+    },
+    "thumbnail": "thumbnails/minimalist_compact.png",
+    "created": "2025-03-31T12:01:29.778603"
+  },
+  "elegant_classic": {
+    "id": "elegant_classic",
+    "filename": "elegant_classic.html",
+    "path": "generated_resumes/elegant_classic.html",
+    "theme": {
+      "id": "elegant",
+      "name": "Elegant",
+      "colors": {
+        "primary": "#1e293b",
+        "secondary": "#64748b",
+        "text": "#334155",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0369a1",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Playfair Display', 'Georgia', serif",
+        "heading_family": "'Playfair Display', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "classic",
+      "name": "Classic",
+      "description": "Traditional single-column layout"
+    },
+    "thumbnail": "thumbnails/elegant_classic.png",
+    "created": "2025-03-31T12:01:29.784270"
+  },
+  "elegant_modern": {
+    "id": "elegant_modern",
+    "filename": "elegant_modern.html",
+    "path": "generated_resumes/elegant_modern.html",
+    "theme": {
+      "id": "elegant",
+      "name": "Elegant",
+      "colors": {
+        "primary": "#1e293b",
+        "secondary": "#64748b",
+        "text": "#334155",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0369a1",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Playfair Display', 'Georgia', serif",
+        "heading_family": "'Playfair Display', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "modern",
+      "name": "Modern",
+      "description": "Two-column modern layout"
+    },
+    "thumbnail": "thumbnails/elegant_modern.png",
+    "created": "2025-03-31T12:01:29.789906"
+  },
+  "elegant_sidebar": {
+    "id": "elegant_sidebar",
+    "filename": "elegant_sidebar.html",
+    "path": "generated_resumes/elegant_sidebar.html",
+    "theme": {
+      "id": "elegant",
+      "name": "Elegant",
+      "colors": {
+        "primary": "#1e293b",
+        "secondary": "#64748b",
+        "text": "#334155",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0369a1",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Playfair Display', 'Georgia', serif",
+        "heading_family": "'Playfair Display', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "description": "Two-column layout with left sidebar"
+    },
+    "thumbnail": "thumbnails/elegant_sidebar.png",
+    "created": "2025-03-31T12:01:29.795902"
+  },
+  "elegant_minimalist": {
+    "id": "elegant_minimalist",
+    "filename": "elegant_minimalist.html",
+    "path": "generated_resumes/elegant_minimalist.html",
+    "theme": {
+      "id": "elegant",
+      "name": "Elegant",
+      "colors": {
+        "primary": "#1e293b",
+        "secondary": "#64748b",
+        "text": "#334155",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0369a1",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Playfair Display', 'Georgia', serif",
+        "heading_family": "'Playfair Display', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "description": "Clean and minimal single-column layout"
+    },
+    "thumbnail": "thumbnails/elegant_minimalist.png",
+    "created": "2025-03-31T12:01:29.801493"
+  },
+  "elegant_professional": {
+    "id": "elegant_professional",
+    "filename": "elegant_professional.html",
+    "path": "generated_resumes/elegant_professional.html",
+    "theme": {
+      "id": "elegant",
+      "name": "Elegant",
+      "colors": {
+        "primary": "#1e293b",
+        "secondary": "#64748b",
+        "text": "#334155",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0369a1",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Playfair Display', 'Georgia', serif",
+        "heading_family": "'Playfair Display', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "professional",
+      "name": "Professional",
+      "description": "Professional two-column layout with header"
+    },
+    "thumbnail": "thumbnails/elegant_professional.png",
+    "created": "2025-03-31T12:01:29.806885"
+  },
+  "elegant_timeline": {
+    "id": "elegant_timeline",
+    "filename": "elegant_timeline.html",
+    "path": "generated_resumes/elegant_timeline.html",
+    "theme": {
+      "id": "elegant",
+      "name": "Elegant",
+      "colors": {
+        "primary": "#1e293b",
+        "secondary": "#64748b",
+        "text": "#334155",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0369a1",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Playfair Display', 'Georgia', serif",
+        "heading_family": "'Playfair Display', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "timeline",
+      "name": "Timeline",
+      "description": "Experience presented as a visual timeline"
+    },
+    "thumbnail": "thumbnails/elegant_timeline.png",
+    "created": "2025-03-31T12:01:29.814012"
+  },
+  "elegant_cards": {
+    "id": "elegant_cards",
+    "filename": "elegant_cards.html",
+    "path": "generated_resumes/elegant_cards.html",
+    "theme": {
+      "id": "elegant",
+      "name": "Elegant",
+      "colors": {
+        "primary": "#1e293b",
+        "secondary": "#64748b",
+        "text": "#334155",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0369a1",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Playfair Display', 'Georgia', serif",
+        "heading_family": "'Playfair Display', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "cards",
+      "name": "Cards",
+      "description": "Card-based components for each section"
+    },
+    "thumbnail": "thumbnails/elegant_cards.png",
+    "created": "2025-03-31T12:01:29.820551"
+  },
+  "elegant_grid": {
+    "id": "elegant_grid",
+    "filename": "elegant_grid.html",
+    "path": "generated_resumes/elegant_grid.html",
+    "theme": {
+      "id": "elegant",
+      "name": "Elegant",
+      "colors": {
+        "primary": "#1e293b",
+        "secondary": "#64748b",
+        "text": "#334155",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0369a1",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Playfair Display', 'Georgia', serif",
+        "heading_family": "'Playfair Display', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "grid",
+      "name": "Modern Grid",
+      "description": "A responsive grid layout with modern styling"
+    },
+    "thumbnail": "thumbnails/elegant_grid.png",
+    "created": "2025-03-31T12:01:29.827461"
+  },
+  "elegant_portfolio": {
+    "id": "elegant_portfolio",
+    "filename": "elegant_portfolio.html",
+    "path": "generated_resumes/elegant_portfolio.html",
+    "theme": {
+      "id": "elegant",
+      "name": "Elegant",
+      "colors": {
+        "primary": "#1e293b",
+        "secondary": "#64748b",
+        "text": "#334155",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0369a1",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Playfair Display', 'Georgia', serif",
+        "heading_family": "'Playfair Display', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "portfolio",
+      "name": "Portfolio",
+      "description": "Design that highlights projects for creative professionals"
+    },
+    "thumbnail": "thumbnails/elegant_portfolio.png",
+    "created": "2025-03-31T12:01:29.834995"
+  },
+  "elegant_compact": {
+    "id": "elegant_compact",
+    "filename": "elegant_compact.html",
+    "path": "generated_resumes/elegant_compact.html",
+    "theme": {
+      "id": "elegant",
+      "name": "Elegant",
+      "colors": {
+        "primary": "#1e293b",
+        "secondary": "#64748b",
+        "text": "#334155",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0369a1",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Playfair Display', 'Georgia', serif",
+        "heading_family": "'Playfair Display', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "compact",
+      "name": "One-Page Compact",
+      "description": "Compact layout designed to fit everything on one page"
+    },
+    "thumbnail": "thumbnails/elegant_compact.png",
+    "created": "2025-03-31T12:01:29.841790"
+  },
+  "corporate_classic": {
+    "id": "corporate_classic",
+    "filename": "corporate_classic.html",
+    "path": "generated_resumes/corporate_classic.html",
+    "theme": {
+      "id": "corporate",
+      "name": "Corporate",
+      "colors": {
+        "primary": "#0f172a",
+        "secondary": "#475569",
+        "text": "#1e293b",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0284c7",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "classic",
+      "name": "Classic",
+      "description": "Traditional single-column layout"
+    },
+    "thumbnail": "thumbnails/corporate_classic.png",
+    "created": "2025-03-31T12:01:29.847681"
+  },
+  "corporate_modern": {
+    "id": "corporate_modern",
+    "filename": "corporate_modern.html",
+    "path": "generated_resumes/corporate_modern.html",
+    "theme": {
+      "id": "corporate",
+      "name": "Corporate",
+      "colors": {
+        "primary": "#0f172a",
+        "secondary": "#475569",
+        "text": "#1e293b",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0284c7",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "modern",
+      "name": "Modern",
+      "description": "Two-column modern layout"
+    },
+    "thumbnail": "thumbnails/corporate_modern.png",
+    "created": "2025-03-31T12:01:29.853205"
+  },
+  "corporate_sidebar": {
+    "id": "corporate_sidebar",
+    "filename": "corporate_sidebar.html",
+    "path": "generated_resumes/corporate_sidebar.html",
+    "theme": {
+      "id": "corporate",
+      "name": "Corporate",
+      "colors": {
+        "primary": "#0f172a",
+        "secondary": "#475569",
+        "text": "#1e293b",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0284c7",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "description": "Two-column layout with left sidebar"
+    },
+    "thumbnail": "thumbnails/corporate_sidebar.png",
+    "created": "2025-03-31T12:01:29.858761"
+  },
+  "corporate_minimalist": {
+    "id": "corporate_minimalist",
+    "filename": "corporate_minimalist.html",
+    "path": "generated_resumes/corporate_minimalist.html",
+    "theme": {
+      "id": "corporate",
+      "name": "Corporate",
+      "colors": {
+        "primary": "#0f172a",
+        "secondary": "#475569",
+        "text": "#1e293b",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0284c7",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "description": "Clean and minimal single-column layout"
+    },
+    "thumbnail": "thumbnails/corporate_minimalist.png",
+    "created": "2025-03-31T12:01:29.864534"
+  },
+  "corporate_professional": {
+    "id": "corporate_professional",
+    "filename": "corporate_professional.html",
+    "path": "generated_resumes/corporate_professional.html",
+    "theme": {
+      "id": "corporate",
+      "name": "Corporate",
+      "colors": {
+        "primary": "#0f172a",
+        "secondary": "#475569",
+        "text": "#1e293b",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0284c7",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "professional",
+      "name": "Professional",
+      "description": "Professional two-column layout with header"
+    },
+    "thumbnail": "thumbnails/corporate_professional.png",
+    "created": "2025-03-31T12:01:29.869985"
+  },
+  "corporate_timeline": {
+    "id": "corporate_timeline",
+    "filename": "corporate_timeline.html",
+    "path": "generated_resumes/corporate_timeline.html",
+    "theme": {
+      "id": "corporate",
+      "name": "Corporate",
+      "colors": {
+        "primary": "#0f172a",
+        "secondary": "#475569",
+        "text": "#1e293b",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0284c7",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "timeline",
+      "name": "Timeline",
+      "description": "Experience presented as a visual timeline"
+    },
+    "thumbnail": "thumbnails/corporate_timeline.png",
+    "created": "2025-03-31T12:01:29.876731"
+  },
+  "corporate_cards": {
+    "id": "corporate_cards",
+    "filename": "corporate_cards.html",
+    "path": "generated_resumes/corporate_cards.html",
+    "theme": {
+      "id": "corporate",
+      "name": "Corporate",
+      "colors": {
+        "primary": "#0f172a",
+        "secondary": "#475569",
+        "text": "#1e293b",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0284c7",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "cards",
+      "name": "Cards",
+      "description": "Card-based components for each section"
+    },
+    "thumbnail": "thumbnails/corporate_cards.png",
+    "created": "2025-03-31T12:01:29.883793"
+  },
+  "corporate_grid": {
+    "id": "corporate_grid",
+    "filename": "corporate_grid.html",
+    "path": "generated_resumes/corporate_grid.html",
+    "theme": {
+      "id": "corporate",
+      "name": "Corporate",
+      "colors": {
+        "primary": "#0f172a",
+        "secondary": "#475569",
+        "text": "#1e293b",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0284c7",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "grid",
+      "name": "Modern Grid",
+      "description": "A responsive grid layout with modern styling"
+    },
+    "thumbnail": "thumbnails/corporate_grid.png",
+    "created": "2025-03-31T12:01:29.890714"
+  },
+  "corporate_portfolio": {
+    "id": "corporate_portfolio",
+    "filename": "corporate_portfolio.html",
+    "path": "generated_resumes/corporate_portfolio.html",
+    "theme": {
+      "id": "corporate",
+      "name": "Corporate",
+      "colors": {
+        "primary": "#0f172a",
+        "secondary": "#475569",
+        "text": "#1e293b",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0284c7",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "portfolio",
+      "name": "Portfolio",
+      "description": "Design that highlights projects for creative professionals"
+    },
+    "thumbnail": "thumbnails/corporate_portfolio.png",
+    "created": "2025-03-31T12:01:29.897866"
+  },
+  "corporate_compact": {
+    "id": "corporate_compact",
+    "filename": "corporate_compact.html",
+    "path": "generated_resumes/corporate_compact.html",
+    "theme": {
+      "id": "corporate",
+      "name": "Corporate",
+      "colors": {
+        "primary": "#0f172a",
+        "secondary": "#475569",
+        "text": "#1e293b",
+        "text_light": "#64748b",
+        "background": "#ffffff",
+        "accent": "#0284c7",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Roboto', 'Segoe UI', 'Helvetica Neue', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "500"
+      }
+    },
+    "layout": {
+      "id": "compact",
+      "name": "One-Page Compact",
+      "description": "Compact layout designed to fit everything on one page"
+    },
+    "thumbnail": "thumbnails/corporate_compact.png",
+    "created": "2025-03-31T12:01:29.904642"
+  },
+  "tech_classic": {
+    "id": "tech_classic",
+    "filename": "tech_classic.html",
+    "path": "generated_resumes/tech_classic.html",
+    "theme": {
+      "id": "tech",
+      "name": "Tech",
+      "colors": {
+        "primary": "#6b21a8",
+        "secondary": "#6d28d9",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#2dd4bf",
+        "border": "#e4e4e7"
+      },
+      "typography": {
+        "font_family": "'Fira Code', 'Source Code Pro', monospace",
+        "heading_family": "'Montserrat', 'SF Pro Display', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "classic",
+      "name": "Classic",
+      "description": "Traditional single-column layout"
+    },
+    "thumbnail": "thumbnails/tech_classic.png",
+    "created": "2025-03-31T12:01:29.909991"
+  },
+  "tech_modern": {
+    "id": "tech_modern",
+    "filename": "tech_modern.html",
+    "path": "generated_resumes/tech_modern.html",
+    "theme": {
+      "id": "tech",
+      "name": "Tech",
+      "colors": {
+        "primary": "#6b21a8",
+        "secondary": "#6d28d9",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#2dd4bf",
+        "border": "#e4e4e7"
+      },
+      "typography": {
+        "font_family": "'Fira Code', 'Source Code Pro', monospace",
+        "heading_family": "'Montserrat', 'SF Pro Display', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "modern",
+      "name": "Modern",
+      "description": "Two-column modern layout"
+    },
+    "thumbnail": "thumbnails/tech_modern.png",
+    "created": "2025-03-31T12:01:29.916230"
+  },
+  "tech_sidebar": {
+    "id": "tech_sidebar",
+    "filename": "tech_sidebar.html",
+    "path": "generated_resumes/tech_sidebar.html",
+    "theme": {
+      "id": "tech",
+      "name": "Tech",
+      "colors": {
+        "primary": "#6b21a8",
+        "secondary": "#6d28d9",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#2dd4bf",
+        "border": "#e4e4e7"
+      },
+      "typography": {
+        "font_family": "'Fira Code', 'Source Code Pro', monospace",
+        "heading_family": "'Montserrat', 'SF Pro Display', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "description": "Two-column layout with left sidebar"
+    },
+    "thumbnail": "thumbnails/tech_sidebar.png",
+    "created": "2025-03-31T12:01:29.921956"
+  },
+  "tech_minimalist": {
+    "id": "tech_minimalist",
+    "filename": "tech_minimalist.html",
+    "path": "generated_resumes/tech_minimalist.html",
+    "theme": {
+      "id": "tech",
+      "name": "Tech",
+      "colors": {
+        "primary": "#6b21a8",
+        "secondary": "#6d28d9",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#2dd4bf",
+        "border": "#e4e4e7"
+      },
+      "typography": {
+        "font_family": "'Fira Code', 'Source Code Pro', monospace",
+        "heading_family": "'Montserrat', 'SF Pro Display', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "description": "Clean and minimal single-column layout"
+    },
+    "thumbnail": "thumbnails/tech_minimalist.png",
+    "created": "2025-03-31T12:01:29.927522"
+  },
+  "tech_professional": {
+    "id": "tech_professional",
+    "filename": "tech_professional.html",
+    "path": "generated_resumes/tech_professional.html",
+    "theme": {
+      "id": "tech",
+      "name": "Tech",
+      "colors": {
+        "primary": "#6b21a8",
+        "secondary": "#6d28d9",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#2dd4bf",
+        "border": "#e4e4e7"
+      },
+      "typography": {
+        "font_family": "'Fira Code', 'Source Code Pro', monospace",
+        "heading_family": "'Montserrat', 'SF Pro Display', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "professional",
+      "name": "Professional",
+      "description": "Professional two-column layout with header"
+    },
+    "thumbnail": "thumbnails/tech_professional.png",
+    "created": "2025-03-31T12:01:29.933403"
+  },
+  "tech_timeline": {
+    "id": "tech_timeline",
+    "filename": "tech_timeline.html",
+    "path": "generated_resumes/tech_timeline.html",
+    "theme": {
+      "id": "tech",
+      "name": "Tech",
+      "colors": {
+        "primary": "#6b21a8",
+        "secondary": "#6d28d9",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#2dd4bf",
+        "border": "#e4e4e7"
+      },
+      "typography": {
+        "font_family": "'Fira Code', 'Source Code Pro', monospace",
+        "heading_family": "'Montserrat', 'SF Pro Display', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "timeline",
+      "name": "Timeline",
+      "description": "Experience presented as a visual timeline"
+    },
+    "thumbnail": "thumbnails/tech_timeline.png",
+    "created": "2025-03-31T12:01:29.940257"
+  },
+  "tech_cards": {
+    "id": "tech_cards",
+    "filename": "tech_cards.html",
+    "path": "generated_resumes/tech_cards.html",
+    "theme": {
+      "id": "tech",
+      "name": "Tech",
+      "colors": {
+        "primary": "#6b21a8",
+        "secondary": "#6d28d9",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#2dd4bf",
+        "border": "#e4e4e7"
+      },
+      "typography": {
+        "font_family": "'Fira Code', 'Source Code Pro', monospace",
+        "heading_family": "'Montserrat', 'SF Pro Display', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "cards",
+      "name": "Cards",
+      "description": "Card-based components for each section"
+    },
+    "thumbnail": "thumbnails/tech_cards.png",
+    "created": "2025-03-31T12:01:29.947393"
+  },
+  "tech_grid": {
+    "id": "tech_grid",
+    "filename": "tech_grid.html",
+    "path": "generated_resumes/tech_grid.html",
+    "theme": {
+      "id": "tech",
+      "name": "Tech",
+      "colors": {
+        "primary": "#6b21a8",
+        "secondary": "#6d28d9",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#2dd4bf",
+        "border": "#e4e4e7"
+      },
+      "typography": {
+        "font_family": "'Fira Code', 'Source Code Pro', monospace",
+        "heading_family": "'Montserrat', 'SF Pro Display', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "grid",
+      "name": "Modern Grid",
+      "description": "A responsive grid layout with modern styling"
+    },
+    "thumbnail": "thumbnails/tech_grid.png",
+    "created": "2025-03-31T12:01:29.954395"
+  },
+  "tech_portfolio": {
+    "id": "tech_portfolio",
+    "filename": "tech_portfolio.html",
+    "path": "generated_resumes/tech_portfolio.html",
+    "theme": {
+      "id": "tech",
+      "name": "Tech",
+      "colors": {
+        "primary": "#6b21a8",
+        "secondary": "#6d28d9",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#2dd4bf",
+        "border": "#e4e4e7"
+      },
+      "typography": {
+        "font_family": "'Fira Code', 'Source Code Pro', monospace",
+        "heading_family": "'Montserrat', 'SF Pro Display', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "portfolio",
+      "name": "Portfolio",
+      "description": "Design that highlights projects for creative professionals"
+    },
+    "thumbnail": "thumbnails/tech_portfolio.png",
+    "created": "2025-03-31T12:01:29.961314"
+  },
+  "tech_compact": {
+    "id": "tech_compact",
+    "filename": "tech_compact.html",
+    "path": "generated_resumes/tech_compact.html",
+    "theme": {
+      "id": "tech",
+      "name": "Tech",
+      "colors": {
+        "primary": "#6b21a8",
+        "secondary": "#6d28d9",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#2dd4bf",
+        "border": "#e4e4e7"
+      },
+      "typography": {
+        "font_family": "'Fira Code', 'Source Code Pro', monospace",
+        "heading_family": "'Montserrat', 'SF Pro Display', sans-serif",
+        "base_size": "14px",
+        "line_height": "1.6",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "compact",
+      "name": "One-Page Compact",
+      "description": "Compact layout designed to fit everything on one page"
+    },
+    "thumbnail": "thumbnails/tech_compact.png",
+    "created": "2025-03-31T12:01:29.968765"
+  },
+  "creative_classic": {
+    "id": "creative_classic",
+    "filename": "creative_classic.html",
+    "path": "generated_resumes/creative_classic.html",
+    "theme": {
+      "id": "creative",
+      "name": "Creative",
+      "colors": {
+        "primary": "#ec4899",
+        "secondary": "#8b5cf6",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#fcd34d",
+        "border": "#f3f4f6"
+      },
+      "typography": {
+        "font_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "classic",
+      "name": "Classic",
+      "description": "Traditional single-column layout"
+    },
+    "thumbnail": "thumbnails/creative_classic.png",
+    "created": "2025-03-31T12:01:29.974204"
+  },
+  "creative_modern": {
+    "id": "creative_modern",
+    "filename": "creative_modern.html",
+    "path": "generated_resumes/creative_modern.html",
+    "theme": {
+      "id": "creative",
+      "name": "Creative",
+      "colors": {
+        "primary": "#ec4899",
+        "secondary": "#8b5cf6",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#fcd34d",
+        "border": "#f3f4f6"
+      },
+      "typography": {
+        "font_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "modern",
+      "name": "Modern",
+      "description": "Two-column modern layout"
+    },
+    "thumbnail": "thumbnails/creative_modern.png",
+    "created": "2025-03-31T12:01:29.980134"
+  },
+  "creative_sidebar": {
+    "id": "creative_sidebar",
+    "filename": "creative_sidebar.html",
+    "path": "generated_resumes/creative_sidebar.html",
+    "theme": {
+      "id": "creative",
+      "name": "Creative",
+      "colors": {
+        "primary": "#ec4899",
+        "secondary": "#8b5cf6",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#fcd34d",
+        "border": "#f3f4f6"
+      },
+      "typography": {
+        "font_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "description": "Two-column layout with left sidebar"
+    },
+    "thumbnail": "thumbnails/creative_sidebar.png",
+    "created": "2025-03-31T12:01:29.985804"
+  },
+  "creative_minimalist": {
+    "id": "creative_minimalist",
+    "filename": "creative_minimalist.html",
+    "path": "generated_resumes/creative_minimalist.html",
+    "theme": {
+      "id": "creative",
+      "name": "Creative",
+      "colors": {
+        "primary": "#ec4899",
+        "secondary": "#8b5cf6",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#fcd34d",
+        "border": "#f3f4f6"
+      },
+      "typography": {
+        "font_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "description": "Clean and minimal single-column layout"
+    },
+    "thumbnail": "thumbnails/creative_minimalist.png",
+    "created": "2025-03-31T12:01:29.991291"
+  },
+  "creative_professional": {
+    "id": "creative_professional",
+    "filename": "creative_professional.html",
+    "path": "generated_resumes/creative_professional.html",
+    "theme": {
+      "id": "creative",
+      "name": "Creative",
+      "colors": {
+        "primary": "#ec4899",
+        "secondary": "#8b5cf6",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#fcd34d",
+        "border": "#f3f4f6"
+      },
+      "typography": {
+        "font_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "professional",
+      "name": "Professional",
+      "description": "Professional two-column layout with header"
+    },
+    "thumbnail": "thumbnails/creative_professional.png",
+    "created": "2025-03-31T12:01:29.997508"
+  },
+  "creative_timeline": {
+    "id": "creative_timeline",
+    "filename": "creative_timeline.html",
+    "path": "generated_resumes/creative_timeline.html",
+    "theme": {
+      "id": "creative",
+      "name": "Creative",
+      "colors": {
+        "primary": "#ec4899",
+        "secondary": "#8b5cf6",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#fcd34d",
+        "border": "#f3f4f6"
+      },
+      "typography": {
+        "font_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "timeline",
+      "name": "Timeline",
+      "description": "Experience presented as a visual timeline"
+    },
+    "thumbnail": "thumbnails/creative_timeline.png",
+    "created": "2025-03-31T12:01:30.004399"
+  },
+  "creative_cards": {
+    "id": "creative_cards",
+    "filename": "creative_cards.html",
+    "path": "generated_resumes/creative_cards.html",
+    "theme": {
+      "id": "creative",
+      "name": "Creative",
+      "colors": {
+        "primary": "#ec4899",
+        "secondary": "#8b5cf6",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#fcd34d",
+        "border": "#f3f4f6"
+      },
+      "typography": {
+        "font_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "cards",
+      "name": "Cards",
+      "description": "Card-based components for each section"
+    },
+    "thumbnail": "thumbnails/creative_cards.png",
+    "created": "2025-03-31T12:01:30.010961"
+  },
+  "creative_grid": {
+    "id": "creative_grid",
+    "filename": "creative_grid.html",
+    "path": "generated_resumes/creative_grid.html",
+    "theme": {
+      "id": "creative",
+      "name": "Creative",
+      "colors": {
+        "primary": "#ec4899",
+        "secondary": "#8b5cf6",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#fcd34d",
+        "border": "#f3f4f6"
+      },
+      "typography": {
+        "font_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "grid",
+      "name": "Modern Grid",
+      "description": "A responsive grid layout with modern styling"
+    },
+    "thumbnail": "thumbnails/creative_grid.png",
+    "created": "2025-03-31T12:01:30.018446"
+  },
+  "creative_portfolio": {
+    "id": "creative_portfolio",
+    "filename": "creative_portfolio.html",
+    "path": "generated_resumes/creative_portfolio.html",
+    "theme": {
+      "id": "creative",
+      "name": "Creative",
+      "colors": {
+        "primary": "#ec4899",
+        "secondary": "#8b5cf6",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#fcd34d",
+        "border": "#f3f4f6"
+      },
+      "typography": {
+        "font_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "portfolio",
+      "name": "Portfolio",
+      "description": "Design that highlights projects for creative professionals"
+    },
+    "thumbnail": "thumbnails/creative_portfolio.png",
+    "created": "2025-03-31T12:01:30.025238"
+  },
+  "creative_compact": {
+    "id": "creative_compact",
+    "filename": "creative_compact.html",
+    "path": "generated_resumes/creative_compact.html",
+    "theme": {
+      "id": "creative",
+      "name": "Creative",
+      "colors": {
+        "primary": "#ec4899",
+        "secondary": "#8b5cf6",
+        "text": "#18181b",
+        "text_light": "#71717a",
+        "background": "#ffffff",
+        "accent": "#fcd34d",
+        "border": "#f3f4f6"
+      },
+      "typography": {
+        "font_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Poppins', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "compact",
+      "name": "One-Page Compact",
+      "description": "Compact layout designed to fit everything on one page"
+    },
+    "thumbnail": "thumbnails/creative_compact.png",
+    "created": "2025-03-31T12:01:30.032556"
+  },
+  "dark_classic": {
+    "id": "dark_classic",
+    "filename": "dark_classic.html",
+    "path": "generated_resumes/dark_classic.html",
+    "theme": {
+      "id": "dark",
+      "name": "Dark Mode",
+      "colors": {
+        "primary": "#60a5fa",
+        "secondary": "#93c5fd",
+        "text": "#e5e7eb",
+        "text_light": "#9ca3af",
+        "background": "#1f2937",
+        "accent": "#f472b6",
+        "border": "#374151"
+      },
+      "typography": {
+        "font_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "classic",
+      "name": "Classic",
+      "description": "Traditional single-column layout"
+    },
+    "thumbnail": "thumbnails/dark_classic.png",
+    "created": "2025-03-31T12:01:30.037840"
+  },
+  "dark_modern": {
+    "id": "dark_modern",
+    "filename": "dark_modern.html",
+    "path": "generated_resumes/dark_modern.html",
+    "theme": {
+      "id": "dark",
+      "name": "Dark Mode",
+      "colors": {
+        "primary": "#60a5fa",
+        "secondary": "#93c5fd",
+        "text": "#e5e7eb",
+        "text_light": "#9ca3af",
+        "background": "#1f2937",
+        "accent": "#f472b6",
+        "border": "#374151"
+      },
+      "typography": {
+        "font_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "modern",
+      "name": "Modern",
+      "description": "Two-column modern layout"
+    },
+    "thumbnail": "thumbnails/dark_modern.png",
+    "created": "2025-03-31T12:01:30.043234"
+  },
+  "dark_sidebar": {
+    "id": "dark_sidebar",
+    "filename": "dark_sidebar.html",
+    "path": "generated_resumes/dark_sidebar.html",
+    "theme": {
+      "id": "dark",
+      "name": "Dark Mode",
+      "colors": {
+        "primary": "#60a5fa",
+        "secondary": "#93c5fd",
+        "text": "#e5e7eb",
+        "text_light": "#9ca3af",
+        "background": "#1f2937",
+        "accent": "#f472b6",
+        "border": "#374151"
+      },
+      "typography": {
+        "font_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "description": "Two-column layout with left sidebar"
+    },
+    "thumbnail": "thumbnails/dark_sidebar.png",
+    "created": "2025-03-31T12:01:30.049167"
+  },
+  "dark_minimalist": {
+    "id": "dark_minimalist",
+    "filename": "dark_minimalist.html",
+    "path": "generated_resumes/dark_minimalist.html",
+    "theme": {
+      "id": "dark",
+      "name": "Dark Mode",
+      "colors": {
+        "primary": "#60a5fa",
+        "secondary": "#93c5fd",
+        "text": "#e5e7eb",
+        "text_light": "#9ca3af",
+        "background": "#1f2937",
+        "accent": "#f472b6",
+        "border": "#374151"
+      },
+      "typography": {
+        "font_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "description": "Clean and minimal single-column layout"
+    },
+    "thumbnail": "thumbnails/dark_minimalist.png",
+    "created": "2025-03-31T12:01:30.054612"
+  },
+  "dark_professional": {
+    "id": "dark_professional",
+    "filename": "dark_professional.html",
+    "path": "generated_resumes/dark_professional.html",
+    "theme": {
+      "id": "dark",
+      "name": "Dark Mode",
+      "colors": {
+        "primary": "#60a5fa",
+        "secondary": "#93c5fd",
+        "text": "#e5e7eb",
+        "text_light": "#9ca3af",
+        "background": "#1f2937",
+        "accent": "#f472b6",
+        "border": "#374151"
+      },
+      "typography": {
+        "font_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "professional",
+      "name": "Professional",
+      "description": "Professional two-column layout with header"
+    },
+    "thumbnail": "thumbnails/dark_professional.png",
+    "created": "2025-03-31T12:01:30.059986"
+  },
+  "dark_timeline": {
+    "id": "dark_timeline",
+    "filename": "dark_timeline.html",
+    "path": "generated_resumes/dark_timeline.html",
+    "theme": {
+      "id": "dark",
+      "name": "Dark Mode",
+      "colors": {
+        "primary": "#60a5fa",
+        "secondary": "#93c5fd",
+        "text": "#e5e7eb",
+        "text_light": "#9ca3af",
+        "background": "#1f2937",
+        "accent": "#f472b6",
+        "border": "#374151"
+      },
+      "typography": {
+        "font_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "timeline",
+      "name": "Timeline",
+      "description": "Experience presented as a visual timeline"
+    },
+    "thumbnail": "thumbnails/dark_timeline.png",
+    "created": "2025-03-31T12:01:30.067269"
+  },
+  "dark_cards": {
+    "id": "dark_cards",
+    "filename": "dark_cards.html",
+    "path": "generated_resumes/dark_cards.html",
+    "theme": {
+      "id": "dark",
+      "name": "Dark Mode",
+      "colors": {
+        "primary": "#60a5fa",
+        "secondary": "#93c5fd",
+        "text": "#e5e7eb",
+        "text_light": "#9ca3af",
+        "background": "#1f2937",
+        "accent": "#f472b6",
+        "border": "#374151"
+      },
+      "typography": {
+        "font_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "cards",
+      "name": "Cards",
+      "description": "Card-based components for each section"
+    },
+    "thumbnail": "thumbnails/dark_cards.png",
+    "created": "2025-03-31T12:01:30.073750"
+  },
+  "dark_grid": {
+    "id": "dark_grid",
+    "filename": "dark_grid.html",
+    "path": "generated_resumes/dark_grid.html",
+    "theme": {
+      "id": "dark",
+      "name": "Dark Mode",
+      "colors": {
+        "primary": "#60a5fa",
+        "secondary": "#93c5fd",
+        "text": "#e5e7eb",
+        "text_light": "#9ca3af",
+        "background": "#1f2937",
+        "accent": "#f472b6",
+        "border": "#374151"
+      },
+      "typography": {
+        "font_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "grid",
+      "name": "Modern Grid",
+      "description": "A responsive grid layout with modern styling"
+    },
+    "thumbnail": "thumbnails/dark_grid.png",
+    "created": "2025-03-31T12:01:30.081215"
+  },
+  "dark_portfolio": {
+    "id": "dark_portfolio",
+    "filename": "dark_portfolio.html",
+    "path": "generated_resumes/dark_portfolio.html",
+    "theme": {
+      "id": "dark",
+      "name": "Dark Mode",
+      "colors": {
+        "primary": "#60a5fa",
+        "secondary": "#93c5fd",
+        "text": "#e5e7eb",
+        "text_light": "#9ca3af",
+        "background": "#1f2937",
+        "accent": "#f472b6",
+        "border": "#374151"
+      },
+      "typography": {
+        "font_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "portfolio",
+      "name": "Portfolio",
+      "description": "Design that highlights projects for creative professionals"
+    },
+    "thumbnail": "thumbnails/dark_portfolio.png",
+    "created": "2025-03-31T12:01:30.088116"
+  },
+  "dark_compact": {
+    "id": "dark_compact",
+    "filename": "dark_compact.html",
+    "path": "generated_resumes/dark_compact.html",
+    "theme": {
+      "id": "dark",
+      "name": "Dark Mode",
+      "colors": {
+        "primary": "#60a5fa",
+        "secondary": "#93c5fd",
+        "text": "#e5e7eb",
+        "text_light": "#9ca3af",
+        "background": "#1f2937",
+        "accent": "#f472b6",
+        "border": "#374151"
+      },
+      "typography": {
+        "font_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "heading_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "compact",
+      "name": "One-Page Compact",
+      "description": "Compact layout designed to fit everything on one page"
+    },
+    "thumbnail": "thumbnails/dark_compact.png",
+    "created": "2025-03-31T12:01:30.095438"
+  },
+  "vintage_classic": {
+    "id": "vintage_classic",
+    "filename": "vintage_classic.html",
+    "path": "generated_resumes/vintage_classic.html",
+    "theme": {
+      "id": "vintage",
+      "name": "Vintage",
+      "colors": {
+        "primary": "#854d0e",
+        "secondary": "#a16207",
+        "text": "#44403c",
+        "text_light": "#78716c",
+        "background": "#faf7f5",
+        "accent": "#b45309",
+        "border": "#e7e5e4"
+      },
+      "typography": {
+        "font_family": "'Libre Baskerville', 'Georgia', serif",
+        "heading_family": "'Libre Baskerville', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "classic",
+      "name": "Classic",
+      "description": "Traditional single-column layout"
+    },
+    "thumbnail": "thumbnails/vintage_classic.png",
+    "created": "2025-03-31T12:01:30.100842"
+  },
+  "vintage_modern": {
+    "id": "vintage_modern",
+    "filename": "vintage_modern.html",
+    "path": "generated_resumes/vintage_modern.html",
+    "theme": {
+      "id": "vintage",
+      "name": "Vintage",
+      "colors": {
+        "primary": "#854d0e",
+        "secondary": "#a16207",
+        "text": "#44403c",
+        "text_light": "#78716c",
+        "background": "#faf7f5",
+        "accent": "#b45309",
+        "border": "#e7e5e4"
+      },
+      "typography": {
+        "font_family": "'Libre Baskerville', 'Georgia', serif",
+        "heading_family": "'Libre Baskerville', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "modern",
+      "name": "Modern",
+      "description": "Two-column modern layout"
+    },
+    "thumbnail": "thumbnails/vintage_modern.png",
+    "created": "2025-03-31T12:01:30.106286"
+  },
+  "vintage_sidebar": {
+    "id": "vintage_sidebar",
+    "filename": "vintage_sidebar.html",
+    "path": "generated_resumes/vintage_sidebar.html",
+    "theme": {
+      "id": "vintage",
+      "name": "Vintage",
+      "colors": {
+        "primary": "#854d0e",
+        "secondary": "#a16207",
+        "text": "#44403c",
+        "text_light": "#78716c",
+        "background": "#faf7f5",
+        "accent": "#b45309",
+        "border": "#e7e5e4"
+      },
+      "typography": {
+        "font_family": "'Libre Baskerville', 'Georgia', serif",
+        "heading_family": "'Libre Baskerville', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "description": "Two-column layout with left sidebar"
+    },
+    "thumbnail": "thumbnails/vintage_sidebar.png",
+    "created": "2025-03-31T12:01:30.112210"
+  },
+  "vintage_minimalist": {
+    "id": "vintage_minimalist",
+    "filename": "vintage_minimalist.html",
+    "path": "generated_resumes/vintage_minimalist.html",
+    "theme": {
+      "id": "vintage",
+      "name": "Vintage",
+      "colors": {
+        "primary": "#854d0e",
+        "secondary": "#a16207",
+        "text": "#44403c",
+        "text_light": "#78716c",
+        "background": "#faf7f5",
+        "accent": "#b45309",
+        "border": "#e7e5e4"
+      },
+      "typography": {
+        "font_family": "'Libre Baskerville', 'Georgia', serif",
+        "heading_family": "'Libre Baskerville', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "description": "Clean and minimal single-column layout"
+    },
+    "thumbnail": "thumbnails/vintage_minimalist.png",
+    "created": "2025-03-31T12:01:30.117783"
+  },
+  "vintage_professional": {
+    "id": "vintage_professional",
+    "filename": "vintage_professional.html",
+    "path": "generated_resumes/vintage_professional.html",
+    "theme": {
+      "id": "vintage",
+      "name": "Vintage",
+      "colors": {
+        "primary": "#854d0e",
+        "secondary": "#a16207",
+        "text": "#44403c",
+        "text_light": "#78716c",
+        "background": "#faf7f5",
+        "accent": "#b45309",
+        "border": "#e7e5e4"
+      },
+      "typography": {
+        "font_family": "'Libre Baskerville', 'Georgia', serif",
+        "heading_family": "'Libre Baskerville', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "professional",
+      "name": "Professional",
+      "description": "Professional two-column layout with header"
+    },
+    "thumbnail": "thumbnails/vintage_professional.png",
+    "created": "2025-03-31T12:01:30.123366"
+  },
+  "vintage_timeline": {
+    "id": "vintage_timeline",
+    "filename": "vintage_timeline.html",
+    "path": "generated_resumes/vintage_timeline.html",
+    "theme": {
+      "id": "vintage",
+      "name": "Vintage",
+      "colors": {
+        "primary": "#854d0e",
+        "secondary": "#a16207",
+        "text": "#44403c",
+        "text_light": "#78716c",
+        "background": "#faf7f5",
+        "accent": "#b45309",
+        "border": "#e7e5e4"
+      },
+      "typography": {
+        "font_family": "'Libre Baskerville', 'Georgia', serif",
+        "heading_family": "'Libre Baskerville', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "timeline",
+      "name": "Timeline",
+      "description": "Experience presented as a visual timeline"
+    },
+    "thumbnail": "thumbnails/vintage_timeline.png",
+    "created": "2025-03-31T12:01:30.130681"
+  },
+  "vintage_cards": {
+    "id": "vintage_cards",
+    "filename": "vintage_cards.html",
+    "path": "generated_resumes/vintage_cards.html",
+    "theme": {
+      "id": "vintage",
+      "name": "Vintage",
+      "colors": {
+        "primary": "#854d0e",
+        "secondary": "#a16207",
+        "text": "#44403c",
+        "text_light": "#78716c",
+        "background": "#faf7f5",
+        "accent": "#b45309",
+        "border": "#e7e5e4"
+      },
+      "typography": {
+        "font_family": "'Libre Baskerville', 'Georgia', serif",
+        "heading_family": "'Libre Baskerville', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "cards",
+      "name": "Cards",
+      "description": "Card-based components for each section"
+    },
+    "thumbnail": "thumbnails/vintage_cards.png",
+    "created": "2025-03-31T12:01:30.137260"
+  },
+  "vintage_grid": {
+    "id": "vintage_grid",
+    "filename": "vintage_grid.html",
+    "path": "generated_resumes/vintage_grid.html",
+    "theme": {
+      "id": "vintage",
+      "name": "Vintage",
+      "colors": {
+        "primary": "#854d0e",
+        "secondary": "#a16207",
+        "text": "#44403c",
+        "text_light": "#78716c",
+        "background": "#faf7f5",
+        "accent": "#b45309",
+        "border": "#e7e5e4"
+      },
+      "typography": {
+        "font_family": "'Libre Baskerville', 'Georgia', serif",
+        "heading_family": "'Libre Baskerville', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "grid",
+      "name": "Modern Grid",
+      "description": "A responsive grid layout with modern styling"
+    },
+    "thumbnail": "thumbnails/vintage_grid.png",
+    "created": "2025-03-31T12:01:30.144127"
+  },
+  "vintage_portfolio": {
+    "id": "vintage_portfolio",
+    "filename": "vintage_portfolio.html",
+    "path": "generated_resumes/vintage_portfolio.html",
+    "theme": {
+      "id": "vintage",
+      "name": "Vintage",
+      "colors": {
+        "primary": "#854d0e",
+        "secondary": "#a16207",
+        "text": "#44403c",
+        "text_light": "#78716c",
+        "background": "#faf7f5",
+        "accent": "#b45309",
+        "border": "#e7e5e4"
+      },
+      "typography": {
+        "font_family": "'Libre Baskerville', 'Georgia', serif",
+        "heading_family": "'Libre Baskerville', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "portfolio",
+      "name": "Portfolio",
+      "description": "Design that highlights projects for creative professionals"
+    },
+    "thumbnail": "thumbnails/vintage_portfolio.png",
+    "created": "2025-03-31T12:01:30.151277"
+  },
+  "vintage_compact": {
+    "id": "vintage_compact",
+    "filename": "vintage_compact.html",
+    "path": "generated_resumes/vintage_compact.html",
+    "theme": {
+      "id": "vintage",
+      "name": "Vintage",
+      "colors": {
+        "primary": "#854d0e",
+        "secondary": "#a16207",
+        "text": "#44403c",
+        "text_light": "#78716c",
+        "background": "#faf7f5",
+        "accent": "#b45309",
+        "border": "#e7e5e4"
+      },
+      "typography": {
+        "font_family": "'Libre Baskerville', 'Georgia', serif",
+        "heading_family": "'Libre Baskerville', 'Georgia', serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "700"
+      }
+    },
+    "layout": {
+      "id": "compact",
+      "name": "One-Page Compact",
+      "description": "Compact layout designed to fit everything on one page"
+    },
+    "thumbnail": "thumbnails/vintage_compact.png",
+    "created": "2025-03-31T12:01:30.158087"
+  },
+  "gradient_classic": {
+    "id": "gradient_classic",
+    "filename": "gradient_classic.html",
+    "path": "generated_resumes/gradient_classic.html",
+    "theme": {
+      "id": "gradient",
+      "name": "Gradient",
+      "colors": {
+        "primary": "#4f46e5",
+        "secondary": "#7c3aed",
+        "text": "#111827",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#3b82f6",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "classic",
+      "name": "Classic",
+      "description": "Traditional single-column layout"
+    },
+    "thumbnail": "thumbnails/gradient_classic.png",
+    "created": "2025-03-31T12:01:30.164092"
+  },
+  "gradient_modern": {
+    "id": "gradient_modern",
+    "filename": "gradient_modern.html",
+    "path": "generated_resumes/gradient_modern.html",
+    "theme": {
+      "id": "gradient",
+      "name": "Gradient",
+      "colors": {
+        "primary": "#4f46e5",
+        "secondary": "#7c3aed",
+        "text": "#111827",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#3b82f6",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "modern",
+      "name": "Modern",
+      "description": "Two-column modern layout"
+    },
+    "thumbnail": "thumbnails/gradient_modern.png",
+    "created": "2025-03-31T12:01:30.169689"
+  },
+  "gradient_sidebar": {
+    "id": "gradient_sidebar",
+    "filename": "gradient_sidebar.html",
+    "path": "generated_resumes/gradient_sidebar.html",
+    "theme": {
+      "id": "gradient",
+      "name": "Gradient",
+      "colors": {
+        "primary": "#4f46e5",
+        "secondary": "#7c3aed",
+        "text": "#111827",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#3b82f6",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "description": "Two-column layout with left sidebar"
+    },
+    "thumbnail": "thumbnails/gradient_sidebar.png",
+    "created": "2025-03-31T12:01:30.175445"
+  },
+  "gradient_minimalist": {
+    "id": "gradient_minimalist",
+    "filename": "gradient_minimalist.html",
+    "path": "generated_resumes/gradient_minimalist.html",
+    "theme": {
+      "id": "gradient",
+      "name": "Gradient",
+      "colors": {
+        "primary": "#4f46e5",
+        "secondary": "#7c3aed",
+        "text": "#111827",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#3b82f6",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "minimalist",
+      "name": "Minimalist",
+      "description": "Clean and minimal single-column layout"
+    },
+    "thumbnail": "thumbnails/gradient_minimalist.png",
+    "created": "2025-03-31T12:01:30.181682"
+  },
+  "gradient_professional": {
+    "id": "gradient_professional",
+    "filename": "gradient_professional.html",
+    "path": "generated_resumes/gradient_professional.html",
+    "theme": {
+      "id": "gradient",
+      "name": "Gradient",
+      "colors": {
+        "primary": "#4f46e5",
+        "secondary": "#7c3aed",
+        "text": "#111827",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#3b82f6",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "professional",
+      "name": "Professional",
+      "description": "Professional two-column layout with header"
+    },
+    "thumbnail": "thumbnails/gradient_professional.png",
+    "created": "2025-03-31T12:01:30.187162"
+  },
+  "gradient_timeline": {
+    "id": "gradient_timeline",
+    "filename": "gradient_timeline.html",
+    "path": "generated_resumes/gradient_timeline.html",
+    "theme": {
+      "id": "gradient",
+      "name": "Gradient",
+      "colors": {
+        "primary": "#4f46e5",
+        "secondary": "#7c3aed",
+        "text": "#111827",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#3b82f6",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "timeline",
+      "name": "Timeline",
+      "description": "Experience presented as a visual timeline"
+    },
+    "thumbnail": "thumbnails/gradient_timeline.png",
+    "created": "2025-03-31T12:01:30.194132"
+  },
+  "gradient_cards": {
+    "id": "gradient_cards",
+    "filename": "gradient_cards.html",
+    "path": "generated_resumes/gradient_cards.html",
+    "theme": {
+      "id": "gradient",
+      "name": "Gradient",
+      "colors": {
+        "primary": "#4f46e5",
+        "secondary": "#7c3aed",
+        "text": "#111827",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#3b82f6",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "cards",
+      "name": "Cards",
+      "description": "Card-based components for each section"
+    },
+    "thumbnail": "thumbnails/gradient_cards.png",
+    "created": "2025-03-31T12:01:30.201036"
+  },
+  "gradient_grid": {
+    "id": "gradient_grid",
+    "filename": "gradient_grid.html",
+    "path": "generated_resumes/gradient_grid.html",
+    "theme": {
+      "id": "gradient",
+      "name": "Gradient",
+      "colors": {
+        "primary": "#4f46e5",
+        "secondary": "#7c3aed",
+        "text": "#111827",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#3b82f6",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "grid",
+      "name": "Modern Grid",
+      "description": "A responsive grid layout with modern styling"
+    },
+    "thumbnail": "thumbnails/gradient_grid.png",
+    "created": "2025-03-31T12:01:30.208074"
+  },
+  "gradient_portfolio": {
+    "id": "gradient_portfolio",
+    "filename": "gradient_portfolio.html",
+    "path": "generated_resumes/gradient_portfolio.html",
+    "theme": {
+      "id": "gradient",
+      "name": "Gradient",
+      "colors": {
+        "primary": "#4f46e5",
+        "secondary": "#7c3aed",
+        "text": "#111827",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#3b82f6",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "portfolio",
+      "name": "Portfolio",
+      "description": "Design that highlights projects for creative professionals"
+    },
+    "thumbnail": "thumbnails/gradient_portfolio.png",
+    "created": "2025-03-31T12:01:30.215205"
+  },
+  "gradient_compact": {
+    "id": "gradient_compact",
+    "filename": "gradient_compact.html",
+    "path": "generated_resumes/gradient_compact.html",
+    "theme": {
+      "id": "gradient",
+      "name": "Gradient",
+      "colors": {
+        "primary": "#4f46e5",
+        "secondary": "#7c3aed",
+        "text": "#111827",
+        "text_light": "#6b7280",
+        "background": "#ffffff",
+        "accent": "#3b82f6",
+        "border": "#e5e7eb"
+      },
+      "typography": {
+        "font_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "heading_family": "'Raleway', 'Helvetica Neue', sans-serif",
+        "base_size": "15px",
+        "line_height": "1.7",
+        "heading_weight": "600"
+      }
+    },
+    "layout": {
+      "id": "compact",
+      "name": "One-Page Compact",
+      "description": "Compact layout designed to fit everything on one page"
+    },
+    "thumbnail": "thumbnails/gradient_compact.png",
+    "created": "2025-03-31T12:01:30.222136"
+  }
+}
