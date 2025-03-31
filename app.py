@@ -15,7 +15,8 @@ from flask_wtf.csrf import CSRFProtect, CSRFError
 
 os.environ['DYLD_LIBRARY_PATH'] = '/opt/homebrew/lib:' + os.environ.get('DYLD_LIBRARY_PATH', '')
 
-app = Flask(__name__)
+app = Flask(__name__,template_folder="pages")
+
 csrf = CSRFProtect(app)
 load_dotenv(dotenv_path='python-dotenv.env')
 
