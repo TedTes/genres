@@ -556,13 +556,13 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             
             <div class="templates-list">
-                {% for template_id, template in templates.items() %}
+                {% for template in templates %}
                 <div class="template-option">
-                    <input type="radio" name="template" id="template-{{ template_id }}" 
-                        value="{{ template_id }}" {% if selected_template == template_id %}checked{% endif %}
+                    <input type="radio" name="template" id="template-{{ template.id }}" 
+                        value="{{ template.id }}" {% if selected_template == template.id %}checked{% endif %}
                         onchange="document.getElementById('template-form').submit();">
-                    <label for="template-{{ template_id }}" class="template-label" data-template-name="{{ template.name }}">
-                        <div class="template-color-indicator {{ template_id }}">
+                    <label for="template-{{ template.id }}" class="template-label" data-template-name="{{ template.name }}">
+                        <div class="template-color-indicator {{ template.theme_id }}">
                             <img src="{{ template.thumbnail_url }}" alt="{{ template.name }} Thumbnail" class="template-thumbnail">
                         </div>
                         <div class="template-info">
