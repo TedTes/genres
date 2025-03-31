@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app,request, abort,jsonify,render_template,flash,request,redirect,url_for,send_file,session,make_response
+from flask import Blueprint, current_app,request,Response, abort,jsonify,render_template,flash,request,redirect,url_for,send_file,session,make_response
 from flask_login import login_user,  current_user, login_required
 from weasyprint import HTML, CSS
 from template_registry import TemplateRegistry
@@ -8,13 +8,12 @@ import json
 from models import Job, Resume,Application
 from sqlalchemy.orm import attributes
 from datetime import datetime
-from helpers import analyze_job_description,extract_skills_from_text
+from helpers import analyze_job_description,extract_skills_from_text,generate_resume
 from forms import ContactForm,SummaryForm,ExperienceForm,EducationForm,SkillsForm
 from db import db
 
 resume_bp = Blueprint("resume", __name__)
-
-
+template_registry = TemplateRegistry('pages/templates')
 
 @resume_bp.route('/resume/start/<int:job_id>')
 @login_required
@@ -237,7 +236,7 @@ def resume_skills(resume_id):
     if form.validate_on_submit() and form.skills.data :
         if resume.resume_data is None:
             resume.resume_data = {}
-        resume.resume_data['skills'] = form.skills.data
+        resume.resume_data['skills'] = [skill.strip() for skill in form.skills.data.split(',')] if form.skills.data else []
         attributes.flag_modified(resume, 'resume_data')
         try:
             db.session.commit()
@@ -268,14 +267,13 @@ def resume_preview(resume_id):
         abort(403)
     
     # Get all available templates
-    template_registry = TemplateRegistry('./templates')
     templates = template_registry.get_all_templates()
-    
+
     return render_template(
         'resume_preview.html', 
         resume=resume,
         templates=templates,
-        selected_template=resume.template or '1'  # Default to modern if none selected
+        selected_template=resume.template or 'professional_classic'  # Default to professional_classic if none selected
     )
 @resume_bp.route('/resume/<int:resume_id>/download')
 @login_required
@@ -285,23 +283,13 @@ def download_resume(resume_id):
     if resume.user_id != current_user.id:
         abort(403)
     
-    # Get template ID
-    template_id = resume.template or '1'
-    
     try:
         
-        # Generate absolute CSS file path
-        css_path = os.path.join(current_app.root_path, 'static', 'css', 'templates', template_id, 'style.css')
-        
-        with open(css_path, 'r') as f:
-            css_content = f.read()
-        # Render HTML template without embedded CSS
-        html_string = render_template(
-            f'{template_id}/template.html',
-            resume=resume.resume_data,
-            template=template_id,
-            css_content=css_content
-        )
+        template_id = resume.template or 'professional_classic'
+        template = template_registry.get_template(template_id)
+
+        html_string  = generate_resume(template['theme']['id'],template['layout']['id'],resume.resume_data)
+        # Render the resume template
         # Create a BytesIO object to store the PDF
         pdf_file = BytesIO()
         
@@ -334,7 +322,7 @@ def update_resume_template(resume_id):
     
     # Get the selected template
     template = request.form.get('template')
-    
+
     # Update the resume with the new template
     if template:
         resume.template = template
@@ -349,15 +337,15 @@ def resume_render(resume_id):
     resume = Resume.query.get_or_404(resume_id)
     if resume.user_id != current_user.id:
         abort(403)
-    
+
     # Default to standard template if none specified
-    template_id = resume.template or '1'
+    template_id = resume.template or 'professional_classic'
+    template = template_registry.get_template(template_id)
+
+    html_output  = generate_resume(template['theme']['id'],template['layout']['id'],resume.resume_data)
     # Render the resume template
-    return render_template(
-        f'{template_id}/template.html',
-        resume=resume.resume_data,
-        template=template_id
-    )
+    return Response(html_output, mimetype="text/html")
+
 
 @resume_bp.route('/resume/<int:resume_id>/delete', methods=['POST'])
 @login_required
