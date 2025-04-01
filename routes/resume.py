@@ -175,8 +175,6 @@ def resume_experience(resume_id):
         else:
             # Handle single experience object
             experiences = [experiences_data]
-    
-    print(f"Rendering with experiences: {experiences}")
 
     return render_template('resume_experience.html', form=form, resume=resume, 
                         experiences=experiences, skills=session.get('skills', []))
@@ -256,7 +254,7 @@ def resume_skills(resume_id):
         suggested_skills = [skill for skill, _ in suggested_skills[:15]]
     # Pre-populate form
     if resume.resume_data and 'skills' in resume.resume_data:
-        form.skills.data = resume.resume_data['skills']
+        form.skills.data = ', '.join(resume.resume_data['skills'])
     return render_template('resume_skills.html', form=form, resume=resume, suggested_skills=suggested_skills)
 
 @resume_bp.route('/resume/<int:resume_id>/preview')
