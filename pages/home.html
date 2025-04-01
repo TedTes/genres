@@ -285,130 +285,114 @@
             <button class="category-btn" data-category="technical">Technical</button>
         </div>
         
-        <div class="templates-grid">
-            <!-- Template 1 -->
-            <div class="template-card" data-category="professional modern">
-                <div class="template-preview">
-                    <img src="{{ url_for('static', filename='images/thumbnails/1.png') }}" alt="Modern Blue Template"
-                        onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'300\' height=\'420\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 420\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23555555;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:21pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'300\' height=\'420\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'90\' y=\'210\'%3EModern Blue%3C/text%3E%3Ctext x=\'90\' y=\'250\'%3ETemplate%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
-                    <div class="template-overlay">
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
-                        <div class="template-badge">Popular</div>
+        <div class="templates-wrapper">
+            <div class="templates-grid">
+                <!-- Template 1 - Unlocked -->
+                <div class="template-card" data-category="professional modern">
+                    <div class="template-preview">
+                        <img src="{{ url_for('static', filename='images/thumbnails/dark_modern.png') }}" alt="Modern Blue Template">
+                        <div class="template-overlay">
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+                            <div class="template-badge popular">Popular</div>
+                        </div>
                     </div>
+                 
                 </div>
-                <div class="template-info">
-                    <h3>Modern Blue</h3>
-                    <p>Clean, professional design with sidebar for technical roles</p>
-                    <div class="template-rating">
-                        <span class="stars">★★★★★</span>
-                        <span class="count">3.2M+ users</span>
+                
+                <!-- Template 2 - Unlocked -->
+                <div class="template-card" data-category="professional">
+                    <div class="template-preview">
+                        <img src="{{ url_for('static', filename='images/thumbnails/professional_sidebar.png') }}" alt="Classic Professional Template">
+                        <div class="template-overlay">
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+                        </div>
                     </div>
+              
                 </div>
-            </div>
-            
-            <!-- Template 2 -->
-            <div class="template-card" data-category="professional">
-                <div class="template-preview">
-                    <img src="{{ url_for('static', filename='images/thumbnails/2.png') }}" alt="Classic Professional Template"
-                        onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'300\' height=\'420\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 420\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23555555;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:21pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'300\' height=\'420\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'75\' y=\'210\'%3EClassic Pro%3C/text%3E%3Ctext x=\'90\' y=\'250\'%3ETemplate%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
-                    <div class="template-overlay">
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+                
+                <!-- Template 3 - Unlocked -->
+                <div class="template-card" data-category="modern creative">
+                    <div class="template-preview">
+                        <img src="{{ url_for('static', filename='images/thumbnails/professional_portfolio.png') }}" alt="Executive Blue Template">
+                        <div class="template-overlay">
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+                            <div class="template-badge trending">Trending</div>
+                        </div>
                     </div>
+                    <!-- "template-info" removed -->
                 </div>
-                <div class="template-info">
-                    <h3>Classic Professional</h3>
-                    <p>Traditional layout ideal for corporate and business roles</p>
-                    <div class="template-rating">
-                        <span class="stars">★★★★★</span>
-                        <span class="count">2.5M+ users</span>
+                
+                <!-- Template 4 - Unlocked -->
+                <div class="template-card" data-category="creative technical">
+                    <div class="template-preview">
+                        <img src="{{ url_for('static', filename='images/thumbnails/creative_modern.png') }}" alt="Modern Gradient Template">
+                        <div class="template-overlay">
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+                        </div>
                     </div>
+                
                 </div>
-            </div>
-            
-            <!-- Template 3 -->
-            <div class="template-card" data-category="modern creative">
-                <div class="template-preview">
-                    <img src="{{ url_for('static', filename='images/thumbnails/3.png') }}" alt="Executive Blue Template"
-                        onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'300\' height=\'420\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 420\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23555555;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:21pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'300\' height=\'420\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'90\' y=\'210\'%3EExecutive%3C/text%3E%3Ctext x=\'90\' y=\'250\'%3ETemplate%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
-                    <div class="template-overlay">
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
-                        <div class="template-badge">Trending</div>
+                
+                <!-- Template 5 - Unlocked -->
+                <div class="template-card" data-category="modern professional">
+                    <div class="template-preview">
+                        <img src="{{ url_for('static', filename='images/thumbnails/minimalist_cards.png') }}" alt="Professional Plus Template">
+                        <div class="template-overlay">
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+                        </div>
                     </div>
+                
                 </div>
-                <div class="template-info">
-                    <h3>Executive Blue</h3>
-                    <p>Modern header design with clean sections for executives</p>
-                    <div class="template-rating">
-                        <span class="stars">★★★★★</span>
-                        <span class="count">1.8M+ users</span>
+                
+                <!-- Template 6 - Unlocked -->
+                <div class="template-card" data-category="professional">
+                    <div class="template-preview">
+                        <img src="{{ url_for('static', filename='images/thumbnails/tech_professional.png') }}" alt="Modern Gradient Template">
+                        <div class="template-overlay">
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+                        </div>
                     </div>
+               
                 </div>
-            </div>
-            
-            <!-- Template 4 -->
-            <div class="template-card" data-category="creative technical">
-                <div class="template-preview">
-                    <img src="{{ url_for('static', filename='images/thumbnails/4.png') }}" alt="Modern Gradient Template"
-                        onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'300\' height=\'420\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 420\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23555555;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:21pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'300\' height=\'420\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'90\' y=\'210\'%3EModern%3C/text%3E%3Ctext x=\'90\' y=\'250\'%3EGradient%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
-                    <div class="template-overlay">
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+                
+                <!-- Template 7 - LOCKED -->
+                <div class="template-card locked" data-category="creative modern">
+                    <div class="template-preview">
+                        <img src="{{ url_for('static', filename='images/thumbnails/tech_cards.png') }}" alt="Creative Splash Template">
                     </div>
+                    <!-- "template-info" removed -->
                 </div>
-                <div class="template-info">
-                    <h3>Modern Gradient</h3>
-                    <p>Contemporary design with gradient header for tech roles</p>
-                    <div class="template-rating">
-                        <span class="stars">★★★★★</span>
-                        <span class="count">1.5M+ users</span>
+                
+                <!-- Template 8 - LOCKED -->
+                <div class="template-card locked" data-category="professional technical">
+                    <div class="template-preview">
+                        <img src="{{ url_for('static', filename='images/thumbnails/tech_minimalist.png') }}" alt="Tech Focus Template">
                     </div>
+                
                 </div>
-            </div>
-            
-            <!-- Template 5 -->
-            <div class="template-card" data-category="modern professional">
-                <div class="template-preview">
-                    <img src="{{ url_for('static', filename='images/thumbnails/5.png') }}" alt="Professional Plus Template"
-                        onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'300\' height=\'420\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 420\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23555555;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:21pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'300\' height=\'420\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'75\' y=\'210\'%3EProfessional%3C/text%3E%3Ctext x=\'90\' y=\'250\'%3EPlus%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
-                    <div class="template-overlay">
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+                
+                <!-- Template 9 - LOCKED -->
+                <div class="template-card locked" data-category="modern">
+                    <div class="template-preview">
+                        <img src="{{ url_for('static', filename='images/thumbnails/professional_professional.png') }}" alt="Timeline Pro Template">
                     </div>
-                </div>
-                <div class="template-info">
-                    <h3>Professional Plus</h3>
-                    <p>Elegant two-column design with professional avatar</p>
-                    <div class="template-rating">
-                        <span class="stars">★★★★★</span>
-                        <span class="count">1.4M+ users</span>
-                    </div>
+                    <!-- "template-info" removed -->
                 </div>
             </div>
             
-            <!-- Template 6 -->
-            <div class="template-card" data-category="professional">
-                <div class="template-preview">
-                    <img src="{{ url_for('static', filename='images/thumbnails/6.png') }}" alt="Traditional CV Template"
-                        onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'300\' height=\'420\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 420\' preserveAspectRatio=\'none\'%3E%3Cdefs%3E%3Cstyle type=\'text/css\'%3E%23holder_1a2b3c4d5e text %7B fill:%23555555;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:21pt %7D %3C/style%3E%3C/defs%3E%3Cg id=\'holder_1a2b3c4d5e\'%3E%3Crect width=\'300\' height=\'420\' fill=\'%23EEEEEE\'%3E%3C/rect%3E%3Cg%3E%3Ctext x=\'90\' y=\'210\'%3ETraditional%3C/text%3E%3Ctext x=\'90\' y=\'250\'%3ECV%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E'">
-                    <div class="template-overlay">
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-white">Use this template</a>
+            <!-- Unlock Overlay -->
+            <div class="unlock-overlay">
+                <div class="unlock-content">
+                    <div class="unlock-icon">
+                        <i class="fas fa-lock"></i>
                     </div>
-                </div>
-                <div class="template-info">
-                    <h3>Traditional CV</h3>
-                    <p>Classic layout with formal styling for academic positions</p>
-                    <div class="template-rating">
-                        <span class="stars">★★★★☆</span>
-                        <span class="count">950K+ users</span>
-                    </div>
+                    <h3>Unlock 90+ Premium Templates</h3>
+                    <p>Create a free account to access our full collection</p>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Sign Up Free</a>
                 </div>
             </div>
-            
+        </div>
       
-        </div>
-        
-        <div class="templates-footer">
-            <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Create your resume now</a>
-            <p class="templates-note">All templates are ATS-friendly and fully customizable</p>
-        </div>
     </div>
 </section>
 
