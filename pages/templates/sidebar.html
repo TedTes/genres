@@ -4,6 +4,7 @@
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>{{ resume.contact.name|default('Resume') }}</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
             <style>
                 /* CSS Reset */
                 *, *::before, *::after {
@@ -11,7 +12,6 @@
                     margin: 0;
                     padding: 0;
                 }
-                
                 /* CSS Variables */
                 :root {
                     --font-family: {{ theme.typography.font_family }};
@@ -71,35 +71,35 @@
                         
                         {% if resume.contact.email %}
                         <div class="contact-item">
-                            <span class="contact-icon"><i class="fa fa-envelope"></i></span>
+                            <span class="contact-icon"><i class="fa-solid fa-envelope"></i></span>
                             <span>{{ resume.contact.email }}</span>
                         </div>
                         {% endif %}
                         
                         {% if resume.contact.phone %}
                         <div class="contact-item">
-                            <span class="contact-icon"><i class="fa fa-phone"></i></span>
+                            <span class="contact-icon"><i class="fa-solid fa-phone"></i></span>
                             <span>{{ resume.contact.phone }}</span>
                         </div>
                         {% endif %}
                         
                         {% if resume.contact.location %}
                         <div class="contact-item">
-                            <span class="contact-icon"><i class="fa fa-map-marker"></i></span>
+                            <span class="contact-icon"><i class="fa-solid fa-location-dot"></i></span>
                             <span>{{ resume.contact.location }}</span>
                         </div>
                         {% endif %}
                         
                         {% if resume.contact.linkedin %}
                         <div class="contact-item">
-                            <span class="contact-icon"><i class="fa fa-linkedin"></i></span>
+                            <span class="contact-icon"><i class="fa-brands fa-linkedin-in"></i></span>
                             <span>{{ resume.contact.linkedin }}</span>
                         </div>
                         {% endif %}
                         
                         {% if resume.contact.website %}
                         <div class="contact-item">
-                            <span class="contact-icon"><i class="fa fa-globe"></i></span>
+                            <span class="contact-icon"><i class="fa-solid fa-globe"></i></span>
                             <span>{{ resume.contact.website }}</span>
                         </div>
                         {% endif %}

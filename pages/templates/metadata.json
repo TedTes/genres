@@ -28,8 +28,8 @@
       "name": "Classic",
       "description": "Traditional single-column layout"
     },
-    "thumbnail": "thumbnails/professional_classic.png",
-    "created": "2025-03-31T12:01:29.586854"
+    "thumbnail": "images/thumbnails/professional_classic.png",
+    "created": "2025-04-01T08:18:11.813197"
   },
   "professional_modern": {
     "id": "professional_modern",
@@ -60,8 +60,8 @@
       "name": "Modern",
       "description": "Two-column modern layout"
     },
-    "thumbnail": "thumbnails/professional_modern.png",
-    "created": "2025-03-31T12:01:29.593183"
+    "thumbnail": "images/thumbnails/professional_modern.png",
+    "created": "2025-04-01T08:18:11.819114"
   },
   "professional_sidebar": {
     "id": "professional_sidebar",
@@ -92,8 +92,8 @@
       "name": "Sidebar",
       "description": "Two-column layout with left sidebar"
     },
-    "thumbnail": "thumbnails/professional_sidebar.png",
-    "created": "2025-03-31T12:01:29.599832"
+    "thumbnail": "images/thumbnails/professional_sidebar.png",
+    "created": "2025-04-01T08:18:11.825471"
   },
   "professional_minimalist": {
     "id": "professional_minimalist",
@@ -124,8 +124,8 @@
       "name": "Minimalist",
       "description": "Clean and minimal single-column layout"
     },
-    "thumbnail": "thumbnails/professional_minimalist.png",
-    "created": "2025-03-31T12:01:29.605729"
+    "thumbnail": "images/thumbnails/professional_minimalist.png",
+    "created": "2025-04-01T08:18:11.831495"
   },
   "professional_professional": {
     "id": "professional_professional",
@@ -156,8 +156,8 @@
       "name": "Professional",
       "description": "Professional two-column layout with header"
     },
-    "thumbnail": "thumbnails/professional_professional.png",
-    "created": "2025-03-31T12:01:29.611593"
+    "thumbnail": "images/thumbnails/professional_professional.png",
+    "created": "2025-04-01T08:18:11.837480"
   },
   "professional_timeline": {
     "id": "professional_timeline",
@@ -188,8 +188,8 @@
       "name": "Timeline",
       "description": "Experience presented as a visual timeline"
     },
-    "thumbnail": "thumbnails/professional_timeline.png",
-    "created": "2025-03-31T12:01:29.619196"
+    "thumbnail": "images/thumbnails/professional_timeline.png",
+    "created": "2025-04-01T08:18:11.845440"
   },
   "professional_cards": {
     "id": "professional_cards",
@@ -220,8 +220,8 @@
       "name": "Cards",
       "description": "Card-based components for each section"
     },
-    "thumbnail": "thumbnails/professional_cards.png",
-    "created": "2025-03-31T12:01:29.626069"
+    "thumbnail": "images/thumbnails/professional_cards.png",
+    "created": "2025-04-01T08:18:11.852489"
   },
   "professional_grid": {
     "id": "professional_grid",
@@ -252,8 +252,8 @@
       "name": "Modern Grid",
       "description": "A responsive grid layout with modern styling"
     },
-    "thumbnail": "thumbnails/professional_grid.png",
-    "created": "2025-03-31T12:01:29.634740"
+    "thumbnail": "images/thumbnails/professional_grid.png",
+    "created": "2025-04-01T08:18:11.859827"
   },
   "professional_portfolio": {
     "id": "professional_portfolio",
@@ -284,8 +284,8 @@
       "name": "Portfolio",
       "description": "Design that highlights projects for creative professionals"
     },
-    "thumbnail": "thumbnails/professional_portfolio.png",
-    "created": "2025-03-31T12:01:29.642598"
+    "thumbnail": "images/thumbnails/professional_portfolio.png",
+    "created": "2025-04-01T08:18:11.867383"
   },
   "professional_compact": {
     "id": "professional_compact",
@@ -316,8 +316,8 @@
       "name": "One-Page Compact",
       "description": "Compact layout designed to fit everything on one page"
     },
-    "thumbnail": "thumbnails/professional_compact.png",
-    "created": "2025-03-31T12:01:29.650183"
+    "thumbnail": "images/thumbnails/professional_compact.png",
+    "created": "2025-04-01T08:18:11.874613"
   },
   "modern_classic": {
     "id": "modern_classic",
@@ -348,8 +348,8 @@
       "name": "Classic",
       "description": "Traditional single-column layout"
     },
-    "thumbnail": "thumbnails/modern_classic.png",
-    "created": "2025-03-31T12:01:29.655749"
+    "thumbnail": "images/thumbnails/modern_classic.png",
+    "created": "2025-04-01T08:18:11.880668"
   },
   "modern_modern": {
     "id": "modern_modern",
@@ -380,8 +380,8 @@
       "name": "Modern",
       "description": "Two-column modern layout"
     },
-    "thumbnail": "thumbnails/modern_modern.png",
-    "created": "2025-03-31T12:01:29.661447"
+    "thumbnail": "images/thumbnails/modern_modern.png",
+    "created": "2025-04-01T08:18:11.886309"
   },
   "modern_sidebar": {
     "id": "modern_sidebar",
@@ -412,8 +412,8 @@
       "name": "Sidebar",
       "description": "Two-column layout with left sidebar"
     },
-    "thumbnail": "thumbnails/modern_sidebar.png",
-    "created": "2025-03-31T12:01:29.667594"
+    "thumbnail": "images/thumbnails/modern_sidebar.png",
+    "created": "2025-04-01T08:18:11.891995"
   },
   "modern_minimalist": {
     "id": "modern_minimalist",
@@ -444,8 +444,8 @@
       "name": "Minimalist",
       "description": "Clean and minimal single-column layout"
     },
-    "thumbnail": "thumbnails/modern_minimalist.png",
-    "created": "2025-03-31T12:01:29.673272"
+    "thumbnail": "images/thumbnails/modern_minimalist.png",
+    "created": "2025-04-01T08:18:11.898121"
   },
   "modern_professional": {
     "id": "modern_professional",
@@ -476,8 +476,8 @@
       "name": "Professional",
       "description": "Professional two-column layout with header"
     },
-    "thumbnail": "thumbnails/modern_professional.png",
-    "created": "2025-03-31T12:01:29.679578"
+    "thumbnail": "images/thumbnails/modern_professional.png",
+    "created": "2025-04-01T08:18:11.903901"
   },
   "modern_timeline": {
     "id": "modern_timeline",
@@ -508,8 +508,8 @@
       "name": "Timeline",
       "description": "Experience presented as a visual timeline"
     },
-    "thumbnail": "thumbnails/modern_timeline.png",
-    "created": "2025-03-31T12:01:29.686834"
+    "thumbnail": "images/thumbnails/modern_timeline.png",
+    "created": "2025-04-01T08:18:11.911262"
   },
   "modern_cards": {
     "id": "modern_cards",
@@ -540,8 +540,8 @@
       "name": "Cards",
       "description": "Card-based components for each section"
     },
-    "thumbnail": "thumbnails/modern_cards.png",
-    "created": "2025-03-31T12:01:29.693433"
+    "thumbnail": "images/thumbnails/modern_cards.png",
+    "created": "2025-04-01T08:18:11.918277"
   },
   "modern_grid": {
     "id": "modern_grid",
@@ -572,8 +572,8 @@
       "name": "Modern Grid",
       "description": "A responsive grid layout with modern styling"
     },
-    "thumbnail": "thumbnails/modern_grid.png",
-    "created": "2025-03-31T12:01:29.700724"
+    "thumbnail": "images/thumbnails/modern_grid.png",
+    "created": "2025-04-01T08:18:11.925351"
   },
   "modern_portfolio": {
     "id": "modern_portfolio",
@@ -604,8 +604,8 @@
       "name": "Portfolio",
       "description": "Design that highlights projects for creative professionals"
     },
-    "thumbnail": "thumbnails/modern_portfolio.png",
-    "created": "2025-03-31T12:01:29.707940"
+    "thumbnail": "images/thumbnails/modern_portfolio.png",
+    "created": "2025-04-01T08:18:11.932590"
   },
   "modern_compact": {
     "id": "modern_compact",
@@ -636,8 +636,8 @@
       "name": "One-Page Compact",
       "description": "Compact layout designed to fit everything on one page"
     },
-    "thumbnail": "thumbnails/modern_compact.png",
-    "created": "2025-03-31T12:01:29.715410"
+    "thumbnail": "images/thumbnails/modern_compact.png",
+    "created": "2025-04-01T08:18:11.939693"
   },
   "minimalist_classic": {
     "id": "minimalist_classic",
@@ -668,8 +668,8 @@
       "name": "Classic",
       "description": "Traditional single-column layout"
     },
-    "thumbnail": "thumbnails/minimalist_classic.png",
-    "created": "2025-03-31T12:01:29.720778"
+    "thumbnail": "images/thumbnails/minimalist_classic.png",
+    "created": "2025-04-01T08:18:11.945584"
   },
   "minimalist_modern": {
     "id": "minimalist_modern",
@@ -700,8 +700,8 @@
       "name": "Modern",
       "description": "Two-column modern layout"
     },
-    "thumbnail": "thumbnails/minimalist_modern.png",
-    "created": "2025-03-31T12:01:29.726337"
+    "thumbnail": "images/thumbnails/minimalist_modern.png",
+    "created": "2025-04-01T08:18:11.951138"
   },
   "minimalist_sidebar": {
     "id": "minimalist_sidebar",
@@ -732,8 +732,8 @@
       "name": "Sidebar",
       "description": "Two-column layout with left sidebar"
     },
-    "thumbnail": "thumbnails/minimalist_sidebar.png",
-    "created": "2025-03-31T12:01:29.732665"
+    "thumbnail": "images/thumbnails/minimalist_sidebar.png",
+    "created": "2025-04-01T08:18:11.956804"
   },
   "minimalist_minimalist": {
     "id": "minimalist_minimalist",
@@ -764,8 +764,8 @@
       "name": "Minimalist",
       "description": "Clean and minimal single-column layout"
     },
-    "thumbnail": "thumbnails/minimalist_minimalist.png",
-    "created": "2025-03-31T12:01:29.738173"
+    "thumbnail": "images/thumbnails/minimalist_minimalist.png",
+    "created": "2025-04-01T08:18:11.962756"
   },
   "minimalist_professional": {
     "id": "minimalist_professional",
@@ -796,8 +796,8 @@
       "name": "Professional",
       "description": "Professional two-column layout with header"
     },
-    "thumbnail": "thumbnails/minimalist_professional.png",
-    "created": "2025-03-31T12:01:29.743572"
+    "thumbnail": "images/thumbnails/minimalist_professional.png",
+    "created": "2025-04-01T08:18:11.968424"
   },
   "minimalist_timeline": {
     "id": "minimalist_timeline",
@@ -828,8 +828,8 @@
       "name": "Timeline",
       "description": "Experience presented as a visual timeline"
     },
-    "thumbnail": "thumbnails/minimalist_timeline.png",
-    "created": "2025-03-31T12:01:29.750812"
+    "thumbnail": "images/thumbnails/minimalist_timeline.png",
+    "created": "2025-04-01T08:18:11.975524"
   },
   "minimalist_cards": {
     "id": "minimalist_cards",
@@ -860,8 +860,8 @@
       "name": "Cards",
       "description": "Card-based components for each section"
     },
-    "thumbnail": "thumbnails/minimalist_cards.png",
-    "created": "2025-03-31T12:01:29.757481"
+    "thumbnail": "images/thumbnails/minimalist_cards.png",
+    "created": "2025-04-01T08:18:11.982482"
   },
   "minimalist_grid": {
     "id": "minimalist_grid",
@@ -892,8 +892,8 @@
       "name": "Modern Grid",
       "description": "A responsive grid layout with modern styling"
     },
-    "thumbnail": "thumbnails/minimalist_grid.png",
-    "created": "2025-03-31T12:01:29.764717"
+    "thumbnail": "images/thumbnails/minimalist_grid.png",
+    "created": "2025-04-01T08:18:11.989395"
   },
   "minimalist_portfolio": {
     "id": "minimalist_portfolio",
@@ -924,8 +924,8 @@
       "name": "Portfolio",
       "description": "Design that highlights projects for creative professionals"
     },
-    "thumbnail": "thumbnails/minimalist_portfolio.png",
-    "created": "2025-03-31T12:01:29.771465"
+    "thumbnail": "images/thumbnails/minimalist_portfolio.png",
+    "created": "2025-04-01T08:18:11.996755"
   },
   "minimalist_compact": {
     "id": "minimalist_compact",
@@ -956,8 +956,8 @@
       "name": "One-Page Compact",
       "description": "Compact layout designed to fit everything on one page"
     },
-    "thumbnail": "thumbnails/minimalist_compact.png",
-    "created": "2025-03-31T12:01:29.778603"
+    "thumbnail": "images/thumbnails/minimalist_compact.png",
+    "created": "2025-04-01T08:18:12.003600"
   },
   "elegant_classic": {
     "id": "elegant_classic",
@@ -988,8 +988,8 @@
       "name": "Classic",
       "description": "Traditional single-column layout"
     },
-    "thumbnail": "thumbnails/elegant_classic.png",
-    "created": "2025-03-31T12:01:29.784270"
+    "thumbnail": "images/thumbnails/elegant_classic.png",
+    "created": "2025-04-01T08:18:12.009005"
   },
   "elegant_modern": {
     "id": "elegant_modern",
@@ -1020,8 +1020,8 @@
       "name": "Modern",
       "description": "Two-column modern layout"
     },
-    "thumbnail": "thumbnails/elegant_modern.png",
-    "created": "2025-03-31T12:01:29.789906"
+    "thumbnail": "images/thumbnails/elegant_modern.png",
+    "created": "2025-04-01T08:18:12.014906"
   },
   "elegant_sidebar": {
     "id": "elegant_sidebar",
@@ -1052,8 +1052,8 @@
       "name": "Sidebar",
       "description": "Two-column layout with left sidebar"
     },
-    "thumbnail": "thumbnails/elegant_sidebar.png",
-    "created": "2025-03-31T12:01:29.795902"
+    "thumbnail": "images/thumbnails/elegant_sidebar.png",
+    "created": "2025-04-01T08:18:12.020525"
   },
   "elegant_minimalist": {
     "id": "elegant_minimalist",
@@ -1084,8 +1084,8 @@
       "name": "Minimalist",
       "description": "Clean and minimal single-column layout"
     },
-    "thumbnail": "thumbnails/elegant_minimalist.png",
-    "created": "2025-03-31T12:01:29.801493"
+    "thumbnail": "images/thumbnails/elegant_minimalist.png",
+    "created": "2025-04-01T08:18:12.026171"
   },
   "elegant_professional": {
     "id": "elegant_professional",
@@ -1116,8 +1116,8 @@
       "name": "Professional",
       "description": "Professional two-column layout with header"
     },
-    "thumbnail": "thumbnails/elegant_professional.png",
-    "created": "2025-03-31T12:01:29.806885"
+    "thumbnail": "images/thumbnails/elegant_professional.png",
+    "created": "2025-04-01T08:18:12.031984"
   },
   "elegant_timeline": {
     "id": "elegant_timeline",
@@ -1148,8 +1148,8 @@
       "name": "Timeline",
       "description": "Experience presented as a visual timeline"
     },
-    "thumbnail": "thumbnails/elegant_timeline.png",
-    "created": "2025-03-31T12:01:29.814012"
+    "thumbnail": "images/thumbnails/elegant_timeline.png",
+    "created": "2025-04-01T08:18:12.038997"
   },
   "elegant_cards": {
     "id": "elegant_cards",
@@ -1180,8 +1180,8 @@
       "name": "Cards",
       "description": "Card-based components for each section"
     },
-    "thumbnail": "thumbnails/elegant_cards.png",
-    "created": "2025-03-31T12:01:29.820551"
+    "thumbnail": "images/thumbnails/elegant_cards.png",
+    "created": "2025-04-01T08:18:12.046021"
   },
   "elegant_grid": {
     "id": "elegant_grid",
@@ -1212,8 +1212,8 @@
       "name": "Modern Grid",
       "description": "A responsive grid layout with modern styling"
     },
-    "thumbnail": "thumbnails/elegant_grid.png",
-    "created": "2025-03-31T12:01:29.827461"
+    "thumbnail": "images/thumbnails/elegant_grid.png",
+    "created": "2025-04-01T08:18:12.053100"
   },
   "elegant_portfolio": {
     "id": "elegant_portfolio",
@@ -1244,8 +1244,8 @@
       "name": "Portfolio",
       "description": "Design that highlights projects for creative professionals"
     },
-    "thumbnail": "thumbnails/elegant_portfolio.png",
-    "created": "2025-03-31T12:01:29.834995"
+    "thumbnail": "images/thumbnails/elegant_portfolio.png",
+    "created": "2025-04-01T08:18:12.060360"
   },
   "elegant_compact": {
     "id": "elegant_compact",
@@ -1276,8 +1276,8 @@
       "name": "One-Page Compact",
       "description": "Compact layout designed to fit everything on one page"
     },
-    "thumbnail": "thumbnails/elegant_compact.png",
-    "created": "2025-03-31T12:01:29.841790"
+    "thumbnail": "images/thumbnails/elegant_compact.png",
+    "created": "2025-04-01T08:18:12.067289"
   },
   "corporate_classic": {
     "id": "corporate_classic",
@@ -1308,8 +1308,8 @@
       "name": "Classic",
       "description": "Traditional single-column layout"
     },
-    "thumbnail": "thumbnails/corporate_classic.png",
-    "created": "2025-03-31T12:01:29.847681"
+    "thumbnail": "images/thumbnails/corporate_classic.png",
+    "created": "2025-04-01T08:18:12.072668"
   },
   "corporate_modern": {
     "id": "corporate_modern",
@@ -1340,8 +1340,8 @@
       "name": "Modern",
       "description": "Two-column modern layout"
     },
-    "thumbnail": "thumbnails/corporate_modern.png",
-    "created": "2025-03-31T12:01:29.853205"
+    "thumbnail": "images/thumbnails/corporate_modern.png",
+    "created": "2025-04-01T08:18:12.078698"
   },
   "corporate_sidebar": {
     "id": "corporate_sidebar",
@@ -1372,8 +1372,8 @@
       "name": "Sidebar",
       "description": "Two-column layout with left sidebar"
     },
-    "thumbnail": "thumbnails/corporate_sidebar.png",
-    "created": "2025-03-31T12:01:29.858761"
+    "thumbnail": "images/thumbnails/corporate_sidebar.png",
+    "created": "2025-04-01T08:18:12.084463"
   },
   "corporate_minimalist": {
     "id": "corporate_minimalist",
@@ -1404,8 +1404,8 @@
       "name": "Minimalist",
       "description": "Clean and minimal single-column layout"
     },
-    "thumbnail": "thumbnails/corporate_minimalist.png",
-    "created": "2025-03-31T12:01:29.864534"
+    "thumbnail": "images/thumbnails/corporate_minimalist.png",
+    "created": "2025-04-01T08:18:12.089802"
   },
   "corporate_professional": {
     "id": "corporate_professional",
@@ -1436,8 +1436,8 @@
       "name": "Professional",
       "description": "Professional two-column layout with header"
     },
-    "thumbnail": "thumbnails/corporate_professional.png",
-    "created": "2025-03-31T12:01:29.869985"
+    "thumbnail": "images/thumbnails/corporate_professional.png",
+    "created": "2025-04-01T08:18:12.095831"
   },
   "corporate_timeline": {
     "id": "corporate_timeline",
@@ -1468,8 +1468,8 @@
       "name": "Timeline",
       "description": "Experience presented as a visual timeline"
     },
-    "thumbnail": "thumbnails/corporate_timeline.png",
-    "created": "2025-03-31T12:01:29.876731"
+    "thumbnail": "images/thumbnails/corporate_timeline.png",
+    "created": "2025-04-01T08:18:12.102683"
   },
   "corporate_cards": {
     "id": "corporate_cards",
@@ -1500,8 +1500,8 @@
       "name": "Cards",
       "description": "Card-based components for each section"
     },
-    "thumbnail": "thumbnails/corporate_cards.png",
-    "created": "2025-03-31T12:01:29.883793"
+    "thumbnail": "images/thumbnails/corporate_cards.png",
+    "created": "2025-04-01T08:18:12.109587"
   },
   "corporate_grid": {
     "id": "corporate_grid",
@@ -1532,8 +1532,8 @@
       "name": "Modern Grid",
       "description": "A responsive grid layout with modern styling"
     },
-    "thumbnail": "thumbnails/corporate_grid.png",
-    "created": "2025-03-31T12:01:29.890714"
+    "thumbnail": "images/thumbnails/corporate_grid.png",
+    "created": "2025-04-01T08:18:12.116741"
   },
   "corporate_portfolio": {
     "id": "corporate_portfolio",
@@ -1564,8 +1564,8 @@
       "name": "Portfolio",
       "description": "Design that highlights projects for creative professionals"
     },
-    "thumbnail": "thumbnails/corporate_portfolio.png",
-    "created": "2025-03-31T12:01:29.897866"
+    "thumbnail": "images/thumbnails/corporate_portfolio.png",
+    "created": "2025-04-01T08:18:12.123552"
   },
   "corporate_compact": {
     "id": "corporate_compact",
@@ -1596,8 +1596,8 @@
       "name": "One-Page Compact",
       "description": "Compact layout designed to fit everything on one page"
     },
-    "thumbnail": "thumbnails/corporate_compact.png",
-    "created": "2025-03-31T12:01:29.904642"
+    "thumbnail": "images/thumbnails/corporate_compact.png",
+    "created": "2025-04-01T08:18:12.131061"
   },
   "tech_classic": {
     "id": "tech_classic",
@@ -1628,8 +1628,8 @@
       "name": "Classic",
       "description": "Traditional single-column layout"
     },
-    "thumbnail": "thumbnails/tech_classic.png",
-    "created": "2025-03-31T12:01:29.909991"
+    "thumbnail": "images/thumbnails/tech_classic.png",
+    "created": "2025-04-01T08:18:12.136474"
   },
   "tech_modern": {
     "id": "tech_modern",
@@ -1660,8 +1660,8 @@
       "name": "Modern",
       "description": "Two-column modern layout"
     },
-    "thumbnail": "thumbnails/tech_modern.png",
-    "created": "2025-03-31T12:01:29.916230"
+    "thumbnail": "images/thumbnails/tech_modern.png",
+    "created": "2025-04-01T08:18:12.142082"
   },
   "tech_sidebar": {
     "id": "tech_sidebar",
@@ -1692,8 +1692,8 @@
       "name": "Sidebar",
       "description": "Two-column layout with left sidebar"
     },
-    "thumbnail": "thumbnails/tech_sidebar.png",
-    "created": "2025-03-31T12:01:29.921956"
+    "thumbnail": "images/thumbnails/tech_sidebar.png",
+    "created": "2025-04-01T08:18:12.148079"
   },
   "tech_minimalist": {
     "id": "tech_minimalist",
@@ -1724,8 +1724,8 @@
       "name": "Minimalist",
       "description": "Clean and minimal single-column layout"
     },
-    "thumbnail": "thumbnails/tech_minimalist.png",
-    "created": "2025-03-31T12:01:29.927522"
+    "thumbnail": "images/thumbnails/tech_minimalist.png",
+    "created": "2025-04-01T08:18:12.154058"
   },
   "tech_professional": {
     "id": "tech_professional",
@@ -1756,8 +1756,8 @@
       "name": "Professional",
       "description": "Professional two-column layout with header"
     },
-    "thumbnail": "thumbnails/tech_professional.png",
-    "created": "2025-03-31T12:01:29.933403"
+    "thumbnail": "images/thumbnails/tech_professional.png",
+    "created": "2025-04-01T08:18:12.159927"
   },
   "tech_timeline": {
     "id": "tech_timeline",
@@ -1788,8 +1788,8 @@
       "name": "Timeline",
       "description": "Experience presented as a visual timeline"
     },
-    "thumbnail": "thumbnails/tech_timeline.png",
-    "created": "2025-03-31T12:01:29.940257"
+    "thumbnail": "images/thumbnails/tech_timeline.png",
+    "created": "2025-04-01T08:18:12.166932"
   },
   "tech_cards": {
     "id": "tech_cards",
@@ -1820,8 +1820,8 @@
       "name": "Cards",
       "description": "Card-based components for each section"
     },
-    "thumbnail": "thumbnails/tech_cards.png",
-    "created": "2025-03-31T12:01:29.947393"
+    "thumbnail": "images/thumbnails/tech_cards.png",
+    "created": "2025-04-01T08:18:12.173512"
   },
   "tech_grid": {
     "id": "tech_grid",
@@ -1852,8 +1852,8 @@
       "name": "Modern Grid",
       "description": "A responsive grid layout with modern styling"
     },
-    "thumbnail": "thumbnails/tech_grid.png",
-    "created": "2025-03-31T12:01:29.954395"
+    "thumbnail": "images/thumbnails/tech_grid.png",
+    "created": "2025-04-01T08:18:12.180934"
   },
   "tech_portfolio": {
     "id": "tech_portfolio",
@@ -1884,8 +1884,8 @@
       "name": "Portfolio",
       "description": "Design that highlights projects for creative professionals"
     },
-    "thumbnail": "thumbnails/tech_portfolio.png",
-    "created": "2025-03-31T12:01:29.961314"
+    "thumbnail": "images/thumbnails/tech_portfolio.png",
+    "created": "2025-04-01T08:18:12.187734"
   },
   "tech_compact": {
     "id": "tech_compact",
@@ -1916,8 +1916,8 @@
       "name": "One-Page Compact",
       "description": "Compact layout designed to fit everything on one page"
     },
-    "thumbnail": "thumbnails/tech_compact.png",
-    "created": "2025-03-31T12:01:29.968765"
+    "thumbnail": "images/thumbnails/tech_compact.png",
+    "created": "2025-04-01T08:18:12.194983"
   },
   "creative_classic": {
     "id": "creative_classic",
@@ -1948,8 +1948,8 @@
       "name": "Classic",
       "description": "Traditional single-column layout"
     },
-    "thumbnail": "thumbnails/creative_classic.png",
-    "created": "2025-03-31T12:01:29.974204"
+    "thumbnail": "images/thumbnails/creative_classic.png",
+    "created": "2025-04-01T08:18:12.200395"
   },
   "creative_modern": {
     "id": "creative_modern",
@@ -1980,8 +1980,8 @@
       "name": "Modern",
       "description": "Two-column modern layout"
     },
-    "thumbnail": "thumbnails/creative_modern.png",
-    "created": "2025-03-31T12:01:29.980134"
+    "thumbnail": "images/thumbnails/creative_modern.png",
+    "created": "2025-04-01T08:18:12.205878"
   },
   "creative_sidebar": {
     "id": "creative_sidebar",
@@ -2012,8 +2012,8 @@
       "name": "Sidebar",
       "description": "Two-column layout with left sidebar"
     },
-    "thumbnail": "thumbnails/creative_sidebar.png",
-    "created": "2025-03-31T12:01:29.985804"
+    "thumbnail": "images/thumbnails/creative_sidebar.png",
+    "created": "2025-04-01T08:18:12.211972"
   },
   "creative_minimalist": {
     "id": "creative_minimalist",
@@ -2044,8 +2044,8 @@
       "name": "Minimalist",
       "description": "Clean and minimal single-column layout"
     },
-    "thumbnail": "thumbnails/creative_minimalist.png",
-    "created": "2025-03-31T12:01:29.991291"
+    "thumbnail": "images/thumbnails/creative_minimalist.png",
+    "created": "2025-04-01T08:18:12.217538"
   },
   "creative_professional": {
     "id": "creative_professional",
@@ -2076,8 +2076,8 @@
       "name": "Professional",
       "description": "Professional two-column layout with header"
     },
-    "thumbnail": "thumbnails/creative_professional.png",
-    "created": "2025-03-31T12:01:29.997508"
+    "thumbnail": "images/thumbnails/creative_professional.png",
+    "created": "2025-04-01T08:18:12.222931"
   },
   "creative_timeline": {
     "id": "creative_timeline",
@@ -2108,8 +2108,8 @@
       "name": "Timeline",
       "description": "Experience presented as a visual timeline"
     },
-    "thumbnail": "thumbnails/creative_timeline.png",
-    "created": "2025-03-31T12:01:30.004399"
+    "thumbnail": "images/thumbnails/creative_timeline.png",
+    "created": "2025-04-01T08:18:12.230183"
   },
   "creative_cards": {
     "id": "creative_cards",
@@ -2140,8 +2140,8 @@
       "name": "Cards",
       "description": "Card-based components for each section"
     },
-    "thumbnail": "thumbnails/creative_cards.png",
-    "created": "2025-03-31T12:01:30.010961"
+    "thumbnail": "images/thumbnails/creative_cards.png",
+    "created": "2025-04-01T08:18:12.236756"
   },
   "creative_grid": {
     "id": "creative_grid",
@@ -2172,8 +2172,8 @@
       "name": "Modern Grid",
       "description": "A responsive grid layout with modern styling"
     },
-    "thumbnail": "thumbnails/creative_grid.png",
-    "created": "2025-03-31T12:01:30.018446"
+    "thumbnail": "images/thumbnails/creative_grid.png",
+    "created": "2025-04-01T08:18:12.244118"
   },
   "creative_portfolio": {
     "id": "creative_portfolio",
@@ -2204,8 +2204,8 @@
       "name": "Portfolio",
       "description": "Design that highlights projects for creative professionals"
     },
-    "thumbnail": "thumbnails/creative_portfolio.png",
-    "created": "2025-03-31T12:01:30.025238"
+    "thumbnail": "images/thumbnails/creative_portfolio.png",
+    "created": "2025-04-01T08:18:12.250890"
   },
   "creative_compact": {
     "id": "creative_compact",
@@ -2236,8 +2236,8 @@
       "name": "One-Page Compact",
       "description": "Compact layout designed to fit everything on one page"
     },
-    "thumbnail": "thumbnails/creative_compact.png",
-    "created": "2025-03-31T12:01:30.032556"
+    "thumbnail": "images/thumbnails/creative_compact.png",
+    "created": "2025-04-01T08:18:12.257785"
   },
   "dark_classic": {
     "id": "dark_classic",
@@ -2268,8 +2268,8 @@
       "name": "Classic",
       "description": "Traditional single-column layout"
     },
-    "thumbnail": "thumbnails/dark_classic.png",
-    "created": "2025-03-31T12:01:30.037840"
+    "thumbnail": "images/thumbnails/dark_classic.png",
+    "created": "2025-04-01T08:18:12.263745"
   },
   "dark_modern": {
     "id": "dark_modern",
@@ -2300,8 +2300,8 @@
       "name": "Modern",
       "description": "Two-column modern layout"
     },
-    "thumbnail": "thumbnails/dark_modern.png",
-    "created": "2025-03-31T12:01:30.043234"
+    "thumbnail": "images/thumbnails/dark_modern.png",
+    "created": "2025-04-01T08:18:12.269284"
   },
   "dark_sidebar": {
     "id": "dark_sidebar",
@@ -2332,8 +2332,8 @@
       "name": "Sidebar",
       "description": "Two-column layout with left sidebar"
     },
-    "thumbnail": "thumbnails/dark_sidebar.png",
-    "created": "2025-03-31T12:01:30.049167"
+    "thumbnail": "images/thumbnails/dark_sidebar.png",
+    "created": "2025-04-01T08:18:12.274873"
   },
   "dark_minimalist": {
     "id": "dark_minimalist",
@@ -2364,8 +2364,8 @@
       "name": "Minimalist",
       "description": "Clean and minimal single-column layout"
     },
-    "thumbnail": "thumbnails/dark_minimalist.png",
-    "created": "2025-03-31T12:01:30.054612"
+    "thumbnail": "images/thumbnails/dark_minimalist.png",
+    "created": "2025-04-01T08:18:12.280887"
   },
   "dark_professional": {
     "id": "dark_professional",
@@ -2396,8 +2396,8 @@
       "name": "Professional",
       "description": "Professional two-column layout with header"
     },
-    "thumbnail": "thumbnails/dark_professional.png",
-    "created": "2025-03-31T12:01:30.059986"
+    "thumbnail": "images/thumbnails/dark_professional.png",
+    "created": "2025-04-01T08:18:12.286362"
   },
   "dark_timeline": {
     "id": "dark_timeline",
@@ -2428,8 +2428,8 @@
       "name": "Timeline",
       "description": "Experience presented as a visual timeline"
     },
-    "thumbnail": "thumbnails/dark_timeline.png",
-    "created": "2025-03-31T12:01:30.067269"
+    "thumbnail": "images/thumbnails/dark_timeline.png",
+    "created": "2025-04-01T08:18:12.293725"
   },
   "dark_cards": {
     "id": "dark_cards",
@@ -2460,8 +2460,8 @@
       "name": "Cards",
       "description": "Card-based components for each section"
     },
-    "thumbnail": "thumbnails/dark_cards.png",
-    "created": "2025-03-31T12:01:30.073750"
+    "thumbnail": "images/thumbnails/dark_cards.png",
+    "created": "2025-04-01T08:18:12.300430"
   },
   "dark_grid": {
     "id": "dark_grid",
@@ -2492,8 +2492,8 @@
       "name": "Modern Grid",
       "description": "A responsive grid layout with modern styling"
     },
-    "thumbnail": "thumbnails/dark_grid.png",
-    "created": "2025-03-31T12:01:30.081215"
+    "thumbnail": "images/thumbnails/dark_grid.png",
+    "created": "2025-04-01T08:18:12.307703"
   },
   "dark_portfolio": {
     "id": "dark_portfolio",
@@ -2524,8 +2524,8 @@
       "name": "Portfolio",
       "description": "Design that highlights projects for creative professionals"
     },
-    "thumbnail": "thumbnails/dark_portfolio.png",
-    "created": "2025-03-31T12:01:30.088116"
+    "thumbnail": "images/thumbnails/dark_portfolio.png",
+    "created": "2025-04-01T08:18:12.314995"
   },
   "dark_compact": {
     "id": "dark_compact",
@@ -2556,8 +2556,8 @@
       "name": "One-Page Compact",
       "description": "Compact layout designed to fit everything on one page"
     },
-    "thumbnail": "thumbnails/dark_compact.png",
-    "created": "2025-03-31T12:01:30.095438"
+    "thumbnail": "images/thumbnails/dark_compact.png",
+    "created": "2025-04-01T08:18:12.321912"
   },
   "vintage_classic": {
     "id": "vintage_classic",
@@ -2588,8 +2588,8 @@
       "name": "Classic",
       "description": "Traditional single-column layout"
     },
-    "thumbnail": "thumbnails/vintage_classic.png",
-    "created": "2025-03-31T12:01:30.100842"
+    "thumbnail": "images/thumbnails/vintage_classic.png",
+    "created": "2025-04-01T08:18:12.328001"
   },
   "vintage_modern": {
     "id": "vintage_modern",
@@ -2620,8 +2620,8 @@
       "name": "Modern",
       "description": "Two-column modern layout"
     },
-    "thumbnail": "thumbnails/vintage_modern.png",
-    "created": "2025-03-31T12:01:30.106286"
+    "thumbnail": "images/thumbnails/vintage_modern.png",
+    "created": "2025-04-01T08:18:12.333612"
   },
   "vintage_sidebar": {
     "id": "vintage_sidebar",
@@ -2652,8 +2652,8 @@
       "name": "Sidebar",
       "description": "Two-column layout with left sidebar"
     },
-    "thumbnail": "thumbnails/vintage_sidebar.png",
-    "created": "2025-03-31T12:01:30.112210"
+    "thumbnail": "images/thumbnails/vintage_sidebar.png",
+    "created": "2025-04-01T08:18:12.339404"
   },
   "vintage_minimalist": {
     "id": "vintage_minimalist",
@@ -2684,8 +2684,8 @@
       "name": "Minimalist",
       "description": "Clean and minimal single-column layout"
     },
-    "thumbnail": "thumbnails/vintage_minimalist.png",
-    "created": "2025-03-31T12:01:30.117783"
+    "thumbnail": "images/thumbnails/vintage_minimalist.png",
+    "created": "2025-04-01T08:18:12.345262"
   },
   "vintage_professional": {
     "id": "vintage_professional",
@@ -2716,8 +2716,8 @@
       "name": "Professional",
       "description": "Professional two-column layout with header"
     },
-    "thumbnail": "thumbnails/vintage_professional.png",
-    "created": "2025-03-31T12:01:30.123366"
+    "thumbnail": "images/thumbnails/vintage_professional.png",
+    "created": "2025-04-01T08:18:12.350773"
   },
   "vintage_timeline": {
     "id": "vintage_timeline",
@@ -2748,8 +2748,8 @@
       "name": "Timeline",
       "description": "Experience presented as a visual timeline"
     },
-    "thumbnail": "thumbnails/vintage_timeline.png",
-    "created": "2025-03-31T12:01:30.130681"
+    "thumbnail": "images/thumbnails/vintage_timeline.png",
+    "created": "2025-04-01T08:18:12.357733"
   },
   "vintage_cards": {
     "id": "vintage_cards",
@@ -2780,8 +2780,8 @@
       "name": "Cards",
       "description": "Card-based components for each section"
     },
-    "thumbnail": "thumbnails/vintage_cards.png",
-    "created": "2025-03-31T12:01:30.137260"
+    "thumbnail": "images/thumbnails/vintage_cards.png",
+    "created": "2025-04-01T08:18:12.364927"
   },
   "vintage_grid": {
     "id": "vintage_grid",
@@ -2812,8 +2812,8 @@
       "name": "Modern Grid",
       "description": "A responsive grid layout with modern styling"
     },
-    "thumbnail": "thumbnails/vintage_grid.png",
-    "created": "2025-03-31T12:01:30.144127"
+    "thumbnail": "images/thumbnails/vintage_grid.png",
+    "created": "2025-04-01T08:18:12.371814"
   },
   "vintage_portfolio": {
     "id": "vintage_portfolio",
@@ -2844,8 +2844,8 @@
       "name": "Portfolio",
       "description": "Design that highlights projects for creative professionals"
     },
-    "thumbnail": "thumbnails/vintage_portfolio.png",
-    "created": "2025-03-31T12:01:30.151277"
+    "thumbnail": "images/thumbnails/vintage_portfolio.png",
+    "created": "2025-04-01T08:18:12.378963"
   },
   "vintage_compact": {
     "id": "vintage_compact",
@@ -2876,8 +2876,8 @@
       "name": "One-Page Compact",
       "description": "Compact layout designed to fit everything on one page"
     },
-    "thumbnail": "thumbnails/vintage_compact.png",
-    "created": "2025-03-31T12:01:30.158087"
+    "thumbnail": "images/thumbnails/vintage_compact.png",
+    "created": "2025-04-01T08:18:12.385867"
   },
   "gradient_classic": {
     "id": "gradient_classic",
@@ -2908,8 +2908,8 @@
       "name": "Classic",
       "description": "Traditional single-column layout"
     },
-    "thumbnail": "thumbnails/gradient_classic.png",
-    "created": "2025-03-31T12:01:30.164092"
+    "thumbnail": "images/thumbnails/gradient_classic.png",
+    "created": "2025-04-01T08:18:12.391207"
   },
   "gradient_modern": {
     "id": "gradient_modern",
@@ -2940,8 +2940,8 @@
       "name": "Modern",
       "description": "Two-column modern layout"
     },
-    "thumbnail": "thumbnails/gradient_modern.png",
-    "created": "2025-03-31T12:01:30.169689"
+    "thumbnail": "images/thumbnails/gradient_modern.png",
+    "created": "2025-04-01T08:18:12.397151"
   },
   "gradient_sidebar": {
     "id": "gradient_sidebar",
@@ -2972,8 +2972,8 @@
       "name": "Sidebar",
       "description": "Two-column layout with left sidebar"
     },
-    "thumbnail": "thumbnails/gradient_sidebar.png",
-    "created": "2025-03-31T12:01:30.175445"
+    "thumbnail": "images/thumbnails/gradient_sidebar.png",
+    "created": "2025-04-01T08:18:12.402900"
   },
   "gradient_minimalist": {
     "id": "gradient_minimalist",
@@ -3004,8 +3004,8 @@
       "name": "Minimalist",
       "description": "Clean and minimal single-column layout"
     },
-    "thumbnail": "thumbnails/gradient_minimalist.png",
-    "created": "2025-03-31T12:01:30.181682"
+    "thumbnail": "images/thumbnails/gradient_minimalist.png",
+    "created": "2025-04-01T08:18:12.409037"
   },
   "gradient_professional": {
     "id": "gradient_professional",
@@ -3036,8 +3036,8 @@
       "name": "Professional",
       "description": "Professional two-column layout with header"
     },
-    "thumbnail": "thumbnails/gradient_professional.png",
-    "created": "2025-03-31T12:01:30.187162"
+    "thumbnail": "images/thumbnails/gradient_professional.png",
+    "created": "2025-04-01T08:18:12.414911"
   },
   "gradient_timeline": {
     "id": "gradient_timeline",
@@ -3068,8 +3068,8 @@
       "name": "Timeline",
       "description": "Experience presented as a visual timeline"
     },
-    "thumbnail": "thumbnails/gradient_timeline.png",
-    "created": "2025-03-31T12:01:30.194132"
+    "thumbnail": "images/thumbnails/gradient_timeline.png",
+    "created": "2025-04-01T08:18:12.422203"
   },
   "gradient_cards": {
     "id": "gradient_cards",
@@ -3100,8 +3100,8 @@
       "name": "Cards",
       "description": "Card-based components for each section"
     },
-    "thumbnail": "thumbnails/gradient_cards.png",
-    "created": "2025-03-31T12:01:30.201036"
+    "thumbnail": "images/thumbnails/gradient_cards.png",
+    "created": "2025-04-01T08:18:12.429490"
   },
   "gradient_grid": {
     "id": "gradient_grid",
@@ -3132,8 +3132,8 @@
       "name": "Modern Grid",
       "description": "A responsive grid layout with modern styling"
     },
-    "thumbnail": "thumbnails/gradient_grid.png",
-    "created": "2025-03-31T12:01:30.208074"
+    "thumbnail": "images/thumbnails/gradient_grid.png",
+    "created": "2025-04-01T08:18:12.437820"
   },
   "gradient_portfolio": {
     "id": "gradient_portfolio",
@@ -3164,8 +3164,8 @@
       "name": "Portfolio",
       "description": "Design that highlights projects for creative professionals"
     },
-    "thumbnail": "thumbnails/gradient_portfolio.png",
-    "created": "2025-03-31T12:01:30.215205"
+    "thumbnail": "images/thumbnails/gradient_portfolio.png",
+    "created": "2025-04-01T08:18:12.445578"
   },
   "gradient_compact": {
     "id": "gradient_compact",
@@ -3196,7 +3196,7 @@
       "name": "One-Page Compact",
       "description": "Compact layout designed to fit everything on one page"
     },
-    "thumbnail": "thumbnails/gradient_compact.png",
-    "created": "2025-03-31T12:01:30.222136"
+    "thumbnail": "images/thumbnails/gradient_compact.png",
+    "created": "2025-04-01T08:18:12.452579"
   }
 }

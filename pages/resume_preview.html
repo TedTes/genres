@@ -563,7 +563,7 @@
                         onchange="document.getElementById('template-form').submit();">
                     <label for="template-{{ template_id }}" class="template-label" data-template-name="{{ template.id }}">
                         <div class="template-color-indicator {{ template_id }}">
-                            <img src="{{ template.thumbnail_url }}" alt="{{ template.id }} Thumbnail" class="template-thumbnail">
+                            <img src="{{url_for('static',filename=template.thumbnail ) }}" alt="{{ template.id }} Thumbnail" class="template-thumbnail">
                         </div>
                         <div class="template-info">
                             <span class="template-name">{{ template.id }}</span>
