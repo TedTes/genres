@@ -1094,10 +1094,6 @@ LAYOUTS = {
             background-color: var(--primary) !important;
         }
 
-        /* Ensure consistent font rendering */
-        * {
-            font-family: var(--font-family) !important;
-        }
 
         @media print, (max-width: 768px) {
             .resume-container {
@@ -1148,7 +1144,6 @@ LAYOUTS = {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            /* Removed gap: 15px 30px */
         }
 
         .contact-item {
