@@ -68,3 +68,36 @@ def dashboard():
         applications=applications_count,
         subscription=subscription,
         show_upgrade_banner=True)
+    
+
+
+@app.route('/admin/job-scraper/stat')
+@login_required
+@admin_required
+def job_scraper_dashboard():
+    # Get basic stats
+    total_jobs = Job.query.count()
+    jobs_by_source = db.session.query(
+        Job.source, 
+        db.func.count(Job.id).label('count')
+    ).group_by(Job.source).all()
+    
+    # Recent jobs
+    recent_jobs = Job.query.order_by(Job.created_at.desc()).limit(20).all()
+    
+    # Daily job counts for last 14 days
+    two_weeks_ago = datetime.utcnow() - timedelta(days=14)
+    daily_counts = db.session.query(
+        db.func.date(Job.created_at).label('date'),
+        db.func.count(Job.id).label('count')
+    ).filter(Job.created_at >= two_weeks_ago).group_by(
+        db.func.date(Job.created_at)
+    ).order_by(db.func.date(Job.created_at).desc()).all()
+    
+    return render_template(
+        'pages/job_scraper.html',
+        total_jobs=total_jobs,
+        jobs_by_source=jobs_by_source,
+        recent_jobs=recent_jobs,
+        daily_counts=daily_counts
+    )
