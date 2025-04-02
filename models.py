@@ -38,6 +38,12 @@ class Job(db.Model):
     posted_at = db.Column(db.DateTime)
     resumes = db.relationship('Resume', back_populates='job', lazy=True)
 
+    #scraper-specific fields:
+    source = db.Column(db.String(50))
+    source_job_id = db.Column(db.String(100))
+    is_active = db.Column(db.Boolean, default=True)
+    last_seen = db.Column(db.DateTime)
+
 # Update the Resume model in models.py
 
 class Resume(db.Model):
@@ -95,3 +101,16 @@ class Subscription(db.Model):
     
     def __repr__(self):
         return f'<Subscription {self.id} for User {self.user_id} ({self.plan_id})>'
+
+class ScraperRun(db.Model):
+    """Track individual scraper runs for monitoring"""
+    id = db.Column(db.Integer, primary_key=True)
+    source = db.Column(db.String(50), nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False)
+    end_time = db.Column(db.DateTime)
+    status = db.Column(db.String(20))  # success, failed, partial
+    jobs_found = db.Column(db.Integer, default=0)
+    jobs_added = db.Column(db.Integer, default=0)
+    keywords = db.Column(db.String(255))
+    location = db.Column(db.String(255))
+    error_message = db.Column(db.Text)
