@@ -1,0 +1,67 @@
+<!-- templates/admin/job_scraper.html -->
+{% extends "base.html" %}
+
+{% block title %}Job Scraper Dashboard - Admin{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Job Scraper Dashboard</h1>
+    
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h3>Total Jobs</h3>
+            <div class="stat-number">{{ total_jobs }}</div>
+        </div>
+        
+        <!-- More stats cards -->
+    </div>
+    
+    <div class="dashboard-charts">
+        <div class="chart-container">
+            <h3>Jobs by Source</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for source in jobs_by_source %}
+                    <tr>
+                        <td>{{ source.source }}</td>
+                        <td>{{ source.count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- More charts -->
+    </div>
+    
+    <div class="recent-jobs">
+        <h3>Recent Jobs</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Company</th>
+                    <th>Source</th>
+                    <th>Added</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in recent_jobs %}
+                <tr>
+                    <td>{{ job.title }}</td>
+                    <td>{{ job.company_name }}</td>
+                    <td>{{ job.source }}</td>
+                    <td>{{ job.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
