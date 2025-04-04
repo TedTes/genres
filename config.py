@@ -23,3 +23,16 @@ class Config:
     PAYPAL_6MONTH_PLAN_ID = os.environ.get('PAYPAL_6MONTH_PLAN_ID')
     PAYPAL_ANNUAL_PLAN_ID = os.environ.get('PAYPAL_ANNUAL_PLAN_ID')
     PAYPAL_WEBHOOK_ID = os.environ.get('PAYPAL_WEBHOOK_ID')
+
+    #base web urls
+    S_BUCK = os.environ.get('S_BUCK_BASE_URL')
+    T_HORT = os.environ.get('T_HORT_BASE_URL')
+    H_DEPO = os.environ.get('H_DEPO_BASE_URL')
+    W_MAR = os.environ.get('W_MAR_BASE_URL')
+
+
+    #selectors
+    S_BUCK_SELECTOR = os.environ.get('S_BUCK_SELECTOR')
+    T_HORT_SELECTOR = os.environ.get('T_HORT_SELECTOR')
+    H_DEPO_SELECTOR = os.environ.get('H_DEPO_SELECTOR')
+    W_MAR_SELECTOR = os.environ.get('H_MAR_SELECTOR')
