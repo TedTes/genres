@@ -35,4 +35,4 @@ class Config:
     S_BUCK_SELECTOR = os.environ.get('S_BUCK_SELECTOR')
     T_HORT_SELECTOR = os.environ.get('T_HORT_SELECTOR')
     H_DEPO_SELECTOR = os.environ.get('H_DEPO_SELECTOR')
-    W_MAR_SELECTOR = os.environ.get('H_MAR_SELECTOR')
+    W_MAR_SELECTOR = os.environ.get('W_MAR_SELECTOR')
