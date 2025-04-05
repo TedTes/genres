@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request
 from datetime import datetime, timedelta
 from sqlalchemy import func, desc
 from models import Job, ScraperRun
-from app import db
+from db import db
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
