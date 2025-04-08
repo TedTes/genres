@@ -1,5 +1,6 @@
 from flask import Blueprint,abort,render_template,url_for,redirect
-from helpers import get_recent_job_matches,calculate_resume_completeness
+from helpers.job_helper import get_recent_job_matches
+from helpers.resume_helper import calculate_resume_completeness
 from flask_login import  current_user, login_required
 from models import  User, Job, Resume,Application
 from services.subscription_service import SubscriptionService

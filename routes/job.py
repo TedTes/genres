@@ -6,70 +6,40 @@ from models import  Job, Resume
 from datetime import datetime
 from forms import JobSearchForm
 from db import db
-from helpers import calculate_skill_match,find_similar_jobs,fetch_job_by_slug,extract_skills_from_text,extract_job_tags,fetch_jobs
+from helpers.resume_helper import calculate_skill_match,extract_skills_from_text
+from helpers.job_helper import find_similar_jobs,extract_job_tags,process_jobs_for_display
+from services.job_service import JobService
+
 job_bp = Blueprint("job", __name__)
+# Create job service instance
+job_service = JobService()
 
 @job_bp.route('/job', methods=['GET', 'POST'])
 def job():
-        form = JobSearchForm()
-        jobs_data = []
-        
-        try:
-            if form.validate_on_submit():
-                # Get form data for filtering
-                search_term = form.search.data
-                location = form.location.data
-                remote_only = form.remote.data
-                
-                # Fetch jobs with filters
-                jobs_data = fetch_jobs(search_term, location, remote_only)
-            else:
-                # Default fetch with no filters
-                jobs_data = fetch_jobs()
-
-            # Process job data to extract tags and format dates
-            processed_jobs = []
-            for job in jobs_data:
-                # Extract tags from job title and description
-                tags = extract_job_tags(job.get('title', ''), job.get('description', ''))
-                
-                # Format the date
-                created_at = job.get('created_at')
-                if created_at:
-                    # Convert ISO date to more readable format
-                    try:
-                        if created_at and isinstance(created_at,str):
-                           date_obj = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
-                        else:
-                            date_obj = datetime.now()
-                        days_ago = (datetime.now(date_obj.tzinfo) - date_obj).days
-                        
-                        if days_ago == 0:
-                            formatted_date = "Today"
-                        elif days_ago == 1:
-                            formatted_date = "Yesterday"
-                        else:
-                            formatted_date = f"{days_ago} days ago"
-                    except:
-                        formatted_date = "Recently"
-                else:
-                    formatted_date = "Recently"
-                
-                # Create processed job object
-                processed_job = {
-                    **job,  # Include all original job data
-                    'tags': tags[:3],  # Limit to top 3 tags
-                    'created_at': formatted_date
-                }
-                
-                processed_jobs.append(processed_job)
+    form = JobSearchForm()
+    
+    try:
+        if form.validate_on_submit():
+            # Get form data for filtering
+            search_term = form.search.data
+            location = form.location.data
+            remote_only = form.remote.data
             
-            return render_template('jobs.html', jobs=processed_jobs, form=form)
+            # Fetch jobs with filters using job service
+            jobs_data = job_service.get_jobs(search_term, location, remote_only)
+        else:
+            # Default fetch with no filters
+            jobs_data = job_service.get_jobs()
         
-        except Exception as e:
-            print(f"Error in jobs route: {e}")
-            flash(f"Error fetching jobs: {str(e)}", 'danger')
-            return render_template('jobs.html', jobs=[], form=form)
+        # Process job data using job service
+        processed_jobs = process_jobs_for_display(jobs_data)
+        
+        return render_template('jobs.html', jobs=processed_jobs, form=form)
+        
+    except Exception as e:
+        print(f"Error in jobs route: {e}")
+        flash(f"Error fetching jobs: {str(e)}", 'danger')
+        return render_template('jobs.html', jobs=[], form=form)
 
 @job_bp.route('/job/<slug>')
 def job_detail(slug):
