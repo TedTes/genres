@@ -3,7 +3,7 @@ import logging
 from services.scraper.data_aggregator import DataAggregator
 from db import db
 from app import app
-from parser_configs import configs
+from .parser_configs import configs
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

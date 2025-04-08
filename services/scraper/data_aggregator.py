@@ -1,7 +1,7 @@
 import asyncio
 from typing import List, Dict
-from web_scraper import WebScraper
-from parser import parse_jobs
+from .web_scraper import WebScraper
+from .parser import parse_jobs
 import logging
 from datetime import datetime
 from db import db
@@ -39,6 +39,7 @@ class DataAggregator:
                 job["source"] = site_key
                 job["source_job_id"] = job.pop("job_id", None)  # Rename job_id to source_job_id
                 job["site"] = url  # Store full URL as source reference
+
             return jobs
         except Exception as e:
             logger.error(f"Failed to scrape {site_key}: {str(e)}")

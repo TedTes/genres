@@ -20,7 +20,7 @@ class WebScraper:
         self.headless = headless
         self.timeout = timeout
     
-    async def scrape_elements(self, url: str, selector: str, wait_time: int = 3000) -> List[ElementHandle]:
+    async def scrape_html_block(self, url: str, selector: str, wait_time: int = 3000):
         """
         Scrape elements from a web page.
         
@@ -57,11 +57,12 @@ class WebScraper:
                 elements_locator = page.locator(selector)
                 await elements_locator.wait_for(state='visible', timeout=10000)
                 
-                # Get the element handles
-                element_handles = await elements_locator.element_handles()
+                # Get the html content
+                html_content = await elements_locator.inner_html()
                 
-                logger.info(f"Successfully scraped {len(element_handles)} elements")
-                return element_handles
+                logger.info(f"Successfully completed scraping html block content for {url}")
+                
+                return html_content
                 
             except Exception as e:
                 logger.error(f"Error scraping elements: {str(e)}")
