@@ -1,6 +1,6 @@
 import spacy
-from themes_helper import THEMES
-from layout_helper import LAYOUT
+from .themes_helper import THEMES
+from .layouts_helper import LAYOUTS
 
 def generate_pdf(html_string):
     html = HTML(string=html_string)
