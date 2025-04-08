@@ -20,7 +20,7 @@ class WebScraper:
         self.headless = headless
         self.timeout = timeout
     
-    async def scrape_html_block(self, url: str, selector: str, wait_time: int = 3000):
+    async def scrape_html_block(self, url: str, selector: str, wait_time: int = 6000):
         """
         Scrape elements from a web page.
         
@@ -61,7 +61,7 @@ class WebScraper:
                 html_content = await elements_locator.inner_html()
                 
                 logger.info(f"Successfully completed scraping html block content for {url}")
-                
+
                 return html_content
                 
             except Exception as e:
