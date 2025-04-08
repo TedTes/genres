@@ -1,6 +1,6 @@
 import requests
 from datetime import datetime
-
+from utils.date import format_job_posted_date
 
 def analyze_job_description(description):
     """
@@ -207,3 +207,47 @@ def get_recent_job_matches(user_id, limit=3):
         import traceback
         traceback.print_exc()
         return []
+
+def process_jobs_for_display(jobs):
+        """
+        Process job data to add tags and format dates
+        
+        Args:
+            jobs: List of Job objects
+            
+        Returns:
+            list: List of processed job dictionaries
+        """
+        processed_jobs = []
+        
+        for job in jobs:
+            # Convert SQLAlchemy object to dictionary
+            job_dict = {
+                'id': job.id,
+                'title': job.title,
+                'company': job.company,
+                'location': job.location,
+                'description': job.description,
+                'remote': job.remote,
+                'salary': job.salary,
+                'url': job.url,
+                'slug': job.slug,
+                'created_at': job.created_at
+            }
+            
+            # Extract tags from job title and description
+            tags = extract_job_tags(job.title, job.description)
+            
+            # Format the date
+            formatted_date = format_job_posted_date(job.created_at)
+            
+            # Create processed job object
+            processed_job = {
+                **job_dict,
+                'tags': tags[:3],  # Limit to top 3 tags
+                'created_at': formatted_date
+            }
+            
+            processed_jobs.append(processed_job)
+        
+        return processed_jobs
