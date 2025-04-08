@@ -1,7 +1,7 @@
 configs = {
     "h-depo": {
-        "site": "careers.homedepot.ca",
-        "container_selector": "li.job-list-item",
+        "site": "https://careers.homedepot.ca/job-search",
+        "container_selector": ".jobs-content",
         "url": {"selector": "a[href]", "extract": "href"},
         "title": {"selector": ".job-data h3", "extract": "text"},
         "company": {"selector": ".job-logo img[alt]", "extract": "alt"},
@@ -11,7 +11,7 @@ configs = {
     },
     "s-buck": {
         "site": "https://starbucks.eightfold.ai/careers",
-        "container_selector": "div.job-item",
+        "container_selector": "div[role='list']",
         "url": {"selector": "a[href]", "extract": "href"},
         "title": {"selector": ".position-title", "extract": "text"},
         "company": {"value": "Starbucks"},
@@ -21,7 +21,7 @@ configs = {
     },
     "t-hort": {
         "site": "https://app.higherme.com/careers/58bd9e7f472bd?langCode=en",
-        "container_selector": "div.sc-gpDAgj",
+        "container_selector": "div[class='hCXxvRc89YBhPXkzL9Wl'] > div",
         "url": {"selector": "button.sc-jbAkgO[href]", "extract": "href"},
         "title": {"selector": "h1.sc-gjcoXW", "extract": "text"},
         "company": {"value": "Tim Hortons"},
@@ -31,7 +31,7 @@ configs = {
     },
     "w-mart": {
         "site": "https://careers.walmart.ca/search-jobs",
-        "container_selector": "li",
+        "container_selector": "#search-results-list",
         "url": {"selector": "a[href]", "extract": "href"},
         "title": {"selector": "h2", "extract": "text"},
         "company": {"value": "Walmart"},
@@ -41,7 +41,7 @@ configs = {
     },
     "l-law": {
         "site": "https://careers.loblaw.ca/jobs",
-        "container_selector": "li.results-list__item",
+        "container_selector": ".results-list.front",
         "url": {"selector": ".results-list__item-title[href]", "extract": "href"},
         "title": {"selector": ".results-list__item-title span", "extract": "text"},
         "company": {"selector": ".results-list__item-brand--label", "extract": "text"},
@@ -50,7 +50,7 @@ configs = {
     },
     "j-bank": {
         "site": "https://www.jobbank.gc.ca/jobsearch/",
-        "container_selector": "article",
+        "container_selector": ".results-jobs",
         "url": {"selector": ".resultJobItem[href]", "extract": "href"},
         "title": {"selector": ".noctitle", "extract": "text"},
         "company": {"selector": ".business", "extract": "text"},
@@ -60,7 +60,7 @@ configs = {
     },
     "m-don": {
         "site": "https://careers.mcdonalds.ca/restaurant-jobs",
-        "container_selector": "li.results-list__item",
+        "container_selector": ".results-list.front",
         "url": {"selector": ".results-list__item-title[href]", "extract": "href"},
         "title": {"selector": ".results-list__item-title span", "extract": "text"},
         "company": {"selector": ".results-list__item-brand--label", "extract": "text"},
@@ -68,8 +68,8 @@ configs = {
         "job_id": {"selector": ".results-list__item-title[href]", "extract": "href", "post_process": "split('/')[-1]"}
     },
     "m-tro": {
-        "site": "talent.metro.ca",
-        "container_selector": "div.job-block",
+        "site": "https://talent.metro.ca/en",
+        "container_selector": ".grid.grid-cols-1.gap-4",
         "url": {"selector": "button.bg-primary[href]", "extract": "href"},
         "title": {"selector": "h2", "extract": "text"},
         "company": {"value": "Metro"},
