@@ -50,13 +50,13 @@ def dashboard():
 
     # Format dates for display
     for job in job_matches_list:
-        days_ago = job.get('created_at', 0)
+        days_ago = job.get('posted_at', 0)
         if days_ago == 0:
-            job['created_at'] = "Today"
+            job['posted_at'] = "Today"
         elif days_ago == 1:
-            job['created_at'] = "Yesterday"
+            job['posted_at'] = "Yesterday"
         else:
-            job['created_at'] = f"{days_ago} days ago"
+            job['posted_at'] = f"{days_ago} days ago"
 
     # Placeholder for applications count
     applications_count = Application.query.filter_by(user_id=current_user.id).count()

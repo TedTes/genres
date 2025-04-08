@@ -96,7 +96,7 @@
                                         {% endif %}
                                         <span class="job-search-date">
                                             <i class="far fa-calendar-alt"></i> 
-                                            {{ job.created_at|default('Recently posted') }}
+                                            {{ job.posted_at|default('Recently posted') }}
                                         </span>
                                     </div>
                                     <div class="job-search-tags">

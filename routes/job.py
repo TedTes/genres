@@ -57,7 +57,7 @@ def job_detail(slug):
                     flash('Job not found.', 'danger')
                     return redirect(url_for('job.job'))
                 
-                created_at = job_data.get('created_at')
+                posted_at = job_data.get('posted_at')
             
                 # Create a new Job record in the database
                 jobRes = Job(
@@ -66,7 +66,7 @@ def job_detail(slug):
                     company=job_data.get('company_name', 'Unknown Company'),
                     location=job_data.get('location', 'Remote'),
                     description=job_data.get('description', ''),
-                    posted_at=datetime.fromisoformat(job_data.get('created_at', datetime.now().isoformat()).replace('Z', '+00:00')) if created_at and isinstance(created_at,str) else datetime.now()
+                    posted_at=datetime.fromisoformat(job_data.get('posted_at', datetime.now().isoformat()).replace('Z', '+00:00')) if posted_at and isinstance(posted_at,str) else datetime.now()
                 )
             
                 # Add additional attributes from API data
@@ -75,24 +75,24 @@ def job_detail(slug):
                 job_data['tags'] = extract_job_tags(job_data.get('title', ''), job_data.get('description', ''))
                 
                 # Format the date
-                if created_at:
+                if posted_at:
                     try: 
-                        if created_at and isinstance(created_at,str):
-                            date_obj = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                        if posted_at and isinstance(posted_at,str):
+                            date_obj = datetime.fromisoformat(posted_at.replace('Z', '+00:00'))
                         else:
                             date_obj = datetime.now()
                             days_ago = (datetime.now(date_obj.tzinfo) - date_obj).days
                         
                         if days_ago == 0:
-                            job_data['created_at'] = "Today"
+                            job_data['posted_at'] = "Today"
                         elif days_ago == 1:
-                            job_data['created_at'] = "Yesterday"
+                            job_data['posted_at'] = "Yesterday"
                         else:
-                            job_data['created_at'] = f"{days_ago} days ago"
+                            job_data['posted_at'] = f"{days_ago} days ago"
                     except:
-                        job_data['created_at'] = "Recently"
+                        job_data['posted_at'] = "Recently"
                 else:
-                    job_data['created_at'] = "Recently"
+                    job_data['posted_at'] = "Recently"
 
                 # Save to database
                 db.session.add(jobRes)
@@ -110,7 +110,7 @@ def job_detail(slug):
                     'location': job.location,
                     'description': job.description or '',
                     'remote': True if 'remote' in job.location.lower() else False,
-                    'created_at': "Today" if (datetime.now() - job.posted_at).days == 0 else 
+                    'posted_at': "Today" if (datetime.now() - job.posted_at).days == 0 else 
                                 "Yesterday" if (datetime.now() - job.posted_at).days == 1 else
                                 f"{(datetime.now() - job.posted_at).days} days ago",
                     'tags': extract_job_tags(job.title, job.description),

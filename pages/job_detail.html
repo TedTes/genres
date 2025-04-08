@@ -34,7 +34,7 @@
                     {% endif %}
                     <span class="job-date">
                         <i class="far fa-calendar-alt"></i> 
-                        {{ job.created_at|default('Recently posted') }}
+                        {{ job.posted_at|default('Recently posted') }}
                     </span>
                 </div>
             </div>
@@ -158,7 +158,7 @@
                             <div class="info-label">
                                 <i class="far fa-calendar-alt"></i> Posted
                             </div>
-                            <div class="info-value">{{ job.created_at|default('Recently') }}</div>
+                            <div class="info-value">{{ job.posted_at|default('Recently') }}</div>
                         </li>
                     </ul>
                 </div>
