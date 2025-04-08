@@ -19,6 +19,10 @@ def parse_job(config, job_block):
                             value = value.split('/')[-1]
                         elif post_process == "split()[-1]":
                             value = value.split()[-1]
+                        elif post_process == "split('_')[-1]":
+                            value = value.split('_')[-1]
+                        elif post_process == "split('-')[-1]":
+                            value = value.split('-')[-1]
                     job_data[field] = value
                 else:
                     job_data[field] = "N/A"
@@ -35,6 +39,10 @@ def parse_job(config, job_block):
                             value = value.split('/')[-1]
                         elif post_process == "split()[-1]":
                             value = value.split()[-1]
+                        elif post_process == "split('_')[-1]":
+                            value = value.split('_')[-1]
+                        elif post_process == "split('-')[-1]":
+                            value = value.split('-')[-1]
                     job_data[field] = value
                 else:
                     job_data[field] = "N/A"
@@ -46,21 +54,24 @@ def parse_job(config, job_block):
 
 def parse_jobs(config, html):
     """
-    Parse multiple job blocks from a single HTML string.
+    Parse multiple job blocks from a flat HTML string (e.g., <li>...</li><li>...</li>).
     
     Args:
-        config (dict): Config for one company, including container_selector
-        html (str): Single HTML string with job blocks one after another
+        config (dict): Config for one company, container_selector unused in parsing
+        html (str): Flat string of job blocks from WebScraper
     
     Returns:
         list: List of parsed job dictionaries
     """
-    if "container_selector" not in config:
-        raise ValueError("container_selector must be provided in config")
-    
+    if not html.strip():
+        return []
+
     soup = BeautifulSoup(html, 'html.parser')
-    job_blocks = soup.select(config["container_selector"])
+    
+    # Find all top-level elements (e.g., <li>, <div>, <article>) in the flat string
+    job_blocks = [child for child in soup.children if child.name]  # Filter out text nodes
+    
     if not job_blocks:
-        return []  # No jobs found
+        return []
     
     return [parse_job(config, block) for block in job_blocks]
