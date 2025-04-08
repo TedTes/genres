@@ -118,11 +118,11 @@ def find_similar_jobs(current_slug, job_skills, limit=3):
             # Format dates
             days_ago = (datetime.now() - job.posted_at).days if job.posted_at else 0
             if days_ago == 0:
-                job.created_at = "Today"
+                job.posted_at = "Today"
             elif days_ago == 1:
-                job.created_at = "Yesterday"
+                job.posted_at = "Yesterday"
             else:
-                job.created_at = f"{days_ago} days ago"
+                job.posted_at = f"{days_ago} days ago"
         
         return similar_jobs
     
@@ -158,7 +158,7 @@ def get_recent_job_matches(user_id, limit=3):
                 'company_name': job.company,
                 'location': job.location,
                 'remote': 'remote' in job.location.lower() if job.location else False,
-                'created_at': (datetime.now() - job.posted_at).days if job.posted_at else 0,
+                'posted_at': (datetime.now() - job.posted_at).days if job.posted_at else 0,
                 'match': 50  # Default match score of 50% for users without skills
             } for job in recent_jobs]
         
@@ -192,7 +192,7 @@ def get_recent_job_matches(user_id, limit=3):
                 'location': job.location,
                 'remote': 'remote' in job.location.lower() if job.location else False,
                 'match': match_percentage,
-                'created_at': (datetime.now() - job.posted_at).days if job.posted_at else 0
+                'posted_at': (datetime.now() - job.posted_at).days if job.posted_at else 0
             }
             
             job_matches.append(job_match)
@@ -239,13 +239,13 @@ def process_jobs_for_display(jobs):
             tags = extract_job_tags(job.title, job.description)
             
             # Format the date
-            formatted_date = format_job_posted_date(job.created_at)
+            formatted_date = format_job_posted_date(job.posted_at)
             
             # Create processed job object
             processed_job = {
                 **job_dict,
                 'tags': tags[:3],  # Limit to top 3 tags
-                'created_at': formatted_date
+                'posted_at': formatted_date
             }
             
             processed_jobs.append(processed_job)

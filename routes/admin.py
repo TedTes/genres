@@ -16,16 +16,16 @@ def job_scraper_dashboard():
     ).group_by(Job.source).all()
     
     # Recent jobs
-    recent_jobs = Job.query.order_by(Job.created_at.desc()).limit(20).all()
+    recent_jobs = Job.query.order_by(Job.posted_at.desc()).limit(20).all()
     
     # Daily job counts for last 14 days
     two_weeks_ago = datetime.utcnow() - timedelta(days=14)
     daily_counts = db.session.query(
-        func.date(Job.created_at).label('date'),
+        func.date(Job.posted_at).label('date'),
         func.count(Job.id).label('count')
-    ).filter(Job.created_at >= two_weeks_ago).group_by(
-        func.date(Job.created_at)
-    ).order_by(func.date(Job.created_at).desc()).all()
+    ).filter(Job.posted_at >= two_weeks_ago).group_by(
+        func.date(Job.posted_at)
+    ).order_by(func.date(Job.posted_at).desc()).all()
     
     # Recent scraper runs
     recent_runs = ScraperRun.query.order_by(
