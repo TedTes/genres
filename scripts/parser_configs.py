@@ -31,7 +31,7 @@ configs = {
     },
     "w-mart": {
         "site": "https://careers.walmart.ca/search-jobs",
-        "container_selector": "#search-results-list",
+        "container_selector": "#search-results-list > ul",
         "url": {"selector": "a[href]", "extract": "href"},
         "title": {"selector": "h2", "extract": "text"},
         "company": {"value": "Walmart"},
