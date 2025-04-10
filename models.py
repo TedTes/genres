@@ -38,12 +38,12 @@ class Job(db.Model):
     posted_at = db.Column(db.DateTime)
     resumes = db.relationship('Resume', back_populates='job', lazy=True)
     remote = db.Column(db.Boolean, default=False)
-    salary = db.Column(db.String(10), default = 0)
     #scraper-specific fields:
-    source = db.Column(db.String(50))
-    source_job_id = db.Column(db.String(100))
+    source = db.Column(db.String(50), nullable=True)
+    source_job_id = db.Column(db.String(50), nullable=True)
     is_active = db.Column(db.Boolean, default=True)
-    last_seen = db.Column(db.DateTime)
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+    url = db.Column(db.String(50), nullable=True)
 
 # Update the Resume model in models.py
 
