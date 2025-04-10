@@ -60,7 +60,7 @@ def job_detail(slug):
                             "Yesterday" if (datetime.now() - job.posted_at).days == 1 else
                             f"{(datetime.now() - job.posted_at).days} days ago",
                 'tags': extract_job_tags(job.title, job.description),
-                'apply_url': f"https://www.arbeitnow.com/view/{job.slug}" if job.slug else None
+                'apply_url': f"{job.url}" if job.url else None
             }
             job_skills = extract_skills_from_text(job.get('description'))
             # For authenticated users, calculate skills match
