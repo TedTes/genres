@@ -1,6 +1,7 @@
 import spacy
 from .themes_helper import THEMES
 from .layouts_helper import LAYOUTS
+from jinja2 import  Environment, FileSystemLoader
 
 def generate_pdf(html_string):
     html = HTML(string=html_string)
