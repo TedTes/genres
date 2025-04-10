@@ -35,7 +35,7 @@ class Job(db.Model):
     company = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(100))
     description = db.Column(db.Text)
-    posted_at = db.Column(db.DateTime)
+    posted_at = db.Column(db.DateTime,default=datetime.utcnow)
     resumes = db.relationship('Resume', back_populates='job', lazy=True)
     remote = db.Column(db.Boolean, default=False)
     #scraper-specific fields:
