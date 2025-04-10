@@ -1,125 +1,154 @@
-# ResumeMatch - Job-Tailored Resume Builder
+# ResumeMatch
 
-ResumeMatch is a web application that helps job seekers create tailored resumes optimized for specific job listings. The application fetches real-time job listings, analyzes job descriptions to extract key skills, and guides users through creating professional resumes targeted to their desired positions.
+ResumeMatch is an AI-powered resume builder that helps job seekers create professional, ATS-optimized resumes tailored to specific job listings with intelligent skills matching.
 
 ## Features
 
-- **Real-time Job Listings**: Browse jobs from the Arbeitnow API with filtering options for keywords, location, and remote work.
-- **Job Analysis**: Automatically extract key skills and requirements from job descriptions using NLP.
-- **Tailored Resume Creation**: Multi-step form process to create resumes specifically designed for individual job listings.
-- **Skills Matching**: Compare your skills with job requirements to see how well you match with positions.
-- **PDF Generation**: Download professionally formatted PDF resumes ready for submission.
-- **User Dashboard**: Manage all your created resumes in one place.
+- **AI-powered resume creation**: Generate professional resumes with optimal formatting and content
+- **Job-specific tailoring**: Customize your resume to match specific job listings
+- **ATS optimization**: Create resumes that pass through Applicant Tracking Systems
+- **Skills matching**: Automatically identify and highlight relevant skills for job positions
+- **Multiple templates**: Choose from various professional resume templates
+- **Job search**: Browse job listings and create tailored resumes for each position
+- **Application tracking**: Track your job applications and their statuses
+- **PDF download**: Export your resume as a PDF ready for submission
 
-## Technology Stack
+## Tech Stack
 
-- **Backend**: Flask web framework with Python
-- **Database**: SQLAlchemy ORM with PostgreSQL (via Supabase)
-- **Authentication**: Flask-Login for user management
-- **Forms**: Flask-WTF for form handling and validation
-- **API Integration**: Requests library for Arbeitnow API integration
-- **Text Analysis**: spaCy for Natural Language Processing
-- **PDF Generation**: WeasyPrint for converting HTML to PDF
-- **Frontend**: HTML, CSS, JavaScript with responsive design
-
-## Installation
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/resume-matcher.git
-   cd resume-matcher
-   ```
-
-2. Create and activate a virtual environment:
-   ```
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. Install the required packages:
-   ```
-   pip install -r requirements.txt
-   ```
-
-4. Set up environment variables:
-   ```
-   # Create a .env file with the following variables
-   FLASK_APP=app.py
-   FLASK_ENV=development
-   DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:6543/postgres
-   FLASK_SECRET_KEY=[YOUR_SECRET_KEY]
-   ```
-
-5. Initialize the database:
-   ```
-   flask db upgrade
-   ```
-
-6. Run the application:
-   ```
-   flask run
-   ```
+- **Backend**: Python/Flask
+- **Database**: PostgreSQL (with SQLAlchemy ORM)
+- **Frontend**: HTML, CSS, JavaScript
+- **Authentication**: Flask-Login
+- **Form Handling**: WTForms
+- **PDF Generation**: WeasyPrint
+- **Job Scraping**: PlayWright, BeautifulSoup
+- **NLP**: spaCy for skills extraction and matching
+- **Payment Processing**: Stripe integration (with PayPal support)
+- **Storage**: Supabase for file storage
 
 ## Project Structure
 
 ```
-resume-matcher/
-├── app.py              # Main application initialization
-├── routes.py           # Route definitions
-├── models.py           # Database models
-├── forms.py            # Form definitions
-├── static/             # Static assets
-│   ├── css/            # CSS files
-│   ├── js/             # JavaScript files
-│   └── images/         # Image assets
-├── templates/          # HTML templates
-│   ├── base.html       # Base template
-│   ├── home.html       # Landing page
-│   ├── dashboard.html  # User dashboard
-│   ├── jobs.html       # Job listings
-│   ├── job_detail.html # Job details
-│   └── resume/         # Resume creation templates
-├── migrations/         # Database migrations
-└── requirements.txt    # Dependencies
+ResumeMatch/
+├── app.py                  # Main application entry point
+├── db.py                   # Database configuration
+├── forms.py                # WTForms form definitions
+├── models.py               # SQLAlchemy models
+├── routes/                 # Route handlers
+│   ├── admin.py            # Admin dashboard routes
+│   ├── application.py      # Job application tracking routes
+│   ├── auth.py             # Authentication routes
+│   ├── job.py              # Job listing and search routes
+│   ├── payment.py          # Payment processing routes
+│   ├── resume.py           # Resume creation/editing routes
+│   └── root.py             # Home and dashboard routes
+├── helpers/                # Helper functions
+│   ├── job_helper.py       # Job data processing helpers
+│   ├── resume_helper.py    # Resume generation helpers
+│   ├── layouts_helper.py   # Resume layout definitions
+│   └── themes_helper.py    # Resume theme definitions
+├── services/               # Business logic services
+│   ├── job_service.py      # Job-related business logic
+│   ├── subscription_service.py # Subscription management
+│   └── scraper/            # Job scraping functionality
+│       ├── web_scraper.py  # Web scraping using PlayWright
+│       ├── parser.py       # HTML parsing with BeautifulSoup
+│       └── data_aggregator.py # Combines scraped data
+├── pages/                  # HTML templates
+│   ├── base.html           # Base template with common structure
+│   ├── home.html           # Landing page
+│   ├── dashboard.html      # User dashboard
+│   ├── jobs.html           # Job search page
+│   ├── job_detail.html     # Individual job listing
+│   └── resume_*.html       # Various resume creation forms
+├── static/                 # Static assets (CSS, JS, images)
+└── payments/               # Payment gateway implementations
+    ├── base.py             # Abstract payment gateway
+    ├── stripe_gateway.py   # Stripe integration
+    └── paypal_gateway.py   # PayPal integration
 ```
 
-## Usage
+## Setup Instructions
 
-1. Register a new account or log in to an existing account.
-2. Browse jobs on the Jobs page, using filters to find relevant positions.
-3. View job details to see the full job description and skills match.
-4. Click "Create Resume" to start building a tailored resume for a specific job.
-5. Follow the step-by-step form to enter your information.
-6. Preview your resume and download the PDF.
-7. Manage all your resumes from the Dashboard.
+### Prerequisites
 
-## API Integration
+- Python 3.8+
+- PostgreSQL
+- Node.js and npm (for frontend development)
 
-The application integrates with the Arbeitnow API to fetch real-time job listings. The API endpoint is:
-```
-https://www.arbeitnow.com/api/job-board-api
-```
+### Environment Setup
 
-## Database 
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/resumematch.git
+   cd resumematch
+   ```
 
-The application uses PostgreSQL hosted on Supabase. The database schema includes these main tables:
-- Users: Authentication and profile information
-- Jobs: Cached job listings from the API
-- Resumes: User-created resumes linked to jobs
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-## Future Enhancements
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-- Enhanced job matching algorithm
-- Cover letter generation
-- Application tracking system
-- Email notifications
-- Multiple resume templates
-- Social media login integration
+4. Set up environment variables in a `.env` file:
+   ```
+   DATABASE_URL=postgresql://username:password@localhost/resumematch
+   SECRET_KEY=your_secret_key
+   STRIPE_SECRET_KEY=your_stripe_secret_key
+   STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_KEY=your_supabase_key
+   ```
+
+5. Initialize the database:
+   ```bash
+   flask db init
+   flask db migrate
+   flask db upgrade
+   ```
+
+### Running the Application
+
+1. Start the Flask development server:
+   ```bash
+   flask run
+   ```
+
+2. Visit `http://localhost:5000` in your browser
+
+## Subscription Plans
+
+ResumeMatch offers the following subscription options:
+
+- **Free Plan**: Basic features with limited templates
+- **3-Month Plan**: $30 (Premium features for 3 months)
+- **6-Month Plan**: $48 (Premium features for 6 months)
+- **Annual Plan**: $80 (Premium features for 12 months)
+
+## Resume Templates
+
+The application includes multiple professional resume templates:
+
+- Classic
+- Modern
+- Sidebar
+- Minimalist
+- Professional
+- Timeline
+- Cards
+- Grid
+- Portfolio
+- Compact
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Commit your changes: `git commit -m 'Add some feature'`
+4. Push to the branch: `git push origin feature-name`
+5. Open a pull request
