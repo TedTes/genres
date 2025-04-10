@@ -229,10 +229,9 @@ def process_jobs_for_display(jobs):
                 'location': job.location,
                 'description': job.description,
                 'remote': job.remote,
-                'salary': job.salary,
                 'url': job.url,
                 'slug': job.slug,
-                'created_at': job.created_at
+                'posted_at': job.posted_at
             }
             
             # Extract tags from job title and description
