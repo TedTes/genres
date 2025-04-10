@@ -43,79 +43,25 @@ def job():
 
 @job_bp.route('/job/<slug>')
 def job_detail(slug):
-
         try: 
             mail = Mail(current_app)
             # First, check if job exists in the database
             job = Job.query.filter_by(slug=slug).first()
-            
-            # If not in database, fetch from API
-            if not job:
-                job_data = fetch_job_by_slug(slug)
-
-                if not job_data:
-                    flash('Job not found.', 'danger')
-                    return redirect(url_for('job.job'))
-                
-                posted_at = job_data.get('posted_at')
-            
-                # Create a new Job record in the database
-                jobRes = Job(
-                    slug=job_data.get('slug'),
-                    title=job_data.get('title', 'Untitled Position'),
-                    company=job_data.get('company_name', 'Unknown Company'),
-                    location=job_data.get('location', 'Remote'),
-                    description=job_data.get('description', ''),
-                    posted_at=datetime.fromisoformat(job_data.get('posted_at', datetime.now().isoformat()).replace('Z', '+00:00')) if posted_at and isinstance(posted_at,str) else datetime.now()
-                )
-            
-                # Add additional attributes from API data
-                job_data['remote'] = job_data.get('remote', False)
-                job_data['apply_url'] = job_data.get('url', '')
-                job_data['tags'] = extract_job_tags(job_data.get('title', ''), job_data.get('description', ''))
-                
-                # Format the date
-                if posted_at:
-                    try: 
-                        if posted_at and isinstance(posted_at,str):
-                            date_obj = datetime.fromisoformat(posted_at.replace('Z', '+00:00'))
-                        else:
-                            date_obj = datetime.now()
-                            days_ago = (datetime.now(date_obj.tzinfo) - date_obj).days
-                        
-                        if days_ago == 0:
-                            job_data['posted_at'] = "Today"
-                        elif days_ago == 1:
-                            job_data['posted_at'] = "Yesterday"
-                        else:
-                            job_data['posted_at'] = f"{days_ago} days ago"
-                    except:
-                        job_data['posted_at'] = "Recently"
-                else:
-                    job_data['posted_at'] = "Recently"
-
-                # Save to database
-                db.session.add(jobRes)
-                db.session.commit()
-                job_data['id'] = jobRes.id
-                job = job_data
-            else:
-
-                # Convert the SQLAlchemy model to a dictionary for template rendering
-                job = {
-                    'id': job.id,
-                    'slug': job.slug,
-                    'title': job.title,
-                    'company_name': job.company,
-                    'location': job.location,
-                    'description': job.description or '',
-                    'remote': True if 'remote' in job.location.lower() else False,
-                    'posted_at': "Today" if (datetime.now() - job.posted_at).days == 0 else 
-                                "Yesterday" if (datetime.now() - job.posted_at).days == 1 else
-                                f"{(datetime.now() - job.posted_at).days} days ago",
-                    'tags': extract_job_tags(job.title, job.description),
-                    'apply_url': f"https://www.arbeitnow.com/view/{job.slug}" if job.slug else None
-                }
+            # Convert the SQLAlchemy model to a dictionary for template rendering
+            job = {
+                'id': job.id,
+                'slug': job.slug,
+                'title': job.title,
+                'company_name': job.company,
+                'location': job.location,
+                'description': job.description or '',
+                'remote': True if 'remote' in job.location.lower() else False,
+                'posted_at': "Today" if (datetime.now() - job.posted_at).days == 0 else 
+                            "Yesterday" if (datetime.now() - job.posted_at).days == 1 else
+                            f"{(datetime.now() - job.posted_at).days} days ago",
+                'tags': extract_job_tags(job.title, job.description),
+                'apply_url': f"https://www.arbeitnow.com/view/{job.slug}" if job.slug else None
+            }
             job_skills = extract_skills_from_text(job.get('description'))
             # For authenticated users, calculate skills match
             skills_match = []
