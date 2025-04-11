@@ -7,7 +7,9 @@ from utils.date import format_job_posted_date
 class JobService:
     """Service class for handling job-related business logic"""
     
-    def get_jobs(self, search_term=None, location=None, remote_only=False):
+    def get_jobs(self, search_term=None, location=None, remote_only=False,date_posted=None, salary_min=None, salary_max=None, 
+             experience_level=None, employment_type=None, industry=None, 
+             company_size=None, skills_match=None):
         """
         Fetch jobs from database with optional filters
         
@@ -35,9 +37,36 @@ class JobService:
         
         if remote_only:
             query = query.filter(Job.remote.is_(True))
+        if date_posted:
+            days_ago = datetime.utcnow() - timedelta(days=int(date_posted))
+            query = query.filter(Job.posted_at >= days_ago)
+
+        if salary_min is not None:
+            query = query.filter(Job.salary >= salary_min)
+
+        if salary_max is not None:
+            query = query.filter(Job.salary <= salary_max)
+
+        if experience_level:
+            query = query.filter(Job.experience_level == experience_level)
+
+        if employment_type:
+            query = query.filter(Job.employment_type == employment_type)
+
+        if industry:
+            query = query.filter(Job.industry == industry)
+
+        if company_size:
+            query = query.filter(Job.company_size == company_size)
         
+        # Skills match requires special handling with logged-in user
+        if skills_match and current_user.is_authenticated:
+            # TODO: would require  implementation 
+            # to calculate skills match percentage on the fly
+            # or join with a pre-calculated match table
+            pass
         # Order by most recent
-        # query = query.order_by(Job.created_at.desc())
+        query = query.order_by(Job.posted_at.desc())
         
         return query.all()
     
