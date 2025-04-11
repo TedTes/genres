@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
-from wtforms.validators import DataRequired, Email, EqualTo, Length,Regexp
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField,IntegerField
+from wtforms.validators import DataRequired, Email, EqualTo, Length,Regexp,Optional, NumberRange
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=4, max=80)])
@@ -16,9 +16,68 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 class JobSearchForm(FlaskForm):
+    # Basic filters
     search = StringField('Search Term')
     location = StringField('Location')
     remote = BooleanField('Remote Only')
+    
+    # New primary filters
+    date_posted = SelectField('Date Posted', choices=[
+        ('', 'Any time'),
+        ('1', 'Last 24 hours'),
+        ('3', 'Last 3 days'),
+        ('7', 'Last 7 days'),
+        ('30', 'Last 30 days')
+    ])
+    
+    salary_min = IntegerField('Minimum Salary', validators=[Optional(), NumberRange(min=0)])
+    salary_max = IntegerField('Maximum Salary', validators=[Optional(), NumberRange(min=0)])
+    
+    # Advanced filters
+    experience_level = SelectField('Experience Level', choices=[
+        ('', 'Any experience'),
+        ('entry', 'Entry Level'),
+        ('mid', 'Mid-Level'),
+        ('senior', 'Senior'),
+        ('executive', 'Executive')
+    ])
+    
+    employment_type = SelectField('Employment Type', choices=[
+        ('', 'Any type'),
+        ('full_time', 'Full-time'),
+        ('part_time', 'Part-time'),
+        ('contract', 'Contract'),
+        ('internship', 'Internship'),
+        ('temporary', 'Temporary')
+    ])
+    
+    industry = SelectField('Industry', choices=[
+        ('', 'All industries'),
+        ('technology', 'Technology'),
+        ('healthcare', 'Healthcare'),
+        ('finance', 'Finance'),
+        ('education', 'Education'),
+        ('marketing', 'Marketing'),
+        ('retail', 'Retail'),
+        ('manufacturing', 'Manufacturing'),
+        ('hospitality', 'Hospitality')
+    ])
+    
+    company_size = SelectField('Company Size', choices=[
+        ('', 'Any size'),
+        ('startup', 'Startup'),
+        ('small', 'Small (1-50 employees)'),
+        ('medium', 'Medium (51-500 employees)'),
+        ('large', 'Large (500+ employees)')
+    ])
+    
+    skills_match = SelectField('Skills Match', choices=[
+        ('', 'Any match'),
+        ('50', '50%+ match'),
+        ('70', '70%+ match'),
+        ('90', '90%+ match')
+    ])
+    
     submit = SubmitField('Search')
 
 class ContactForm(FlaskForm):
