@@ -18,13 +18,13 @@ def format_job_posted_date(date):
                 date = datetime.fromisoformat(date.replace('Z', '+00:00'))
             
             # Calculate days ago
-            days_ago = (datetime.now(timezone.utc) - date).days
-            
+            days_ago = (datetime.now().date() - date.date()).days
             if days_ago == 0:
                 return "Today"
             elif days_ago == 1:
                 return "Yesterday"
             else:
                 return f"{days_ago} days ago"
-        except Exception:
+        except Exception as e:
+            print(f"Error formating job posted data , {str(e)}")
             return "Recently"

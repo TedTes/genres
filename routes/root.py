@@ -4,7 +4,7 @@ from helpers.resume_helper import calculate_resume_completeness
 from flask_login import  current_user, login_required
 from models import  User, Job, Resume,Application
 from services.subscription_service import SubscriptionService
-
+from utils.date import format_job_posted_date
 root_bp = Blueprint("root",__name__)
 
 
@@ -50,13 +50,7 @@ def dashboard():
 
     # Format dates for display
     for job in job_matches_list:
-        days_ago = job.get('posted_at', 0)
-        if days_ago == 0:
-            job['posted_at'] = "Today"
-        elif days_ago == 1:
-            job['posted_at'] = "Yesterday"
-        else:
-            job['posted_at'] = f"{days_ago} days ago"
+        job['posted_at'] = format_job_posted_date(job['posted_at'])
 
     # Placeholder for applications count
     applications_count = Application.query.filter_by(user_id=current_user.id).count()

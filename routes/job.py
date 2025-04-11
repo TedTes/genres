@@ -9,7 +9,7 @@ from db import db
 from helpers.resume_helper import calculate_skill_match,extract_skills_from_text
 from helpers.job_helper import find_similar_jobs,extract_job_tags,process_jobs_for_display
 from services.job_service import JobService
-
+from utils.date import format_job_posted_date
 job_bp = Blueprint("job", __name__)
 # Create job service instance
 job_service = JobService()
@@ -48,6 +48,7 @@ def job_detail(slug):
             # First, check if job exists in the database
             job = Job.query.filter_by(slug=slug).first()
             # Convert the SQLAlchemy model to a dictionary for template rendering
+            days_ago = format_job_posted_date(job.posted_at)
             job = {
                 'id': job.id,
                 'slug': job.slug,
@@ -58,7 +59,7 @@ def job_detail(slug):
                 'remote': True if 'remote' in job.location.lower() else False,
                 'posted_at': "Today" if (datetime.now() - job.posted_at).days == 0 else 
                             "Yesterday" if (datetime.now() - job.posted_at).days == 1 else
-                            f"{(datetime.now() - job.posted_at).days} days ago",
+                            f"{days_ago}",
                 'tags': extract_job_tags(job.title, job.description),
                 'apply_url': f"{job.url}" if job.url else None
             }
@@ -66,7 +67,7 @@ def job_detail(slug):
             # For authenticated users, calculate skills match
             skills_match = []
             match_percentage = 0
-            
+            user_skills_data = None
             if current_user.is_authenticated:
                 # Get user skills
                 user_resume = Resume.query.filter_by(user_id=current_user.id).first()

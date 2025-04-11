@@ -1,7 +1,7 @@
 import requests
 from datetime import datetime
 from utils.date import format_job_posted_date
-
+from utils.date import format_job_posted_date
 def analyze_job_description(description):
     """
     Analyze job description to extract important skills and keywords
@@ -116,13 +116,7 @@ def find_similar_jobs(current_slug, job_skills, limit=3):
             job.tags = list(extract_skills_from_text(job.description).keys())[:5]
             
             # Format dates
-            days_ago = (datetime.now() - job.posted_at).days if job.posted_at else 0
-            if days_ago == 0:
-                job.posted_at = "Today"
-            elif days_ago == 1:
-                job.posted_at = "Yesterday"
-            else:
-                job.posted_at = f"{days_ago} days ago"
+            job.posted_at = format_job_posted_date(job.posted_at)
         
         return similar_jobs
     
