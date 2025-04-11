@@ -3227,7 +3227,83 @@ job search content section
   margin: 0 0 1.5rem 0;
   max-width: 400px;
 }
+.job-search-advanced-toggle {
+  margin: 15px 0;
+  text-align: center;
+}
 
+.advanced-filters-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.advanced-filters-btn:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.toggle-text {
+  margin-right: 5px;
+}
+
+.toggle-icon {
+  transition: transform 0.3s;
+}
+
+.advanced-filters-btn.active .toggle-icon {
+  transform: rotate(180deg);
+}
+
+.job-search-advanced-filters {
+  display: none;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 15px;
+  margin-top: 5px;
+}
+
+.job-search-advanced-filters.active {
+  display: block;
+}
+
+.range-inputs {
+  display: flex;
+  align-items: center;
+}
+
+.salary-input {
+  width: calc(50% - 10px);
+}
+
+.range-separator {
+  margin: 0 10px;
+  color: var(--text-light);
+}
+
+/* Additional styles for new filter elements */
+.job-search-filter-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text);
+  background-color: white;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+}
 /* Responsive adjustments */
 @media (max-width: 992px) {
   .job-search-layout {
