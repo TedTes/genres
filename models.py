@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
 from db import db
-
+from sqlalchemy.dialects.postgresql import ARRAY
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -30,7 +30,7 @@ class User(db.Model, UserMixin):
 
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    slug = db.Column(db.String(100), unique=True, nullable=False)  # From Arbeitnow API
+    slug = db.Column(db.String(100), unique=True, nullable=False)
     title = db.Column(db.String(200), nullable=False)
     company = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(100))
@@ -38,13 +38,59 @@ class Job(db.Model):
     posted_at = db.Column(db.DateTime,default=datetime.utcnow)
     resumes = db.relationship('Resume', back_populates='job', lazy=True)
     remote = db.Column(db.Boolean, default=False)
-    #scraper-specific fields:
+    
+    # salary information
+    salary_min = db.Column(db.Integer, nullable=True)
+    salary_max = db.Column(db.Integer, nullable=True)
+    salary_currency = db.Column(db.String(10), default="USD")
+    salary_period = db.Column(db.String(20), default="yearly")  # yearly, monthly, hourly
+    
+    # Job classification fields
+    experience_level = db.Column(db.String(20), nullable=True)  # entry, mid, senior, executive
+    employment_type = db.Column(db.String(20), nullable=True)  # full_time, part_time, contract, etc.
+    industry = db.Column(db.String(50), nullable=True)
+    company_size = db.Column(db.String(20), nullable=True)  # startup, small, medium, large
+    
+    # Skills and keywords
+    required_skills = db.Column(ARRAY(db.String), nullable=True)
+
+    # Metadata/source information
     source = db.Column(db.String(50), nullable=True)
-    source_job_id = db.Column(db.String(50), nullable=True)
+    source_job_id = db.Column(db.String(100), nullable=True)
     is_active = db.Column(db.Boolean, default=True)
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
-    url = db.Column(db.String(50), nullable=True)
+    url = db.Column(db.String(255), nullable=True)  # Increased length for URLs
+    
+    # Additional helpful fields
+    benefits = db.Column(db.Text, nullable=True)
+    application_deadline = db.Column(db.DateTime, nullable=True)
+    education_required = db.Column(db.String(50), nullable=True)
+   
+    def __repr__(self):
+        return f'<Job {self.id}: {self.title} at {self.company}>'
 
+    @property
+    def salary_display(self):
+        """Return a formatted salary range for display."""
+        if not (self.salary_min or self.salary_max):
+            return "Not specified"
+        
+        if self.salary_min and self.salary_max:
+            if self.salary_min == self.salary_max:
+                return f"{self.salary_currency} {self.salary_min:,} {self.salary_period}"
+            return f"{self.salary_currency} {self.salary_min:,} - {self.salary_max:,} {self.salary_period}"
+        elif self.salary_min:
+            return f"{self.salary_currency} {self.salary_min:,}+ {self.salary_period}"
+        else:
+            return f"Up to {self.salary_currency} {self.salary_max:,} {self.salary_period}"
+    @property
+    def skills_list(self):
+        """Return a list of required skills."""
+        if isinstance(self.required_skills, list):
+            return self.required_skills
+        elif self.required_skills:
+            return [skill.strip() for skill in self.required_skills.split(',')]
+        return []
 # Update the Resume model in models.py
 
 class Resume(db.Model):
