@@ -44,6 +44,24 @@
                     </div>
                     
                     <div class="job-search-filter-group">
+                        <h4 class="job-search-filter-title">Date Posted</h4>
+                        <div class="job-search-filter-select-wrapper">
+                            {{ form.date_posted(class="job-search-filter-select") }}
+                        </div>
+                    </div>
+                    
+                    <div class="job-search-filter-group">
+                        <h4 class="job-search-filter-title">Salary Range</h4>
+                        <div class="job-search-filter-range-wrapper">
+                            <div class="range-inputs">
+                                {{ form.salary_min(class="job-search-filter-input salary-input", placeholder="Min") }}
+                                <span class="range-separator">-</span>
+                                {{ form.salary_max(class="job-search-filter-input salary-input", placeholder="Max") }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="job-search-filter-group">
                         <h4 class="job-search-filter-title">Job Type</h4>
                         <div class="job-search-filter-options">
                             <label class="job-search-filter-checkbox">
@@ -52,6 +70,72 @@
                                 Remote Only
                             </label>
                         </div>
+                    </div>
+                    
+                    <!-- Advanced Filters Toggle -->
+                    <div class="job-search-advanced-toggle">
+                        <button type="button" id="advanced-filters-toggle" class="advanced-filters-btn">
+                            <span class="toggle-text">Show Advanced Filters</span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Advanced Filters Section (Hidden by default) -->
+                    <div id="advanced-filters" class="job-search-advanced-filters">
+                        <div class="job-search-filter-group">
+                            <h4 class="job-search-filter-title">Experience Level</h4>
+                            <div class="job-search-filter-options">
+                                {% for value, label in form.experience_level.choices %}
+                                <label class="job-search-filter-checkbox">
+                                    <input type="checkbox" name="experience_level" value="{{ value }}">
+                                    <span class="job-search-checkmark"></span>
+                                    {{ label }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="job-search-filter-group">
+                            <h4 class="job-search-filter-title">Employment Type</h4>
+                            <div class="job-search-filter-options">
+                                {% for value, label in form.employment_type.choices %}
+                                <label class="job-search-filter-checkbox">
+                                    <input type="checkbox" name="employment_type" value="{{ value }}">
+                                    <span class="job-search-checkmark"></span>
+                                    {{ label }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="job-search-filter-group">
+                            <h4 class="job-search-filter-title">Industry</h4>
+                            <div class="job-search-filter-select-wrapper">
+                                {{ form.industry(class="job-search-filter-select") }}
+                            </div>
+                        </div>
+                        
+                        <div class="job-search-filter-group">
+                            <h4 class="job-search-filter-title">Company Size</h4>
+                            <div class="job-search-filter-options">
+                                {% for value, label in form.company_size.choices %}
+                                <label class="job-search-filter-checkbox">
+                                    <input type="checkbox" name="company_size" value="{{ value }}">
+                                    <span class="job-search-checkmark"></span>
+                                    {{ label }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        {% if current_user.is_authenticated %}
+                        <div class="job-search-filter-group">
+                            <h4 class="job-search-filter-title">Skills Match</h4>
+                            <div class="job-search-filter-select-wrapper">
+                                {{ form.skills_match(class="job-search-filter-select") }}
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                     
                     <div class="job-search-filter-actions">
@@ -139,6 +223,49 @@
         const userDropdownToggle = document.getElementById('user-dropdown-toggle');
         const userDropdown = document.getElementById('user-dropdown');
         
+        const advancedToggle = document.getElementById('advanced-filters-toggle');
+        const advancedFilters = document.getElementById('advanced-filters');
+
+        if (advancedToggle && advancedFilters) {
+            advancedToggle.addEventListener('click', function() {
+                advancedFilters.classList.toggle('active');
+                this.classList.toggle('active');
+                
+                const toggleText = this.querySelector('.toggle-text');
+                if (advancedFilters.classList.contains('active')) {
+                    toggleText.textContent = 'Hide Advanced Filters';
+                } else {
+                    toggleText.textContent = 'Show Advanced Filters';
+                }
+            });
+        }
+
+           // Clear all filters button functionality
+          const clearFiltersBtn = document.querySelector('.job-search-clear-btn');
+          const filterForm = document.getElementById('job-search-filter-form');
+        
+          if (clearFiltersBtn && filterForm) {
+            clearFiltersBtn.addEventListener('click', function() {
+                const inputs = filterForm.querySelectorAll('input:not([type="hidden"]):not([type="submit"])');
+                const selects = filterForm.querySelectorAll('select');
+                
+                inputs.forEach(input => {
+                    if (input.type === 'text') {
+                        input.value = '';
+                    } else if (input.type === 'checkbox') {
+                        input.checked = false;
+                    }
+                });
+                
+                selects.forEach(select => {
+                    select.selectedIndex = 0;
+                });
+                
+                // Submit the form to refresh results
+                filterForm.submit();
+            });
+        }
+
         if (userDropdownToggle && userDropdown) {
             userDropdownToggle.addEventListener('click', function() {
                 userDropdown.classList.toggle('active');
@@ -163,25 +290,8 @@
             });
         }
         
-        // Clear all filters
-        const clearFiltersBtn = document.querySelector('.btn-clear-filters');
-        const filterForm = document.getElementById('filter-form');
-        
-        if (clearFiltersBtn && filterForm) {
-            clearFiltersBtn.addEventListener('click', function() {
-                const inputs = filterForm.querySelectorAll('input:not([type="hidden"]):not([type="submit"])');
-                inputs.forEach(input => {
-                    if (input.type === 'text') {
-                        input.value = '';
-                    } else if (input.type === 'checkbox') {
-                        input.checked = false;
-                    }
-                });
-                
-                // Submit the form to refresh results
-                filterForm.submit();
-            });
-        }
+       
+       
         
         // Save job functionality
         const saveButtons = document.querySelectorAll('.btn-save-job');
