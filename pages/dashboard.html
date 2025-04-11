@@ -10,7 +10,7 @@
         <div class="nav-links">
             <a href="{{ url_for('root.dashboard') }}" class="active">Dashboard</a>
             <a href="{{ url_for('job.job') }}">Browse Jobs</a>
-            <a href="#" id="create-resume-btn">Create Resume</a>
+            <a href="{{url_for('resume.create_general_resume')}}" id="create-resume-btn">Create Resume</a>
         </div>
         <div class="user-menu">
             <div class="user-info" id="user-dropdown-toggle">
