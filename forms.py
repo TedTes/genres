@@ -1,7 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField,IntegerField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField,IntegerField,SelectMultipleField,widgets
 from wtforms.validators import DataRequired, Email, EqualTo, Length,Regexp,Optional, NumberRange
 
+class MultiCheckboxField(SelectMultipleField):
+    widget = widgets.ListWidget(prefix_label=False)
+    option_widget = widgets.CheckboxInput()
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=4, max=80)])
     email = StringField('Email', validators=[DataRequired(), Email()])
@@ -34,7 +37,7 @@ class JobSearchForm(FlaskForm):
     salary_max = IntegerField('Maximum Salary', validators=[Optional(), NumberRange(min=0)])
     
     # Advanced filters
-    experience_level = SelectField('Experience Level', choices=[
+    experience_level = MultiCheckboxField('Experience Level', choices=[
         ('', 'Any experience'),
         ('entry', 'Entry Level'),
         ('mid', 'Mid-Level'),
@@ -42,7 +45,7 @@ class JobSearchForm(FlaskForm):
         ('executive', 'Executive')
     ])
     
-    employment_type = SelectField('Employment Type', choices=[
+    employment_type = MultiCheckboxField('Employment Type', choices=[
         ('', 'Any type'),
         ('full_time', 'Full-time'),
         ('part_time', 'Part-time'),
@@ -63,7 +66,7 @@ class JobSearchForm(FlaskForm):
         ('hospitality', 'Hospitality')
     ])
     
-    company_size = SelectField('Company Size', choices=[
+    company_size = MultiCheckboxField('Company Size', choices=[
         ('', 'Any size'),
         ('startup', 'Startup'),
         ('small', 'Small (1-50 employees)'),
@@ -71,7 +74,7 @@ class JobSearchForm(FlaskForm):
         ('large', 'Large (500+ employees)')
     ])
     
-    skills_match = SelectField('Skills Match', choices=[
+    skills_match = MultiCheckboxField('Skills Match', choices=[
         ('', 'Any match'),
         ('50', '50%+ match'),
         ('70', '70%+ match'),
