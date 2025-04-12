@@ -47,22 +47,6 @@
         margin: 0;
     }
     
-    .sidebar-close {
-        display: none;
-        background: none;
-        border: none;
-        color: #64748b;
-        cursor: pointer;
-        font-size: 1.25rem;
-        padding: 0.25rem;
-        border-radius: 0.25rem;
-        transition: all 0.2s ease;
-    }
-    
-    .sidebar-close:hover {
-        color: #ef4444;
-        background-color: rgba(239, 68, 68, 0.1);
-    }
     
     /* Templates list */
     .templates-list {
@@ -196,7 +180,7 @@
         position: fixed;
         top: 90px;
         left: 15px;
-        z-index: 60;
+        z-index: 1000;
         width: 40px;
         height: 40px;
         background-color: white;
@@ -236,7 +220,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        z-index: 49;
+        z-index: 1000;
     }
     
     /* Floating action buttons */
@@ -294,21 +278,6 @@
     
     .tooltip-container:hover .btn-tooltip {
         opacity: 1;
-    }
-    
-    /* Overlay for mobile sidebar */
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 40;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        pointer-events: none;
     }
     
     /* Info tooltip with resume details */
@@ -381,15 +350,6 @@
             transform: translateX(0);
         }
         
-        .sidebar-close {
-            display: block;
-        }
-        
-        .sidebar-overlay.active {
-            display: block;
-            opacity: 1;
-            pointer-events: auto;
-        }
         
         .template-toggle {
             display: flex;
@@ -521,7 +481,8 @@
 
 <!-- Mobile template toggle button -->
 <button class="template-toggle" id="template-toggle" aria-label="Choose Template">
-    <i class="fas fa-palette"></i>
+    <i class="fas fa-palette open-icon"></i>
+    <i class="fas fa-times close-icon" style="display: none;"></i>
 </button>
 
 <!-- Current template pill for mobile -->
@@ -529,17 +490,11 @@
     Template: <strong>{{ templates[selected_template].id if selected_template in templates else 'professional_classic' }}</strong>
 </div>
 
-<!-- Overlay for mobile sidebar -->
-<div class="sidebar-overlay" id="sidebar-overlay"></div>
-
 <div class="resume-preview-container">
     <!-- Template Sidebar -->
     <div class="template-sidebar" id="template-sidebar">
         <div class="sidebar-header">
             <h3 class="sidebar-title">Choose a Template</h3>
-            <button class="sidebar-close" id="sidebar-close" aria-label="Close">
-                <i class="fas fa-times"></i>
-            </button>
         </div>
         
         <form id="template-form" method="POST" action="{{ url_for('resume.update_resume_template', resume_id=resume.id) }}">
@@ -648,48 +603,20 @@
         // Mobile sidebar elements
         const templateToggle = document.getElementById('template-toggle');
         const templateSidebar = document.getElementById('template-sidebar');
-        const sidebarClose = document.getElementById('sidebar-close');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const openIcon = templateToggle.querySelector('.open-icon');
+        const closeIcon = templateToggle.querySelector(".close-icon");
         const currentTemplatePill = document.querySelector('.current-template-pill');
         
-        // Separate open and close functions instead of toggle
-        function openSidebar() {
-            templateSidebar.classList.add('active');
-            sidebarOverlay.classList.add('active');
-            document.body.classList.add('sidebar-open');
-        }
-        
-        function closeSidebar() {
-            templateSidebar.classList.remove('active');
-            sidebarOverlay.classList.remove('active');
-            document.body.classList.remove('sidebar-open');
-        }
-        
-        // Event listeners for sidebar control
-        if (templateToggle) {
-            templateToggle.addEventListener('click', function(e) {
-                e.stopPropagation(); // Prevent event from bubbling
-                openSidebar();
-            });
-        }
-        
-        if (sidebarClose) {
-            sidebarClose.addEventListener('click', function(e) {
-                e.stopPropagation(); // Prevent event from bubbling
-                closeSidebar();
-            });
-        }
-        
-        if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', function(e) {
-                e.stopPropagation(); // Prevent event from bubbling
-                closeSidebar();
-            });
-        }
-         // Prevent sidebar from closing when clicking inside it
-    templateSidebar.addEventListener('click', function (e) {
-        e.stopPropagation();
-    });
+        templateToggle.addEventListener("click", () => {
+     
+            const isOpen = templateSidebar.classList.contains("active");
+          
+            templateSidebar.classList.toggle("active");
+          
+            openIcon.style.display = isOpen ? "inline-block" : "none";
+            closeIcon.style.display = isOpen ? "none" : "inline-block";
+        });
+  
         // Update current template pill text when template changes
         const templateLabels = document.querySelectorAll('.template-label');
         const templateInputs = document.querySelectorAll('input[name="template"]');
@@ -701,11 +628,6 @@
                     if (label) {
                         const templateName = label.dataset.templateName || 'professional_classic';
                         currentTemplatePill.innerHTML = `Template: <strong>${templateName}</strong>`;
-                    }
-                    
-                    // Close sidebar after selection on mobile
-                    if (window.innerWidth <= 1024) {
-                        closeSidebar();
                     }
                 }
             });
@@ -834,16 +756,7 @@
                 }
             }
         }
-        
-        // Prevent default body events from accidentally triggering the sidebar
-        document.body.addEventListener('click', function(e) {
-            // Only close the sidebar if it's open and if clicking outside the sidebar
-            if (templateSidebar.classList.contains('active') && 
-                !templateSidebar.contains(e.target) && 
-                !templateToggle.contains(e.target)) {
-                closeSidebar();
-            }
-        });
+   
         
         // Fix for iOS touch handling - prevent scroll blocking
         document.addEventListener('touchmove', function(e) {
@@ -852,12 +765,6 @@
                 e.stopPropagation();
             }
         }, { passive: true });
-          // Prevent unwanted clicks from triggering sidebar
-    document.addEventListener('click', function (e) {
-        if (!templateSidebar.contains(e.target) && !templateToggle.contains(e.target)) {
-            closeSidebar();
-        }
-    });
     });
 </script>
 {% endblock %}
