@@ -3,7 +3,7 @@ from sqlalchemy import or_, and_
 from models import Job
 from db import db
 from helpers.job_helper import extract_job_tags
-from utils.date import format_job_posted_date
+
 class JobService:
     """Service class for handling job-related business logic"""
     
