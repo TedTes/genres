@@ -17,16 +17,39 @@ job_service = JobService()
 @job_bp.route('/job', methods=['GET', 'POST'])
 def job():
     form = JobSearchForm()
-    
+    jobs_data = None
     try:
         if form.validate_on_submit():
-            # Get form data for filtering
+            # Get basic form data for filtering
             search_term = form.search.data
             location = form.location.data
             remote_only = form.remote.data
             
-            # Fetch jobs with filters using job service
-            jobs_data = job_service.get_jobs(search_term, location, remote_only)
+            # Get additional filter data
+            date_posted = form.date_posted.data
+            salary_min = form.salary_min.data
+            salary_max = form.salary_max.data
+            experience_level = form.experience_level.data
+            employment_type = form.employment_type.data
+            industry = form.industry.data
+            company_size = form.company_size.data
+            skills_match = form.skills_match.data
+            
+            # Fetch jobs with all filters using job service
+            jobs_data = job_service.get_jobs(
+                search_term=search_term,
+                location=location,
+                remote_only=remote_only,
+                date_posted=date_posted,
+                salary_min=salary_min,
+                salary_max=salary_max,
+                experience_level=experience_level,
+                employment_type=employment_type,
+                industry=industry,
+                company_size=company_size,
+                skills_match=skills_match
+            )
+
         else:
             # Default fetch with no filters
             jobs_data = job_service.get_jobs()
