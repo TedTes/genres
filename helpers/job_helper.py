@@ -1,7 +1,7 @@
 import requests
 from datetime import datetime
 from utils.date import format_job_posted_date
-from utils.date import format_job_posted_date
+
 def analyze_job_description(description):
     """
     Analyze job description to extract important skills and keywords
@@ -152,7 +152,7 @@ def get_recent_job_matches(user_id, limit=3):
                 'company_name': job.company,
                 'location': job.location,
                 'remote': 'remote' in job.location.lower() if job.location else False,
-                'posted_at': (datetime.now() - job.posted_at).days if job.posted_at else 0,
+                'posted_at': format_job_posted_date(job.posted_at),
                 'match': 50  # Default match score of 50% for users without skills
             } for job in recent_jobs]
         
