@@ -48,10 +48,6 @@ def dashboard():
         # Get job matches from the database
     job_matches_list = get_recent_job_matches(current_user.id, limit=3)
 
-    # Format dates for display
-    for job in job_matches_list:
-        job['posted_at'] = format_job_posted_date(job['posted_at'])
-
     # Placeholder for applications count
     applications_count = Application.query.filter_by(user_id=current_user.id).count()
 
