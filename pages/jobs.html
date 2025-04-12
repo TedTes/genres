@@ -85,26 +85,14 @@
                         <div class="job-search-filter-group">
                             <h4 class="job-search-filter-title">Experience Level</h4>
                             <div class="job-search-filter-options">
-                                {% for value, label in form.experience_level.choices %}
-                                <label class="job-search-filter-checkbox">
-                                    <input type="checkbox" name="experience_level" value="{{ value }}">
-                                    <span class="job-search-checkmark"></span>
-                                    {{ label }}
-                                </label>
-                                {% endfor %}
+                                {{ form.experience_level(class="checkbox-group") }}
                             </div>
                         </div>
                         
                         <div class="job-search-filter-group">
                             <h4 class="job-search-filter-title">Employment Type</h4>
                             <div class="job-search-filter-options">
-                                {% for value, label in form.employment_type.choices %}
-                                <label class="job-search-filter-checkbox">
-                                    <input type="checkbox" name="employment_type" value="{{ value }}">
-                                    <span class="job-search-checkmark"></span>
-                                    {{ label }}
-                                </label>
-                                {% endfor %}
+                                {{ form.employment_type(class="checkbox-group") }}
                             </div>
                         </div>
                         
@@ -118,13 +106,7 @@
                         <div class="job-search-filter-group">
                             <h4 class="job-search-filter-title">Company Size</h4>
                             <div class="job-search-filter-options">
-                                {% for value, label in form.company_size.choices %}
-                                <label class="job-search-filter-checkbox">
-                                    <input type="checkbox" name="company_size" value="{{ value }}">
-                                    <span class="job-search-checkmark"></span>
-                                    {{ label }}
-                                </label>
-                                {% endfor %}
+                                {{ form.company_size(class="checkbox-group") }}
                             </div>
                         </div>
                         
