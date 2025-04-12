@@ -5252,5 +5252,10 @@ font-size: 1rem;
 }
 }
 
-
-
+/* temporary css to disble profile, settings menu(link) */
+a.profile, a.settings {
+  pointer-events: none;      
+  cursor: not-allowed;      
+  color: gray;          
+  opacity: 0.6; 
+}

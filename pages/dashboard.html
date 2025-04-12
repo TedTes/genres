@@ -21,10 +21,10 @@
                 <i class="fas fa-chevron-down"></i>
             </div>
             <div class="user-dropdown" id="user-dropdown">
-                <a href="#" class="dropdown-item">
-                    <i class="fas fa-user"></i> Profile
+                <a href="#" class="dropdown-item profile">
+                    <i class="fas fa-user  "></i> Profile
                 </a>
-                <a href="#" class="dropdown-item">
+                <a href="#" class="dropdown-item settings">
                     <i class="fas fa-cog"></i> Settings
                 </a>
                 <div class="dropdown-divider"></div>
@@ -501,6 +501,7 @@
     notification.className = `notification ${type}`;
     notification.innerHTML = `
         <div class="notification-content">
+             <i class="notification-icon fas ${getIconForType(type)}"></i>
             <div class="notification-message">${message}</div>
             <button class="notification-close">&times;</button>
         </div>
@@ -529,5 +530,14 @@
         }, 300);
     });
 }
+  // Helper function to get icon based on notification type
+  function getIconForType(type) {
+        switch(type) {
+            case 'success': return 'fa-check-circle';
+            case 'error': return 'fa-exclamation-circle';
+            case 'warning': return 'fa-exclamation-triangle';
+            case 'info': default: return 'fa-info-circle';
+        }
+    }
 </script>
 {% endblock %}
