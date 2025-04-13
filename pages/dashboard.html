@@ -289,11 +289,7 @@
 
 {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // User dropdown toggle
-        const userDropdownToggle = document.getElementById('user-dropdown-toggle');
-        const userDropdown = document.getElementById('user-dropdown');
-        
+    document.addEventListener('DOMContentLoaded', function() { 
         const upgradeBanner = document.querySelector('.upgrade-banner');
         const dismissButton = document.querySelector('.upgrade-dismiss');
 
@@ -313,19 +309,7 @@
                 upgradeBanner.style.display = 'none';
             }
         }
-        if (userDropdownToggle && userDropdown) {
-            userDropdownToggle.addEventListener('click', function() {
-                userDropdown.classList.toggle('active');
-            });
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!userDropdownToggle.contains(event.target) && !userDropdown.contains(event.target)) {
-                    userDropdown.classList.remove('active');
-                }
-            });
-        }
-        
+    
         // Create resume modal
         const createResumeBtn = document.getElementById('create-resume-modal-btn');
         const createResumeModal = document.getElementById('create-resume-modal');

@@ -162,6 +162,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 300);
         }, 5000);
     });
+
+    document.addEventListener('click', function(event) {
+        // Toggle dropdown when clicking the toggle element
+        if (event.target.closest('#user-dropdown-toggle')) {
+            event.preventDefault();
+            document.getElementById('user-dropdown').classList.toggle('active');
+        } 
+        // Close dropdown when clicking outside
+        else if (!event.target.closest('#user-dropdown') && 
+                document.getElementById('user-dropdown') && 
+                document.getElementById('user-dropdown').classList.contains('active')) {
+            document.getElementById('user-dropdown').classList.remove('active');
+        }
+    });
 });
 function showSaveIndicator() {
     const indicator = document.getElementById('save-indicator');

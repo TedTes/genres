@@ -261,23 +261,7 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // User dropdown toggle
-        const userDropdownToggle = document.getElementById('user-dropdown-toggle');
-        const userDropdown = document.getElementById('user-dropdown');
-        
-        if (userDropdownToggle && userDropdown) {
-            userDropdownToggle.addEventListener('click', function() {
-                userDropdown.classList.toggle('active');
-            });
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!userDropdownToggle.contains(event.target) && !userDropdown.contains(event.target)) {
-                    userDropdown.classList.remove('active');
-                }
-            });
-        }
-        
+
         // Save job button
         const saveJobBtn = document.querySelector('.btn-save-job');
         

@@ -3,35 +3,16 @@
 {% block title %}Apply to {{ job.title }} - ResumeMatch{% endblock %}
 
 {% block content %}
-<nav class="main-nav dashboard-nav">
-    <div class="container nav-container">
-        <div class="logo">
-            <a href="{{ url_for('root.home') }}">ResumeMatch</a>
-        </div>
-        <div class="nav-links">
-            <a href="{{ url_for('root.dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('job.job') }}">Browse Jobs</a>
-        </div>
-        <div class="user-menu">
-            <div class="user-info" id="user-dropdown-toggle">
-                <div class="user-avatar">
-                    <span>{{ current_user.username[0].upper() }}</span>
-                </div>
-                <span class="user-name">{{ current_user.username }}</span>
-                <i class="fas fa-chevron-down"></i>
-            </div>
-            <div class="user-dropdown" id="user-dropdown">
-                <a href="{{ url_for('root.dashboard') }}" class="dropdown-item">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="{{ url_for('auth.logout') }}" class="dropdown-item">
-                    <i class="fas fa-sign-out-alt"></i> Log Out
-                </a>
-            </div>
-        </div>
-    </div>
-</nav>
+{% set active_page='jobs' %}
+{% set  nav_items=[
+{'id': 'dashboard', 'url': url_for('root.dashboard'), 'text': 'Dashboard'},
+{'id': 'browse_jobs', 'url': url_for('job.job'), 'text': 'Browse Jobs'},
+{'id': 'create_resume', 'url': url_for('resume.create_general_resume'), 'text': 'Create Resume'}
+] %}
+
+{% with active_page=active_page, nav_items=nav_items %}
+    {% include 'partials/navbar.html' with context %}
+{% endwith %}
 
 <section class="apply-job-section">
     <div class="container">

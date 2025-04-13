@@ -207,9 +207,6 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // User dropdown toggle
-        const userDropdownToggle = document.getElementById('user-dropdown-toggle');
-        const userDropdown = document.getElementById('user-dropdown');
-        
         const advancedToggle = document.getElementById('advanced-filters-toggle');
         const advancedFilters = document.getElementById('advanced-filters');
 
@@ -253,18 +250,7 @@
             });
         }
 
-        if (userDropdownToggle && userDropdown) {
-            userDropdownToggle.addEventListener('click', function() {
-                userDropdown.classList.toggle('active');
-            });
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!userDropdownToggle.contains(event.target) && !userDropdown.contains(event.target)) {
-                    userDropdown.classList.remove('active');
-                }
-            });
-        }
+     
         
         // Mobile filters toggle
         const mobileFiltersToggle = document.querySelector('.mobile-filters-toggle');
