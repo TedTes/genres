@@ -1,15 +1,17 @@
-<!-- templates/partials/_navbar.html -->
 <nav class="main-nav dashboard-nav">
     <div class="container nav-container">
         <div class="logo">
             <a href="{{ url_for('root.home') }}">ResumeMatch</a>
         </div>
         <div class="nav-links">
+            {%if nav_items is defined %}
+            {% for item in nav_items %}
+            <a href="{{ item.url }}" {% if active_page == item.id %}class="active"{% endif %}>{{item.text}}</a>
+            {% endfor %}
+            {%else%}
             <a href="{{ url_for('root.dashboard') }}" {% if active_page == 'dashboard' %}class="active"{% endif %}>Dashboard</a>
             <a href="{{ url_for('job.job') }}" {% if active_page == 'jobs' %}class="active"{% endif %}>Browse Jobs</a>
-            {% if extra_nav_item %}
-                <a href="{{ extra_nav_item.url }}" {% if active_page == extra_nav_item.id %}class="active"{% endif %}>{{ extra_nav_item.text }}</a>
-            {% endif %}
+            {%endif%}
         </div>
         <div class="user-menu">
             <div class="user-info" id="user-dropdown-toggle">

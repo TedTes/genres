@@ -4,7 +4,14 @@
 
 {% block content %}
 <!-- Navigation Bar -->
-{% with active_page='jobs', extra_nav_item={'id': 'create_resume', 'url': url_for('resume.create_general_resume'), 'text': 'Create Resume'} %}
+{% set active_page='jobs' %}
+{% set  nav_items=[
+{'id': 'dashboard', 'url': url_for('root.dashboard'), 'text': 'Dashboard'},
+{'id': 'browse_jobs', 'url': url_for('job.job'), 'text': 'Browse Jobs'},
+{'id': 'create_resume', 'url': url_for('resume.create_general_resume'), 'text': 'Create Resume'}
+] %}
+
+{% with active_page=active_page, nav_items=nav_items %}
     {% include 'partials/navbar.html' with context %}
 {% endwith %}
 
