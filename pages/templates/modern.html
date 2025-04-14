@@ -66,39 +66,40 @@
                     <div class="contact-grid">
                         {% if resume.contact.email %}
                         <div class="contact-item">
-                            <span class="contact-icon"><i class="fa-solid fa-envelope"></i></span>
-                            {{ resume.contact.email }}
+                          <span class="contact-icon"><i class="fa-solid fa-envelope"></i></span>
+                          <span class="contact-text">{{ resume.contact.email }}</span>
                         </div>
                         {% endif %}
-                        
+                      
                         {% if resume.contact.phone %}
                         <div class="contact-item">
-                            <span class="contact-icon"><i class="fa-solid fa-phone"></i></span>
-                            {{ resume.contact.phone }}
+                          <span class="contact-icon"><i class="fa-solid fa-phone"></i></span>
+                          <span class="contact-text">{{ resume.contact.phone }}</span>
                         </div>
                         {% endif %}
-                        
+                      
                         {% if resume.contact.location %}
                         <div class="contact-item">
-                            <span class="contact-icon"><i class="fa-solid fa-location-dot"></i></span>
-                            {{ resume.contact.location }}
+                          <span class="contact-icon"><i class="fa-solid fa-location-dot"></i></span>
+                          <span class="contact-text">{{ resume.contact.location }}</span>
                         </div>
                         {% endif %}
-                        
+                      
                         {% if resume.contact.linkedin %}
                         <div class="contact-item">
-                            <span class="contact-icon"><i class="fa-brands fa-linkedin-in"></i></span>
-                            {{ resume.contact.linkedin }}
+                          <span class="contact-icon"><i class="fa-brands fa-linkedin-in"></i></span>
+                          <span class="contact-text">{{ resume.contact.linkedin }}</span>
                         </div>
                         {% endif %}
-                        
+                      
                         {% if resume.contact.website %}
                         <div class="contact-item">
-                            <span class="contact-icon"><i class="fa-solid fa-globe"></i></span>
-                            {{ resume.contact.website }}
+                          <span class="contact-icon"><i class="fa-solid fa-globe"></i></span>
+                          <span class="contact-text">{{ resume.contact.website }}</span>
                         </div>
                         {% endif %}
-                    </div>
+                      </div>
+                      
                 </header>
                 
                 <!-- Main Content -->

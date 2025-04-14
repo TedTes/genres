@@ -33,28 +33,16 @@ LAYOUTS = {
                 margin-bottom: 15px;
             }
 
-            /* Replace gap with margins in flexbox layouts */
+            /* Contact container */
             .contact-grid {
                 display: flex;
-                flex-wrap: wrap;
-                /* Removed gap: 10px 20px; */
-                margin: -5px -10px; /* Negative margin to offset item margins */
+                flex-wrap: nowrap;
+            
             }
-
             .contact-item {
-                display: flex;
-                align-items: center;
-                /* Removed gap: 8px; */
-                margin: 5px 10px; /* Replace gap with margin */
+                margin-right: 20px;
             }
-
-            .contact-icon {
-                color: var(--primary);
-                width: 16px;
-                text-align: center;
-                margin-right: 8px; /* Replace gap with margin-right */
-            }
-
+          
             .resume-section {
                 margin-bottom: 25px;
             }
@@ -147,7 +135,7 @@ LAYOUTS = {
         "description": "Two-column modern layout",
         "template": "modern.html",
         "css": """
-           .resume-container {
+        .resume-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 30px;
@@ -156,13 +144,12 @@ LAYOUTS = {
             line-height: var(--line-height);
             display: grid;
             grid-template-columns: 1fr 1fr;
-            /* Removed gap: 30px */
-            grid-column-gap: 30px; /* More compatible than 'gap' */
+            grid-column-gap: 30px;
             grid-row-gap: 30px;
         }
 
         .resume-header {
-            grid-column: 1 / -1;
+            grid-column: 1/3;
             display: flex;
             flex-direction: column;
             margin-bottom: 25px;
@@ -172,38 +159,39 @@ LAYOUTS = {
             font-size: 32px;
             font-weight: 700;
             margin-bottom: 5px;
-            color: var(--primary);
         }
 
         .title {
             font-size: 18px;
             color: var(--text-light);
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
-
+      
         .contact-grid {
-            display: flex;
-            flex-wrap: wrap;
-            /* Removed gap: 10px 20px */
-            margin: -5px -10px; /* Negative margin to compensate for item margins */
+                display: flex;
+                flex-wrap: nowrap;
+                justify-content: flex-start;
+                align-items: center;
+           
         }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            /* Removed gap: 8px */
-            margin: 5px 10px; /* Replace gap with margin */
-        }
-
+       .contact-item {
+        margin-right: 15px;
+       }
         .contact-icon {
-            color: var(--primary);
-            width: 16px;
-            text-align: center;
-            margin-right: 8px; /* Add explicit margin instead of gap */
+            font-size: 0.9rem;
+            color: #333;
+            margin:0;
+        }
+
+        .contact-text {
+            font-size: 0.8rem;
+            word-break: break-word;
+            margin: 0; 
         }
 
         .main-column {
             grid-column: 1 / 2;
+        
         }
 
         .side-column {
@@ -284,15 +272,10 @@ LAYOUTS = {
         }
 
         @media print, (max-width: 768px) {
-            .resume-container {
-                grid-template-columns: 1fr;
-                /* Removed gap: 20px */
-                grid-column-gap: 20px;
-                grid-row-gap: 20px;
-            }
+         
             
             .main-column, .side-column {
-                grid-column: 1 / -1;
+                grid-column: 1 / 3;
             }
         }
         """
@@ -369,7 +352,6 @@ LAYOUTS = {
         .contact-item {
             display: flex;
             align-items: center;
-            /* Removed gap: 10px */
             margin-bottom: 10px;
         }
 
@@ -460,7 +442,7 @@ LAYOUTS = {
         }
                 """
             },
-            "minimalist": {
+    "minimalist": {
                 "name": "Minimalist",
                 "description": "Clean and minimal single-column layout",
                 "template": "minimalist.html",
@@ -503,7 +485,7 @@ LAYOUTS = {
         .contact-item {
             display: flex;
             align-items: center;
-            margin-right: 30px; /* Horizontal spacing replacing gap */
+            margin-right: 35px; /* Horizontal spacing replacing gap */
             margin-bottom: 15px; /* Vertical spacing replacing gap */
             font-size: 14px;
         }
@@ -512,6 +494,7 @@ LAYOUTS = {
             color: var(--primary);
             width: 16px;
             text-align: center;
+            margin-right:6px;
         }
 
         .resume-section {
@@ -640,7 +623,6 @@ LAYOUTS = {
         .contact-item {
             display: flex;
             align-items: center;
-            /* Replaced gap: 8px; */
             font-size: 14px;
             margin: 5px 15px; /* Explicit margins instead of gap */
         }
@@ -811,7 +793,6 @@ LAYOUTS = {
         .contact-item {
             display: flex;
             align-items: center;
-            /* Removed gap: 8px; */
             font-size: 14px;
             margin: 5px 10px; /* Add explicit margins */
         }
@@ -1149,14 +1130,12 @@ LAYOUTS = {
             .contact-grid {
                 display: flex;
                 flex-wrap: wrap;
-                /* Replaced gap: 10px 20px; */
                 margin: -5px -10px; /* Negative margins to offset item margins */
             }
 
             .contact-item {
                 display: flex;
                 align-items: center;
-                /* Replaced gap: 8px; */
                 font-size: 14px;
                 margin: 5px 10px; /* Added explicit margins */
             }
@@ -1357,7 +1336,6 @@ LAYOUTS = {
             .contact-item {
                 display: flex;
                 align-items: center;
-                /* Removed gap: 8px; */
                 font-size: 14px;
                 margin-top: 4px; /* Add explicit margin */
                 margin-bottom: 4px; /* Add explicit margin */
@@ -2049,7 +2027,7 @@ LAYOUTS = {
                 margin-bottom: 15px;
                 display: flex;
                 flex-direction: column;
-                gap: 5px;
+           
             }
             
             .name-title {
