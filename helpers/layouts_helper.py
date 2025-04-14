@@ -167,7 +167,7 @@ LAYOUTS = {
             margin-bottom: 8px;
         }
       
-        .contact-grid {
+        .contact-bar {
                 display: flex;
                 flex-wrap: nowrap;
                 justify-content: flex-start;
@@ -1648,18 +1648,18 @@ LAYOUTS = {
             }
                     """
                 },
-                "portfolio": {
+    "portfolio": {
                     "name": "Portfolio",
                     "description": "Design that highlights projects for creative professionals",
                     "template": "portfolio.html",
                     "css": """
                     .resume-container {
-                max-width: 800px;
-                margin: 0 auto;
-                font-family: var(--font-family);
-                color: var(--text);
-                background-color: var(--background);
-            }
+                        max-width: 800px;
+                        margin: 0 auto;
+                        font-family: var(--font-family);
+                        color: var(--text);
+                        background-color: var(--background);
+                 }
 
             /* Portfolio header */
             .portfolio-header {
@@ -1690,26 +1690,27 @@ LAYOUTS = {
                 opacity: 0.9;
             }
 
-            .contact-bar {
+
+           .contact-bar {
                 display: flex;
+                flex-wrap: nowrap;
                 justify-content: center;
-                flex-wrap: wrap;
-                /* Removed gap: 20px 30px */
-            }
-
-            .contact-item {
-                display: flex;
                 align-items: center;
-                margin-right: 30px; /* Horizontal spacing */
-                margin-bottom: 20px; /* Vertical spacing */
-                font-size: 14px;
-            }
+           
+        }
+       .contact-item {
+        margin-right: 15px;
+       }
+        .contact-icon {
+            font-size: 0.9rem;
+            margin:0;
+        }
 
-            .contact-icon {
-                width: 16px;
-                text-align: center;
-            }
-
+        .contact-text {
+            font-size: 0.8rem;
+            word-break: break-word;
+            margin: 0; 
+        }
             /* Portfolio wrapper */
             .portfolio-wrapper {
                 padding: 30px;
@@ -1767,7 +1768,7 @@ LAYOUTS = {
             .skills-container {
                 display: flex;
                 flex-wrap: wrap;
-                /* Removed gap: 10px */
+  
             }
 
             .skill-tag {
@@ -1779,7 +1780,6 @@ LAYOUTS = {
                 opacity: 0.8;
                 margin-right: 10px; /* Horizontal spacing */
                 margin-bottom: 10px; /* Vertical spacing */
-                /* Removed transition and transform */
             }
 
             /* Projects section */
@@ -1791,7 +1791,7 @@ LAYOUTS = {
                 display: flex;
                 flex-wrap: wrap;
                 justify-content: space-between;
-                /* Removed grid and gap */
+              
             }
 
             .project-card {
