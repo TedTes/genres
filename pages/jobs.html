@@ -118,8 +118,9 @@
                         {% if current_user.is_authenticated %}
                         <div class="job-search-filter-group">
                             <h4 class="job-search-filter-title">Skills Match</h4>
-                            <div class="job-search-filter-select-wrapper">
-                                {{ form.skills_match(class="job-search-filter-select") }}
+                          
+                            <div class="job-search-filter-options">
+                                {{ form.skills_match(class="checkbox-group") }}
                             </div>
                         </div>
                         {% endif %}
