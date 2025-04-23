@@ -75,3 +75,21 @@ def analyze_resume():
         return jsonify(result)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@bp.route('/trends', methods=['POST'])
+def trends():
+    """
+    Analyze resume and provide feedback
+    """
+    data = request.get_json()
+    resume_data = data.get('resume_data')
+    
+    if not resume_data:
+        return jsonify({'error': 'Missing resume data'}), 400
+        
+    try:
+        result = llm_service.analyze_resume(resume_data)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
