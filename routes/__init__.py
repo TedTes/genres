@@ -6,6 +6,7 @@ from .job import job_bp
 from .resume import resume_bp
 from .application import application_bp
 from .admin import admin_bp
+from .resume_llm import bp as resume_llm_bp
 
 def register_routes(app: Flask):
     """Register all routes (Blueprints) in the app"""
@@ -16,3 +17,4 @@ def register_routes(app: Flask):
     app.register_blueprint(resume_bp)
     app.register_blueprint(application_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(resume_llm_bp, url_prefix="/resume/llm")
