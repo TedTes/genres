@@ -36,3 +36,7 @@ class Config:
     T_HORT_SELECTOR = os.environ.get('T_HORT_SELECTOR')
     H_DEPO_SELECTOR = os.environ.get('H_DEPO_SELECTOR')
     W_MAR_SELECTOR = os.environ.get('W_MAR_SELECTOR')
+
+
+    # LLM API keys
+    ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY')
