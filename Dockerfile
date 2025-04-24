@@ -31,5 +31,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Start app
-CMD gunicorn app:app --bind 0.0.0.0:$PORT
+CMD gunicorn app:app --bind 0.0.0.0:8000
 
