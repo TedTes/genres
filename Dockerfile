@@ -9,6 +9,7 @@ ENV PORT=8000
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential \
+    libpq-dev \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
     libcairo2 \
