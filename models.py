@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
 from db import db
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY,JSONB
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -161,3 +161,23 @@ class ScraperRun(db.Model):
     keywords = db.Column(db.String(255))
     location = db.Column(db.String(255))
     error_message = db.Column(db.Text)
+
+
+class Theme(db.Model):
+    id = db.Column(db.String(50), primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    colors = db.Column(JSONB, nullable=False)
+    typography = db.Column(JSONB, nullable=False)
+
+    def __repr__(self):
+        return f'<Theme {self.id}: {self.name}>'
+
+class Layout(db.Model):
+    id = db.Column(db.String(50), primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    template = db.Column(db.String(100), nullable=False)
+    css_file = db.Column(db.String(100), nullable=False)
+
+    def __repr__(self):
+        return f'<Layout {self.id}: {self.name}>'
