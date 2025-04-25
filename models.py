@@ -106,6 +106,14 @@ class Resume(db.Model):
     # Make the job relationship optional
     job = db.relationship('Job', back_populates='resumes', lazy=True, foreign_keys=[job_id])
 
+    @property
+    def theme_id(self):
+        return self.template.split('_')[0] if '_' in self.template else 'professional'
+
+    @property
+    def layout_id(self):
+        return self.template.split('_')[1] if '_' in self.template else 'classic'
+
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
