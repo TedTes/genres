@@ -1,7 +1,9 @@
 import spacy
-from .themes_helper import THEMES
-from .layouts_helper import LAYOUTS
-from jinja2 import  Environment, FileSystemLoader
+from .themes_helper import generate_theme_css,get_theme
+from .layouts_helper import get_layout
+from jinja2 import  FileSystemLoader
+from flask import Flask,request,render_template,jsonify,current_app
+import os
 
 def generate_pdf(html_string):
     html = HTML(string=html_string)
@@ -190,29 +192,43 @@ def calculate_skill_match(user_skills, job_skills):
     
     return overall_match, skill_matches
 
-def generate_resume(theme_id, layout_id,resume_data=None):
-    """Generate a resume with specified theme and layout."""
 
-    TEMPLATE_DIR = "./pages/templates"
-    # Get theme and layout
-    if theme_id not in THEMES:
-        raise ValueError(f"Theme '{theme_id}' not found. Available themes: {', '.join(THEMES.keys())}")
-    
-    if layout_id not in LAYOUTS:
-        raise ValueError(f"Layout '{layout_id}' not found. Available layouts: {', '.join(LAYOUTS.keys())}")
-    
-    theme = THEMES[theme_id]
-    layout = LAYOUTS[layout_id]
-    
-    # Create environment and load template
-    env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
-    template = env.get_template(f"{layout_id}.html")
-    
-    # Render template
-    html_content = template.render(
-        theme=theme,
-        layout_css=layout["css"],
-        resume=resume_data
-    )
-    
-    return html_content
+def generate_resume(app,resume,assets):
+    try:
+  
+        layout = get_layout(resume.layout_id)
+  
+        theme = get_theme(resume.theme_id)
+        theme_css = generate_theme_css(theme)
+       
+        #Get path to the layout-specific CSS
+        css_path = os.path.join(app.static_folder, layout['css_file'].replace('static/', ''))
+        print("css path")
+        print(css_path)
+        if not os.path.exists(css_path):
+                raise FileNotFoundError(f"CSS file not found: {css_path}")
+        with open(css_path, 'r') as f:
+            layout_css = f.read()
+
+        # Combine layout and theme CSS
+        full_css = layout_css + "\n" + theme_css
+
+        # Validate resume_data
+        if not isinstance(resume.resume_data, dict) or 'sections' not in resume.resume_data:
+            raise ValueError("Invalid resume_data: 'sections' key missing")
+
+        # Get template
+        template = app.jinja_env.get_template(layout['template'])
+  
+        # Render template
+        html_content = template.render(
+            theme=theme,
+            css_content=full_css,
+            resume=resume.resume_data
+        )
+        return html_content
+    except Exception as e:
+        print("from generate resume method")
+        print(e)
+        app.logger.error(f"Error generating resume: {str(e)}")
+        raise
