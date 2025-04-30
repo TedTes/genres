@@ -200,11 +200,10 @@ def generate_resume(app,resume,assets):
   
         theme = get_theme(resume.theme_id)
         theme_css = generate_theme_css(theme)
-       
+
         #Get path to the layout-specific CSS
         css_path = os.path.join(app.static_folder, layout['css_file'].replace('static/', ''))
-        print("css path")
-        print(css_path)
+    
         if not os.path.exists(css_path):
                 raise FileNotFoundError(f"CSS file not found: {css_path}")
         with open(css_path, 'r') as f:
@@ -212,7 +211,7 @@ def generate_resume(app,resume,assets):
 
         # Combine layout and theme CSS
         full_css = layout_css + "\n" + theme_css
-
+   
         # Validate resume_data
         if not isinstance(resume.resume_data, dict) or 'sections' not in resume.resume_data:
             raise ValueError("Invalid resume_data: 'sections' key missing")

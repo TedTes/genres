@@ -30,7 +30,7 @@ def download_resume(resume_id):
         template = template_registry.get_template(template_id)
 
         html_string  = generate_resume(g.app,resume, g.assets)
-        # Render the resume template
+
         # Create a BytesIO object to store the PDF
         pdf_file = BytesIO()
         
