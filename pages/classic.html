@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{ resume.contact.name|default('Resume') }}</title>
+  <style>
+    {{ css_content | safe }}
+  </style>
+</head>
+<body>
+  <div class="resume-container">
+    <div class="resume-header">
+      <h1 class="name">{{ resume.name | default('Test User') }}</h1>
+      <h2 class="title">{{ resume.title | default('Professional') }}</h2>
+
+      {% if resume.contact %}
+      <div class="contact-grid">
+        {% for contact in resume.contact %}
+          <span class="contact-item">{{ contact }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    {% for section in resume.sections %}
+    <section class="resume-section {{ section.type }}-section">
+      <h2 class="section-title">{{ section.title }}</h2>
+
+      {% if section.display == 'text' %}
+        <div class="section-content">
+          {{ section.content | safe }}
+        </div>
+
+      {% elif section.display == 'tags' %}
+        <div class="section-container">
+          {% for item in section['items'] %}
+            <span class="section-tag">{{ item }}</span>
+          {% endfor %}
+        </div>
+
+      {% else %}
+        {% for item in section['items'] %}
+          <div class="section-item">
+            {% for key, value in item.items() %}
+              <div class="section-{{ key | replace('_', '-') }}">
+                {{ value }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+    </section>
+    {% endfor %}
+  </div>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>{{ resume.contact.name|default('Resume') }}</title>
+            <style>
+                {{ css_content | safe }}
+              </style>
+        </head>
+        <body>
+            <div class="resume-container">
+                <!-- Header with Name, Title and Contact Info -->
+                <header class="resume-header">
+                    <div class="name-title-container">
+                        <h1 class="name">{{ resume.contact.name|default('Your Name') }}</h1>
+                        <div class="title">{{ resume.contact.title|default('') }}</div>
+                    </div>
+                    
+                    <div class="contact-grid">
+                        {% if resume.contact.email %}
+                        <div class="contact-item">
+                            <span class="contact-icon"><i class="fa-solid fa-envelope"></i></span>
+                            {{ resume.contact.email }}
+                        </div>
+                        {% endif %}
+                        
+                        {% if resume.contact.phone %}
+                        <div class="contact-item">
+                            <span class="contact-icon"><i class="fa-solid fa-phone"></i></span>
+                            {{ resume.contact.phone }}
+                        </div>
+                        {% endif %}
+                        
+                        {% if resume.contact.location %}
+                        <div class="contact-item">
+                            <span class="contact-icon"><i class="fa-solid fa-location-dot"></i></span>
+                            {{ resume.contact.location }}
+                        </div>
+                        {% endif %}
+                        
+                        {% if resume.contact.linkedin %}
+                        <div class="contact-item">
+                            <span class="contact-icon"><i class="fa-brands fa-linkedin-in"></i></span>
+                            {{ resume.contact.linkedin }}
+                        </div>
+                        {% endif %}
+                        
+                        {% if resume.contact.website %}
+                        <div class="contact-item">
+                            <span class="contact-icon"><i class="fa-solid fa-globe"></i></span>
+                            {{ resume.contact.website }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </header>
+                
+                <!-- Main Content -->
+                <div class="resume-body">
+                    <!-- Left Column: Experience and Education -->
+                    <div class="main-column">
+                        {% if resume.summary['content'] %}
+                        <div class="resume-section">
+                            <h2 class="section-title">Professional Summary</h2>
+                            <div class="summary">
+                                {{ resume.summary['content']['content'] }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if resume.experience %}
+                        <div class="resume-section">
+                            <h2 class="section-title">Professional Experience</h2>
+                            
+                            {% for exp in resume.experience %}
+                            <div class="experience-item">
+                                <div class="job-title">{{ exp.title }}</div>
+                                <div class="company-name">{{ exp.company }}</div>
+                                <div class="job-duration">{{ exp.startDate }} — {% if exp.current %}Present{% else %}{{ exp.endDate }}{% endif %}</div>
+                                
+                                {% if exp.description %}
+                                <ul class="job-duties">
+                                    {% for point in exp.description.split('\n') %}
+                                        {% if point.strip() %}
+                                        <li>{{ point.strip() }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if resume.certifications %}
+                        <div class="resume-section">
+                            <h2 class="section-title">Certifications</h2>
+                            <ul class="job-duties">
+                                {% for cert in resume.certifications %}
+                                <li>{{ cert }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Right Column: Education, Skills, etc. -->
+                    <div class="side-column">
+                        {% if resume.education %}
+                        <div class="resume-section">
+                            <h2 class="section-title">Education</h2>
+                            
+                            {% for edu in resume.education %}
+                            <div class="education-item">
+                                <div class="degree">{{ edu.degree }}</div>
+                                <div class="school">{{ edu.school }}</div>
+                                <div class="education-date">{{ edu.startYear }} — {% if edu.current %}Present{% else %}{{ edu.endYear }}{% endif %}</div>
+                                
+                                {% if edu.description %}
+                                <div class="education-description">{{ edu.description }}</div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if resume.skills %}
+                        <div class="resume-section">
+                            <h2 class="section-title">Skills</h2>
+                            <div class="skills-container">
+                                {% for skill in resume.skills %}
+                                <div class="skill-tag">{{ skill }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if resume.languages %}
+                        <div class="resume-section">
+                            <h2 class="section-title">Languages</h2>
+                            <div class="skills-container">
+                                {% for language in resume.languages %}
+                                <div class="skill-tag">{{ language }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
