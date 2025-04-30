@@ -193,7 +193,7 @@ def calculate_skill_match(user_skills, job_skills):
     return overall_match, skill_matches
 
 
-def generate_resume(app,resume,assets):
+def generate_resume(app,resume):
     try:
   
         layout = get_layout(resume.layout_id)

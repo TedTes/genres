@@ -29,7 +29,7 @@ def download_resume(resume_id):
         template_id = resume.template or 'professional_classic'
         template = template_registry.get_template(template_id)
 
-        html_string  = generate_resume(g.app,resume, g.assets)
+        html_string  = generate_resume(g.app,resume)
 
         # Create a BytesIO object to store the PDF
         pdf_file = BytesIO()
@@ -90,7 +90,7 @@ def resume_render(resume_id):
     template_id = resume.template or 'professional_classic'
     template = template_registry.get_template(template_id)
    
-    html_output  = generate_resume(g.app,resume,g.assets)
+    html_output  = generate_resume(g.app,resume)
     # Render the resume template
     return Response(html_output, mimetype="text/html")
 

@@ -14,9 +14,8 @@ from supabase import create_client, Client
 from db import db
 from models import  User,Resume
 from flask_wtf.csrf import CSRFProtect, CSRFError
-from flask_assets import Bundle,Environment
+
 from helpers.resume_helper import generate_resume
-from config.scss_config import scss_config
 from config.config import Config
 os.environ['DYLD_LIBRARY_PATH'] = '/opt/homebrew/lib:' + os.environ.get('DYLD_LIBRARY_PATH', '')
 
@@ -25,34 +24,12 @@ app = Flask(__name__,template_folder="pages")
 csrf = CSRFProtect(app)
 
 app.config.from_object(Config)
-# Initialize Flask-Assets
-assets = Environment(app)
-assets.url = '/static'
-assets.debug = True
 
-
-try:
-    # Configure Flask-Assets for multiple templates
-    for template_name, config in scss_config.items():
-        template_scss = Bundle(
-            config['css'],
-            filters='libsass',
-            output=config['output_css']
-        )
-        assets.register(f'{template_name}_css', template_scss)
-        template_scss.build()
-   
-except Exception as e:
-     print("Error registering or building css files from scss")
-     print(e)
 
 @app.before_request
 def before_request():
-    g.assets = assets
     g.app = app
-@app.route('/test-assets')
-def test_assets():
-    return render_template('test_assets.html')
+
 
 # Register all routes
 from routes import register_routes 
