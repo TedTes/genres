@@ -1,36 +1,64 @@
 
 from dotenv import load_dotenv
-from flask import Flask,request,render_template,jsonify
+load_dotenv(dotenv_path='python-dotenv.env')
+from flask import Flask,request,render_template,jsonify,send_file,g
 from flask_login import LoginManager
 import os
 import io
-
+from io import BytesIO
+from weasyprint import HTML
 import spacy
-import secrets
+
 from datetime import datetime
 from supabase import create_client, Client
 from db import db
-from models import  User
+from models import  User,Resume
 from flask_wtf.csrf import CSRFProtect, CSRFError
-
+from flask_assets import Bundle,Environment
+from helpers.resume_helper import generate_resume
+from config import scss_config
+from config.config import Config
 os.environ['DYLD_LIBRARY_PATH'] = '/opt/homebrew/lib:' + os.environ.get('DYLD_LIBRARY_PATH', '')
 
-app = Flask(__name__,template_folder="pages")
 
+app = Flask(__name__,template_folder="pages")
 csrf = CSRFProtect(app)
-load_dotenv(dotenv_path='python-dotenv.env')
+
+app.config.from_object(Config)
+# Initialize Flask-Assets
+assets = Environment(app)
+assets.url = '/static'
+assets.debug = True
+
+
+try:
+    # Configure Flask-Assets for multiple templates
+    for template_name, config in scss_config.items():
+        template_scss = Bundle(
+            config['css'],
+            filters='libsass',
+            output=config['output_css']
+        )
+        assets.register(f'{template_name}_css', template_scss)
+        template_scss.build()
+   
+except Exception as e:
+     print("Error registering or building css files from scss")
+     print(e)
+
+@app.before_request
+def before_request():
+    g.assets = assets
+    g.app = app
+@app.route('/test-assets')
+def test_assets():
+    return render_template('test_assets.html')
 
 # Register all routes
 from routes import register_routes 
 register_routes(app)
 
-app.config['SECRET_KEY'] = secrets.token_hex(16) #TODOO Replace with a secure key
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-supabase_url = os.environ.get('SUPABASE_URL')
-supabase_key = os.environ.get('SUPABASE_KEY')
-
-supabase: Client = create_client(supabase_url, supabase_key)
+supabase: Client = create_client(app.config['SUPABASE_URL'],app.config['SUPABASE_KEY'])
 
 db.init_app(app)
 login_manager = LoginManager(app)
