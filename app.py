@@ -16,7 +16,7 @@ from models import  User,Resume
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_assets import Bundle,Environment
 from helpers.resume_helper import generate_resume
-from config import scss_config
+from config.scss_config import scss_config
 from config.config import Config
 os.environ['DYLD_LIBRARY_PATH'] = '/opt/homebrew/lib:' + os.environ.get('DYLD_LIBRARY_PATH', '')
 
