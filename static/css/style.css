@@ -1383,6 +1383,7 @@ Resume Cards
   align-items: center;
   height: 180px;
   overflow: hidden;
+
 }
 
 .resume-template-preview {
@@ -3262,7 +3263,6 @@ job search content section
   flex-direction: column;
   gap: 8px;
   padding:0;
-  background:red;
 }
 
 .checkbox-group li {

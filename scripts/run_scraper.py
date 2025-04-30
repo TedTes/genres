@@ -4,7 +4,7 @@ from services.scraper.data_aggregator import DataAggregator
 from db import db
 from app import app
 from .parser_configs import configs
-
+import json
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -14,7 +14,11 @@ async def run_aggregation():
     try:
         logger.info("Starting aggregation run")
         aggregator = DataAggregator(configs)
-        jobs = await aggregator.aggregate()
+        jobs = await aggregator.aggregate_with_details()
+        print("logging result jobs to file...")
+        with open('job_results.json','w') as f:
+            json.dump(jobs,f, indent=4)
+        print("logging result jobs to file done")
         logger.info(f"Aggregation complete: {len(jobs)} jobs collected and stored")
     except Exception as e:
         logger.error(f"Error during aggregation: {str(e)}")

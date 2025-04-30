@@ -60,7 +60,7 @@ def job():
         return render_template('jobs.html', jobs=processed_jobs, form=form)
         
     except Exception as e:
-        print(f"Error in jobs route: {e}")
+        print(f"Error in job route: {e}")
         flash(f"Error fetching jobs: {str(e)}", 'danger')
         return render_template('jobs.html', jobs=[], form=form)
 
