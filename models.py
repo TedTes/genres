@@ -189,3 +189,11 @@ class Layout(db.Model):
 
     def __repr__(self):
         return f'<Layout {self.id}: {self.name}>'
+
+
+
+class SectionType(db.Model):
+    id = db.Column(db.String(50), primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    fields = db.Column(JSONB)  # e.g., {'job_title': 'string', 'company': 'string'}
+    display = db.Column(db.String(50))  # e.g., 'list', 'tags', 'text'
