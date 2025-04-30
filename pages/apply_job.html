@@ -66,7 +66,7 @@
                     {% else %}
                         <div class="no-resumes">
                             <p>You don't have any resumes yet. Create one to apply to this job.</p>
-                            <a href="{{ url_for('resume.resume_contact', resume_id=0, job_id=job.id) }}" class="btn btn-primary">
+                            <a href="{{ url_for('resume.resume_builder', resume_id=0, job_id=job.id) }}" class="btn btn-primary">
                                 Create Resume
                             </a>
                         </div>
