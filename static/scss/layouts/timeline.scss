@@ -1,0 +1,308 @@
+// Define variables for reuse (aligned with your existing CSS vars)
+$max-width: 800px;
+$padding: 25px;
+$primary: var(--primary);
+$secondary: var(--secondary);
+$text: var(--text);
+$text-light: var(--text-light);
+$font-family: var(--font-family);
+$heading-family: var(--heading-family);
+$heading-weight: var(--heading-weight);
+$line-height: var(--line-height);
+
+// Resume Container
+.resume-container {
+  max-width: $max-width;
+  margin: 0 auto;
+  padding: $padding;
+  font-family: $font-family;
+  color: $text;
+
+  // Resume Header
+  .resume-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid $primary;
+
+    .header-main {
+      flex: 1;
+
+      .name {
+        font-size: 28px;
+        font-weight: 700;
+        color: $primary;
+        margin-bottom: 5px;
+      }
+
+      .title {
+        font-size: 16px;
+        color: $text-light;
+      }
+    }
+
+    .contact-grid {
+      display: flex;
+      flex-wrap: wrap;
+      margin: -5px -10px; /* Negative margin to offset item margins */
+      flex: 1;
+      justify-content: flex-end;
+      text-align: right;
+
+      .contact-item {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        margin: 5px 10px; /* Add explicit margins */
+
+        .contact-icon {
+          color: $primary;
+          width: 16px;
+          text-align: center;
+          margin-right: 8px; /* Add explicit margin */
+        }
+      }
+    }
+  }
+
+  // Content Container
+  .content-container {
+    display: grid;
+    grid-template-columns: 7fr 3fr;
+    grid-column-gap: 30px; /* Use grid-column-gap instead */
+    grid-row-gap: 30px; /* Use grid-row-gap instead */
+
+    .main-column {
+      grid-column: 1;
+    }
+
+    .side-column {
+      grid-column: 2;
+    }
+
+    // Resume Section
+    .resume-section {
+      margin-bottom: 25px;
+      page-break-inside: avoid; /* Better for printing */
+
+      .section-title {
+        font-family: $heading-family;
+        font-size: 18px;
+        font-weight: $heading-weight;
+        color: $primary;
+        margin-bottom: 15px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid $primary;
+      }
+
+      .summary {
+        margin-bottom: 20px;
+        line-height: $line-height;
+      }
+
+      // Timeline Styles
+      .timeline {
+        position: relative;
+        padding-left: 30px;
+        margin-left: 10px;
+
+        .timeline-line {
+          position: absolute;
+          left: 0;
+          top: 10px;
+          bottom: 0;
+          width: 2px;
+          background-color: $primary;
+          opacity: 0.3;
+        }
+
+        .timeline-item {
+          position: relative;
+          margin-bottom: 30px;
+
+          .timeline-dot {
+            position: absolute;
+            left: -39px;
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: $primary;
+            z-index: 1;
+          }
+
+          .timeline-date {
+            position: absolute;
+            left: -205px;
+            top: 3px;
+            width: 150px;
+            text-align: right;
+            font-size: 14px;
+            color: $text-light;
+          }
+
+          .timeline-content {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            border-left: 3px solid $primary;
+
+            .job-title {
+              font-size: 16px;
+              font-weight: 600;
+              color: $primary;
+              margin-bottom: 5px;
+            }
+
+            .company-name {
+              font-size: 15px;
+              color: $text-light;
+              margin-bottom: 10px;
+            }
+
+            .job-duties {
+              margin-top: 10px;
+              padding-left: 20px;
+              list-style-position: outside; /* For better list rendering */
+
+              li {
+                margin-bottom: 5px;
+              }
+            }
+          }
+        }
+      }
+
+      // Education & Skills
+      .education-item {
+        margin-bottom: 20px;
+        page-break-inside: avoid; /* Better for printing */
+
+        .degree {
+          font-size: 16px;
+          font-weight: 600;
+          margin-bottom: 2px;
+        }
+
+        .school {
+          font-size: 15px;
+          color: $text-light;
+          margin-bottom: 2px;
+        }
+
+        .education-date {
+          font-size: 14px;
+          color: $text-light;
+          margin-bottom: 5px;
+        }
+
+        .education-description {
+          font-size: 14px;
+          margin-top: 5px;
+        }
+      }
+
+      .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        margin: -4px; /* Negative margin to accommodate skill tag margins */
+
+        .skill-tag {
+          background-color: $primary;
+          color: white;
+          padding: 4px 10px;
+          border-radius: 4px;
+          font-size: 13px;
+          opacity: 0.8;
+          margin: 4px; /* Add explicit margins */
+          display: inline-block; /* Ensure proper rendering */
+        }
+      }
+
+      .certs-list {
+        padding-left: 20px;
+        list-style-position: outside; /* For better list rendering */
+
+        li {
+          margin-bottom: 5px;
+        }
+      }
+
+      // Project Styles
+      .project-item {
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-left: 3px solid $secondary;
+        page-break-inside: avoid; /* Better for printing */
+
+        .project-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: $secondary;
+          margin-bottom: 5px;
+        }
+
+        .project-description {
+          margin-bottom: 10px;
+        }
+
+        .project-tech {
+          display: flex;
+          flex-wrap: wrap;
+          margin: -2.5px; /* Negative margin for tech tags */
+          margin-top: 7.5px; /* Adjustment for top margin */
+
+          .tech-tag {
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin: 2.5px; /* Add explicit margins */
+            display: inline-block; /* Ensure proper rendering */
+          }
+        }
+      }
+    }
+  }
+}
+
+// WeasyPrint specific page setup
+@page {
+  margin: 1cm;
+  size: letter portrait;
+}
+
+// Media Queries for Responsive Design
+@media (max-width: 768px) {
+  .resume-container {
+    .content-container {
+      grid-template-columns: 1fr;
+      grid-column-gap: 0;
+      grid-row-gap: 20px;
+
+      .main-column,
+      .side-column {
+        grid-column: 1;
+      }
+
+      .timeline {
+        padding-left: 20px;
+
+        .timeline-date {
+          position: static;
+          text-align: left;
+          margin-bottom: 5px;
+          width: auto;
+        }
+
+        .timeline-dot {
+          left: -29px;
+        }
+      }
+    }
+  }
+}

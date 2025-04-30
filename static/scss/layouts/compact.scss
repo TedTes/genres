@@ -1,0 +1,201 @@
+// Define variables for reuse (aligned with your existing CSS vars)
+$max-width: 800px;
+$padding: 20px;
+$primary: var(--primary);
+$text: var(--text);
+$text-light: var(--text-light);
+$font-family: var(--font-family);
+$background: var(--background);
+$border: var(--border);
+
+// Resume Container
+.resume-container {
+  max-width: $max-width;
+  margin: 0 auto;
+  font-family: $font-family;
+  color: $text;
+  background-color: $background;
+  font-size: 0.9em;
+  padding: $padding;
+
+  // Compact Header
+  .compact-header {
+    border-bottom: 2px solid $primary;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+
+    .name-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+
+      .name {
+        font-size: 24px;
+        font-weight: 700;
+        color: $primary;
+      }
+
+      .title {
+        font-size: 15px;
+        color: $text-light;
+      }
+    }
+
+    .contact-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 15px;
+      font-size: 12px;
+
+      .contact-item:not(:last-child)::after {
+        content: '•';
+        margin-left: 15px;
+        color: $text-light;
+      }
+    }
+  }
+
+  // Compact Content
+  .compact-content {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 15px;
+
+    .compact-main {
+      grid-column: 1;
+    }
+
+    .compact-sidebar {
+      grid-column: 2;
+      font-size: 0.95em;
+    }
+
+    // Compact Sections
+    .compact-section {
+      margin-bottom: 15px;
+
+      .compact-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: $primary;
+        border-bottom: 1px solid $border;
+        padding-bottom: 5px;
+        margin-bottom: 10px;
+      }
+
+      .compact-summary {
+        font-size: 13px;
+        line-height: 1.5;
+        margin-bottom: 10px;
+      }
+
+      // Compact Items
+      .compact-item {
+        margin-bottom: 12px;
+
+        .compact-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          margin-bottom: 3px;
+
+          .item-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: $text;
+          }
+
+          .small-title {
+            font-size: 13px;
+          }
+
+          .item-date {
+            font-size: 12px;
+            color: $text-light;
+          }
+        }
+
+        .item-subtitle {
+          font-size: 13px;
+          color: $text-light;
+          margin-bottom: 5px;
+        }
+
+        .compact-description {
+          font-size: 12px;
+          margin-top: 5px;
+        }
+
+        // List Styles
+        .compact-list {
+          padding-left: 20px;
+          margin-top: 5px;
+          font-size: 12px;
+
+          li {
+            margin-bottom: 3px;
+          }
+        }
+
+        // Tag Styles
+        .compact-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 5px;
+          margin-top: 5px;
+
+          .compact-tag {
+            background-color: #f1f5f9;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            color: $text;
+          }
+        }
+
+        .project-link {
+          font-size: 12px;
+          color: $primary;
+          text-decoration: none;
+        }
+      }
+
+      &.compact-skills {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+// WeasyPrint specific page setup (added for consistency)
+@page {
+  margin: 0.5cm;
+  size: letter portrait;
+}
+
+// Media Queries
+@media print {
+  .resume-container {
+    padding: 0;
+    max-width: 100%;
+  }
+
+  body {
+    font-size: 11pt;
+  }
+}
+
+@media (max-width: 768px) {
+  .resume-container {
+    .compact-content {
+      grid-template-columns: 1fr;
+
+      .compact-main,
+      .compact-sidebar {
+        grid-column: 1;
+      }
+    }
+  }
+}

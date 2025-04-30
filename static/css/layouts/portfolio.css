@@ -1,0 +1,256 @@
+.resume-container {
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: var(--font-family);
+  color: var(--text);
+  background-color: var(--background); }
+  .resume-container .portfolio-header {
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: white;
+    padding: 30px;
+    border-radius: 8px 8px 0 0; }
+    .resume-container .portfolio-header .header-content {
+      max-width: 100%;
+      margin: 0 auto; }
+      .resume-container .portfolio-header .header-content .name-title {
+        text-align: center;
+        margin-bottom: 20px; }
+        .resume-container .portfolio-header .header-content .name-title .name {
+          font-size: 32px;
+          font-weight: 700;
+          margin-bottom: 5px; }
+        .resume-container .portfolio-header .header-content .name-title .title {
+          font-size: 18px;
+          opacity: 0.9; }
+      .resume-container .portfolio-header .header-content .contact-bar {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center; }
+        .resume-container .portfolio-header .header-content .contact-bar .contact-item {
+          margin-right: 15px; }
+          .resume-container .portfolio-header .header-content .contact-bar .contact-item .contact-icon {
+            font-size: 0.9rem;
+            margin: 0; }
+          .resume-container .portfolio-header .header-content .contact-bar .contact-item .contact-text {
+            font-size: 0.8rem;
+            word-break: break-word;
+            margin: 0; }
+  .resume-container .portfolio-wrapper {
+    padding: 30px;
+    background-color: white;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+    .resume-container .portfolio-wrapper .about-section {
+      margin-bottom: 40px; }
+      .resume-container .portfolio-wrapper .about-section .section-title {
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 20px;
+        text-align: center;
+        position: relative; }
+        .resume-container .portfolio-wrapper .about-section .section-title::after {
+          content: '';
+          display: block;
+          width: 50px;
+          height: 3px;
+          background-color: var(--primary);
+          margin: 10px auto 0; }
+      .resume-container .portfolio-wrapper .about-section .about-content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        /* Gap is supported in flexbox for WeasyPrint, keeping it here */ }
+        .resume-container .portfolio-wrapper .about-section .about-content .summary {
+          line-height: var(--line-height); }
+        .resume-container .portfolio-wrapper .about-section .about-content .subsection-title {
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--text);
+          margin-bottom: 15px; }
+        .resume-container .portfolio-wrapper .about-section .about-content .skills-area {
+          margin-top: 20px; }
+          .resume-container .portfolio-wrapper .about-section .about-content .skills-area .skills-container {
+            display: flex;
+            flex-wrap: wrap; }
+            .resume-container .portfolio-wrapper .about-section .about-content .skills-area .skills-container .skill-tag {
+              background-color: var(--primary);
+              color: white;
+              padding: 6px 12px;
+              border-radius: 20px;
+              font-size: 14px;
+              opacity: 0.8;
+              margin-right: 10px;
+              /* Horizontal spacing */
+              margin-bottom: 10px;
+              /* Vertical spacing */ }
+    .resume-container .portfolio-wrapper .projects-section {
+      margin-bottom: 40px; }
+      .resume-container .portfolio-wrapper .projects-section .projects-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between; }
+        .resume-container .portfolio-wrapper .projects-section .projects-grid .project-card {
+          background-color: #f9fafb;
+          border-radius: 8px;
+          padding: 20px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+          width: calc(50% - 10px);
+          /* Two columns with spacing */
+          margin-bottom: 20px; }
+          .resume-container .portfolio-wrapper .projects-section .projects-grid .project-card .project-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px; }
+            .resume-container .portfolio-wrapper .projects-section .projects-grid .project-card .project-card-header .project-title {
+              font-size: 18px;
+              font-weight: 600;
+              color: var(--primary); }
+            .resume-container .portfolio-wrapper .projects-section .projects-grid .project-card .project-card-header .project-link {
+              color: var(--text-light);
+              text-decoration: none;
+              font-size: 16px; }
+          .resume-container .portfolio-wrapper .projects-section .projects-grid .project-card .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 15px; }
+            .resume-container .portfolio-wrapper .projects-section .projects-grid .project-card .project-tech .tech-tag {
+              background-color: rgba(0, 0, 0, 0.05);
+              padding: 4px 8px;
+              border-radius: 4px;
+              font-size: 13px;
+              color: var(--text-light);
+              margin-right: 5px;
+              /* Horizontal spacing */
+              margin-bottom: 5px;
+              /* Vertical spacing */ }
+          .resume-container .portfolio-wrapper .projects-section .projects-grid .project-card .project-description {
+            font-size: 14px;
+            line-height: 1.5; }
+    .resume-container .portfolio-wrapper .dual-column-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-bottom: 40px; }
+      .resume-container .portfolio-wrapper .dual-column-section .experience-column,
+      .resume-container .portfolio-wrapper .dual-column-section .education-column {
+        width: calc(50% - 15px);
+        /* Two columns with spacing */ }
+        .resume-container .portfolio-wrapper .dual-column-section .experience-column .experience-item,
+        .resume-container .portfolio-wrapper .dual-column-section .education-column .experience-item {
+          margin-bottom: 25px; }
+          .resume-container .portfolio-wrapper .dual-column-section .experience-column .experience-item .exp-header,
+          .resume-container .portfolio-wrapper .dual-column-section .education-column .experience-item .exp-header {
+            margin-bottom: 10px; }
+            .resume-container .portfolio-wrapper .dual-column-section .experience-column .experience-item .exp-header .job-title,
+            .resume-container .portfolio-wrapper .dual-column-section .education-column .experience-item .exp-header .job-title {
+              font-size: 18px;
+              font-weight: 600;
+              color: var(--primary);
+              margin-bottom: 2px; }
+            .resume-container .portfolio-wrapper .dual-column-section .experience-column .experience-item .exp-header .job-duration,
+            .resume-container .portfolio-wrapper .dual-column-section .education-column .experience-item .exp-header .job-duration {
+              font-size: 14px;
+              color: var(--text-light); }
+            .resume-container .portfolio-wrapper .dual-column-section .experience-column .experience-item .exp-header .company-name,
+            .resume-container .portfolio-wrapper .dual-column-section .education-column .experience-item .exp-header .company-name {
+              font-size: 16px;
+              color: var(--text);
+              margin-bottom: 10px; }
+          .resume-container .portfolio-wrapper .dual-column-section .experience-column .experience-item .job-duties,
+          .resume-container .portfolio-wrapper .dual-column-section .education-column .experience-item .job-duties {
+            padding-left: 20px; }
+            .resume-container .portfolio-wrapper .dual-column-section .experience-column .experience-item .job-duties li,
+            .resume-container .portfolio-wrapper .dual-column-section .education-column .experience-item .job-duties li {
+              margin-bottom: 5px; }
+        .resume-container .portfolio-wrapper .dual-column-section .experience-column .education-item,
+        .resume-container .portfolio-wrapper .dual-column-section .education-column .education-item {
+          margin-bottom: 20px; }
+          .resume-container .portfolio-wrapper .dual-column-section .experience-column .education-item .edu-header,
+          .resume-container .portfolio-wrapper .dual-column-section .education-column .education-item .edu-header {
+            margin-bottom: 5px; }
+            .resume-container .portfolio-wrapper .dual-column-section .experience-column .education-item .edu-header .degree,
+            .resume-container .portfolio-wrapper .dual-column-section .education-column .education-item .edu-header .degree {
+              font-size: 18px;
+              font-weight: 600;
+              color: var(--primary);
+              margin-bottom: 2px; }
+            .resume-container .portfolio-wrapper .dual-column-section .experience-column .education-item .edu-header .education-date,
+            .resume-container .portfolio-wrapper .dual-column-section .education-column .education-item .edu-header .education-date {
+              font-size: 14px;
+              color: var(--text-light); }
+            .resume-container .portfolio-wrapper .dual-column-section .experience-column .education-item .edu-header .school,
+            .resume-container .portfolio-wrapper .dual-column-section .education-column .education-item .edu-header .school {
+              font-size: 16px;
+              color: var(--text);
+              margin-bottom: 5px; }
+        .resume-container .portfolio-wrapper .dual-column-section .experience-column .certifications-title,
+        .resume-container .portfolio-wrapper .dual-column-section .experience-column .languages-title,
+        .resume-container .portfolio-wrapper .dual-column-section .education-column .certifications-title,
+        .resume-container .portfolio-wrapper .dual-column-section .education-column .languages-title {
+          margin-top: 30px; }
+        .resume-container .portfolio-wrapper .dual-column-section .experience-column .certifications-list,
+        .resume-container .portfolio-wrapper .dual-column-section .education-column .certifications-list {
+          padding-left: 20px; }
+          .resume-container .portfolio-wrapper .dual-column-section .experience-column .certifications-list .cert-item,
+          .resume-container .portfolio-wrapper .dual-column-section .education-column .certifications-list .cert-item {
+            margin-bottom: 5px; }
+        .resume-container .portfolio-wrapper .dual-column-section .experience-column .languages-container,
+        .resume-container .portfolio-wrapper .dual-column-section .education-column .languages-container {
+          margin-top: 10px; }
+    .resume-container .portfolio-wrapper .awards-section {
+      margin-bottom: 30px; }
+      .resume-container .portfolio-wrapper .awards-section .awards-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between; }
+        .resume-container .portfolio-wrapper .awards-section .awards-grid .award-item {
+          display: flex;
+          background-color: #f9fafb;
+          border-radius: 8px;
+          padding: 15px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          width: calc(50% - 10px);
+          /* Two columns with spacing */
+          margin-bottom: 20px; }
+          .resume-container .portfolio-wrapper .awards-section .awards-grid .award-item .award-icon {
+            font-size: 24px;
+            color: var(--accent);
+            margin-right: 15px;
+            display: flex;
+            align-items: center; }
+          .resume-container .portfolio-wrapper .awards-section .awards-grid .award-item .award-content {
+            flex: 1; }
+            .resume-container .portfolio-wrapper .awards-section .awards-grid .award-item .award-content .award-title {
+              font-size: 16px;
+              font-weight: 600;
+              color: var(--text);
+              margin-bottom: 5px; }
+            .resume-container .portfolio-wrapper .awards-section .awards-grid .award-item .award-content .award-meta {
+              font-size: 14px;
+              color: var(--text-light);
+              margin-bottom: 8px; }
+            .resume-container .portfolio-wrapper .awards-section .awards-grid .award-item .award-content .award-description {
+              font-size: 14px; }
+
+@page {
+  margin: 0.5cm;
+  size: letter portrait; }
+
+@media print {
+  .resume-container .dual-column-section {
+    display: block; }
+    .resume-container .dual-column-section .experience-column,
+    .resume-container .dual-column-section .education-column {
+      width: 100%; }
+  .resume-container .projects-grid,
+  .resume-container .awards-grid {
+    display: block; }
+    .resume-container .projects-grid .project-card,
+    .resume-container .projects-grid .award-item,
+    .resume-container .awards-grid .project-card,
+    .resume-container .awards-grid .award-item {
+      width: 100%;
+      margin-bottom: 20px; } }

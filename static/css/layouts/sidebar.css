@@ -1,0 +1,126 @@
+.resume-container {
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: var(--font-family);
+  color: var(--text);
+  line-height: var(--line-height);
+  display: grid;
+  grid-template-columns: 250px 1fr; }
+  .resume-container .sidebar {
+    background-color: var(--primary);
+    color: white;
+    padding: 30px 20px;
+    height: 100%;
+    -weasy-box-sizing: border-box;
+    /* WeasyPrint specific */
+    -weasy-background-origin: padding-box;
+    /* Fix for background color in PDF */
+    -weasy-background-clip: padding-box;
+    background-color: var(--primary) !important; }
+    .resume-container .sidebar .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.2);
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 700; }
+    .resume-container .sidebar .name {
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 5px; }
+    .resume-container .sidebar .title {
+      font-size: 16px;
+      text-align: center;
+      margin-bottom: 25px;
+      opacity: 0.9; }
+    .resume-container .sidebar .sidebar-section {
+      margin-bottom: 25px;
+      page-break-inside: avoid;
+      /* Prevent awkward breaks */ }
+      .resume-container .sidebar .sidebar-section .sidebar-title {
+        text-transform: uppercase;
+        font-size: 14px;
+        letter-spacing: 1px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding-bottom: 5px; }
+      .resume-container .sidebar .sidebar-section .contact-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px; }
+        .resume-container .sidebar .sidebar-section .contact-item .contact-icon {
+          width: 16px;
+          text-align: center;
+          margin-right: 10px; }
+      .resume-container .sidebar .sidebar-section .skill-tag {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        margin-bottom: 8px;
+        display: inline-block;
+        margin-right: 8px; }
+  .resume-container .main-content {
+    padding: 30px;
+    -weasy-box-sizing: border-box;
+    /* WeasyPrint specific */ }
+    .resume-container .main-content .main-section {
+      margin-bottom: 25px;
+      page-break-inside: avoid;
+      /* Prevent awkward breaks */ }
+      .resume-container .main-content .main-section .main-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 15px;
+        padding-bottom: 5px;
+        border-bottom: 2px solid var(--primary); }
+    .resume-container .main-content .experience-item,
+    .resume-container .main-content .education-item {
+      margin-bottom: 20px;
+      page-break-inside: avoid;
+      /* Prevent awkward breaks */ }
+      .resume-container .main-content .experience-item .job-title,
+      .resume-container .main-content .experience-item .degree,
+      .resume-container .main-content .education-item .job-title,
+      .resume-container .main-content .education-item .degree {
+        font-weight: 600;
+        font-size: 16px;
+        margin-bottom: 5px; }
+      .resume-container .main-content .experience-item .company-name,
+      .resume-container .main-content .experience-item .school,
+      .resume-container .main-content .education-item .company-name,
+      .resume-container .main-content .education-item .school {
+        font-weight: 500;
+        margin-bottom: 3px; }
+      .resume-container .main-content .experience-item .job-duration,
+      .resume-container .main-content .experience-item .education-date,
+      .resume-container .main-content .education-item .job-duration,
+      .resume-container .main-content .education-item .education-date {
+        color: var(--text-light);
+        font-size: 14px;
+        margin-bottom: 8px; }
+      .resume-container .main-content .experience-item .job-duties,
+      .resume-container .main-content .education-item .job-duties {
+        margin-top: 8px;
+        padding-left: 20px;
+        list-style-position: outside;
+        /* Better rendering in PDF */ }
+        .resume-container .main-content .experience-item .job-duties li,
+        .resume-container .main-content .education-item .job-duties li {
+          margin-bottom: 5px; }
+
+@page {
+  margin: 0.5cm;
+  size: letter portrait; }
+
+@media print, (max-width: 768px) {
+  .resume-container {
+    grid-template-columns: 1fr; }
+    .resume-container .sidebar {
+      padding-bottom: 20px; } }

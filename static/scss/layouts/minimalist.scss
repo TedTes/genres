@@ -1,0 +1,161 @@
+// Define variables for reuse (aligned with your existing CSS vars)
+$max-width: 800px;
+$padding: 40px;
+$primary: var(--primary);
+$text: var(--text);
+$text-light: var(--text-light);
+$font-family: var(--font-family);
+$line-height: var(--line-height);
+$border: var(--border);
+
+// Resume Container
+.resume-container {
+  max-width: $max-width;
+  margin: 0 auto;
+  padding: $padding;
+  font-family: $font-family;
+  color: $text;
+  line-height: $line-height;
+
+  // Resume Header
+  .resume-header {
+    text-align: center;
+    margin-bottom: 40px;
+
+    .name {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: $primary;
+      letter-spacing: 1px;
+    }
+
+    .title {
+      font-size: 16px;
+      color: $text-light;
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+
+    .contact-grid {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+
+      .contact-item {
+        display: flex;
+        align-items: center;
+        margin-right: 35px; /* Horizontal spacing replacing gap */
+        margin-bottom: 15px; /* Vertical spacing replacing gap */
+        font-size: 14px;
+
+        .contact-icon {
+          color: $primary;
+          width: 16px;
+          text-align: center;
+          margin-right: 6px;
+        }
+      }
+    }
+  }
+
+  // Resume Section
+  .resume-section {
+    margin-bottom: 30px;
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: $primary;
+      margin-bottom: 15px;
+    }
+  }
+
+  // Experience and Education Items
+  .experience-item,
+  .education-item {
+    margin-bottom: 25px;
+    overflow: hidden; /* Contains floated elements */
+
+    .job-header,
+    .education-header {
+      margin-bottom: 10px;
+    }
+
+    .job-title,
+    .degree {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .company-name,
+    .school {
+      color: $text-light;
+    }
+
+    .job-duration,
+    .education-date {
+      float: left;
+      width: 150px;
+      font-size: 14px;
+      color: $text-light;
+    }
+
+    .job-duties,
+    .education-details {
+      margin-left: 170px; /* 150px width + 20px spacing */
+    }
+
+    .job-duties {
+      margin: 0;
+      padding-left: 20px;
+
+      li {
+        margin-bottom: 5px;
+      }
+    }
+  }
+
+  // Skills Container
+  .skills-container {
+    display: flex;
+    flex-wrap: wrap;
+
+    .skill-tag {
+      background: none;
+      border: 1px solid $border;
+      padding: 4px 10px;
+      border-radius: 3px;
+      font-size: 14px;
+      margin-right: 8px; /* Horizontal spacing replacing gap */
+      margin-bottom: 8px; /* Vertical spacing replacing gap */
+    }
+  }
+}
+
+// Media Queries for Responsive Design
+@media (max-width: 600px) {
+  .resume-container {
+    .experience-item,
+    .education-item {
+      .job-duration,
+      .education-date {
+        float: none;
+        width: auto;
+      }
+
+      .job-duties,
+      .education-details {
+        margin-left: 0;
+      }
+    }
+
+    .contact-grid {
+      .contact-item {
+        margin-right: 15px; /* Reduced horizontal spacing for smaller screens */
+      }
+    }
+  }
+}

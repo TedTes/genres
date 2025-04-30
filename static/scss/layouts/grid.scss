@@ -1,0 +1,373 @@
+// Define variables for reuse (aligned with your existing CSS vars)
+$max-width: 800px;
+$padding: 30px;
+$primary: var(--primary);
+$accent: var(--accent);
+$text: var(--text);
+$text-light: var(--text-light);
+$font-family: var(--font-family);
+$background: var(--background);
+
+// Ensure font consistency
+* {
+  font-family: $font-family;
+}
+
+// Resume Container
+.resume-container {
+  max-width: $max-width;
+  margin: 0 auto;
+  font-family: $font-family;
+  color: $text;
+  background-color: $background;
+
+  // Resume Header
+  .resume-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px $padding;
+    background-color: $primary;
+    color: white;
+    -weasy-box-sizing: border-box; /* WeasyPrint specific */
+    -weasy-background-origin: padding-box; /* Background color fix for WeasyPrint */
+    -weasy-background-clip: padding-box;
+    background-color: $primary !important;
+
+    .header-left {
+      flex: 1;
+
+      .name {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 5px;
+      }
+
+      .title {
+        font-size: 16px;
+        opacity: 0.9;
+      }
+    }
+
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      margin-top: -4px; /* Negative margin to compensate for item margins */
+
+      .contact-item {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        margin-top: 4px; /* Add explicit margin */
+        margin-bottom: 4px; /* Add explicit margin */
+
+        .contact-icon {
+          width: 16px;
+          text-align: center;
+          margin-right: 8px; /* Add explicit margin */
+        }
+      }
+    }
+  }
+
+  // Resume Grid
+  .resume-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+    padding: $padding;
+    -weasy-box-sizing: border-box; /* WeasyPrint specific */
+
+    // Grid Section
+    .grid-section {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      margin-bottom: 10px;
+      page-break-inside: avoid; /* Prevent section breaks in PDF */
+      -weasy-box-sizing: border-box; /* WeasyPrint specific */
+
+      // Section Title
+      .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: $primary;
+        margin-bottom: 15px;
+        padding-bottom: 5px;
+        border-bottom: 2px solid $primary;
+      }
+
+      // Section Content
+      .section-content {
+        padding-top: 5px;
+      }
+
+      // Item Styles
+      .experience-item,
+      .education-item {
+        margin-bottom: 20px;
+        page-break-inside: avoid; /* Prevent item breaks in PDF */
+
+        .exp-header,
+        .edu-header {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 5px;
+
+          .job-title-company,
+          .degree-school {
+            flex: 1;
+
+            .job-title,
+            .degree {
+              font-size: 16px;
+              font-weight: 600;
+              color: $text;
+              margin-bottom: 2px;
+            }
+
+            .company-name,
+            .school {
+              font-size: 15px;
+              color: $text-light;
+            }
+          }
+
+          .job-duration,
+          .education-date {
+            font-size: 14px;
+            color: $text-light;
+            text-align: right;
+          }
+        }
+
+        .job-duties {
+          margin-top: 10px;
+          padding-left: 20px;
+          list-style-position: outside; /* Better list rendering */
+
+          li {
+            margin-bottom: 5px;
+          }
+        }
+
+        .education-description {
+          font-size: 14px;
+          margin-top: 5px;
+        }
+      }
+
+      // Skills and Languages
+      .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        margin: -4px; /* Negative margin for skill tags */
+
+        .skill-tag {
+          background-color: rgba(59, 130, 246, 0.1);
+          color: $primary;
+          padding: 5px 12px;
+          border-radius: 20px;
+          font-size: 13px;
+          margin: 4px; /* Add explicit margin */
+          display: inline-block; /* Better rendering */
+        }
+      }
+
+      .certs-list {
+        padding-left: 20px;
+        list-style-position: outside; /* Better list rendering */
+
+        li {
+          margin-bottom: 5px;
+        }
+      }
+    }
+
+    // Section Sizing
+    .summary-section {
+      grid-column: span 12;
+    }
+
+    .skills-section {
+      grid-column: span 6;
+    }
+
+    .languages-section {
+      grid-column: span 6;
+    }
+
+    .experience-section {
+      grid-column: span 12;
+    }
+
+    .education-section {
+      grid-column: span 6;
+    }
+
+    .certifications-section {
+      grid-column: span 6;
+    }
+
+    .projects-section,
+    .awards-section {
+      grid-column: span 12;
+
+      // Projects Grid
+      .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        grid-column-gap: 15px;
+        grid-row-gap: 15px;
+
+        .project-item {
+          background-color: #f8fafc;
+          border-radius: 8px;
+          padding: 15px;
+          border-top: 3px solid $accent;
+          page-break-inside: avoid; /* Prevent breaks in PDF */
+
+          .project-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: $text;
+            margin-bottom: 8px;
+          }
+
+          .project-description {
+            font-size: 14px;
+            margin-bottom: 10px;
+          }
+
+          .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            margin: -2.5px; /* Negative margin for tech tags */
+            margin-top: 7.5px; /* Adjust top margin */
+
+            .tech-tag {
+              background-color: rgba(0, 0, 0, 0.05);
+              padding: 3px 8px;
+              border-radius: 3px;
+              font-size: 12px;
+              color: $text-light;
+              margin: 2.5px; /* Add explicit margin */
+              display: inline-block; /* Better rendering */
+            }
+          }
+
+          .project-link {
+            display: block;
+            margin-top: 10px;
+            font-size: 13px;
+            color: $primary;
+            text-decoration: none;
+          }
+        }
+      }
+
+      // Award Styles
+      .award-item {
+        margin-bottom: 15px;
+        page-break-inside: avoid; /* Prevent breaks in PDF */
+
+        .award-title-date {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 5px;
+
+          .award-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: $text;
+          }
+
+          .award-date {
+            font-size: 14px;
+            color: $text-light;
+          }
+        }
+
+        .award-issuer {
+          font-size: 15px;
+          color: $text-light;
+          margin-bottom: 5px;
+        }
+      }
+    }
+  }
+
+  // Resume Footer
+  .resume-footer {
+    grid-column: span 12;
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    margin-top: 20px;
+
+    .social-link {
+      color: $primary;
+      text-decoration: none;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      margin: 0 10px; /* Add horizontal margin */
+
+      i,
+      svg {
+        margin-right: 5px; /* Add margin for icons */
+      }
+    }
+  }
+}
+
+// WeasyPrint specific page setup
+@page {
+  margin: 0.5cm;
+  size: letter portrait;
+}
+
+// Media Queries
+@media print {
+  .resume-container {
+    margin: 0;
+    max-width: none;
+
+    .grid-section {
+      box-shadow: none;
+      border: 1px solid #e2e8f0;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .resume-container {
+    .resume-grid {
+      .skills-section,
+      .languages-section,
+      .education-section,
+      .certifications-section {
+        grid-column: span 12;
+      }
+
+      .projects-grid {
+        grid-template-columns: 1fr;
+        grid-column-gap: 0;
+        grid-row-gap: 15px;
+      }
+    }
+
+    .resume-header {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .header-right {
+        margin-top: 15px;
+        align-items: flex-start;
+      }
+    }
+  }
+}

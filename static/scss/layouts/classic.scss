@@ -1,0 +1,160 @@
+// Variables
+$spacing-unit: 20px;
+$font-base: 14px;
+$font-family-base: 'Open Sans', sans-serif;
+$primary: #2c3e50;
+$secondary: #3498db;
+$text-dark: #333;
+$text-light: #666;
+$border: #ddd;
+$background: #fff;
+$line-height-base: 1.6;
+
+// Mixins
+@mixin flex-row($wrap: wrap) {
+  display: flex;
+  flex-wrap: $wrap;
+}
+
+@mixin tag-style {
+  background: $secondary;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  margin: 5px;
+}
+
+// Global
+html, body {
+  margin: 0;
+  padding: 0;
+  background: $background;
+  font-family: $font-family-base;
+  font-size: $font-base;
+  line-height: $line-height-base;
+  color: $text-dark;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+// Layout
+.resume-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: $spacing-unit;
+  background: $background;
+}
+
+.resume-header {
+  text-align: center;
+  margin-bottom: $spacing-unit;
+  padding-bottom: $spacing-unit / 2;
+  border-bottom: 1px solid $border;
+
+  .name {
+    font-size: 26px;
+    font-weight: 700;
+    color: $primary;
+    margin-bottom: 5px;
+  }
+
+  .title {
+    font-size: 16px;
+    font-weight: 400;
+    color: $text-light;
+    margin-bottom: $spacing-unit / 2;
+  }
+
+  .contact-grid {
+    @include flex-row;
+    justify-content: center;
+    gap: 10px;
+
+    .contact-item {
+      font-size: 12px;
+      color: $text-light;
+    }
+  }
+}
+
+// Sections
+.resume-section {
+  margin-bottom: $spacing-unit;
+//  
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: $primary;
+    margin-bottom: $spacing-unit / 2;
+    padding-bottom: 5px;
+    border-bottom: 1px solid $border;
+  }
+
+  // Flexible layouts inside sections
+  &[class*="-section"] {
+    .section-content {
+      color: $text-dark;
+    }
+
+    .section-container {
+      @include flex-row;
+      gap: 10px;
+    }
+
+    .section-tag {
+      @include tag-style;
+    }
+
+    .section-item {
+      margin-bottom: $spacing-unit / 1.5;
+
+      [class*="-name"],
+      [class*="-job-title"],
+      [class*="-degree"] {
+        font-weight: 600;
+        font-size: 16px;
+        margin-bottom: 3px;
+      }
+
+      [class*="-company"],
+      [class*="-school"],
+      [class*="-issuer"],
+      [class*="-description"] {
+        font-weight: 400;
+        color: $text-light;
+        font-size: $font-base;
+        margin-bottom: 3px;
+      }
+
+      [class*="-date"],
+      [class*="-duration"] {
+        font-style: italic;
+        font-size: 12px;
+        color: $text-light;
+        margin-bottom: 5px;
+      }
+
+      [class*="-duties"] {
+        margin: 5px 0 0;
+        padding-left: 20px;
+        list-style: disc inside;
+
+        li {
+          margin-bottom: 5px;
+        }
+      }
+    }
+  }
+}
+
+// List Styles
+ul, ol {
+  list-style-position: outside;
+  padding-left: 20px;
+  margin: 0;
+}

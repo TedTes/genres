@@ -1,0 +1,199 @@
+.resume-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 25px;
+  font-family: var(--font-family);
+  color: var(--text);
+  background-color: #f9fafb; }
+  .resume-container .resume-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    overflow: hidden;
+    page-break-inside: avoid;
+    /* Try to keep cards together */ }
+    .resume-container .resume-card .header-card {
+      display: flex;
+      padding: 20px;
+      background-color: var(--primary);
+      /* Replaced gradient for WeasyPrint compatibility */
+      color: white; }
+      .resume-container .resume-card .header-card .avatar {
+        width: 64px;
+        height: 64px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 700;
+        margin-right: 20px;
+        flex-shrink: 0; }
+      .resume-container .resume-card .header-card .header-info {
+        flex: 1; }
+        .resume-container .resume-card .header-card .header-info .name {
+          font-size: 24px;
+          font-weight: 700;
+          margin-bottom: 5px; }
+        .resume-container .resume-card .header-card .header-info .title {
+          font-size: 16px;
+          opacity: 0.9;
+          margin-bottom: 15px; }
+        .resume-container .resume-card .header-card .header-info .contact-grid {
+          display: flex;
+          flex-wrap: wrap;
+          margin: -5px -10px;
+          /* Negative margins to offset item margins */ }
+          .resume-container .resume-card .header-card .header-info .contact-grid .contact-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            margin: 5px 10px;
+            /* Added explicit margins */ }
+            .resume-container .resume-card .header-card .header-info .contact-grid .contact-item .contact-icon {
+              width: 16px;
+              text-align: center;
+              margin-right: 8px;
+              /* Added explicit margin */ }
+    .resume-container .resume-card .card-content {
+      padding: 20px; }
+    .resume-container .resume-card .card-header {
+      padding: 15px 20px;
+      background-color: #f8fafc;
+      border-bottom: 1px solid var(--border); }
+      .resume-container .resume-card .card-header .card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--primary);
+        margin: 0; }
+    .resume-container .resume-card .experience-item,
+    .resume-container .resume-card .education-item,
+    .resume-container .resume-card .project-item {
+      margin-bottom: 20px;
+      page-break-inside: avoid;
+      /* Better PDF rendering */ }
+      .resume-container .resume-card .experience-item:last-child,
+      .resume-container .resume-card .education-item:last-child,
+      .resume-container .resume-card .project-item:last-child {
+        margin-bottom: 0; }
+      .resume-container .resume-card .experience-item .job-title,
+      .resume-container .resume-card .experience-item .degree,
+      .resume-container .resume-card .experience-item .project-title,
+      .resume-container .resume-card .education-item .job-title,
+      .resume-container .resume-card .education-item .degree,
+      .resume-container .resume-card .education-item .project-title,
+      .resume-container .resume-card .project-item .job-title,
+      .resume-container .resume-card .project-item .degree,
+      .resume-container .resume-card .project-item .project-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 2px; }
+      .resume-container .resume-card .experience-item .company-name,
+      .resume-container .resume-card .experience-item .school,
+      .resume-container .resume-card .education-item .company-name,
+      .resume-container .resume-card .education-item .school,
+      .resume-container .resume-card .project-item .company-name,
+      .resume-container .resume-card .project-item .school {
+        font-size: 15px;
+        color: var(--text-light);
+        margin-bottom: 2px; }
+      .resume-container .resume-card .experience-item .job-duration,
+      .resume-container .resume-card .experience-item .education-date,
+      .resume-container .resume-card .education-item .job-duration,
+      .resume-container .resume-card .education-item .education-date,
+      .resume-container .resume-card .project-item .job-duration,
+      .resume-container .resume-card .project-item .education-date {
+        font-size: 14px;
+        color: var(--text-light);
+        margin-bottom: 10px; }
+      .resume-container .resume-card .experience-item .job-duties,
+      .resume-container .resume-card .education-item .job-duties,
+      .resume-container .resume-card .project-item .job-duties {
+        margin-top: 10px;
+        padding-left: 20px;
+        list-style-position: outside;
+        /* Better list rendering */ }
+        .resume-container .resume-card .experience-item .job-duties li,
+        .resume-container .resume-card .education-item .job-duties li,
+        .resume-container .resume-card .project-item .job-duties li {
+          margin-bottom: 5px; }
+      .resume-container .resume-card .experience-item .project-description,
+      .resume-container .resume-card .education-item .project-description,
+      .resume-container .resume-card .project-item .project-description {
+        margin-top: 8px;
+        font-size: 14px; }
+      .resume-container .resume-card .experience-item .project-tech,
+      .resume-container .resume-card .education-item .project-tech,
+      .resume-container .resume-card .project-item .project-tech {
+        display: flex;
+        flex-wrap: wrap;
+        margin: -2.5px;
+        /* Negative margins to offset tech tag margins */
+        margin-top: 5.5px;
+        /* Adjustment to maintain original spacing */ }
+        .resume-container .resume-card .experience-item .project-tech .tech-tag,
+        .resume-container .resume-card .education-item .project-tech .tech-tag,
+        .resume-container .resume-card .project-item .project-tech .tech-tag {
+          background-color: #f1f5f9;
+          padding: 3px 8px;
+          border-radius: 3px;
+          font-size: 12px;
+          color: var(--text-light);
+          margin: 2.5px;
+          /* Added explicit margins */
+          display: inline-block;
+          /* Better rendering */ }
+    .resume-container .resume-card .skills-container {
+      display: flex;
+      flex-wrap: wrap;
+      margin: -4px;
+      /* Negative margins to offset skill tag margins */ }
+      .resume-container .resume-card .skills-container .skill-tag {
+        background-color: #f1f5f9;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 13px;
+        color: var(--primary);
+        margin: 4px;
+        /* Added explicit margins */
+        display: inline-block;
+        /* Better rendering */ }
+    .resume-container .resume-card .summary {
+      line-height: var(--line-height); }
+    .resume-container .resume-card .certs-list {
+      padding-left: 20px;
+      list-style-position: outside;
+      /* Better list rendering */ }
+      .resume-container .resume-card .certs-list li {
+        margin-bottom: 5px; }
+    .resume-container .resume-card .card-divider {
+      border: none;
+      height: 1px;
+      background-color: var(--border);
+      margin: 15px 0; }
+  .resume-container .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-column-gap: 20px;
+    grid-row-gap: 20px; }
+
+@page {
+  margin: 0.75cm;
+  size: letter portrait; }
+
+@media print {
+  .resume-container {
+    background-color: white;
+    padding: 0; }
+    .resume-container .resume-card {
+      box-shadow: none;
+      border: 1px solid #e2e8f0; } }
+
+@media (max-width: 768px) {
+  .resume-container .cards-grid {
+    grid-template-columns: 1fr;
+    grid-column-gap: 0;
+    grid-row-gap: 20px; } }

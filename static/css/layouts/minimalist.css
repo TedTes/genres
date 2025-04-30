@@ -1,0 +1,118 @@
+.resume-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px;
+  font-family: var(--font-family);
+  color: var(--text);
+  line-height: var(--line-height); }
+  .resume-container .resume-header {
+    text-align: center;
+    margin-bottom: 40px; }
+    .resume-container .resume-header .name {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--primary);
+      letter-spacing: 1px; }
+    .resume-container .resume-header .title {
+      font-size: 16px;
+      color: var(--text-light);
+      margin-bottom: 20px;
+      font-weight: 400; }
+    .resume-container .resume-header .contact-grid {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap; }
+      .resume-container .resume-header .contact-grid .contact-item {
+        display: flex;
+        align-items: center;
+        margin-right: 35px;
+        /* Horizontal spacing replacing gap */
+        margin-bottom: 15px;
+        /* Vertical spacing replacing gap */
+        font-size: 14px; }
+        .resume-container .resume-header .contact-grid .contact-item .contact-icon {
+          color: var(--primary);
+          width: 16px;
+          text-align: center;
+          margin-right: 6px; }
+  .resume-container .resume-section {
+    margin-bottom: 30px; }
+    .resume-container .resume-section .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--primary);
+      margin-bottom: 15px; }
+  .resume-container .experience-item,
+  .resume-container .education-item {
+    margin-bottom: 25px;
+    overflow: hidden;
+    /* Contains floated elements */ }
+    .resume-container .experience-item .job-header,
+    .resume-container .experience-item .education-header,
+    .resume-container .education-item .job-header,
+    .resume-container .education-item .education-header {
+      margin-bottom: 10px; }
+    .resume-container .experience-item .job-title,
+    .resume-container .experience-item .degree,
+    .resume-container .education-item .job-title,
+    .resume-container .education-item .degree {
+      font-weight: 600;
+      font-size: 16px; }
+    .resume-container .experience-item .company-name,
+    .resume-container .experience-item .school,
+    .resume-container .education-item .company-name,
+    .resume-container .education-item .school {
+      color: var(--text-light); }
+    .resume-container .experience-item .job-duration,
+    .resume-container .experience-item .education-date,
+    .resume-container .education-item .job-duration,
+    .resume-container .education-item .education-date {
+      float: left;
+      width: 150px;
+      font-size: 14px;
+      color: var(--text-light); }
+    .resume-container .experience-item .job-duties,
+    .resume-container .experience-item .education-details,
+    .resume-container .education-item .job-duties,
+    .resume-container .education-item .education-details {
+      margin-left: 170px;
+      /* 150px width + 20px spacing */ }
+    .resume-container .experience-item .job-duties,
+    .resume-container .education-item .job-duties {
+      margin: 0;
+      padding-left: 20px; }
+      .resume-container .experience-item .job-duties li,
+      .resume-container .education-item .job-duties li {
+        margin-bottom: 5px; }
+  .resume-container .skills-container {
+    display: flex;
+    flex-wrap: wrap; }
+    .resume-container .skills-container .skill-tag {
+      background: none;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 3px;
+      font-size: 14px;
+      margin-right: 8px;
+      /* Horizontal spacing replacing gap */
+      margin-bottom: 8px;
+      /* Vertical spacing replacing gap */ }
+
+@media (max-width: 600px) {
+  .resume-container .experience-item .job-duration,
+  .resume-container .experience-item .education-date,
+  .resume-container .education-item .job-duration,
+  .resume-container .education-item .education-date {
+    float: none;
+    width: auto; }
+  .resume-container .experience-item .job-duties,
+  .resume-container .experience-item .education-details,
+  .resume-container .education-item .job-duties,
+  .resume-container .education-item .education-details {
+    margin-left: 0; }
+  .resume-container .contact-grid .contact-item {
+    margin-right: 15px;
+    /* Reduced horizontal spacing for smaller screens */ } }
