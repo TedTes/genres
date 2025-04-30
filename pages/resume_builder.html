@@ -1,0 +1,416 @@
+{% block title %}Resume Builder - ResumeMatch{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/resume-builder.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+{% block content %}
+{% include 'partials/navbar.html' %}
+<div class="resume-builder" data-resume-id="{{ resume.id }}">
+    <!-- Floating Controls (Left Side) -->
+    <div class="floating-controls-left">
+        <div class="tooltip-container">
+            <button class="float-control-btn" data-panel="edit-panel" title="Edit Sections">
+                <i class="fas fa-edit"></i>
+            </button>
+            <div class="btn-tooltip">Edit Sections</div>
+        </div>
+        
+        <div class="tooltip-container">
+            <button class="float-control-btn" data-panel="templates-panel" title="Choose Template">
+                <i class="fas fa-palette"></i>
+            </button>
+            <div class="btn-tooltip">Choose Template</div>
+        </div>
+        
+        <div class="tooltip-container">
+            <button class="float-control-btn" data-panel="add-section-panel" title="Add Section">
+                <i class="fas fa-plus-circle"></i>
+            </button>
+            <div class="btn-tooltip">Add Section</div>
+        </div>
+        
+        <div class="tooltip-container">
+            <button class="float-control-btn" id="preview-toggle" title="Toggle Preview Size">
+                <i class="fas fa-expand"></i>
+            </button>
+            <div class="btn-tooltip">Toggle Preview</div>
+        </div>
+        
+        <div class="tooltip-container">
+            <a href="{{ url_for('resume.download_resume', resume_id=resume.id) }}" class="float-control-btn">
+                <i class="fas fa-download"></i>
+            </a>
+            <div class="btn-tooltip">Download Resume</div>
+        </div>
+    </div>
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle" id="sidebar-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Circular Progress Indicator -->
+    <div class="circular-progress">
+        <svg viewBox="0 0 36 36" class="progress-ring">
+            <path class="progress-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <path class="progress-ring-fill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+        </svg>
+        <span class="progress-percentage">0%</span>
+    </div>
+
+    <!-- Slide Out Panels -->
+    <!-- Edit Panel -->
+    <div class="slide-panel" id="edit-panel">
+        <div class="panel-header">
+            <h2>Edit Resume</h2>
+            <button class="panel-close" data-panel="edit-panel">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="panel-content">
+            <div class="resume-sections">
+                <!-- Contact Section -->
+                <section class="resume-section-collapsible" data-section="contact">
+                    <div class="section-header collapsible">
+                        <h3>Contact Information</h3>
+                        <div class="section-toggle">
+                            <i class="fas fa-check-circle section-complete-icon"></i>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <form method="POST" class="resume-form" id="contact-form">
+                            {{ contact_form.hidden_tag() }}
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    {{ contact_form.name.label(class="form-label") }} <span class="required">*</span>
+                                    {{ contact_form.name(class="form-control resume-field auto-resize", **{"placeholder": "e.g. John Smith", "required": "required", "data-section": "contact"}) }}
+                                </div>
+                                <div class="form-group">
+                                    {{ contact_form.email.label(class="form-label") }} <span class="required">*</span>
+                                    {{ contact_form.email(class="form-control resume-field auto-resize", **{"placeholder": "e.g. john.smith@example.com", "required": "required", "data-section": "contact"}) }}
+                                </div>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    {{ contact_form.phone.label(class="form-label") }} <span class="required">*</span>
+                                    {{ contact_form.phone(class="form-control resume-field auto-resize", **{"placeholder": "e.g. (555) 123-4567", "required": "required", "data-section": "contact"}) }}
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Location</label>
+                                    <input type="text" name="location" class="form-control resume-field auto-resize" placeholder="e.g. New York, NY" data-section="contact">
+                                </div>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">LinkedIn</label>
+                                    <input type="text" name="linkedin" class="form-control resume-field auto-resize" placeholder="e.g. linkedin.com/in/johnsmith" data-section="contact">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Website</label>
+                                    <input type="text" name="website" class="form-control resume-field auto-resize" placeholder="e.g. johnsmith.com" data-section="contact">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Skills Section -->
+                <section class="resume-section-collapsible" data-section="skills">
+                    <div class="section-header collapsible">
+                        <h3>Skills</h3>
+                        <div class="section-toggle">
+                            <i class="fas fa-check-circle section-complete-icon"></i>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <form method="POST" class="resume-form" id="skills-form">
+                            {{ skills_form.hidden_tag() }}
+                            <div class="skills-container">
+                                <div class="skills-input-compact">
+                                    <input type="text" class="form-control" id="skill-input" placeholder="Add a skill and press Enter">
+                                    <input type="hidden" name="skills" id="skills-hidden">
+                                </div>
+                                <div class="skills-list" id="skills-list">
+                                    <!-- Skills will be added here dynamically -->
+                                </div>
+                            </div>
+                            {% if skills %}
+                            <div class="job-skills-match">
+                                <h3>Suggested Skills <button type="button" class="btn-sm toggle-skills" aria-expanded="false">Show</button></h3>
+                                <div class="skills-tags collapse">
+                                    {% for skill in skills %}
+                                    <span class="skill-tag suggested" data-skill="{{ skill }}">{{ skill }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Summary Section -->
+                <section class="resume-section-collapsible" data-section="summary">
+                    <div class="section-header collapsible">
+                        <h3>Professional Summary</h3>
+                        <div class="section-toggle">
+                            <i class="fas fa-check-circle section-complete-icon"></i>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <form method="POST" class="resume-form" id="summary-form">
+                            {{ summary_form.hidden_tag() }}
+                            <div class="form-group">
+                                {{ summary_form.summary.label(class="form-label") }} <span class="required">*</span>
+                                {{ summary_form.summary(class="form-control resume-field auto-expand", **{"rows": "3", "required": "required", "data-section": "summary", "placeholder": "Write a concise overview of your professional background, key skills, and career goals..."}) }}
+                            </div>
+                            <div class="ai-tools-compact">
+                                <button type="button" class="btn btn-sm enhance-summary" data-type="professional" title="Enhance Professionally">
+                                    <i class="fas fa-magic"></i> Professional
+                                </button>
+                                <button type="button" class="btn btn-sm enhance-summary" data-type="concise" title="Make Concise">
+                                    <i class="fas fa-cut"></i> Concise
+                                </button>
+                                <button type="button" class="btn btn-sm enhance-summary" data-type="keywords" title="Add Keywords">
+                                    <i class="fas fa-key"></i> Keywords
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Experience Section -->
+                <section class="resume-section-collapsible" data-section="experience">
+                    <div class="section-header collapsible">
+                        <h3>Experience</h3>
+                        <div class="section-toggle">
+                            <i class="fas fa-check-circle section-complete-icon"></i>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div id="experience-list">
+                            <!-- Experience entries will be added here -->
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline btn-add-item" id="add-experience">
+                            <i class="fas fa-plus"></i> Add Experience
+                        </button>
+                        
+                        <div class="form-container" id="experience-form-container" style="display: none;">
+                            <form id="experience-form" class="compact-form">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Job Title <span class="required">*</span></label>
+                                        <input type="text" id="job-title" class="form-control auto-resize" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Company <span class="required">*</span></label>
+                                        <input type="text" id="company" class="form-control auto-resize" required>
+                                    </div>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Start Date <span class="required">*</span></label>
+                                        <input type="text" id="start-date" class="form-control auto-resize" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">End Date</label>
+                                        <div class="end-date-group">
+                                            <input type="text" id="end-date" class="form-control auto-resize">
+                                            <label class="checkbox-inline">
+                                                <input type="checkbox" id="current-job"> Current
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Responsibilities & Achievements <span class="required">*</span></label>
+                                    <textarea id="job-description" class="form-control auto-expand" rows="3" required></textarea>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" id="cancel-experience" class="btn btn-outline btn-sm">Cancel</button>
+                                    <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Education Section -->
+                <section class="resume-section-collapsible" data-section="education">
+                    <div class="section-header collapsible">
+                        <h3>Education</h3>
+                        <div class="section-toggle">
+                            <i class="fas fa-check-circle section-complete-icon"></i>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div id="education-list">
+                            <!-- Education entries will be added here -->
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline btn-add-item" id="add-education">
+                            <i class="fas fa-plus"></i> Add Education
+                        </button>
+                        
+                        <div class="form-container" id="education-form-container" style="display: none;">
+                            <form id="education-form" class="compact-form">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Degree <span class="required">*</span></label>
+                                        <input type="text" id="degree" class="form-control auto-resize" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">School <span class="required">*</span></label>
+                                        <input type="text" id="school" class="form-control auto-resize" required>
+                                    </div>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Start Year <span class="required">*</span></label>
+                                        <input type="text" id="education-start" class="form-control auto-resize" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">End Year</label>
+                                        <div class="end-date-group">
+                                            <input type="text" id="education-end" class="form-control auto-resize">
+                                            <label class="checkbox-inline">
+                                                <input type="checkbox" id="current-education"> Current
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" id="cancel-education" class="btn btn-outline btn-sm">Cancel</button>
+                                    <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Templates Panel -->
+    <div class="slide-panel" id="templates-panel">
+        <div class="panel-header">
+            <h2>Choose Template</h2>
+            <button class="panel-close" data-panel="templates-panel">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="panel-content">
+            <form id="template-form" method="POST" action="{{ url_for('resume.update_resume_template', resume_id=resume.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="templates-list">
+                    {% for template_id, template in templates.items() %}
+                    <div class="template-option">
+                        <input type="radio" name="template" id="template-{{ template_id }}" 
+                            value="{{ template_id }}" {% if selected_template == template_id %}checked{% endif %} onchange="document.getElementById('template-form').submit();">
+                        <label for="template-{{ template_id }}" class="template-label" data-template-name="{{ template.id }}" data-template-id="{{ template_id }}">
+                            <div class="template-color-indicator {{ template_id }}">
+                                <img src="{{ url_for('static', filename=template.thumbnail) }}" alt="{{ template.id }} Thumbnail" class="template-thumbnail">
+                            </div>
+                            <div class="template-info">
+                                <span class="template-name">{{ template.id }}</span>
+                                <span class="template-description">{{ template.get('layout', {}).get('description', 'No description available') }}</span>
+                            </div>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Add Section Panel -->
+    <div class="slide-panel" id="add-section-panel">
+        <div class="panel-header">
+            <h2>Add Section</h2>
+            <button class="panel-close" data-panel="add-section-panel">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="panel-content">
+            <div class="add-section-options">
+                <div class="section-option" data-section="certifications">
+                    <div class="section-option-icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <div class="section-option-details">
+                        <h3>Certifications</h3>
+                        <p>Add professional certifications and licenses</p>
+                    </div>
+                </div>
+                
+                <div class="section-option" data-section="projects">
+                    <div class="section-option-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="section-option-details">
+                        <h3>Projects</h3>
+                        <p>Showcase personal or professional projects</p>
+                    </div>
+                </div>
+                
+                <div class="section-option" data-section="languages">
+                    <div class="section-option-icon">
+                        <i class="fas fa-language"></i>
+                    </div>
+                    <div class="section-option-details">
+                        <h3>Languages</h3>
+                        <p>Add languages you speak and proficiency levels</p>
+                    </div>
+                </div>
+                
+                <div class="section-option" data-section="awards">
+                    <div class="section-option-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="section-option-details">
+                        <h3>Awards & Honors</h3>
+                        <p>Highlight achievements and recognition</p>
+                    </div>
+                </div>
+                
+                <div class="section-option" data-section="volunteering">
+                    <div class="section-option-icon">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <div class="section-option-details">
+                        <h3>Volunteer Experience</h3>
+                        <p>Show community involvement and volunteer work</p>
+                    </div>
+                </div>
+                
+                <div class="section-option" data-section="publications">
+                    <div class="section-option-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="section-option-details">
+                        <h3>Publications</h3>
+                        <p>List articles, papers, or books you've published</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Preview Area -->
+    <div class="resume-preview-container">
+        <div class="preview-loading" id="preview-loading" style="display: none;">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Updating preview...</div>
+        </div>
+        <iframe src="{{ url_for('resume.resume_render', resume_id=resume.id) }}" class="preview-iframe" id="preview-iframe" frameborder="0"></iframe>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/resume-builder.js') }}"></script>
+{% endblock %}
