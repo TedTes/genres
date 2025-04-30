@@ -10,46 +10,241 @@
 <body>
   <div class="resume-container">
     <div class="resume-header">
-      <h1 class="name">{{ resume.name | default('Test User') }}</h1>
-      <h2 class="title">{{ resume.title | default('Professional') }}</h2>
-
+      <h1 class="name">{{ resume.contact.name|default('John Doe') }}</h1>
+      <h2 class="title">{{ resume.title|default('Professional Title') }}</h2>
+      
       {% if resume.contact %}
       <div class="contact-grid">
-        {% for contact in resume.contact %}
-          <span class="contact-item">{{ contact }}</span>
-        {% endfor %}
+        {% if resume.contact.email %}
+        <span class="contact-item">
+          <i class="fas fa-envelope"></i>
+          <span class="content">{{ resume.contact.email }}</span>
+        </span>
+        {% endif %}
+        
+        {% if resume.contact.phone %}
+        <span class="contact-item">
+          <i class="fas fa-phone"></i>
+          {{ resume.contact.phone }}
+        </span>
+        {% endif %}
+        
+        {% if resume.contact.location %}
+        <span class="contact-item">
+          <i class="fas fa-map-marker-alt"></i>
+          {{ resume.contact.location }}
+        </span>
+        {% endif %}
+        
+        {% if resume.contact.linkedin %}
+        <span class="contact-item">
+          <i class="fab fa-linkedin"></i>
+          {{ resume.contact.linkedin }}
+        </span>
+        {% endif %}
+        
+        {% if resume.contact.website %}
+        <span class="contact-item">
+          <i class="fas fa-globe"></i>
+          {{ resume.contact.website }}
+        </span>
+        {% endif %}
       </div>
       {% endif %}
     </div>
-
+    
+    {% if resume.summary %}
+    <section class="resume-section summary-section">
+      <h2 class="section-title">
+        <i class="fas fa-user"></i>
+        Professional Summary
+      </h2>
+      <div class="section-content">
+        {{ resume.summary.content|default(resume.summary)|safe }}
+      </div>
+    </section>
+    {% endif %}
+    
+    {% if resume.experience %}
+    <section class="resume-section experience-section">
+      <h2 class="section-title">
+        <i class="fas fa-briefcase"></i>
+        Work Experience
+      </h2>
+      
+      {% for exp in resume.experience %}
+      <div class="section-item">
+        <div class="section-job-title">
+          <i class="fas fa-chevron-right"></i>
+          {{ exp.title }}
+        </div>
+        <div class="section-company">
+          <i class="fas fa-building"></i>
+          {{ exp.company }}
+        </div>
+        <div class="section-date">
+          <i class="fas fa-calendar-alt"></i>
+          {{ exp.startDate }} - {{ exp.endDate|default('Present') }}
+        </div>
+        <div class="section-description">
+          {% if exp.description %}
+            {% if '\n' in exp.description %}
+              <ul class="section-duties">
+                {% for bullet in exp.description.split('\n') %}
+                  {% if bullet|trim %}
+                    <li>{{ bullet|trim }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            {% else %}
+              {{ exp.description }}
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </section>
+    {% endif %}
+    
+    {% if resume.education %}
+    <section class="resume-section education-section">
+      <h2 class="section-title">
+        <i class="fas fa-graduation-cap"></i>
+        Education
+      </h2>
+      
+      {% for edu in resume.education %}
+      <div class="section-item">
+        <div class="section-degree">
+          <i class="fas fa-chevron-right"></i>
+          {{ edu.degree }}
+        </div>
+        <div class="section-school">
+          <i class="fas fa-university"></i>
+          {{ edu.school }}
+        </div>
+        <div class="section-date">
+          <i class="fas fa-calendar-alt"></i>
+          {{ edu.startYear|default(edu.year) }}{% if edu.endYear %} - {{ edu.endYear }}{% endif %}
+        </div>
+        {% if edu.description %}
+        <div class="section-description">
+          {{ edu.description }}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </section>
+    {% endif %}
+    
+    {% if resume.skills %}
+    <section class="resume-section skills-section">
+      <h2 class="section-title">
+        <i class="fas fa-cogs"></i>
+        Skills
+      </h2>
+      <div class="section-container">
+        {% for skill in resume.skills %}
+        <span class="section-tag">
+          <i class="fas fa-check"></i>
+          {{ skill }}
+        </span>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+    
+    {% if resume.certifications %}
+    <section class="resume-section certifications-section">
+      <h2 class="section-title">
+        <i class="fas fa-certificate"></i>
+        Certifications
+      </h2>
+      
+      {% for cert in resume.certifications %}
+      <div class="section-item">
+        <div class="section-name">
+          <i class="fas fa-award"></i>
+          {{ cert.name }}
+        </div>
+        <div class="section-issuer">
+          <i class="fas fa-building"></i>
+          {{ cert.issuer }}
+        </div>
+        {% if cert.date %}
+        <div class="section-date">
+          <i class="fas fa-calendar-alt"></i>
+          {{ cert.date }}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </section>
+    {% endif %}
+    
+    {% if resume.projects %}
+    <section class="resume-section projects-section">
+      <h2 class="section-title">
+        <i class="fas fa-project-diagram"></i>
+        Projects
+      </h2>
+      
+      {% for project in resume.projects %}
+      <div class="section-item">
+        <div class="section-name">
+          <i class="fas fa-chevron-right"></i>
+          {{ project.name }}
+        </div>
+        {% if project.description %}
+        <div class="section-description">
+          {{ project.description }}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </section>
+    {% endif %}
+    
     {% for section in resume.sections %}
     <section class="resume-section {{ section.type }}-section">
-      <h2 class="section-title">{{ section.title }}</h2>
-
+      <h2 class="section-title">
+        <i class="fas fa-star"></i>
+        {{ section.title }}
+      </h2>
+      
       {% if section.display == 'text' %}
         <div class="section-content">
           {{ section.content | safe }}
         </div>
-
+      
       {% elif section.display == 'tags' %}
         <div class="section-container">
-          {% for item in section['items'] %}
-            <span class="section-tag">{{ item }}</span>
+          {% for item in section["items"] %}
+            <span class="section-tag">
+              <i class="fas fa-check"></i>
+              {{ item }}
+            </span>
           {% endfor %}
         </div>
-
+      
       {% else %}
-        {% for item in section['items'] %}
+        {% for item in section["items"] %}
           <div class="section-item">
             {% for key, value in item.items() %}
               <div class="section-{{ key | replace('_', '-') }}">
+                {% if key == 'name' or key == 'job_title' or key == 'degree' %}
+                  <i class="fas fa-chevron-right"></i>
+                {% elif key == 'company' or key == 'school' or key == 'issuer' %}
+                  <i class="fas fa-building"></i>
+                {% elif key == 'date' or key == 'duration' %}
+                  <i class="fas fa-calendar-alt"></i>
+                {% endif %}
                 {{ value }}
               </div>
             {% endfor %}
           </div>
         {% endfor %}
       {% endif %}
-
     </section>
     {% endfor %}
   </div>
