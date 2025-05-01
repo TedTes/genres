@@ -3,9 +3,7 @@
         <div class="logo">
             <a href="{{ url_for('root.home') }}">ResumeMatch</a>
         </div>
-        <button class="nav-toggle">
-            <i class="fas fa-bars"></i>
-        </button>
+
         <div class="nav-links">
             {%if nav_items is defined %}
             {% for item in nav_items %}
