@@ -7,7 +7,7 @@
 {% set active_page='jobs' %}
 {% set  nav_items=[
 {'id': 'dashboard', 'url': url_for('root.dashboard'), 'text': 'Dashboard'},
-{'id': 'create_resume', 'url': url_for('resume.create_general_resume'), 'text': 'Create Resume'}
+{'id': 'create_resume', 'url': url_for('resume.generate_general_resume'), 'text': 'Create Resume'}
 ] %}
 
 {% with active_page=active_page, nav_items=nav_items %}
