@@ -15,7 +15,7 @@
         <header class="resume-header">
             <div class="header-left">
                 <h1 class="name">{{ resume.contact.name|default('Your Name') }}</h1>
-                <div class="title">{{ resume.title|default('') }}</div>
+                <div class="title">{{ resume.title|default('Professional Title') }}</div>
             </div>
             
             <div class="header-right">
@@ -33,86 +33,103 @@
                 </div>
                 {% endif %}
                 
+                {% if resume.contact.location %}
+                <div class="contact-item">
+                    <span class="contact-icon"><i class="fa-solid fa-location-dot"></i></span>
+                    {{ resume.contact.location }}
+                </div>
+                {% endif %}
+                
                 {% if resume.contact.linkedin %}
                 <div class="contact-item">
                     <span class="contact-icon"><i class="fa-brands fa-linkedin-in"></i></span>
                     {{ resume.contact.linkedin }}
                 </div>
                 {% endif %}
+                
+                {% if resume.contact.website %}
+                <div class="contact-item">
+                    <span class="contact-icon"><i class="fa-solid fa-globe"></i></span>
+                    {{ resume.contact.website }}
+                </div>
+                {% endif %}
             </div>
         </header>
         
-        <!-- Grid Layout -->
+        <!-- Grid Layout with Dynamic Sections -->
         <div class="resume-grid">
-            <!-- Summary Section -->
+            <!-- 1. First, render summary if available -->
             {% for section in resume.sections %}
                 {% if section.type == 'summary' %}
                 <section class="grid-section summary-section">
                     <h2 class="section-title">{{ section.title }}</h2>
                     <div class="section-content">
-                        <p>{{ section.content }}</p>
+                        <p>{{ section.content|default('A dedicated Software Engineer with extensive experience in developing scalable applications, solving complex technical problems, and collaborating with cross-functional teams to deliver high-quality software solutions.') }}</p>
                     </div>
                 </section>
                 {% endif %}
             {% endfor %}
             
-            <!-- Skills Section -->
+            <!-- 2. Then, render skills and short sections -->
             {% for section in resume.sections %}
-                {% if section.type == 'skills' %}
-                <section class="grid-section skills-section">
+                {% if section.type == 'skills' or section.type == 'languages' or section.type == 'certifications' %}
+                <section class="grid-section {{ section.type }}-section">
                     <h2 class="section-title">{{ section.title }}</h2>
                     <div class="section-content">
-                        <div class="skills-container">
-                            {% for skill in section["items"] %}
-                            <div class="skill-tag">{{ skill }}</div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </section>
-                {% endif %}
-            {% endfor %}
-            
-            <!-- Experience Section -->
-            {% for section in resume.sections %}
-                {% if section.type == 'experience' %}
-                <section class="grid-section experience-section">
-                    <h2 class="section-title">{{ section.title }}</h2>
-                    <div class="section-content">
-                        {% for item in section["items"] %}
-                        <div class="experience-item">
-                            <div class="exp-header">
-                                <div class="job-title-company">
-                                    <h3 class="job-title">{{ item.job_title }}</h3>
-                                    <div class="company-name">{{ item.company }}</div>
-                                </div>
-                                <div class="job-duration">
-                                    {{ item.duration }}
-                                </div>
+                        {% if section.type in ['skills', 'languages'] and section.display == 'tags' %}
+                            <div class="skills-container">
+                                {% for item in section["items"] %}
+                                <div class="skill-tag">{{ item }}</div>
+                                {% endfor %}
                             </div>
-                        </div>
-                        {% endfor %}
+                        {% elif section.type == 'certifications' %}
+                            <ul class="certs-list">
+                                {% for cert in section["items"] %}
+                                <li>
+                                    {{ cert.name }} 
+                                    <span class="cert-details">
+                                        ({{ cert.issuer }}{% if cert.date %}, {{ cert.date }}{% endif %})
+                                    </span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <!-- Generic list display -->
+                            <ul>
+                                {% for item in section["items"] %}
+                                <li>{{ item }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
                     </div>
                 </section>
                 {% endif %}
             {% endfor %}
             
-            <!-- Education Section -->
+            <!-- 3. Handle education section -->
             {% for section in resume.sections %}
                 {% if section.type == 'education' %}
-                <section class="grid-section education-section">
+                {% set class_modifier = '' %}
+                {% set column_modifier = '' %}
+                {% if section["items"]|length > 8 %}
+                    {% set class_modifier = 'full-width' %}
+                    {% set column_modifier = 'multi-column' %}
+                {% endif %}
+                <section class="grid-section education-section {{ class_modifier }}">
                     <h2 class="section-title">{{ section.title }}</h2>
-                    <div class="section-content">
+                    <div class="section-content {{ column_modifier }}">
                         {% for item in section["items"] %}
-                        <div class="education-item">
+                        <div class="education-item avoid-break">
                             <div class="edu-header">
                                 <div class="degree-school">
                                     <h3 class="degree">{{ item.degree }}</h3>
                                     <div class="school">{{ item.school }}</div>
                                 </div>
                                 <div class="education-date">
-                                    {{ item.date }}
+                                    {{ item.date|replace('$', '') }} <!-- Remove $ symbols -->
                                 </div>
                             </div>
+                            {% if not loop.last %}<div class="item-divider"></div>{% endif %}
                         </div>
                         {% endfor %}
                     </div>
@@ -120,98 +137,97 @@
                 {% endif %}
             {% endfor %}
             
-            <!-- Languages Section -->
+            <!-- 4. Finally, render experience section (usually largest) -->
             {% for section in resume.sections %}
-                {% if section.type == 'languages' %}
-                <section class="grid-section languages-section">
+                {% if section.type == 'experience' %}
+                <section class="grid-section experience-section">
                     <h2 class="section-title">{{ section.title }}</h2>
-                    <div class="section-content">
-                        <div class="skills-container">
-                            {% for language in section["items"] %}
-                            <div class="skill-tag">{{ language }}</div>
-                            {% endfor %}
+                    <div class="section-content multi-column">
+                        {% for item in section["items"] %}
+                        <div class="experience-item avoid-break">
+                            <div class="exp-header">
+                                <div class="job-title-company">
+                                    <h3 class="job-title">{{ item.job_title }}</h3>
+                                    <div class="company-name">{{ item.company }}</div>
+                                </div>
+                                <div class="job-duration">
+                                    {{ item.duration|replace('$', '') }}
+                                </div>
+                            </div>
+                            
+                            {% if item.description %}
+                            <ul class="job-duties">
+                                {% if '\n' in item.description %}
+                                    {% for bullet in item.description.split('\n') %}
+                                        {% if bullet.strip() %}
+                                        <li>{{ bullet.strip() }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <li>{{ item.description }}</li>
+                                {% endif %}
+                            </ul>
+                            {% endif %}
+                            
+                            {% if not loop.last %}<div class="item-divider"></div>{% endif %}
                         </div>
+                        {% endfor %}
                     </div>
                 </section>
                 {% endif %}
             {% endfor %}
             
-            <!-- Certifications Section -->
+            <!-- 5. Handle any remaining section types -->
             {% for section in resume.sections %}
-                {% if section.type == 'certifications' %}
-                <section class="grid-section certifications-section">
+                {% if section.type not in ['summary', 'skills', 'languages', 'certifications', 'education', 'experience'] %}
+                <section class="grid-section {{ section.type }}-section">
                     <h2 class="section-title">{{ section.title }}</h2>
                     <div class="section-content">
-                        <ul class="certs-list">
-                            {% for cert in section["items"] %}
-                            <li>{{ cert.name }} ({{ cert.issuer }}, {{ cert.date }})</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </section>
-                {% endif %}
-            {% endfor %}
-            
-            <!-- Projects Section -->
-            {% for section in resume.sections %}
-                {% if section.type == 'projects' %}
-                <section class="grid-section projects-section">
-                    <h2 class="section-title">{{ section.title }}</h2>
-                    <div class="section-content">
-                        <div class="projects-grid">
-                            {% for project in section["items"] %}
-                            <div class="project-item">
-                                <h3 class="project-title">{{ project.title }}</h3>
-                                <p class="project-description">{{ project.description }}</p>
-                                {% if project.technologies %}
-                                <div class="project-tech">
-                                    {% for tech in project.technologies %}
-                                    <span class="tech-tag">{{ tech }}</span>
+                        {% if section.content %}
+                            <p>{{ section.content }}</p>
+                        {% elif section["items"] %}
+                            {% if section.display == 'tags' %}
+                                <div class="skills-container">
+                                    {% for item in section["items"] %}
+                                    <div class="skill-tag">{{ item }}</div>
                                     {% endfor %}
                                 </div>
-                                {% endif %}
-                                {% if project.url %}
-                                <a href="{{ project.url }}" class="project-link" target="_blank">{{ project.url }}</a>
-                                {% endif %}
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </section>
-                {% endif %}
-            {% endfor %}
-            
-            <!-- Awards Section -->
-            {% for section in resume.sections %}
-                {% if section.type == 'awards' %}
-                <section class="grid-section awards-section">
-                    <h2 class="section-title">{{ section.title }}</h2>
-                    <div class="section-content">
-                        {% for award in section["items"] %}
-                        <div class="award-item">
-                            <div class="award-title-date">
-                                <h3 class="award-title">{{ award.title }}</h3>
-                                <div class="award-date">{{ award.date }}</div>
-                            </div>
-                            <div class="award-issuer">{{ award.issuer }}</div>
-                            {% if award.description %}
-                            <p class="award-description">{{ award.description }}</p>
+                            {% elif section.display == 'list' %}
+                                <ul>
+                                    {% for item in section["items"] %}
+                                    <li>{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <!-- Default to generic list -->
+                                <ul>
+                                    {% for item in section["items"] %}
+                                    <li>{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
                             {% endif %}
-                        </div>
-                        {% endfor %}
+                        {% endif %}
                     </div>
                 </section>
                 {% endif %}
             {% endfor %}
             
             <!-- Bottom links row for social media -->
+            {% if resume.contact.linkedin or resume.contact.website %}
             <footer class="resume-footer">
                 {% if resume.contact.linkedin %}
                 <a href="{{ resume.contact.linkedin }}" class="social-link" target="_blank">
-                    <i class="fa fa-linkedin"></i> LinkedIn
+                    <i class="fa-brands fa-linkedin"></i> LinkedIn
+                </a>
+                {% endif %}
+                
+                {% if resume.contact.website %}
+                <a href="{{ resume.contact.website }}" class="social-link" target="_blank">
+                    <i class="fa-solid fa-globe"></i> Website
                 </a>
                 {% endif %}
             </footer>
+            {% endif %}
         </div>
     </div>
 </body>

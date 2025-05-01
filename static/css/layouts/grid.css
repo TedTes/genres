@@ -1,317 +1,512 @@
+
 * {
-  font-family: var(--font-family); }
-
-.resume-container {
-  max-width: 800px;
-  margin: 0 auto;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: var(--font-family);
-  color: var(--text);
-  background-color: var(--background); }
-  .resume-container .resume-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 25px 30px;
-    background-color: var(--primary);
-    color: white;
-    -weasy-box-sizing: border-box;
-    /* WeasyPrint specific */
-    -weasy-background-origin: padding-box;
-    /* Background color fix for WeasyPrint */
-    -weasy-background-clip: padding-box;
-    background-color: var(--primary) !important; }
-    .resume-container .resume-header .header-left {
-      flex: 1; }
-      .resume-container .resume-header .header-left .name {
-        font-size: 24px;
-        font-weight: 700;
-        margin-bottom: 5px; }
-      .resume-container .resume-header .header-left .title {
-        font-size: 16px;
-        opacity: 0.9; }
-    .resume-container .resume-header .header-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      margin-top: -4px;
-      /* Negative margin to compensate for item margins */ }
-      .resume-container .resume-header .header-right .contact-item {
-        display: flex;
-        align-items: center;
-        font-size: 14px;
-        margin-top: 4px;
-        /* Add explicit margin */
-        margin-bottom: 4px;
-        /* Add explicit margin */ }
-        .resume-container .resume-header .header-right .contact-item .contact-icon {
-          width: 16px;
-          text-align: center;
-          margin-right: 8px;
-          /* Add explicit margin */ }
-  .resume-container .resume-grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-column-gap: 20px;
-    grid-row-gap: 20px;
-    padding: 30px;
-    -weasy-box-sizing: border-box;
-    /* WeasyPrint specific */ }
-    .resume-container .resume-grid .grid-section {
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      padding: 20px;
-      margin-bottom: 10px;
-      page-break-inside: avoid;
-      /* Prevent section breaks in PDF */
-      -weasy-box-sizing: border-box;
-      /* WeasyPrint specific */ }
-      .resume-container .resume-grid .grid-section .section-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--primary);
-        margin-bottom: 15px;
-        padding-bottom: 5px;
-        border-bottom: 2px solid var(--primary); }
-      .resume-container .resume-grid .grid-section .section-content {
-        padding-top: 5px; }
-      .resume-container .resume-grid .grid-section .experience-item,
-      .resume-container .resume-grid .grid-section .education-item {
-        margin-bottom: 20px;
-        page-break-inside: avoid;
-        /* Prevent item breaks in PDF */ }
-        .resume-container .resume-grid .grid-section .experience-item .exp-header,
-        .resume-container .resume-grid .grid-section .experience-item .edu-header,
-        .resume-container .resume-grid .grid-section .education-item .exp-header,
-        .resume-container .resume-grid .grid-section .education-item .edu-header {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 5px; }
-          .resume-container .resume-grid .grid-section .experience-item .exp-header .job-title-company,
-          .resume-container .resume-grid .grid-section .experience-item .exp-header .degree-school,
-          .resume-container .resume-grid .grid-section .experience-item .edu-header .job-title-company,
-          .resume-container .resume-grid .grid-section .experience-item .edu-header .degree-school,
-          .resume-container .resume-grid .grid-section .education-item .exp-header .job-title-company,
-          .resume-container .resume-grid .grid-section .education-item .exp-header .degree-school,
-          .resume-container .resume-grid .grid-section .education-item .edu-header .job-title-company,
-          .resume-container .resume-grid .grid-section .education-item .edu-header .degree-school {
-            flex: 1; }
-            .resume-container .resume-grid .grid-section .experience-item .exp-header .job-title-company .job-title,
-            .resume-container .resume-grid .grid-section .experience-item .exp-header .job-title-company .degree,
-            .resume-container .resume-grid .grid-section .experience-item .exp-header .degree-school .job-title,
-            .resume-container .resume-grid .grid-section .experience-item .exp-header .degree-school .degree,
-            .resume-container .resume-grid .grid-section .experience-item .edu-header .job-title-company .job-title,
-            .resume-container .resume-grid .grid-section .experience-item .edu-header .job-title-company .degree,
-            .resume-container .resume-grid .grid-section .experience-item .edu-header .degree-school .job-title,
-            .resume-container .resume-grid .grid-section .experience-item .edu-header .degree-school .degree,
-            .resume-container .resume-grid .grid-section .education-item .exp-header .job-title-company .job-title,
-            .resume-container .resume-grid .grid-section .education-item .exp-header .job-title-company .degree,
-            .resume-container .resume-grid .grid-section .education-item .exp-header .degree-school .job-title,
-            .resume-container .resume-grid .grid-section .education-item .exp-header .degree-school .degree,
-            .resume-container .resume-grid .grid-section .education-item .edu-header .job-title-company .job-title,
-            .resume-container .resume-grid .grid-section .education-item .edu-header .job-title-company .degree,
-            .resume-container .resume-grid .grid-section .education-item .edu-header .degree-school .job-title,
-            .resume-container .resume-grid .grid-section .education-item .edu-header .degree-school .degree {
-              font-size: 16px;
-              font-weight: 600;
-              color: var(--text);
-              margin-bottom: 2px; }
-            .resume-container .resume-grid .grid-section .experience-item .exp-header .job-title-company .company-name,
-            .resume-container .resume-grid .grid-section .experience-item .exp-header .job-title-company .school,
-            .resume-container .resume-grid .grid-section .experience-item .exp-header .degree-school .company-name,
-            .resume-container .resume-grid .grid-section .experience-item .exp-header .degree-school .school,
-            .resume-container .resume-grid .grid-section .experience-item .edu-header .job-title-company .company-name,
-            .resume-container .resume-grid .grid-section .experience-item .edu-header .job-title-company .school,
-            .resume-container .resume-grid .grid-section .experience-item .edu-header .degree-school .company-name,
-            .resume-container .resume-grid .grid-section .experience-item .edu-header .degree-school .school,
-            .resume-container .resume-grid .grid-section .education-item .exp-header .job-title-company .company-name,
-            .resume-container .resume-grid .grid-section .education-item .exp-header .job-title-company .school,
-            .resume-container .resume-grid .grid-section .education-item .exp-header .degree-school .company-name,
-            .resume-container .resume-grid .grid-section .education-item .exp-header .degree-school .school,
-            .resume-container .resume-grid .grid-section .education-item .edu-header .job-title-company .company-name,
-            .resume-container .resume-grid .grid-section .education-item .edu-header .job-title-company .school,
-            .resume-container .resume-grid .grid-section .education-item .edu-header .degree-school .company-name,
-            .resume-container .resume-grid .grid-section .education-item .edu-header .degree-school .school {
-              font-size: 15px;
-              color: var(--text-light); }
-          .resume-container .resume-grid .grid-section .experience-item .exp-header .job-duration,
-          .resume-container .resume-grid .grid-section .experience-item .exp-header .education-date,
-          .resume-container .resume-grid .grid-section .experience-item .edu-header .job-duration,
-          .resume-container .resume-grid .grid-section .experience-item .edu-header .education-date,
-          .resume-container .resume-grid .grid-section .education-item .exp-header .job-duration,
-          .resume-container .resume-grid .grid-section .education-item .exp-header .education-date,
-          .resume-container .resume-grid .grid-section .education-item .edu-header .job-duration,
-          .resume-container .resume-grid .grid-section .education-item .edu-header .education-date {
-            font-size: 14px;
-            color: var(--text-light);
-            text-align: right; }
-        .resume-container .resume-grid .grid-section .experience-item .job-duties,
-        .resume-container .resume-grid .grid-section .education-item .job-duties {
-          margin-top: 10px;
-          padding-left: 20px;
-          list-style-position: outside;
-          /* Better list rendering */ }
-          .resume-container .resume-grid .grid-section .experience-item .job-duties li,
-          .resume-container .resume-grid .grid-section .education-item .job-duties li {
-            margin-bottom: 5px; }
-        .resume-container .resume-grid .grid-section .experience-item .education-description,
-        .resume-container .resume-grid .grid-section .education-item .education-description {
-          font-size: 14px;
-          margin-top: 5px; }
-      .resume-container .resume-grid .grid-section .skills-container {
-        display: flex;
-        flex-wrap: wrap;
-        margin: -4px;
-        /* Negative margin for skill tags */ }
-        .resume-container .resume-grid .grid-section .skills-container .skill-tag {
-          background-color: rgba(59, 130, 246, 0.1);
-          color: var(--primary);
-          padding: 5px 12px;
-          border-radius: 20px;
-          font-size: 13px;
-          margin: 4px;
-          /* Add explicit margin */
-          display: inline-block;
-          /* Better rendering */ }
-      .resume-container .resume-grid .grid-section .certs-list {
-        padding-left: 20px;
-        list-style-position: outside;
-        /* Better list rendering */ }
-        .resume-container .resume-grid .grid-section .certs-list li {
-          margin-bottom: 5px; }
-    .resume-container .resume-grid .summary-section {
-      grid-column: span 12; }
-    .resume-container .resume-grid .skills-section {
-      grid-column: span 6; }
-    .resume-container .resume-grid .languages-section {
-      grid-column: span 6; }
-    .resume-container .resume-grid .experience-section {
-      grid-column: span 12; }
-    .resume-container .resume-grid .education-section {
-      grid-column: span 6; }
-    .resume-container .resume-grid .certifications-section {
-      grid-column: span 6; }
-    .resume-container .resume-grid .projects-section,
-    .resume-container .resume-grid .awards-section {
-      grid-column: span 12; }
-      .resume-container .resume-grid .projects-section .projects-grid,
-      .resume-container .resume-grid .awards-section .projects-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        grid-column-gap: 15px;
-        grid-row-gap: 15px; }
-        .resume-container .resume-grid .projects-section .projects-grid .project-item,
-        .resume-container .resume-grid .awards-section .projects-grid .project-item {
-          background-color: #f8fafc;
-          border-radius: 8px;
-          padding: 15px;
-          border-top: 3px solid var(--accent);
-          page-break-inside: avoid;
-          /* Prevent breaks in PDF */ }
-          .resume-container .resume-grid .projects-section .projects-grid .project-item .project-title,
-          .resume-container .resume-grid .awards-section .projects-grid .project-item .project-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 8px; }
-          .resume-container .resume-grid .projects-section .projects-grid .project-item .project-description,
-          .resume-container .resume-grid .awards-section .projects-grid .project-item .project-description {
-            font-size: 14px;
-            margin-bottom: 10px; }
-          .resume-container .resume-grid .projects-section .projects-grid .project-item .project-tech,
-          .resume-container .resume-grid .awards-section .projects-grid .project-item .project-tech {
-            display: flex;
-            flex-wrap: wrap;
-            margin: -2.5px;
-            /* Negative margin for tech tags */
-            margin-top: 7.5px;
-            /* Adjust top margin */ }
-            .resume-container .resume-grid .projects-section .projects-grid .project-item .project-tech .tech-tag,
-            .resume-container .resume-grid .awards-section .projects-grid .project-item .project-tech .tech-tag {
-              background-color: rgba(0, 0, 0, 0.05);
-              padding: 3px 8px;
-              border-radius: 3px;
-              font-size: 12px;
-              color: var(--text-light);
-              margin: 2.5px;
-              /* Add explicit margin */
-              display: inline-block;
-              /* Better rendering */ }
-          .resume-container .resume-grid .projects-section .projects-grid .project-item .project-link,
-          .resume-container .resume-grid .awards-section .projects-grid .project-item .project-link {
-            display: block;
-            margin-top: 10px;
-            font-size: 13px;
-            color: var(--primary);
-            text-decoration: none; }
-      .resume-container .resume-grid .projects-section .award-item,
-      .resume-container .resume-grid .awards-section .award-item {
-        margin-bottom: 15px;
-        page-break-inside: avoid;
-        /* Prevent breaks in PDF */ }
-        .resume-container .resume-grid .projects-section .award-item .award-title-date,
-        .resume-container .resume-grid .awards-section .award-item .award-title-date {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 5px; }
-          .resume-container .resume-grid .projects-section .award-item .award-title-date .award-title,
-          .resume-container .resume-grid .awards-section .award-item .award-title-date .award-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text); }
-          .resume-container .resume-grid .projects-section .award-item .award-title-date .award-date,
-          .resume-container .resume-grid .awards-section .award-item .award-title-date .award-date {
-            font-size: 14px;
-            color: var(--text-light); }
-        .resume-container .resume-grid .projects-section .award-item .award-issuer,
-        .resume-container .resume-grid .awards-section .award-item .award-issuer {
-          font-size: 15px;
-          color: var(--text-light);
-          margin-bottom: 5px; }
-  .resume-container .resume-footer {
-    grid-column: span 12;
-    display: flex;
-    justify-content: center;
-    padding: 10px 0;
-    margin-top: 20px; }
-    .resume-container .resume-footer .social-link {
-      color: var(--primary);
-      text-decoration: none;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      margin: 0 10px;
-      /* Add horizontal margin */ }
-      .resume-container .resume-footer .social-link i,
-      .resume-container .resume-footer .social-link svg {
-        margin-right: 5px;
-        /* Add margin for icons */ }
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
 
+body {
+  background-color: #f9fafb;
+  color: var(--text);
+  line-height: var(--line-height);
+  font-size: 13px; /* Increased for readability (~10pt) */
+}
+
+ul {
+  list-style-position: outside;
+  padding-left: 14px;
+  margin-top: 4px;
+}
+
+li {
+  margin-bottom: 3px;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+h1, h2, h3 {
+  color: var(--text);
+  font-family: var(--heading-family);
+}
+
+/* Resume container */
+.resume-container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 8px;
+  background-color: var(--background);
+}
+
+/* Header styles */
+.resume-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background-color: var(--primary);
+  color: white;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  border-radius: 4px 4px 0 0;
+}
+
+.header-left {
+  flex: 1;
+}
+
+.name {
+  font-size: 22px; 
+  font-weight: 700;
+  margin-bottom: 3px;
+  font-family: var(--heading-family);
+}
+
+.title {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  font-size: 11px; 
+  margin-bottom: 3px;
+  white-space: nowrap;
+}
+
+.contact-icon {
+  width: 10px;
+  text-align: center;
+  margin-right: 4px;
+}
+
+/* Grid layout */
+.resume-grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 8px 4px;
+  gap: 10px;
+}
+
+/* Section styles */
+.grid-section {
+  background-color: white;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  padding: 10px; 
+  page-break-inside: auto;
+  break-inside: auto;
+  width: 100%;
+  position: relative;
+}
+
+/* Dynamic section sizing for web */
+.skills-section,
+.languages-section,
+.certifications-section {
+  width: calc(50% - 5px);
+  flex: 1 1 calc(50% - 5px);
+  min-width: 240px;
+}
+
+/* The education section can be half-width or full-width depending on content size */
+.education-section {
+  width: calc(50% - 5px);
+  flex: 1 1 calc(50% - 5px);
+  min-width: 240px;
+}
+
+/* For large education sections */
+.education-section.full-width {
+  width: 100%;
+  flex: 0 0 100%;
+}
+
+.summary-section,
+.experience-section,
+.projects-section,
+.awards-section {
+  width: 100%;
+  flex: 0 0 100%;
+}
+
+/* Section title */
+.section-title {
+  font-size: 14px; /* Increased */
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 2px solid var(--primary);
+  page-break-after: avoid;
+  break-after: avoid;
+  font-family: var(--heading-family);
+}
+
+.section-content {
+  padding-top: 4px;
+}
+
+/* Summary section */
+.summary-section p {
+  line-height: 1.5;
+  text-align: justify;
+  font-size: 12px; /* Increased */
+}
+
+/* Multi-column layout for sections with many items (web only) */
+.multi-column {
+  column-count: 2;
+  column-gap: 12px;
+  orphans: 3;
+  widows: 3;
+}
+
+@media (max-width: 600px) {
+  .multi-column {
+      column-count: 1;
+  }
+}
+
+/* Item styles */
+.experience-item,
+.education-item,
+.award-item {
+  margin-bottom: 8px;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.experience-item:last-child,
+.education-item:last-child,
+.award-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Ensure items don't break across columns */
+.multi-column .experience-item,
+.multi-column .education-item {
+  display: inline-block;
+  width: 100%;
+}
+
+.exp-header,
+.edu-header,
+.award-title-date {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 3px;
+}
+
+.job-title-company,
+.degree-school {
+  flex: 1;
+  padding-right: 8px;
+}
+
+.job-title,
+.degree,
+.award-title {
+  font-size: 13px; 
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+  font-family: var(--heading-family);
+}
+
+.company-name,
+.school,
+.award-issuer {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-bottom: 2px;
+}
+
+.job-duration,
+.education-date,
+.award-date {
+  font-size: 11px; 
+  color: var(--text-light);
+  text-align: right;
+  background-color: #f1f5f9;
+  padding: 2px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.job-duties {
+  margin-top: 4px;
+  padding-left: 14px;
+  list-style-position: outside;
+  page-break-inside: auto;
+  break-inside: auto;
+  font-size: 12px;
+}
+
+.job-duties li {
+  margin-bottom: 2px;
+  line-height: 1.4;
+}
+
+.education-description,
+.award-description {
+  font-size: 12px;
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.item-divider {
+  height: 1px;
+  background-color: var(--border);
+  margin: 6px 0;
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+/* Skills and languages */
+.skills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.skill-tag {
+  background-color: var(--primary);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 11px; 
+  display: inline-block;
+}
+
+/* Certifications */
+.certs-list {
+  list-style-type: none;
+  padding: 0;
+  page-break-inside: auto;
+  break-inside: auto;
+}
+
+.certs-list li {
+  margin-bottom: 5px;
+  position: relative;
+  padding-left: 14px;
+}
+
+.certs-list li:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+}
+
+.cert-details {
+  font-size: 11px; 
+  color: var(--text-light);
+  font-style: italic;
+}
+
+/* Projects grid */
+.projects-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.project-item {
+  background-color: #f8fafc;
+  border-radius: 4px;
+  padding: 8px;
+  border-left: 3px solid var(--accent);
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.project-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  font-family: var(--heading-family);
+}
+
+.project-description {
+  font-size: 12px;
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+
+.project-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.tech-tag {
+  background-color: #e5e7eb;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 10px; 
+  color: var(--text-light);
+  display: inline-block;
+}
+
+.project-link {
+  display: block;
+  margin-top: 5px;
+  font-size: 11px; 
+  color: var(--primary);
+}
+
+/* Resume footer */
+.resume-footer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 6px 0;
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+.social-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 12px; 
+  display: flex;
+  align-items: center;
+  margin: 0 5px;
+}
+
+.social-link i {
+  margin-right: 3px;
+}
+
+/* Pagination helpers */
+.page-break {
+  page-break-before: always;
+  break-before: page;
+}
+
+.avoid-break {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* WeasyPrint specific settings */
 @page {
-  margin: 0.5cm;
-  size: letter portrait; }
+  margin: 0.75cm 0.5cm;
+  size: letter portrait;
+}
 
 @media print {
+  body {
+      background-color: white;
+  }
+  
   .resume-container {
-    margin: 0;
-    max-width: none; }
-    .resume-container .grid-section {
+      margin: 0;
+      max-width: 100%;
+      padding: 0;
       box-shadow: none;
-      border: 1px solid #e2e8f0; } }
+  }
+  
+  .resume-grid {
+      display: block;
+      padding: 6px 0;
+  }
+  
+  .grid-section {
+      box-shadow: none;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 8px; 
+      break-inside: auto;
+      width: 100% !important;
+  }
+  
+  /* Ensure large sections can break across pages */
+  .experience-section,
+  .education-section {
+      break-inside: auto;
+  }
+  
+  /* Disable multi-column layout in PDF */
+  .multi-column {
+      column-count: 1 !important;
+  }
+  
+  .resume-header {
+      background-color: var(--primary) !important;
+      -weasy-background-origin: padding-box;
+      -weasy-background-clip: padding-box;
+  }
+  
+  .skill-tag {
+      background-color: var(--primary) !important;
+      color: white !important;
+      -weasy-background-origin: padding-box;
+      -weasy-background-clip: padding-box;
+  }
+  
+  .tech-tag {
+      background-color: #e5e7eb !important;
+      -weasy-background-origin: padding-box;
+      -weasy-background-clip: padding-box;
+  }
+  
+  .project-item {
+      background-color: #f8fafc !important;
+      border-left: 3px solid var(--accent) !important;
+      -weasy-background-origin: padding-box;
+      -weasy-background-clip: padding-box;
+  }
+  
+  .contact-item {
+      font-size: 10px; 
+      margin-bottom: 2px;
+  }
+  
+  * {
+      -webkit-print-color-adjust: exact;
+      color-adjust: exact;
+      print-color-adjust: exact;
+  }
+}
 
 @media (max-width: 768px) {
-  .resume-container .resume-grid .skills-section,
-  .resume-container .resume-grid .languages-section,
-  .resume-container .resume-grid .education-section,
-  .resume-container .resume-grid .certifications-section {
-    grid-column: span 12; }
-  .resume-container .resume-grid .projects-grid {
-    grid-template-columns: 1fr;
-    grid-column-gap: 0;
-    grid-row-gap: 15px; }
-  .resume-container .resume-header {
-    flex-direction: column;
-    align-items: flex-start; }
-    .resume-container .resume-header .header-right {
-      margin-top: 15px;
-      align-items: flex-start; } }
+  .resume-header {
+      flex-direction: column;
+      align-items: flex-start;
+  }
+  
+  .header-right {
+      margin-top: 6px;
+      align-items: flex-start;
+  }
+  
+  .skills-section,
+  .languages-section,
+  .education-section,
+  .certifications-section {
+      width: 100%;
+      flex: 0 0 100%;
+  }
+  
+  .resume-grid {
+      gap: 8px;
+  }
+}
