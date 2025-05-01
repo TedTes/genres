@@ -49,5 +49,5 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SUPABASE_URL = os.environ.get('SUPABASE_URL')
     SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
-    #JWT secret key
-    JWT_SECRET_KEY = secrets.token_hex(16)
+    #flask secret key
+    SECRET_KEY = secrets.token_hex(16)
