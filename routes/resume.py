@@ -16,6 +16,38 @@ from db import db
 resume_bp = Blueprint("resume", __name__)
 template_registry = TemplateRegistry('pages/templates')
 
+@resume_bp.route('/resume/start/<int:job_id>')
+@login_required
+def generate_job_resume(job_id):
+    job = Job.query.get_or_404(job_id)
+    
+    # Get user's previous resume data for pre-population
+    last_resume = Resume.query.filter_by(user_id=current_user.id).order_by(Resume.updated_at.desc()).first()
+    # Initialize with empty or previous data
+    resume_data = {}
+    if last_resume and last_resume.resume_data:
+        resume_data = last_resume.resume_data.copy()
+        # Create new resume with pre-populated data
+        last_resume = Resume(user_id=current_user.id, job_id=job.id, resume_data=resume_data)
+        db.session.add(last_resume)
+        db.session.commit()
+    else: 
+        # Create a new resume without a job_id
+        last_resume = Resume(
+            user_id=current_user.id,
+            resume_data={},
+            title=job.title
+        )
+        
+        # Add to database
+        db.session.add(last_resume)
+        db.session.commit()
+    # Extract relevant skills from job description
+    skills = analyze_job_description(job.description)
+    session['skills'] = skills
+    
+    flash('Resume created with your information! Customize it for this job posting.', 'success')
+    return redirect(url_for('resume.resume_builder', resume_id=last_resume.id))
 @resume_bp.route('/resume/<int:resume_id>/download')
 @login_required
 def download_resume(resume_id):
@@ -153,7 +185,7 @@ def view_resume(resume_id):
 
 @resume_bp.route('/resume/create/general')
 @login_required
-def create_general_resume():
+def generate_general_resume():
     """
     Create a general resume not tied to any specific job
     """
