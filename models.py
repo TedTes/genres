@@ -9,10 +9,17 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.Text, nullable=False)
+
+    name = db.Column(db.String(100), nullable=True) 
+    phone = db.Column(db.String(20), nullable=True)
+    location = db.Column(db.String(100), nullable=True)
+    linkedin = db.Column(db.String(200), nullable=True)
+    github = db.Column(db.String(200), nullable=True)
+    website = db.Column(db.String(200), nullable=True)
+ 
     resumes = db.relationship('Resume', backref='user', lazy=True)
     verified = db.Column(db.Boolean, default=False)
     verification_sent_at = db.Column(db.DateTime, nullable=True)
-
     subscriptions = db.relationship('Subscription', backref='user', lazy=True)
     
     @property
