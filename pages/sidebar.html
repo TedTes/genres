@@ -70,6 +70,11 @@
                 </section>
                 {% endif %}
             {% endfor %}
+            
+            <!-- Add the repeating elements for subsequent pages -->
+            <div class="page-sidebar-header" data-name="{{ resume.contact.name|default('Your Name') }}" data-title="{{ resume.title|default('Professional') }}"></div>
+            <div class="sidebar-watermark"></div>
+            <div class="sidebar-footer">{{ resume.contact.email|default('') }}</div>
         </div>
         
         <div class="main-content">
@@ -96,6 +101,14 @@
                         <div class="job-title">{{ item.job_title }}</div>
                         <div class="company-name">{{ item.company }}</div>
                         <div class="job-duration">{{ item.duration }}</div>
+                        
+                        {% if item.description %}
+                        <ul class="job-duties">
+                            {% for bullet in item.description.split('\n') if bullet.strip() %}
+                            <li>{{ bullet }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
                     </div>
                     {% endfor %}
                 </section>
