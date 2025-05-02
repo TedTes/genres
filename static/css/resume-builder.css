@@ -1870,7 +1870,7 @@ body {
 }
 
 /* ========================== 
-   SKILLS FORM CSS 
+   SKILLS SECTION CSS 
  ========================= */
 .skills-input-wrapper {
     position: relative;
@@ -2593,4 +2593,216 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* =======================
+EDUCATION SECTION CSS
+========================= */
+/* Education Timeline Styles */
+.education-container {
+    margin-bottom: var(--space-xl);
+}
+
+.education-timeline {
+    position: relative;
+    min-height: 100px;
+    margin-bottom: var(--space-lg);
+}
+
+/* Education Timeline Item Styling */
+.education-timeline-item {
+    position: relative;
+    margin-bottom: var(--space-lg);
+    padding: var(--space-lg);
+    background-color: white;
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.education-timeline-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -24px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--accent);
+    border: 3px solid white;
+    box-shadow: 0 0 0 1px var(--border);
+    z-index: 2;
+}
+
+.education-timeline-item::after {
+    content: "";
+    position: absolute;
+    top: 16px;
+    bottom: -16px;
+    left: -18px;
+    width: 2px;
+    background-color: var(--border);
+    z-index: 1;
+}
+
+.education-timeline-item:last-child::after {
+    display: none;
+}
+
+.education-timeline-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.education-date {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-lg);
+    color: var(--secondary-light);
+    font-size: var(--font-size-sm);
+}
+
+.education-content h4 {
+    font-size: var(--font-size-lg);
+    color: var(--accent);
+    margin: 0 0 var(--space-xs);
+    font-weight: var(--font-weight-medium);
+    padding-right: 80px; /* Space for date */
+}
+
+.education-school {
+    color: var(--secondary);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-md);
+    font-weight: var(--font-weight-medium);
+}
+
+.education-description ul {
+    margin: var(--space-md) 0 0;
+    padding-left: 20px;
+}
+
+.education-description li {
+    margin-bottom: var(--space-xs);
+    color: var(--secondary);
+}
+
+.education-actions {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    display: flex;
+    gap: var(--space-sm);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.education-timeline-item:hover .education-actions {
+    opacity: 1;
+}
+
+.education-action {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: white;
+    border: 1px solid var(--border);
+    color: var(--secondary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.education-action:hover {
+    background-color: var(--accent-light);
+    color: var(--accent);
+}
+
+.education-action.delete:hover {
+    background-color: #fee2e2;
+    color: var(--danger);
+}
+
+/* Add Education Button */
+.add-education-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    background-color: white;
+    border: 1px dashed var(--border);
+    color: var(--accent);
+    padding: var(--space-md);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.add-education-btn:hover {
+    background-color: var(--accent-light);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+
+.add-education-btn .btn-icon {
+    background-color: var(--accent-light);
+    color: var(--accent);
+}
+
+/* Education Form Container */
+.education-form-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.education-form-container.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Education-specific form stylings */
+#education-form .form-card-header {
+    background-color: var(--accent-light);
+}
+
+#education-form .form-card-header h3 {
+    color: var(--accent);
+}
+
+#education-form .optional-label {
+    font-size: var(--font-size-sm);
+    color: var(--secondary-light);
+    margin-left: 4px;
+}
+
+.current-education-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-top: var(--space-xs);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    color: var(--secondary);
+}
+
+/* Empty state for education */
+#education-empty-state .empty-state-icon {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    color: var(--accent);
 }

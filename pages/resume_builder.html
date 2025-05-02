@@ -541,56 +541,169 @@
                 </div>
             </section>
 
-                <!-- Education Section -->
-                <section class="resume-section-collapsible" data-section="education">
-                    <div class="section-header collapsible">
-                        <h3>Education</h3>
-                        <div class="section-toggle">
-                            <i class="fas fa-check-circle section-complete-icon"></i>
-                            <i class="fas fa-chevron-down"></i>
+             <!-- Education Section -->
+        <section class="resume-section-collapsible" data-section="education">
+            <div class="section-header collapsible">
+                <h3>Education</h3>
+                <div class="section-toggle">
+                    <i class="fas fa-check-circle section-complete-icon"></i>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <!-- Education Timeline Container -->
+                <div class="education-container">
+                    <div class="education-timeline" id="education-timeline">
+                        <!-- Timeline will be generated via JavaScript -->
+                        <div class="timeline-empty-state" id="education-empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <h4>No education added yet</h4>
+                            <p>Add your educational background to showcase your academic achievements</p>
                         </div>
                     </div>
-                    <div class="section-content">
-                        <div id="education-list">
-                            <!-- Education entries will be added here -->
+                    
+                    <button type="button" class="add-education-btn" id="add-education-btn">
+                        <div class="btn-icon">
+                            <i class="fas fa-plus"></i>
                         </div>
-                        <button type="button" class="btn btn-sm btn-outline btn-add-item" id="add-education">
-                            <i class="fas fa-plus"></i> Add Education
-                        </button>
-                        
-                        <div class="form-container" id="education-form-container" style="display: none;">
-                            <form id="education-form" class="compact-form">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label class="form-label">Degree <span class="required">*</span></label>
-                                        <input type="text" id="degree" class="form-control auto-resize" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">School <span class="required">*</span></label>
-                                        <input type="text" id="school" class="form-control auto-resize" required>
-                                    </div>
+                        <span>Add Education</span>
+                    </button>
+                </div>
+                
+                        <!-- Education Form -->
+                <div class="education-form-container" id="education-form-container" style="display: none;">
+                            <div class="form-card">
+                                <div class="form-card-header">
+                                    <h3 id="education-form-title">Add Education</h3>
+                                    <button type="button" class="form-card-close" id="education-form-close">
+                                        <i class="fas fa-times"></i>
+                                    </button>
                                 </div>
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label class="form-label">Start Year <span class="required">*</span></label>
-                                        <input type="text" id="education-start" class="form-control auto-resize" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">End Year</label>
-                                        <div class="end-date-group">
-                                            <input type="text" id="education-end" class="form-control auto-resize">
-                                            <label class="checkbox-inline">
-                                                <input type="checkbox" id="current-education"> Current
-                                            </label>
+                                
+                                <form id="education-form" class="resume-form">
+                                    <input type="hidden" id="education-index" value="-1">
+                                    
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <div class="form-label-container">
+                                                <label class="form-label">Degree / Certificate</label>
+                                                <span class="required">*</span>
+                                            </div>
+                                            <div class="input-icon-wrapper">
+                                                <i class="fas fa-scroll"></i>
+                                                <input type="text" id="degree" class="form-control" placeholder="e.g. Bachelor of Science in Computer Science" required>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <div class="form-label-container">
+                                                <label class="form-label">School / University</label>
+                                                <span class="required">*</span>
+                                            </div>
+                                            <div class="input-icon-wrapper">
+                                                <i class="fas fa-university"></i>
+                                                <input type="text" id="school" class="form-control" placeholder="e.g. University of California, Berkeley" required>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="form-actions">
-                                    <button type="button" id="cancel-education" class="btn btn-outline btn-sm">Cancel</button>
-                                    <button type="submit" class="btn btn-primary btn-sm">Save</button>
-                                </div>
-                            </form>
+                                    
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <div class="form-label-container">
+                                                <label class="form-label">Start Year</label>
+                                                <span class="required">*</span>
+                                            </div>
+                                            <div class="input-icon-wrapper">
+                                                <i class="fas fa-calendar-alt"></i>
+                                                <input type="text" id="education-start" class="form-control" placeholder="e.g. 2018" required>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <div class="form-label-container">
+                                                <label class="form-label">End Year</label>
+                                            </div>
+                                            <div class="end-date-group">
+                                                <div class="input-icon-wrapper">
+                                                    <i class="fas fa-calendar-check"></i>
+                                                    <input type="text" id="education-end" class="form-control" placeholder="e.g. 2022">
+                                                </div>
+                                                <label class="current-education-checkbox">
+                                                    <input type="checkbox" id="current-education"> 
+                                                    <span class="checkmark"></span>
+                                                    <span class="checkbox-label">Currently Studying</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="form-label-container">
+                                            <label class="form-label">Description</label>
+                                            <span class="optional-label">(Optional)</span>
+                                        </div>
+                                        <div class="textarea-tools">
+                                            <textarea id="education-description" class="form-control auto-expand" rows="4" 
+                                                placeholder="Add relevant coursework, achievements, honors, GPA, or activities. For example:
+                - Major: Computer Science with minor in Data Analytics
+                - GPA: 3.8/4.0, Dean's List all semesters
+                - Relevant coursework: Data Structures, Algorithms, Machine Learning
+                - President of Computer Science Club"></textarea>
+                                            
+                                            <div class="textarea-toolbar">
+                                                <button type="button" class="toolbar-btn" data-action="bullet">
+                                                    <i class="fas fa-list-ul"></i>
+                                                </button>
+                                                <button type="button" class="toolbar-btn" data-action="course">
+                                                    <i class="fas fa-book"></i>
+                                                </button>
+                                                <button type="button" class="toolbar-btn" data-action="gpa">
+                                                    <i class="fas fa-award"></i>
+                                                </button>
+                                                <button type="button" class="toolbar-btn ai-enhance" data-action="enhance" data-tooltip="Enhance with AI">
+                                                    <i class="fas fa-magic"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- AI Enhancement Panel for Education -->
+                                    <div class="ai-enhance-panel" id="education-enhance-panel" style="display: none;">
+                                        <div class="enhance-options">
+                                            <button type="button" class="enhance-option" data-enhance="coursework">
+                                                <i class="fas fa-book"></i>
+                                                <span>Add Relevant Coursework</span>
+                                            </button>
+                                            <button type="button" class="enhance-option" data-enhance="achievements">
+                                                <i class="fas fa-medal"></i>
+                                                <span>Add Academic Achievements</span>
+                                            </button>
+                                            <button type="button" class="enhance-option" data-enhance="concise">
+                                                <i class="fas fa-cut"></i>
+                                                <span>Make More Concise</span>
+                                            </button>
+                                            <button type="button" class="enhance-option" data-enhance="format">
+                                                <i class="fas fa-align-left"></i>
+                                                <span>Improve Formatting</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="button" id="cancel-education" class="btn btn-outline">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </button>
+                                        <button type="submit" id="save-education" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
+                        
+                        <input type="hidden" name="education_data" id="education-data" value="">
                     </div>
                 </section>
                 <section class="resume-section-collapsible add-sections-container" data-section="add-sections">

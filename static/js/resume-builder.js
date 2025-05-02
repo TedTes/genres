@@ -1737,7 +1737,671 @@ const showTooltip = (element, message) => {
 initializeExperiences();
 initEventListeners();
 };
-
+// Education Manager
+const initEducationManager = () => {
+  // Elements
+  const educationTimeline = document.getElementById("education-timeline");
+  const addEducationBtn = document.getElementById("add-education-btn");
+  const educationFormContainer = document.getElementById("education-form-container");
+  const educationForm = document.getElementById("education-form");
+  const educationFormClose = document.getElementById("education-form-close");
+  const cancelEducationBtn = document.getElementById("cancel-education");
+  const educationFormTitle = document.getElementById("education-form-title");
+  const educationIndex = document.getElementById("education-index");
+  const degree = document.getElementById("degree");
+  const school = document.getElementById("school");
+  const startYear = document.getElementById("education-start");
+  const endYear = document.getElementById("education-end");
+  const currentEducation = document.getElementById("current-education");
+  const educationDescription = document.getElementById("education-description");
+  const educationData = document.getElementById("education-data");
+  const emptyState = document.getElementById("education-empty-state");
+  const aiEnhanceBtn = document.querySelector("#education-form .toolbar-btn.ai-enhance");
+  const aiEnhancePanel = document.getElementById("education-enhance-panel");
+  const enhanceOptions = document.querySelectorAll("#education-enhance-panel .enhance-option");
+  const toolbarBtns = document.querySelectorAll("#education-form .toolbar-btn");
+  
+  if (!educationTimeline || !addEducationBtn || !educationForm) return;
+  
+  // Education data
+  let educations = [];
+  
+  // Initialize from existing data if available
+  const initializeEducations = () => {
+    try {
+      educations = educationData && educationData.value 
+        ? JSON.parse(educationData.value) 
+        : [];
+    } catch (e) {
+      console.error("Error parsing education data:", e);
+      educations = [];
+    }
+    
+    renderEducations();
+  };
+  
+  // Render educations to timeline
+  const renderEducations = () => {
+    // Clear the timeline except empty state
+    Array.from(educationTimeline.children).forEach(child => {
+      if (child.id !== "education-empty-state") {
+        educationTimeline.removeChild(child);
+      }
+    });
+    
+    // Toggle empty state visibility
+    if (educations.length === 0) {
+      emptyState.style.display = "block";
+      return;
+    } else {
+      emptyState.style.display = "none";
+    }
+    
+    // Render each education
+    educations.forEach((edu, index) => {
+      const timelineItem = document.createElement("div");
+      timelineItem.className = "education-timeline-item";
+      timelineItem.dataset.index = index;
+      
+      // Format description as bullet points
+      let descriptionHTML = "";
+      if (edu.description) {
+        const items = edu.description
+          .split("\n")
+          .filter(line => line.trim())
+          .map(line => {
+            // Ensure each line starts with a bullet
+            const trimmed = line.trim();
+            if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("*")) {
+              return `<li>${trimmed.substring(1).trim()}</li>`;
+            } else {
+              return `<li>${trimmed}</li>`;
+            }
+          });
+        
+        if (items.length) {
+          descriptionHTML = `<ul>${items.join("")}</ul>`;
+        }
+      }
+      
+      // Current or past education
+      const dateDisplay = edu.current 
+        ? `${edu.startYear} - Present` 
+        : `${edu.startYear} - ${edu.endYear}`;
+      
+      timelineItem.innerHTML = `
+        <div class="education-date">${dateDisplay}</div>
+        <div class="education-actions">
+          <button type="button" class="education-action edit" data-index="${index}" aria-label="Edit">
+            <i class="fas fa-pencil-alt"></i>
+          </button>
+          <button type="button" class="education-action delete" data-index="${index}" aria-label="Delete">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+        <div class="education-content">
+          <h4>${edu.degree}</h4>
+          <div class="education-school">${edu.school}</div>
+          <div class="education-description">
+            ${descriptionHTML}
+          </div>
+        </div>
+      `;
+      
+      educationTimeline.appendChild(timelineItem);
+    });
+    
+    // Add event listeners to the action buttons
+    document.querySelectorAll(".education-action.edit").forEach(btn => {
+      btn.addEventListener("click", function() {
+        const index = parseInt(this.dataset.index);
+        editEducation(index);
+      });
+    });
+    
+    document.querySelectorAll(".education-action.delete").forEach(btn => {
+      btn.addEventListener("click", function() {
+        const index = parseInt(this.dataset.index);
+        deleteEducation(index);
+      });
+    });
+    
+    // Update progress
+    updateProgress();
+  };
+  
+  // Add education
+  const addEducation = () => {
+    // Reset the form
+    educationForm.reset();
+    educationIndex.value = -1;
+    educationFormTitle.textContent = "Add Education";
+    
+    // Show the form
+    educationFormContainer.style.display = "flex";
+    setTimeout(() => {
+      educationFormContainer.classList.add("active");
+    }, 10);
+    
+    // Focus on the first input
+    degree.focus();
+  };
+  
+  // Edit education
+  const editEducation = (index) => {
+    const education = educations[index];
+    if (!education) return;
+    
+    // Set form values
+    educationIndex.value = index;
+    degree.value = education.degree;
+    school.value = education.school;
+    startYear.value = education.startYear;
+    
+    if (education.current) {
+      currentEducation.checked = true;
+      endYear.value = "";
+      endYear.disabled = true;
+    } else {
+      currentEducation.checked = false;
+      endYear.value = education.endYear;
+      endYear.disabled = false;
+    }
+    
+    educationDescription.value = education.description || '';
+    
+    // Update form title
+    educationFormTitle.textContent = "Edit Education";
+    
+    // Show the form
+    educationFormContainer.style.display = "flex";
+    setTimeout(() => {
+      educationFormContainer.classList.add("active");
+    }, 10);
+    
+    // Expand the textarea to fit content
+    educationDescription.style.height = "auto";
+    educationDescription.style.height = educationDescription.scrollHeight + "px";
+  };
+  
+  // Delete education
+  const deleteEducation = (index) => {
+    // Confirm before deleting
+    if (confirm("Are you sure you want to delete this education entry?")) {
+      educations.splice(index, 1);
+      updateEducationData();
+      renderEducations();
+    }
+  };
+  
+  // Update the hidden input with educations data
+  const updateEducationData = () => {
+    educationData.value = JSON.stringify(educations);
+    // Trigger change event for autosave
+    const event = new Event('change', { bubbles: true });
+    educationData.dispatchEvent(event);
+  };
+  
+  // Format the education description to ensure bullet points
+  const formatDescription = (text) => {
+    if (!text) return "";
+    
+    return text
+      .split("\n")
+      .map(line => {
+        const trimmed = line.trim();
+        if (!trimmed) return "";
+        if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("*")) {
+          return trimmed;
+        } else {
+          return `• ${trimmed}`;
+        }
+      })
+      .filter(line => line)
+      .join("\n");
+  };
+  
+  // Handle form submission
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    
+    // Basic validation
+    if (!degree.value || !school.value || !startYear.value) {
+      showTooltip(educationForm, "Please fill in all required fields");
+      return;
+    }
+    
+    const index = parseInt(educationIndex.value);
+    const isNewEducation = index === -1;
+    
+    // Format the description
+    const formattedDescription = formatDescription(educationDescription.value);
+    
+    // Create education object
+    const education = {
+      degree: degree.value,
+      school: school.value,
+      startYear: startYear.value,
+      endYear: currentEducation.checked ? "" : endYear.value,
+      current: currentEducation.checked,
+      description: formattedDescription
+    };
+    
+    // Update or add the education
+    if (isNewEducation) {
+      educations.push(education);
+    } else {
+      educations[index] = education;
+    }
+    
+    // Update data and render
+    updateEducationData();
+    renderEducations();
+    
+    // Close the form
+    closeForm();
+    
+    // Show success toast
+    showTooltip(addEducationBtn, isNewEducation ? "Education added successfully" : "Education updated successfully");
+  };
+  
+  // Close the form
+  const closeForm = () => {
+    educationFormContainer.classList.remove("active");
+    setTimeout(() => {
+      educationFormContainer.style.display = "none";
+    }, 300);
+  };
+  
+  // Initialize event listeners
+  const initEventListeners = () => {
+    // Add education button
+    addEducationBtn.addEventListener("click", addEducation);
+    
+    // Form submission
+    educationForm.addEventListener("submit", handleFormSubmit);
+    
+    // Close form buttons
+    educationFormClose.addEventListener("click", closeForm);
+    cancelEducationBtn.addEventListener("click", closeForm);
+    
+    // Current education checkbox
+    currentEducation.addEventListener("change", function() {
+      if (this.checked) {
+        endYear.value = "";
+        endYear.disabled = true;
+      } else {
+        endYear.disabled = false;
+      }
+    });
+    
+    // Close on click outside form
+    educationFormContainer.addEventListener("click", function(e) {
+      if (e.target === this) {
+        closeForm();
+      }
+    });
+    
+    // AI Enhance button
+    if (aiEnhanceBtn && aiEnhancePanel) {
+      aiEnhanceBtn.addEventListener("click", function() {
+        // Toggle the AI enhancement panel
+        if (aiEnhancePanel.style.display === "none") {
+          aiEnhancePanel.style.display = "block";
+        } else {
+          aiEnhancePanel.style.display = "none";
+        }
+      });
+    }
+    
+    // Enhancement options
+    if (enhanceOptions) {
+      enhanceOptions.forEach(option => {
+        option.addEventListener("click", function() {
+          const enhanceType = this.dataset.enhance;
+          
+          if (!educationDescription.value.trim() && enhanceType !== 'coursework') {
+            showTooltip(educationDescription, "Please add a description first");
+            return;
+          }
+          
+          // Add loading effect
+          this.classList.add("loading");
+          const originalContent = this.innerHTML;
+          this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Processing...</span>';
+          
+          // Simulate AI processing (replace with actual API call later)
+          setTimeout(() => {
+            let enhancedText = "";
+            
+            switch (enhanceType) {
+              case "coursework":
+                enhancedText = addRelevantCoursework(degree.value, educationDescription.value);
+                break;
+              case "achievements":
+                enhancedText = addAcademicAchievements(educationDescription.value);
+                break;
+              case "concise":
+                enhancedText = makeEducationConcise(educationDescription.value);
+                break;
+              case "format":
+                enhancedText = improveEducationFormat(educationDescription.value);
+                break;
+              default:
+                enhancedText = educationDescription.value;
+            }
+            
+            // Apply the enhanced text
+            educationDescription.value = enhancedText;
+            
+            // Auto-resize the textarea
+            educationDescription.style.height = "auto";
+            educationDescription.style.height = educationDescription.scrollHeight + "px";
+            
+            // Reset the button
+            this.classList.remove("loading");
+            this.innerHTML = originalContent;
+            
+            // Hide the enhancement panel
+            aiEnhancePanel.style.display = "none";
+            
+            // Show feedback
+            const enhanceName = enhanceType.split('-').map(word => 
+              word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+            showTooltip(educationDescription, `Enhanced with ${enhanceName}`);
+          }, 1500);
+        });
+      });
+    }
+    
+    // Toolbar buttons
+    if (toolbarBtns) {
+      toolbarBtns.forEach(btn => {
+        btn.addEventListener("click", function() {
+          const action = this.dataset.action;
+          
+          // Skip if it's the AI enhance button (handled separately)
+          if (action === "enhance") return;
+          
+          switch (action) {
+            case "bullet":
+              // Add bullet point at cursor or at end
+              const cursorPos = educationDescription.selectionStart;
+              const textBefore = educationDescription.value.substring(0, cursorPos);
+              const textAfter = educationDescription.value.substring(cursorPos);
+              
+              if (cursorPos === 0 || educationDescription.value.charAt(cursorPos - 1) === '\n') {
+                // Add bullet at cursor
+                educationDescription.value = textBefore + "• " + textAfter;
+                educationDescription.selectionStart = educationDescription.selectionEnd = cursorPos + 2;
+              } else if (cursorPos === educationDescription.value.length) {
+                // Add new line and bullet at end
+                educationDescription.value = textBefore + "\n• ";
+                educationDescription.selectionStart = educationDescription.selectionEnd = educationDescription.value.length;
+              } else {
+                // Add new line and bullet in the middle
+                educationDescription.value = textBefore + "\n• " + textAfter;
+                educationDescription.selectionStart = educationDescription.selectionEnd = cursorPos + 3;
+              }
+              break;
+              
+            case "course":
+              // Add coursework template based on degree
+              addCourseTemplate();
+              break;
+              
+            case "gpa":
+              // Add GPA template
+              const gpaPos = educationDescription.selectionEnd;
+              const gpaTemplate = "• GPA: 3.8/4.0, Dean's List";
+              
+              if (educationDescription.value) {
+                const lastChar = educationDescription.value.slice(-1);
+                educationDescription.value += (lastChar === '\n' ? '' : '\n') + gpaTemplate;
+              } else {
+                educationDescription.value = gpaTemplate;
+              }
+              
+              educationDescription.selectionStart = educationDescription.selectionEnd = educationDescription.value.length;
+              break;
+          }
+          
+          // Focus the textarea and update its height
+          educationDescription.focus();
+          educationDescription.style.height = "auto";
+          educationDescription.style.height = educationDescription.scrollHeight + "px";
+        });
+      });
+    }
+    
+    // Auto expand textarea on input
+    educationDescription.addEventListener("input", function() {
+      this.style.height = "auto";
+      this.style.height = this.scrollHeight + "px";
+    });
+  };
+  
+  // Add course template based on degree
+  const addCourseTemplate = () => {
+    if (!degree.value) {
+      showTooltip(degree, "Please enter your degree first");
+      degree.focus();
+      return;
+    }
+    
+    const degreeText = degree.value.toLowerCase();
+    let courseTemplate = "• Relevant coursework: ";
+    
+    if (degreeText.includes("computer science") || degreeText.includes("cs")) {
+      courseTemplate += "Data Structures, Algorithms, Operating Systems, Database Systems, Web Development";
+    } else if (degreeText.includes("business") || degreeText.includes("mba")) {
+      courseTemplate += "Financial Accounting, Marketing Management, Business Strategy, Organizational Behavior";
+    } else if (degreeText.includes("engineering")) {
+      courseTemplate += "Engineering Design, Thermodynamics, Fluid Mechanics, Materials Science";
+    } else if (degreeText.includes("data") || degreeText.includes("analytics")) {
+      courseTemplate += "Statistical Methods, Data Mining, Machine Learning, Big Data Technologies";
+    } else {
+      courseTemplate += "[Add your relevant courses here]";
+    }
+    
+    // Add to description
+    if (educationDescription.value) {
+      const lastChar = educationDescription.value.slice(-1);
+      educationDescription.value += (lastChar === '\n' ? '' : '\n') + courseTemplate;
+    } else {
+      educationDescription.value = courseTemplate;
+    }
+    
+    educationDescription.selectionStart = educationDescription.selectionEnd = educationDescription.value.length;
+    educationDescription.focus();
+    educationDescription.style.height = "auto";
+    educationDescription.style.height = educationDescription.scrollHeight + "px";
+  };
+  
+  const addRelevantCoursework = (degreeText, currentText) => {
+    // Generate relevant coursework based on degree
+    const degree = degreeText.toLowerCase();
+    let coursework = "";
+    
+    if (degree.includes("computer science") || degree.includes("cs")) {
+      coursework = "• Relevant coursework: Data Structures, Algorithms, Operating Systems, Database Systems, Computer Networks, Software Engineering, Artificial Intelligence, Machine Learning";
+    } else if (degree.includes("business") || degree.includes("mba")) {
+      coursework = "• Relevant coursework: Financial Accounting, Marketing Management, Business Strategy, Organizational Behavior, Corporate Finance, Economics, Business Ethics";
+    } else if (degree.includes("engineering")) {
+      coursework = "• Relevant coursework: Engineering Mathematics, Thermodynamics, Fluid Mechanics, Materials Science, Control Systems, Engineering Design, Project Management";
+    } else if (degree.includes("psychology")) {
+      coursework = "• Relevant coursework: Cognitive Psychology, Developmental Psychology, Social Psychology, Research Methods, Statistics, Abnormal Psychology";
+    } else if (degree.includes("data") || degree.includes("analytics")) {
+      coursework = "• Relevant coursework: Statistical Methods, Data Mining, Machine Learning, Big Data Technologies, Data Visualization, Predictive Modeling";
+    } else {
+      coursework = "• Relevant coursework: [Add your major-specific courses here]";
+    }
+    
+    // Add to existing content or replace
+    if (currentText.trim() && !currentText.includes("Relevant coursework")) {
+      return currentText + (currentText.endsWith('\n') ? '' : '\n') + coursework;
+    } else if (currentText.includes("Relevant coursework")) {
+      // Replace existing coursework line
+      const lines = currentText.split('\n');
+      const updatedLines = lines.map(line => {
+        if (line.includes("Relevant coursework")) {
+          return coursework;
+        }
+        return line;
+      });
+      return updatedLines.join('\n');
+    } else {
+      return coursework;
+    }
+  };
+  
+  const addAcademicAchievements = (currentText) => {
+    // Add academic achievements
+    const achievements = [
+      "• Dean's List for all semesters",
+      "• Graduated Magna Cum Laude",
+      "• Recipient of Academic Excellence Scholarship",
+      "• Selected for Honors Program",
+      "• Awarded Department Recognition for Outstanding Performance",
+      "• Participated in Undergraduate Research Program",
+      "• Selected as Teaching Assistant for core courses"
+    ];
+    
+    // Select 2-3 random achievements
+    const numAchievements = Math.floor(Math.random() * 2) + 2; // 2-3
+    const selectedAchievements = [];
+    
+    for (let i = 0; i < numAchievements; i++) {
+      const randomIndex = Math.floor(Math.random() * achievements.length);
+      selectedAchievements.push(achievements[randomIndex]);
+      achievements.splice(randomIndex, 1); // Remove selected achievement
+    }
+    
+    const achievementsText = selectedAchievements.join('\n');
+    
+    // Add to existing content
+    if (currentText.trim()) {
+      return currentText + (currentText.endsWith('\n') ? '' : '\n') + achievementsText;
+    } else {
+      return achievementsText;
+    }
+  };
+  
+  const makeEducationConcise = (currentText) => {
+    if (!currentText.trim()) return "";
+    
+    // Split into lines and remove redundant/verbose content
+    const lines = currentText.split('\n').filter(line => line.trim());
+    
+    // Filter out filler words and shorten lines
+    const conciseLines = lines.map(line => {
+      // Remove filler words
+      let conciseLine = line
+        .replace(/I was |I have been |I am |I've been /g, '')
+        .replace(/was responsible for|was tasked with/g, 'handled')
+        .replace(/In this program,|During my time here,|Throughout my studies,/g, '')
+        .replace(/\bvery\b|\breally\b|\bquite\b|\bbasically\b|\bjust\b/g, '')
+        .trim();
+      
+      // Ensure bullet point
+      if (!conciseLine.startsWith('•') && !conciseLine.startsWith('-') && !conciseLine.startsWith('*')) {
+        conciseLine = '• ' + conciseLine;
+      }
+      
+      return conciseLine;
+    });
+    
+    // Limit to 4-5 most important points
+    const importantLines = conciseLines.slice(0, Math.min(5, conciseLines.length));
+    
+    return importantLines.join('\n');
+  };
+  
+  const improveEducationFormat = (currentText) => {
+    if (!currentText.trim()) return "";
+    
+    // Split into lines
+    let lines = currentText.split('\n').filter(line => line.trim());
+    
+    // Make sure each line starts with a bullet point
+    lines = lines.map(line => {
+      line = line.trim();
+      if (!line.startsWith('•') && !line.startsWith('-') && !line.startsWith('*')) {
+        return '• ' + line;
+      }
+      return line;
+    });
+    
+    // Organize by categories
+    const categorized = {
+      gpa: [],
+      coursework: [],
+      achievements: [],
+      activities: [],
+      other: []
+    };
+    
+    lines.forEach(line => {
+      const lowerLine = line.toLowerCase();
+      if (lowerLine.includes('gpa') || lowerLine.includes('grade') || lowerLine.includes('cum laude')) {
+        categorized.gpa.push(line);
+      } else if (lowerLine.includes('course') || lowerLine.includes('class') || lowerLine.includes('studied')) {
+        categorized.coursework.push(line);
+      } else if (lowerLine.includes('award') || lowerLine.includes('honor') || lowerLine.includes('scholarship') || 
+                lowerLine.includes('dean') || lowerLine.includes('recognition')) {
+        categorized.achievements.push(line);
+      } else if (lowerLine.includes('club') || lowerLine.includes('society') || 
+                lowerLine.includes('association') || lowerLine.includes('volunteer') ||
+                lowerLine.includes('member') || lowerLine.includes('president') ||
+                lowerLine.includes('leader') || lowerLine.includes('captain')) {
+        categorized.activities.push(line);
+      } else {
+        categorized.other.push(line);
+      }
+    });
+    
+    // Reassemble in a logical order
+    const formattedLines = [
+      ...categorized.gpa,
+      ...categorized.coursework,
+      ...categorized.achievements,
+      ...categorized.activities,
+      ...categorized.other
+    ];
+    
+    return formattedLines.join('\n');
+  };
+  
+  // Helper function to show tooltip
+  const showTooltip = (element, message) => {
+    const tooltip = document.createElement("div");
+    tooltip.className = "floating-tooltip";
+    tooltip.textContent = message;
+    
+    document.body.appendChild(tooltip);
+    
+    const rect = element.getBoundingClientRect();
+    tooltip.style.top = `${rect.top + window.scrollY - 30}px`;
+    tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
+    tooltip.style.transform = "translate(-50%, -100%)";
+    
+    setTimeout(() => {
+      tooltip.classList.add("show");
+    }, 10);
+    
+    setTimeout(() => {
+      tooltip.classList.remove("show");
+      setTimeout(() => {
+        document.body.removeChild(tooltip);
+      }, 300);
+    }, 3000);
+  };
+  
+  // Initialize
+  initializeEducations();
+  initEventListeners();
+};
 
 // Initialize Everything
 document.addEventListener("DOMContentLoaded", () => {
@@ -1758,7 +2422,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initSectionOptions();
   initTemplates(); // Add template initialization
   updateProgress();
-
+  initEducationManager();
   // Add this to your document.addEventListener("DOMContentLoaded", ...)
 const toggleAddSections = document.getElementById("toggle-add-sections");
 const addSectionOptions = document.getElementById("add-section-options");
