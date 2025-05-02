@@ -1105,6 +1105,639 @@ const addTooltipStyles = () => {
   `;
   document.head.appendChild(style);
 };
+// Enhanced Experience Manager
+const initExperienceManager = () => {
+  // Elements
+  const experienceTimeline = document.getElementById("experience-timeline");
+  const addExperienceBtn = document.getElementById("add-experience-btn");
+  const experienceFormContainer = document.getElementById("experience-form-container");
+  const experienceForm = document.getElementById("experience-form");
+  const experienceFormClose = document.getElementById("experience-form-close");
+  const cancelExperienceBtn = document.getElementById("cancel-experience");
+  const experienceFormTitle = document.getElementById("experience-form-title");
+  const experienceIndex = document.getElementById("experience-index");
+  const jobTitle = document.getElementById("job-title");
+  const company = document.getElementById("company");
+  const startDate = document.getElementById("start-date");
+  const endDate = document.getElementById("end-date");
+  const currentJob = document.getElementById("current-job");
+  const jobDescription = document.getElementById("job-description");
+  const experienceData = document.getElementById("experience-data");
+  const emptyState = document.getElementById("timeline-empty-state");
+  const toggleJobSkills = document.getElementById("toggle-job-skills");
+  const jobSkillsContainer = document.getElementById("job-skills-container");
+  const skillTags = document.querySelectorAll(".skill-tag.suggested");
+  const aiEnhanceBtn = document.querySelector(".toolbar-btn.ai-enhance");
+  const aiEnhancePanel = document.getElementById("ai-enhance-panel");
+  const enhanceOptions = document.querySelectorAll(".enhance-option");
+  const toolbarBtns = document.querySelectorAll(".toolbar-btn");
+  
+  if (!experienceTimeline || !addExperienceBtn || !experienceForm) return;
+  
+  // Experience data
+  let experiences = [];
+  
+  // Initialize from existing data if available
+  const initializeExperiences = () => {
+    try {
+      experiences = experienceData && experienceData.value 
+        ? JSON.parse(experienceData.value) 
+        : [];
+    } catch (e) {
+      console.error("Error parsing experience data:", e);
+      experiences = [];
+    }
+    
+    renderExperiences();
+  };
+  
+  // Render experiences to timeline
+  const renderExperiences = () => {
+    // Clear the timeline
+    // Keep the empty state element
+    Array.from(experienceTimeline.children).forEach(child => {
+      if (child.id !== "timeline-empty-state") {
+        experienceTimeline.removeChild(child);
+      }
+    });
+    
+    // Toggle empty state visibility
+    if (experiences.length === 0) {
+      emptyState.style.display = "block";
+      return;
+    } else {
+      emptyState.style.display = "none";
+    }
+    
+    // Render each experience
+    experiences.forEach((exp, index) => {
+      const timelineItem = document.createElement("div");
+      timelineItem.className = "timeline-item";
+      timelineItem.dataset.index = index;
+      
+      // Format description as bullet points
+      let descriptionHTML = "";
+      if (exp.description) {
+        const items = exp.description
+          .split("\n")
+          .filter(line => line.trim())
+          .map(line => {
+            // Ensure each line starts with a bullet
+            const trimmed = line.trim();
+            if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("*")) {
+              return `<li>${trimmed.substring(1).trim()}</li>`;
+            } else {
+              return `<li>${trimmed}</li>`;
+            }
+          });
+        
+        if (items.length) {
+          descriptionHTML = `<ul>${items.join("")}</ul>`;
+        }
+      }
+      
+      // Current or past position
+      const dateDisplay = exp.current 
+        ? `${exp.startDate} - Present` 
+        : `${exp.startDate} - ${exp.endDate}`;
+      
+      timelineItem.innerHTML = `
+        <div class="timeline-date">${dateDisplay}</div>
+        <div class="timeline-actions">
+          <button type="button" class="timeline-action edit" data-index="${index}" aria-label="Edit">
+            <i class="fas fa-pencil-alt"></i>
+          </button>
+          <button type="button" class="timeline-action delete" data-index="${index}" aria-label="Delete">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+        <div class="timeline-content">
+          <h4>${exp.title}</h4>
+          <div class="timeline-company">${exp.company}</div>
+          <div class="timeline-description">
+            ${descriptionHTML}
+          </div>
+        </div>
+      `;
+      
+      experienceTimeline.appendChild(timelineItem);
+    });
+    
+    // Add event listeners to the action buttons
+    document.querySelectorAll(".timeline-action.edit").forEach(btn => {
+      btn.addEventListener("click", function() {
+        const index = parseInt(this.dataset.index);
+        editExperience(index);
+      });
+    });
+    
+    document.querySelectorAll(".timeline-action.delete").forEach(btn => {
+      btn.addEventListener("click", function() {
+        const index = parseInt(this.dataset.index);
+        deleteExperience(index);
+      });
+    });
+    
+    // Update progress
+    updateProgress();
+  };
+  
+// Add experience
+const addExperience = () => {
+  // Reset the form
+  experienceForm.reset();
+  experienceIndex.value = -1;
+  experienceFormTitle.textContent = "Add Work Experience";
+  
+  // Show the form
+  experienceFormContainer.style.display = "flex";
+  setTimeout(() => {
+    experienceFormContainer.classList.add("active");
+  }, 10);
+  
+  // Focus on the first input
+  jobTitle.focus();
+};
+
+// Edit experience
+const editExperience = (index) => {
+  const experience = experiences[index];
+  if (!experience) return;
+  
+  // Set form values
+  experienceIndex.value = index;
+  jobTitle.value = experience.title;
+  company.value = experience.company;
+  startDate.value = experience.startDate;
+  
+  if (experience.current) {
+    currentJob.checked = true;
+    endDate.value = "";
+    endDate.disabled = true;
+  } else {
+    currentJob.checked = false;
+    endDate.value = experience.endDate;
+    endDate.disabled = false;
+  }
+  
+  jobDescription.value = experience.description;
+  
+  // Update form title
+  experienceFormTitle.textContent = "Edit Work Experience";
+  
+  // Show the form
+  experienceFormContainer.style.display = "flex";
+  setTimeout(() => {
+    experienceFormContainer.classList.add("active");
+  }, 10);
+  
+  // Expand the textarea to fit content
+  jobDescription.style.height = "auto";
+  jobDescription.style.height = jobDescription.scrollHeight + "px";
+};
+
+// Delete experience
+const deleteExperience = (index) => {
+  // Confirm before deleting
+  if (confirm("Are you sure you want to delete this experience?")) {
+    experiences.splice(index, 1);
+    updateExperienceData();
+    renderExperiences();
+  }
+};
+
+// Update the hidden input with experiences data
+const updateExperienceData = () => {
+  experienceData.value = JSON.stringify(experiences);
+  // Trigger change event for autosave
+  const event = new Event('change', { bubbles: true });
+  experienceData.dispatchEvent(event);
+};
+
+// Format the job description to ensure bullet points
+const formatDescription = (text) => {
+  if (!text) return "";
+  
+  return text
+    .split("\n")
+    .map(line => {
+      const trimmed = line.trim();
+      if (!trimmed) return "";
+      if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("*")) {
+        return trimmed;
+      } else {
+        return `• ${trimmed}`;
+      }
+    })
+    .filter(line => line)
+    .join("\n");
+};
+
+// Handle form submission
+const handleFormSubmit = (e) => {
+  e.preventDefault();
+  
+  // Basic validation
+  if (!jobTitle.value || !company.value || !startDate.value || !jobDescription.value) {
+    showTooltip(experienceForm, "Please fill in all required fields");
+    return;
+  }
+  
+  const index = parseInt(experienceIndex.value);
+  const isNewExperience = index === -1;
+  
+  // Format the description
+  const formattedDescription = formatDescription(jobDescription.value);
+  
+  // Create experience object
+  const experience = {
+    title: jobTitle.value,
+    company: company.value,
+    startDate: startDate.value,
+    endDate: currentJob.checked ? "" : endDate.value,
+    current: currentJob.checked,
+    description: formattedDescription
+  };
+  
+  // Update or add the experience
+  if (isNewExperience) {
+    experiences.push(experience);
+  } else {
+    experiences[index] = experience;
+  }
+  
+  // Update data and render
+  updateExperienceData();
+  renderExperiences();
+  
+  // Close the form
+  closeForm();
+  
+  // Show success toast
+  showTooltip(addExperienceBtn, isNewExperience ? "Experience added successfully" : "Experience updated successfully");
+};
+
+// Close the form
+const closeForm = () => {
+  experienceFormContainer.classList.remove("active");
+  setTimeout(() => {
+    experienceFormContainer.style.display = "none";
+  }, 300);
+};
+
+// Initialize event listeners
+const initEventListeners = () => {
+  // Add experience button
+  addExperienceBtn.addEventListener("click", addExperience);
+  
+  // Form submission
+  experienceForm.addEventListener("submit", handleFormSubmit);
+  
+  // Close form buttons
+  experienceFormClose.addEventListener("click", closeForm);
+  cancelExperienceBtn.addEventListener("click", closeForm);
+  
+  // Current job checkbox
+  currentJob.addEventListener("change", function() {
+    if (this.checked) {
+      endDate.value = "";
+      endDate.disabled = true;
+    } else {
+      endDate.disabled = false;
+    }
+  });
+  
+  // Close on click outside form
+  experienceFormContainer.addEventListener("click", function(e) {
+    if (e.target === this) {
+      closeForm();
+    }
+  });
+  
+  // Toggle job skills
+  if (toggleJobSkills && jobSkillsContainer) {
+    toggleJobSkills.addEventListener("click", function() {
+      const isExpanded = this.getAttribute("aria-expanded") === "true";
+      
+      if (isExpanded) {
+        jobSkillsContainer.classList.add("collapse");
+        this.setAttribute("aria-expanded", "false");
+      } else {
+        jobSkillsContainer.classList.remove("collapse");
+        this.setAttribute("aria-expanded", "true");
+      }
+    });
+  }
+  
+  // Skill tag click
+  if (skillTags) {
+    skillTags.forEach(tag => {
+      tag.addEventListener("click", function() {
+        const skill = this.dataset.skill;
+        // Add to job description with a bullet point
+        const currentText = jobDescription.value;
+        const newBullet = `• Utilized ${skill} to improve project outcomes`;
+        
+        if (currentText) {
+          jobDescription.value = currentText + (currentText.endsWith("\n") ? "" : "\n") + newBullet + "\n";
+        } else {
+          jobDescription.value = newBullet + "\n";
+        }
+        
+        // Show visual feedback
+        this.classList.add("selected");
+        setTimeout(() => {
+          this.classList.remove("selected");
+        }, 1500);
+        
+        // Focus and resize the textarea
+        jobDescription.focus();
+        jobDescription.style.height = "auto";
+        jobDescription.style.height = jobDescription.scrollHeight + "px";
+      });
+    });
+  }
+  
+  // AI Enhance button
+  if (aiEnhanceBtn && aiEnhancePanel) {
+    aiEnhanceBtn.addEventListener("click", function() {
+      // Toggle the AI enhancement panel
+      if (aiEnhancePanel.style.display === "none") {
+        aiEnhancePanel.style.display = "block";
+      } else {
+        aiEnhancePanel.style.display = "none";
+      }
+    });
+  }
+  
+  // Enhancement options
+  if (enhanceOptions) {
+    enhanceOptions.forEach(option => {
+      option.addEventListener("click", function() {
+        const enhanceType = this.dataset.enhance;
+        
+        if (!jobDescription.value.trim()) {
+          showTooltip(jobDescription, "Please add job description first");
+          return;
+        }
+        
+        // Add loading effect
+        this.classList.add("loading");
+        const originalContent = this.innerHTML;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Processing...</span>';
+        
+        // Simulate AI processing (replace with actual API call later)
+        setTimeout(() => {
+          let enhancedText = "";
+          
+          switch (enhanceType) {
+            case "achievements":
+              enhancedText = enhanceWithAchievements(jobDescription.value);
+              break;
+            case "action-verbs":
+              enhancedText = enhanceWithActionVerbs(jobDescription.value);
+              break;
+            case "skills":
+              enhancedText = enhanceWithSkills(jobDescription.value);
+              break;
+            case "concise":
+              enhancedText = enhanceConcise(jobDescription.value);
+              break;
+            default:
+              enhancedText = jobDescription.value;
+          }
+          
+          // Apply the enhanced text
+          jobDescription.value = enhancedText;
+          
+          // Auto-resize the textarea
+          jobDescription.style.height = "auto";
+          jobDescription.style.height = jobDescription.scrollHeight + "px";
+          
+          // Reset the button
+          this.classList.remove("loading");
+          this.innerHTML = originalContent;
+          
+          // Hide the enhancement panel
+          aiEnhancePanel.style.display = "none";
+          
+          // Show feedback
+          const enhanceName = enhanceType.split('-').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1)
+          ).join(' ');
+          showTooltip(jobDescription, `Enhanced with ${enhanceName}`);
+        }, 1500);
+      });
+    });
+  }
+  
+  // Toolbar buttons
+  if (toolbarBtns) {
+    toolbarBtns.forEach(btn => {
+      btn.addEventListener("click", function() {
+        const action = this.dataset.action;
+        
+        // Skip if it's the AI enhance button (handled separately)
+        if (action === "enhance") return;
+        
+        switch (action) {
+          case "bullet":
+            // Add bullet point at cursor or at end
+            const cursorPos = jobDescription.selectionStart;
+            const textBefore = jobDescription.value.substring(0, cursorPos);
+            const textAfter = jobDescription.value.substring(cursorPos);
+            
+            if (cursorPos === 0 || jobDescription.value.charAt(cursorPos - 1) === '\n') {
+              // Add bullet at cursor
+              jobDescription.value = textBefore + "• " + textAfter;
+              jobDescription.selectionStart = jobDescription.selectionEnd = cursorPos + 2;
+            } else if (cursorPos === jobDescription.value.length) {
+              // Add new line and bullet at end
+              jobDescription.value = textBefore + "\n• ";
+              jobDescription.selectionStart = jobDescription.selectionEnd = jobDescription.value.length;
+            } else {
+              // Add new line and bullet in the middle
+              jobDescription.value = textBefore + "\n• " + textAfter;
+              jobDescription.selectionStart = jobDescription.selectionEnd = cursorPos + 3;
+            }
+            break;
+            
+          case "achievement":
+            // Add achievement phrase
+            const achievements = [
+              "resulting in ",
+              "which increased ",
+              "leading to ",
+              "improving ",
+              "reducing "
+            ];
+            const randomAchievement = achievements[Math.floor(Math.random() * achievements.length)];
+            
+            // Add at cursor or end
+            const pos = jobDescription.selectionEnd;
+            jobDescription.value = jobDescription.value.substring(0, pos) + 
+                                 " " + randomAchievement + 
+                                 jobDescription.value.substring(pos);
+            jobDescription.selectionStart = jobDescription.selectionEnd = pos + randomAchievement.length + 1;
+            break;
+            
+          case "skills":
+            // Toggle skills panel
+            if (toggleJobSkills) {
+              const isExpanded = toggleJobSkills.getAttribute("aria-expanded") === "true";
+              if (!isExpanded) {
+                jobSkillsContainer.classList.remove("collapse");
+                toggleJobSkills.setAttribute("aria-expanded", "true");
+              }
+            }
+            break;
+        }
+        
+        // Focus the textarea and update its height
+        jobDescription.focus();
+        jobDescription.style.height = "auto";
+        jobDescription.style.height = jobDescription.scrollHeight + "px";
+      });
+    });
+  }
+  
+  // Auto expand textarea on input
+  jobDescription.addEventListener("input", function() {
+    this.style.height = "auto";
+    this.style.height = this.scrollHeight + "px";
+  });
+};
+
+// Enhancement helper functions (placeholders for future AI integration)
+const enhanceWithAchievements = (text) => {
+  // Add quantifiable achievements to bullet points
+  const lines = text.split('\n');
+  const achievementPhrases = [
+    "resulting in a 20% increase in efficiency",
+    "which improved team productivity by 15%",
+    "leading to a 30% reduction in costs",
+    "generating an additional $50,000 in revenue",
+    "reducing project completion time by 25%",
+    "increasing customer satisfaction by 40%",
+    "which decreased error rates by 35%",
+    "improving system performance by 50%"
+  ];
+  
+  return lines.map(line => {
+    if (!line.trim() || line.includes("resulting in") || line.includes("which improved") || 
+        line.includes("leading to") || line.includes("increasing") || line.includes("reducing")) {
+      return line; // Skip empty lines or lines that already have achievements
+    }
+    
+    const randomAchievement = achievementPhrases[Math.floor(Math.random() * achievementPhrases.length)];
+    return `${line.trim()}, ${randomAchievement}`;
+  }).join('\n');
+};
+
+const enhanceWithActionVerbs = (text) => {
+  // Replace weak verbs with strong action verbs
+  const weakToStrong = {
+    "worked on": "spearheaded",
+    "helped": "facilitated",
+    "made": "created",
+    "did": "executed",
+    "used": "leveraged",
+    "responsible for": "led",
+    "handled": "managed",
+    "took care of": "orchestrated",
+    "in charge of": "directed",
+    "managed": "strategized"
+  };
+  
+  let enhancedText = text;
+  Object.entries(weakToStrong).forEach(([weak, strong]) => {
+    const regex = new RegExp(`\\b${weak}\\b`, 'gi');
+    enhancedText = enhancedText.replace(regex, strong);
+  });
+  
+  return enhancedText;
+};
+
+const enhanceWithSkills = (text) => {
+  // Add technical skills and keywords
+  const techSkills = [
+    "SQL", "Python", "JavaScript", "Data Analysis", 
+    "Project Management", "Agile Methodology", "Strategic Planning",
+    "Cross-functional Collaboration", "Cloud Computing", "Machine Learning",
+    "Digital Marketing", "Financial Analysis", "UI/UX Design"
+  ];
+  
+  const lines = text.split('\n');
+  
+  return lines.map((line, index) => {
+    // Only add skills to some lines (not all)
+    if (line.trim() && index % 2 === 0 && !lines.some(l => 
+      techSkills.some(skill => l.includes(skill)))) {
+      const skill = techSkills[Math.floor(Math.random() * techSkills.length)];
+      if (!line.includes(skill)) {
+        return `${line.trim()} using ${skill}`;
+      }
+    }
+    return line;
+  }).join('\n');
+};
+
+const enhanceConcise = (text) => {
+  // Make text more concise by removing filler words
+  const fillerWords = [
+    "basically", "actually", "literally", "very", "really", "just",
+    "quite", "simply", "that", "in order to", "I think that", "kind of",
+    "sort of", "type of", "for the most part", "needless to say"
+  ];
+  
+  let conciseText = text;
+  fillerWords.forEach(word => {
+    const regex = new RegExp(`\\b${word}\\b`, 'gi');
+    conciseText = conciseText.replace(regex, '');
+  });
+  
+  // Clean up double spaces
+  conciseText = conciseText.replace(/\s+/g, ' ');
+  
+  // Restore line breaks
+  conciseText = conciseText.replace(/• /g, '\n• ');
+  if (!conciseText.startsWith('•')) {
+    conciseText = '• ' + conciseText.trim();
+  }
+  
+  return conciseText;
+};
+
+// Helper function to show tooltip
+const showTooltip = (element, message) => {
+  const tooltip = document.createElement("div");
+  tooltip.className = "floating-tooltip";
+  tooltip.textContent = message;
+  
+  document.body.appendChild(tooltip);
+  
+  const rect = element.getBoundingClientRect();
+  tooltip.style.top = `${rect.top + window.scrollY - 30}px`;
+  tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
+  tooltip.style.transform = "translate(-50%, -100%)";
+  
+  setTimeout(() => {
+    tooltip.classList.add("show");
+  }, 10);
+  
+  setTimeout(() => {
+    tooltip.classList.remove("show");
+    setTimeout(() => {
+      document.body.removeChild(tooltip);
+    }, 300);
+  }, 3000);
+};
+
+// Initialize
+initializeExperiences();
+initEventListeners();
+};
+
 
 // Initialize Everything
 document.addEventListener("DOMContentLoaded", () => {
@@ -1113,6 +1746,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initStyles();
   initSkillsManager();
   initAISkillsIntegration();
+  initExperienceManager();
   initSummaryManager();
   addTooltipStyles();
   initCollapsibleSections();
