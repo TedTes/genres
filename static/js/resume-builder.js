@@ -398,18 +398,26 @@ const setupAutoSave = () => {
   });
 };
 
-// Initialize Skills Manager
+//  Skills Manager
 const initSkillsManager = () => {
   const skillsInput = document.getElementById("skill-input");
   const skillsList = document.getElementById("skills-list");
   const skillsHidden = document.getElementById("skills-hidden");
   const skillSuggestions = document.querySelectorAll(".skill-tag.suggested");
-  const toggleSkills = document.querySelector(".toggle-skills");
-
+  const toggleSkills = document.getElementById("toggle-skills");
+  const emptySkillsMessage = document.getElementById("empty-skills-message");
+  
   if (!skillsInput || !skillsList || !skillsHidden) return;
 
   // Initialize skills from hidden input
-  skills = skillsHidden.value ? JSON.parse(skillsHidden.value) : [];
+  let skills = [];
+  try {
+    skills = skillsHidden.value ? JSON.parse(skillsHidden.value) : [];
+  } catch (e) {
+    console.error("Error parsing skills JSON:", e);
+    skills = [];
+  }
+  
   renderSkills();
 
   // Add skill on Enter or comma
@@ -432,39 +440,60 @@ const initSkillsManager = () => {
   // Toggle suggested skills
   if (toggleSkills) {
     toggleSkills.addEventListener("click", function () {
-      const skillsContainer =
-        this.closest(".job-skills-match").querySelector(".skills-tags");
+      const skillsContainer = document.getElementById("skills-tags-container");
       const isExpanded = this.getAttribute("aria-expanded") === "true";
 
       if (isExpanded) {
         skillsContainer.classList.add("collapse");
         this.setAttribute("aria-expanded", "false");
-        this.textContent = "Show";
       } else {
         skillsContainer.classList.remove("collapse");
         this.setAttribute("aria-expanded", "true");
-        this.textContent = "Hide";
       }
     });
   }
 
   // Add suggested skills
-  skillSuggestions.forEach((suggestion) => {
-    suggestion.addEventListener("click", function () {
-      addSkill(this.dataset.skill);
-      this.classList.add("added");
+  if (skillSuggestions) {
+    skillSuggestions.forEach((suggestion) => {
+      suggestion.addEventListener("click", function () {
+        addSkill(this.dataset.skill);
+        this.classList.add("added");
+        
+        // Visual feedback
+        this.style.backgroundColor = "#d1fae5"; // Success light green
+        this.style.borderColor = "#10b981"; // Success
+        this.style.color = "#10b981"; // Success
+        
+        // Reset after a moment
+        setTimeout(() => {
+          this.style.backgroundColor = "";
+          this.style.borderColor = "";
+          this.style.color = "";
+        }, 1500);
+      });
     });
-  });
+  }
 
   function addSkill(skillText) {
     if (!skillText) return;
+    
     const skillsToAdd = skillText
       .split(",")
       .map((s) => s.trim())
       .filter((s) => s && !skills.includes(s));
+      
+    if (skillsToAdd.length === 0) return;
+    
     skills.push(...skillsToAdd);
     renderSkills();
     updateSkillsField();
+    
+    // Provide subtle feedback
+    skillsInput.style.borderColor = "#10b981";
+    setTimeout(() => {
+      skillsInput.style.borderColor = "";
+    }, 800);
   }
 
   function removeSkill(index) {
@@ -475,32 +504,66 @@ const initSkillsManager = () => {
 
   function renderSkills() {
     skillsList.innerHTML = "";
+    
+    if (skills.length === 0) {
+      skillsList.appendChild(emptySkillsMessage || createEmptyMessage());
+      return;
+    }
+    
     skills.forEach((skill, index) => {
       const tag = document.createElement("div");
       tag.className = "skill-tag";
       tag.innerHTML = `
         <span>${skill}</span>
-        <button type="button" class="remove-skill" data-index="${index}">×</button>
+        <button type="button" class="remove-skill" data-index="${index}" aria-label="Remove ${skill}">×</button>
       `;
       skillsList.appendChild(tag);
     });
 
     document.querySelectorAll(".remove-skill").forEach((button) => {
       button.addEventListener("click", function () {
-        removeSkill(this.dataset.index);
+        removeSkill(parseInt(this.dataset.index));
       });
     });
+  }
 
-    // updatePreview();
+  function createEmptyMessage() {
+    const message = document.createElement("div");
+    message.className = "empty-skills-message";
+    message.id = "empty-skills-message";
+    message.textContent = "No skills added yet. Use the field above to add your skills.";
+    return message;
   }
 
   function updateSkillsField() {
     skillsHidden.value = JSON.stringify(skills);
-    // Trigger saving to local storage or backend
+    // Trigger change event for auto-save
     const event = new Event('change', { bubbles: true });
     skillsHidden.dispatchEvent(event);
+    
+    // Update progress
+    updateProgress();
   }
 };
+
+// Add placeholder for future AI integration
+const initAISkillsIntegration = () => {
+  const aiExtractBtn = document.getElementById('ai-extract-skills');
+  const aiSuggestBtn = document.getElementById('ai-suggest-skills');
+  
+  if (!aiExtractBtn || !aiSuggestBtn) return;
+  
+  // Just stub functions for now that will be implemented later
+  aiExtractBtn.addEventListener('click', function() {
+    console.log('AI Extract Skills functionality will be implemented in future steps');
+  });
+  
+  aiSuggestBtn.addEventListener('click', function() {
+    console.log('AI Suggest Skills functionality will be implemented in future steps');
+  });
+};
+
+
 
 // Initialize AI Enhancement
 const initAIEnhancement = () => {
@@ -758,6 +821,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize everything
   initPanels();
   initStyles();
+  initSkillsManager();
+  initAISkillsIntegration();
   initCollapsibleSections();
   setupAutoResizeInputs();
   setupAutoExpandTextareas();

@@ -142,22 +142,70 @@
                     <div class="section-content">
                         <form method="POST" class="resume-form" id="skills-form">
                             {{ skills_form.hidden_tag() }}
-                            <div class="skills-container">
-                                <div class="skills-input-compact">
-                                    <input type="text" class="form-control" id="skill-input" placeholder="Add a skill and press Enter">
+                            
+                            <div class="form-group">
+                                <div class="form-label-container">
+                                    <label class="form-label">Add Your Skills</label>
+                                </div>
+                                
+                                <div class="skills-input-wrapper">
+                                    <input type="text" class="form-control" id="skill-input" placeholder="Type a skill and press Enter">
                                     <input type="hidden" name="skills" id="skills-hidden">
                                 </div>
-                                <div class="skills-list" id="skills-list">
-                                    <!-- Skills will be added here dynamically -->
+                                
+                                <div class="help-text">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>Press Enter after each skill or separate with commas</span>
                                 </div>
                             </div>
+                            
+                            <div class="skills-container">
+                                <div class="form-label-container">
+                                    <label class="form-label">Your Skills</label>
+                                </div>
+                                
+                                <div class="skills-list-container">
+                                    <div class="skills-list" id="skills-list">
+                                        <!-- Skills will be added here dynamically -->
+                                        <div class="empty-skills-message" id="empty-skills-message">
+                                            No skills added yet. Use the field above to add your skills.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- AI Integration Placeholder for Future Implementation -->
+                            <div class="ai-skills-section">
+                                <div class="form-label-container">
+                                    <label class="form-label">AI Skill Suggestions</label>
+                                    <span class="beta-tag">Coming Soon</span>
+                                </div>
+                                
+                                <div class="ai-action-wrapper">
+                                    <button type="button" class="btn btn-ai" id="ai-extract-skills" disabled>
+                                        <i class="fas fa-magic"></i> Extract from Experience
+                                    </button>
+                                    <button type="button" class="btn btn-ai" id="ai-suggest-skills" disabled>
+                                        <i class="fas fa-lightbulb"></i> Suggest Skills
+                                    </button>
+                                </div>
+                            </div>
+                            
                             {% if skills %}
                             <div class="job-skills-match">
-                                <h3>Suggested Skills <button type="button" class="btn-sm toggle-skills" aria-expanded="false">Show</button></h3>
-                                <div class="skills-tags collapse">
-                                    {% for skill in skills %}
-                                    <span class="skill-tag suggested" data-skill="{{ skill }}">{{ skill }}</span>
-                                    {% endfor %}
+                                <div class="form-label-container">
+                                    <label class="form-label">Suggested Skills for This Job</label>
+                                    <button type="button" class="toggle-skills" id="toggle-skills" aria-expanded="false">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="skills-tags-container collapse" id="skills-tags-container">
+                                    <div class="skills-tags">
+                                        {% for skill in skills %}
+                                        <span class="skill-tag suggested" data-skill="{{ skill }}">{{ skill }}</span>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                             </div>
                             {% endif %}
@@ -304,78 +352,6 @@
                             </form>
                         </div>
                     </div>
-                   
-                    <!-- <div class="slide-panel" id="add-section-panel">
-                        <div class="panel-header">
-                            <h2>Add Section</h2>
-                            <button class="panel-close" data-panel="add-section-panel">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="panel-content">
-                            <div class="add-section-options">
-                                <div class="section-option" data-section="certifications">
-                                    <div class="section-option-icon">
-                                        <i class="fas fa-certificate"></i>
-                                    </div>
-                                    <div class="section-option-details">
-                                        <h3>Certifications</h3>
-                                        <p>Add professional certifications and licenses</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="section-option" data-section="projects">
-                                    <div class="section-option-icon">
-                                        <i class="fas fa-project-diagram"></i>
-                                    </div>
-                                    <div class="section-option-details">
-                                        <h3>Projects</h3>
-                                        <p>Showcase personal or professional projects</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="section-option" data-section="languages">
-                                    <div class="section-option-icon">
-                                        <i class="fas fa-language"></i>
-                                    </div>
-                                    <div class="section-option-details">
-                                        <h3>Languages</h3>
-                                        <p>Add languages you speak and proficiency levels</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="section-option" data-section="awards">
-                                    <div class="section-option-icon">
-                                        <i class="fas fa-trophy"></i>
-                                    </div>
-                                    <div class="section-option-details">
-                                        <h3>Awards & Honors</h3>
-                                        <p>Highlight achievements and recognition</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="section-option" data-section="volunteering">
-                                    <div class="section-option-icon">
-                                        <i class="fas fa-hands-helping"></i>
-                                    </div>
-                                    <div class="section-option-details">
-                                        <h3>Volunteer Experience</h3>
-                                        <p>Show community involvement and volunteer work</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="section-option" data-section="publications">
-                                    <div class="section-option-icon">
-                                        <i class="fas fa-book"></i>
-                                    </div>
-                                    <div class="section-option-details">
-                                        <h3>Publications</h3>
-                                        <p>List articles, papers, or books you've published</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
                 </section>
                 <section class="resume-section-collapsible add-sections-container" data-section="add-sections">
                     <div class="section-header collapsible">

@@ -757,30 +757,40 @@ body {
     background: var(--primary-light);
     color: var(--primary);
     padding: var(--space-xs) var(--space-sm);
-    border-radius: 12px;
+    border-radius: 16px;
     font-size: var(--font-size-sm);
     display: inline-flex;
     align-items: center;
     gap: var(--space-xs);
+    transition: all 0.2s ease;
 }
 
 .skill-tag.suggested {
     background: var(--background);
-    color: var(--secondary-light);
+    color: var(--secondary);
+    border: 1px dashed var(--border);
     cursor: pointer;
 }
 
 .skill-tag.suggested:hover {
     background: var(--accent-light);
     color: var(--accent);
+    border-color: var(--accent);
 }
 
-.remove-skill {
+.skill-tag .remove-skill {
     background: none;
     border: none;
     color: var(--primary);
-    font-size: 1rem;
     cursor: pointer;
+    font-size: 16px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
 }
 
 .job-skills-match {
@@ -790,12 +800,15 @@ body {
 }
 
 .toggle-skills {
-    font-size: var(--font-size-sm);
-    padding: var(--space-xs) var(--space-sm);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: var(--surface);
+    background: none;
+    border: none;
+    color: var(--secondary-light);
     cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
 }
 
 .collapse {
@@ -1147,6 +1160,16 @@ body {
         bottom: 15px;
         right: 15px;
     }
+    @media (max-width: 768px) {
+        .ai-action-wrapper {
+            flex-direction: column;
+        }
+        
+        .btn-ai {
+            width: 100%;
+            justify-content: center;
+        }
+    }
 }
 
 @media (max-width: 480px) {
@@ -1169,8 +1192,6 @@ body {
         font-size: 11px;
     }
 }
-
-/* ... existing CSS ... */
 
 /* Custom Template Panel */
 #custom-template-panel {
@@ -1272,8 +1293,6 @@ body {
     display: inline-block;
 }
 
-
-/* Resume Preview Container Styles */
 .resume-preview-container {
     display: flex;
     justify-content: center;
@@ -1478,4 +1497,108 @@ body {
     display: flex;
     align-items: center;
     margin-bottom: var(--space-sm);
+}
+
+/* ========================== 
+   SKILLS FORM CSS 
+ ========================= */
+ .skills-input-wrapper {
+    position: relative;
+    margin-bottom: var(--space-md);
+}
+
+.skills-input-wrapper .form-control {
+    padding-right: 40px;
+}
+.help-text {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: var(--secondary-light);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-md);
+}
+.help-text i {
+    color: var(--primary);
+    font-size: 14px;
+}
+.skills-list-container {
+    min-height: 100px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: var(--space-md);
+    background-color: var(--background);
+    margin-bottom: var(--space-lg);
+}
+
+.empty-skills-message {
+    width: 100%;
+    text-align: center;
+    color: var(--secondary-light);
+    padding: var(--space-lg) 0;
+    font-style: italic;
+}
+.skill-tag .remove-skill:hover {
+    background-color: rgba(59, 130, 246, 0.2);
+}
+.skill-tag:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.beta-tag {
+    background-color: var(--primary);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    text-transform: uppercase;
+    margin-left: var(--space-xs);
+}
+.ai-skills-section {
+    background-color: #f8f9ff; /* Light blue-ish background */
+    border: 1px dashed var(--primary-light);
+    border-radius: 8px;
+    padding: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+.ai-action-wrapper {
+    display: flex;
+    gap: var(--space-md);
+    margin-top: var(--space-sm);
+}
+.btn-ai {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    background-color: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-sm);
+    color: var(--secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.btn-ai:not(:disabled):hover {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.btn-ai:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-ai i {
+    font-size: 14px;
+}
+.toggle-skills[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+.skills-tags-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
 }
