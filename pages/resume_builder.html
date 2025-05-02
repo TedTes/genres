@@ -213,36 +213,145 @@
                     </div>
                 </section>
 
-                <!-- Summary Section -->
-                <section class="resume-section-collapsible" data-section="summary">
-                    <div class="section-header collapsible">
-                        <h3>Professional Summary</h3>
-                        <div class="section-toggle">
-                            <i class="fas fa-check-circle section-complete-icon"></i>
-                            <i class="fas fa-chevron-down"></i>
+             <!-- Professional Summary Section -->
+            <section class="resume-section-collapsible" data-section="summary">
+                <div class="section-header collapsible">
+                    <h3>Professional Summary</h3>
+                    <div class="section-toggle">
+                        <i class="fas fa-check-circle section-complete-icon"></i>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <form method="POST" class="resume-form" id="summary-form">
+                        {{ summary_form.hidden_tag() }}
+                        
+                        <div class="form-group">
+                            <div class="form-label-container">
+                                <label class="form-label">Your Professional Summary</label>
+                                <span class="required">*</span>
+                                <span class="char-counter" id="summary-char-counter">0/400</span>
+                            </div>
+                            
+                            <div class="summary-textarea-wrapper">
+                                {{ summary_form.summary(class="form-control resume-field auto-expand", **{
+                                    "rows": "5", 
+                                    "required": "required", 
+                                    "data-section": "summary", 
+                                    "placeholder": "Write a concise overview of your professional background, key skills, and career goals...",
+                                    "maxlength": "400",
+                                    "id": "summary-textarea"
+                                }) }}
+                                <div class="summary-help-tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div class="tooltip-content">
+                                        <h4>Writing a Great Summary</h4>
+                                        <ul>
+                                            <li>Keep it concise (3-5 sentences)</li>
+                                            <li>Focus on achievements and skills</li>
+                                            <li>Tailor it to your target role</li>
+                                            <li>Use industry keywords</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="section-content">
-                        <form method="POST" class="resume-form" id="summary-form">
-                            {{ summary_form.hidden_tag() }}
-                            <div class="form-group">
-                                {{ summary_form.summary.label(class="form-label") }} <span class="required">*</span>
-                                {{ summary_form.summary(class="form-control resume-field auto-expand", **{"rows": "3", "required": "required", "data-section": "summary", "placeholder": "Write a concise overview of your professional background, key skills, and career goals..."}) }}
+                        
+                        <div class="ai-enhancement-section">
+                            <div class="form-label-container">
+                                <label class="form-label">Enhance with AI</label>
+                                <span class="pro-tag">Professional</span>
                             </div>
-                            <div class="ai-tools-compact">
-                                <button type="button" class="btn btn-sm enhance-summary" data-type="professional" title="Enhance Professionally">
-                                    <i class="fas fa-magic"></i> Professional
-                                </button>
-                                <button type="button" class="btn btn-sm enhance-summary" data-type="concise" title="Make Concise">
-                                    <i class="fas fa-cut"></i> Concise
-                                </button>
-                                <button type="button" class="btn btn-sm enhance-summary" data-type="keywords" title="Add Keywords">
-                                    <i class="fas fa-key"></i> Keywords
+                            
+                            <div class="enhancement-options">
+                                <div class="enhancement-option" data-type="professional">
+                                    <div class="option-icon">
+                                        <i class="fas fa-briefcase"></i>
+                                    </div>
+                                    <div class="option-content">
+                                        <h4>Professional</h4>
+                                        <p>Polish your summary with professional language</p>
+                                    </div>
+                                    <button type="button" class="enhance-button enhance-summary" data-type="professional">
+                                        <i class="fas fa-magic"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="enhancement-option" data-type="concise">
+                                    <div class="option-icon">
+                                        <i class="fas fa-cut"></i>
+                                    </div>
+                                    <div class="option-content">
+                                        <h4>Concise</h4>
+                                        <p>Make your summary more focused and direct</p>
+                                    </div>
+                                    <button type="button" class="enhance-button enhance-summary" data-type="concise">
+                                        <i class="fas fa-magic"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="enhancement-option" data-type="keywords">
+                                    <div class="option-icon">
+                                        <i class="fas fa-key"></i>
+                                    </div>
+                                    <div class="option-content">
+                                        <h4>Add Keywords</h4>
+                                        <p>Optimize for ATS with industry-relevant terms</p>
+                                    </div>
+                                    <button type="button" class="enhance-button enhance-summary" data-type="keywords">
+                                        <i class="fas fa-magic"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="enhancement-option" data-type="achievement">
+                                    <div class="option-icon">
+                                        <i class="fas fa-trophy"></i>
+                                    </div>
+                                    <div class="option-content">
+                                        <h4>Achievement-Focused</h4>
+                                        <p>Highlight accomplishments and results</p>
+                                    </div>
+                                    <button type="button" class="enhance-button enhance-summary" data-type="achievement">
+                                        <i class="fas fa-magic"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-examples">
+                            <div class="form-label-container">
+                                <label class="form-label">Example Summaries</label>
+                                <button type="button" class="toggle-examples" id="toggle-examples" aria-expanded="false">
+                                    <i class="fas fa-chevron-down"></i>
                                 </button>
                             </div>
-                        </form>
-                    </div>
-                </section>
+                            
+                            <div class="examples-container collapse" id="examples-container">
+                                <div class="example-tabs">
+                                    <button type="button" class="example-tab active" data-example="professional">Professional</button>
+                                    <button type="button" class="example-tab" data-example="creative">Creative</button>
+                                    <button type="button" class="example-tab" data-example="technical">Technical</button>
+                                </div>
+                                
+                                <div class="example-content active" id="example-professional">
+                                    <p>Results-driven marketing professional with 7+ years of experience developing integrated campaigns for Fortune 500 companies. Proven track record of increasing conversion rates by an average of 35% through data-driven strategies and creative execution. Seeking to leverage expertise in digital marketing and team leadership to drive growth as a Marketing Director.</p>
+                                    <button type="button" class="use-example-btn" data-example="professional">Use as Template</button>
+                                </div>
+                                
+                                <div class="example-content" id="example-creative">
+                                    <p>Passionate graphic designer with a flair for translating complex ideas into visually compelling stories. Blending 5 years of agency experience with a strong foundation in brand identity and digital illustration to create memorable visual experiences. Known for client-focused approach and ability to balance creative vision with practical business objectives.</p>
+                                    <button type="button" class="use-example-btn" data-example="creative">Use as Template</button>
+                                </div>
+                                
+                                <div class="example-content" id="example-technical">
+                                    <p>Full-stack developer with 6+ years of experience architecting scalable web applications using React, Node.js, and AWS. Implemented microservices architecture that reduced system downtime by 45% and optimized database queries, cutting response times by 30%. Committed to writing clean, maintainable code and mentoring junior developers in best practices.</p>
+                                    <button type="button" class="use-example-btn" data-example="technical">Use as Template</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
 
                 <!-- Experience Section -->
                 <section class="resume-section-collapsible" data-section="experience">

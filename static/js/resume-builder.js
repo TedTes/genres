@@ -816,6 +816,296 @@ const initStyles = ()=>{
   `;
   document.head.appendChild(style);
 }
+
+// Enhanced Summary Manager
+const initSummaryManager = () => {
+  const summaryTextarea = document.getElementById("summary-textarea");
+  const charCounter = document.getElementById("summary-char-counter");
+  const enhanceButtons = document.querySelectorAll(".enhance-summary");
+  const toggleExamples = document.getElementById("toggle-examples");
+  const examplesContainer = document.getElementById("examples-container");
+  const exampleTabs = document.querySelectorAll(".example-tab");
+  const exampleContents = document.querySelectorAll(".example-content");
+  const useExampleBtns = document.querySelectorAll(".use-example-btn");
+  
+  if (!summaryTextarea) return;
+  
+  // Initialize character counter
+  const updateCharCounter = () => {
+    const maxLength = parseInt(summaryTextarea.getAttribute("maxlength") || 400);
+    const currentLength = summaryTextarea.value.length;
+    
+    charCounter.textContent = `${currentLength}/${maxLength}`;
+    
+    // Update visual feedback based on limit
+    if (currentLength >= maxLength) {
+      charCounter.classList.add("limit-reached");
+      charCounter.classList.remove("limit-near");
+    } else if (currentLength >= maxLength * 0.8) {
+      charCounter.classList.add("limit-near");
+      charCounter.classList.remove("limit-reached");
+    } else {
+      charCounter.classList.remove("limit-near", "limit-reached");
+    }
+  };
+  
+  // Initialize character counter if textarea exists
+  if (summaryTextarea) {
+    updateCharCounter();
+    
+    summaryTextarea.addEventListener("input", () => {
+      updateCharCounter();
+      
+      // Auto expand height
+      summaryTextarea.style.height = "auto";
+      summaryTextarea.style.height = (summaryTextarea.scrollHeight) + "px";
+    });
+  }
+  
+  // AI Enhancement Buttons
+  if (enhanceButtons) {
+    enhanceButtons.forEach(button => {
+      button.addEventListener("click", function() {
+        const enhancementType = this.dataset.type;
+        
+        if (!summaryTextarea.value.trim()) {
+          showTooltip(summaryTextarea, "Please write a summary first");
+          return;
+        }
+        
+        // Show loading state
+        this.classList.add("loading");
+        const originalIcon = this.innerHTML;
+        this.innerHTML = '';
+        
+        // Simulate AI processing (replace with actual API call later)
+        setTimeout(() => {
+          let enhancedText = "";
+          
+          switch (enhancementType) {
+            case "professional":
+              enhancedText = enhanceProfessional(summaryTextarea.value);
+              break;
+            case "concise":
+              enhancedText = enhanceConcise(summaryTextarea.value);
+              break;
+            case "keywords":
+              enhancedText = enhanceKeywords(summaryTextarea.value);
+              break;
+            case "achievement":
+              enhancedText = enhanceAchievement(summaryTextarea.value);
+              break;
+            default:
+              enhancedText = summaryTextarea.value;
+          }
+          
+          // Apply the enhanced text
+          summaryTextarea.value = enhancedText;
+          summaryTextarea.dispatchEvent(new Event('input'));
+          
+          // Add enhancement effect
+          summaryTextarea.classList.add("enhanced");
+          setTimeout(() => {
+            summaryTextarea.classList.remove("enhanced");
+          }, 1000);
+          
+          // Remove loading state
+          this.classList.remove("loading");
+          this.innerHTML = originalIcon;
+          
+          // Trigger autosave
+          const event = new Event('change', { bubbles: true });
+          summaryTextarea.dispatchEvent(event);
+          
+          // Show success message
+          const enhancementName = this.closest('.enhancement-option').querySelector('h4').textContent;
+          showTooltip(summaryTextarea, `Enhanced with ${enhancementName} style`);
+        }, 1500);
+      });
+    });
+  }
+  
+  // Toggle Examples
+  if (toggleExamples && examplesContainer) {
+    toggleExamples.addEventListener("click", function() {
+      const isExpanded = this.getAttribute("aria-expanded") === "true";
+      
+      if (isExpanded) {
+        examplesContainer.classList.add("collapse");
+        this.setAttribute("aria-expanded", "false");
+      } else {
+        examplesContainer.classList.remove("collapse");
+        this.setAttribute("aria-expanded", "true");
+      }
+    });
+  }
+  
+  // Example Tabs
+  if (exampleTabs) {
+    exampleTabs.forEach(tab => {
+      tab.addEventListener("click", function() {
+        // Remove active class from all tabs and contents
+        exampleTabs.forEach(t => t.classList.remove("active"));
+        exampleContents.forEach(c => c.classList.remove("active"));
+        
+        // Add active class to the clicked tab
+        this.classList.add("active");
+        
+        // Show the corresponding content
+        const exampleType = this.dataset.example;
+        document.getElementById(`example-${exampleType}`).classList.add("active");
+      });
+    });
+  }
+  
+  // Use Example buttons
+  if (useExampleBtns) {
+    useExampleBtns.forEach(btn => {
+      btn.addEventListener("click", function() {
+        const exampleType = this.dataset.example;
+        const exampleContent = document.getElementById(`example-${exampleType}`).querySelector("p").textContent;
+        
+        // Confirm before overwriting existing content
+        if (summaryTextarea.value.trim() && !confirm("This will replace your current summary. Continue?")) {
+          return;
+        }
+        
+        // Apply the example text
+        summaryTextarea.value = exampleContent;
+        summaryTextarea.dispatchEvent(new Event('input'));
+        
+        // Trigger autosave
+        const event = new Event('change', { bubbles: true });
+        summaryTextarea.dispatchEvent(event);
+        
+        // Close examples container
+        examplesContainer.classList.add("collapse");
+        toggleExamples.setAttribute("aria-expanded", "false");
+        
+        // Show confirmation message
+        showTooltip(summaryTextarea, "Example applied! Customize it to match your experience.");
+      });
+    });
+  }
+  
+  // Helper function to show tooltip
+  function showTooltip(element, message) {
+    const tooltip = document.createElement("div");
+    tooltip.className = "floating-tooltip";
+    tooltip.textContent = message;
+    
+    document.body.appendChild(tooltip);
+    
+    const rect = element.getBoundingClientRect();
+    tooltip.style.top = `${rect.top + window.scrollY - 30}px`;
+    tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
+    tooltip.style.transform = "translate(-50%, -100%)";
+    
+    setTimeout(() => {
+      tooltip.classList.add("show");
+    }, 10);
+    
+    setTimeout(() => {
+      tooltip.classList.remove("show");
+      setTimeout(() => {
+        document.body.removeChild(tooltip);
+      }, 300);
+    }, 3000);
+  }
+  
+  // Helper functions for AI enhancement (placeholder implementations)
+  function enhanceProfessional(text) {
+    // Placeholder for professional enhancement
+    return text
+      .replace(/I am/g, "I am a")
+      .replace(/I have/g, "I have")
+      .replace(/worked on/g, "successfully delivered")
+      .replace(/good/g, "exceptional")
+      .replace(/made/g, "developed")
+      .replace(/did/g, "executed")
+      .replace(/used/g, "leveraged")
+      .replace(/responsible for/g, "spearheaded")
+      .replace(/team player/g, "collaborative professional");
+  }
+  
+  function enhanceConcise(text) {
+    // Placeholder for concise enhancement
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    if (sentences.length <= 2) return text;
+    return sentences.slice(0, 2).join(". ") + ".";
+  }
+  
+  function enhanceKeywords(text) {
+    // Placeholder for keywords enhancement
+    const keywords = [
+      "strategic leadership",
+      "cross-functional collaboration",
+      "agile methodology",
+      "data-driven decision making",
+      "stakeholder management",
+      "revenue growth",
+      "process optimization"
+    ];
+    const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];
+    return `${text} Adept at ${randomKeyword}.`;
+  }
+  
+  function enhanceAchievement(text) {
+    // Placeholder for achievement-focused enhancement
+    const achievements = [
+      "Increased revenue by 30% through strategic initiatives",
+      "Reduced operational costs by 25% by streamlining processes",
+      "Led cross-functional team that delivered project ahead of schedule",
+      "Improved customer satisfaction scores from 85% to 95%",
+      "Recognized with performance award for exceptional contributions"
+    ];
+    const randomAchievement = achievements[Math.floor(Math.random() * achievements.length)];
+    
+    return text + ` Achievements include: ${randomAchievement}.`;
+  }
+};
+
+// Add this CSS for the tooltip
+const addTooltipStyles = () => {
+  const style = document.createElement('style');
+  style.textContent = `
+    .floating-tooltip {
+      position: absolute;
+      z-index: 1000;
+      background-color: var(--secondary);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      white-space: nowrap;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .floating-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 6px;
+      border-style: solid;
+      border-color: var(--secondary) transparent transparent transparent;
+    }
+    
+    .floating-tooltip.show {
+      opacity: 0.95;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(style);
+};
+
 // Initialize Everything
 document.addEventListener("DOMContentLoaded", () => {
   // Initialize everything
@@ -823,6 +1113,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initStyles();
   initSkillsManager();
   initAISkillsIntegration();
+  initSummaryManager();
+  addTooltipStyles();
   initCollapsibleSections();
   setupAutoResizeInputs();
   setupAutoExpandTextareas();
