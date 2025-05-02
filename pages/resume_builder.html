@@ -22,12 +22,6 @@
             <div class="btn-tooltip">Choose Template</div>
         </div>
         
-        <div class="tooltip-container">
-            <button class="float-control-btn" data-panel="add-section-panel" title="Add Section">
-                <i class="fas fa-plus-circle"></i>
-            </button>
-            <div class="btn-tooltip">Add Section</div>
-        </div>
         
         <div class="tooltip-container">
             <button class="float-control-btn" id="preview-toggle" title="Toggle Preview Size">
@@ -70,50 +64,71 @@
         <div class="panel-content">
             <div class="resume-sections">
                 <!-- Contact Section -->
-                <section class="resume-section-collapsible" data-section="contact">
-                    <div class="section-header collapsible">
-                        <h3>Contact Information</h3>
-                        <div class="section-toggle">
-                            <i class="fas fa-check-circle section-complete-icon"></i>
-                            <i class="fas fa-chevron-down"></i>
+                    <section class="resume-section-collapsible" data-section="contact">
+                        <div class="section-header collapsible">
+                            <h3>Contact Information</h3>
+                            <div class="section-toggle">
+                                <i class="fas fa-check-circle section-complete-icon"></i>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
                         </div>
-                    </div>
-                    <div class="section-content">
-                        <form method="POST" class="resume-form" id="contact-form">
-                            {{ contact_form.hidden_tag() }}
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    {{ contact_form.name.label(class="form-label") }} <span class="required">*</span>
-                                    {{ contact_form.name(class="form-control resume-field auto-resize", **{"placeholder": "e.g. John Smith", "required": "required", "data-section": "contact"}) }}
+                        <div class="section-content">
+                            <form method="POST" class="resume-form" id="contact-form">
+                                {{ contact_form.hidden_tag() }}
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <div class="form-label-container">
+                                            {{ contact_form.name.label(class="form-label") }}
+                                            <span class="required">*</span>
+                                        </div>
+                                        {{ contact_form.name(class="form-control resume-field", **{"placeholder": "e.g. John Smith", "required": "required", "data-section": "contact"}) }}
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="form-label-container">
+                                            {{ contact_form.email.label(class="form-label") }}
+                                            <span class="required">*</span>
+                                        </div>
+                                        {{ contact_form.email(class="form-control resume-field", **{"placeholder": "e.g. john.smith@example.com", "required": "required", "data-section": "contact"}) }}
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    {{ contact_form.email.label(class="form-label") }} <span class="required">*</span>
-                                    {{ contact_form.email(class="form-control resume-field auto-resize", **{"placeholder": "e.g. john.smith@example.com", "required": "required", "data-section": "contact"}) }}
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <div class="form-label-container">
+                                            {{ contact_form.phone.label(class="form-label") }}
+                                            <span class="required">*</span>
+                                        </div>
+                                        {{ contact_form.phone(class="form-control resume-field", **{"placeholder": "e.g. (555) 123-4567", "required": "required", "data-section": "contact"}) }}
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="form-label-container">
+                                            <label class="form-label">Location</label>
+                                        </div>
+                                        <input type="text" name="location" class="form-control resume-field" placeholder="e.g. New York, NY" data-section="contact">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    {{ contact_form.phone.label(class="form-label") }} <span class="required">*</span>
-                                    {{ contact_form.phone(class="form-control resume-field auto-resize", **{"placeholder": "e.g. (555) 123-4567", "required": "required", "data-section": "contact"}) }}
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <div class="form-label-container">
+                                            <label class="form-label">LinkedIn</label>
+                                        </div>
+                                        <input type="text" name="linkedin" class="form-control resume-field" placeholder="e.g. linkedin.com/in/johnsmith" data-section="contact">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="form-label-container">
+                                            <label class="form-label">Website</label>
+                                        </div>
+                                        <input type="text" name="website" class="form-control resume-field" placeholder="e.g. johnsmith.com" data-section="contact">
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label class="form-label">Location</label>
-                                    <input type="text" name="location" class="form-control resume-field auto-resize" placeholder="e.g. New York, NY" data-section="contact">
-                                </div>
-                            </div>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label class="form-label">LinkedIn</label>
-                                    <input type="text" name="linkedin" class="form-control resume-field auto-resize" placeholder="e.g. linkedin.com/in/johnsmith" data-section="contact">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Website</label>
-                                    <input type="text" name="website" class="form-control resume-field auto-resize" placeholder="e.g. johnsmith.com" data-section="contact">
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </section>
+                            </form>
+                        </div>
+                    </section>
 
                 <!-- Skills Section -->
                 <section class="resume-section-collapsible" data-section="skills">
@@ -289,6 +304,149 @@
                             </form>
                         </div>
                     </div>
+                   
+                    <!-- <div class="slide-panel" id="add-section-panel">
+                        <div class="panel-header">
+                            <h2>Add Section</h2>
+                            <button class="panel-close" data-panel="add-section-panel">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="panel-content">
+                            <div class="add-section-options">
+                                <div class="section-option" data-section="certifications">
+                                    <div class="section-option-icon">
+                                        <i class="fas fa-certificate"></i>
+                                    </div>
+                                    <div class="section-option-details">
+                                        <h3>Certifications</h3>
+                                        <p>Add professional certifications and licenses</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="section-option" data-section="projects">
+                                    <div class="section-option-icon">
+                                        <i class="fas fa-project-diagram"></i>
+                                    </div>
+                                    <div class="section-option-details">
+                                        <h3>Projects</h3>
+                                        <p>Showcase personal or professional projects</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="section-option" data-section="languages">
+                                    <div class="section-option-icon">
+                                        <i class="fas fa-language"></i>
+                                    </div>
+                                    <div class="section-option-details">
+                                        <h3>Languages</h3>
+                                        <p>Add languages you speak and proficiency levels</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="section-option" data-section="awards">
+                                    <div class="section-option-icon">
+                                        <i class="fas fa-trophy"></i>
+                                    </div>
+                                    <div class="section-option-details">
+                                        <h3>Awards & Honors</h3>
+                                        <p>Highlight achievements and recognition</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="section-option" data-section="volunteering">
+                                    <div class="section-option-icon">
+                                        <i class="fas fa-hands-helping"></i>
+                                    </div>
+                                    <div class="section-option-details">
+                                        <h3>Volunteer Experience</h3>
+                                        <p>Show community involvement and volunteer work</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="section-option" data-section="publications">
+                                    <div class="section-option-icon">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div class="section-option-details">
+                                        <h3>Publications</h3>
+                                        <p>List articles, papers, or books you've published</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                </section>
+                <section class="resume-section-collapsible add-sections-container" data-section="add-sections">
+                    <div class="section-header collapsible">
+                        <h3>Add More Sections</h3>
+                        <div class="section-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div class="add-section-options">
+                            <div class="section-option" data-section="certifications">
+                                <div class="section-option-icon">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                <div class="section-option-details">
+                                    <h3>Certifications</h3>
+                                    <p>Add professional certifications and licenses</p>
+                                </div>
+                            </div>
+                            
+                            <div class="section-option" data-section="projects">
+                                <div class="section-option-icon">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <div class="section-option-details">
+                                    <h3>Projects</h3>
+                                    <p>Showcase personal or professional projects</p>
+                                </div>
+                            </div>
+                            
+                            <div class="section-option" data-section="languages">
+                                <div class="section-option-icon">
+                                    <i class="fas fa-language"></i>
+                                </div>
+                                <div class="section-option-details">
+                                    <h3>Languages</h3>
+                                    <p>Add languages you speak and proficiency levels</p>
+                                </div>
+                            </div>
+                            
+                            <div class="section-option" data-section="awards">
+                                <div class="section-option-icon">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <div class="section-option-details">
+                                    <h3>Awards & Honors</h3>
+                                    <p>Highlight achievements and recognition</p>
+                                </div>
+                            </div>
+                            
+                            <div class="section-option" data-section="volunteering">
+                                <div class="section-option-icon">
+                                    <i class="fas fa-hands-helping"></i>
+                                </div>
+                                <div class="section-option-details">
+                                    <h3>Volunteer Experience</h3>
+                                    <p>Show community involvement and volunteer work</p>
+                                </div>
+                            </div>
+                            
+                            <div class="section-option" data-section="publications">
+                                <div class="section-option-icon">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div class="section-option-details">
+                                    <h3>Publications</h3>
+                                    <p>List articles, papers, or books you've published</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </section>
             </div>
         </div>
@@ -327,78 +485,7 @@
         </div>
     </div>
     
-    <!-- Add Section Panel -->
-    <div class="slide-panel" id="add-section-panel">
-        <div class="panel-header">
-            <h2>Add Section</h2>
-            <button class="panel-close" data-panel="add-section-panel">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="panel-content">
-            <div class="add-section-options">
-                <div class="section-option" data-section="certifications">
-                    <div class="section-option-icon">
-                        <i class="fas fa-certificate"></i>
-                    </div>
-                    <div class="section-option-details">
-                        <h3>Certifications</h3>
-                        <p>Add professional certifications and licenses</p>
-                    </div>
-                </div>
-                
-                <div class="section-option" data-section="projects">
-                    <div class="section-option-icon">
-                        <i class="fas fa-project-diagram"></i>
-                    </div>
-                    <div class="section-option-details">
-                        <h3>Projects</h3>
-                        <p>Showcase personal or professional projects</p>
-                    </div>
-                </div>
-                
-                <div class="section-option" data-section="languages">
-                    <div class="section-option-icon">
-                        <i class="fas fa-language"></i>
-                    </div>
-                    <div class="section-option-details">
-                        <h3>Languages</h3>
-                        <p>Add languages you speak and proficiency levels</p>
-                    </div>
-                </div>
-                
-                <div class="section-option" data-section="awards">
-                    <div class="section-option-icon">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <div class="section-option-details">
-                        <h3>Awards & Honors</h3>
-                        <p>Highlight achievements and recognition</p>
-                    </div>
-                </div>
-                
-                <div class="section-option" data-section="volunteering">
-                    <div class="section-option-icon">
-                        <i class="fas fa-hands-helping"></i>
-                    </div>
-                    <div class="section-option-details">
-                        <h3>Volunteer Experience</h3>
-                        <p>Show community involvement and volunteer work</p>
-                    </div>
-                </div>
-                
-                <div class="section-option" data-section="publications">
-                    <div class="section-option-icon">
-                        <i class="fas fa-book"></i>
-                    </div>
-                    <div class="section-option-details">
-                        <h3>Publications</h3>
-                        <p>List articles, papers, or books you've published</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Main Preview Area -->
     <div class="resume-preview-container">

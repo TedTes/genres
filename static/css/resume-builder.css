@@ -24,7 +24,7 @@
     --space-xl: 2rem;
 
     /* Sizes */
-    --panel-width: 360px;
+    --panel-width: 600px;
     --sidebar-width: 64px;
     --navbar-height: 64px;
 
@@ -646,40 +646,67 @@ body {
 
 /* Forms */
 .form-group {
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-lg);
 }
-
+.form-group.focused .form-label {
+    color: var(--primary);
+}
+.form-group.filled .form-label {
+    color: var(--secondary);
+}
+.form-group.focused .form-control {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    outline: none;
+}
 .form-label {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-base);
     font-weight: var(--font-weight-medium);
     color: var(--secondary);
-    margin-bottom: var(--space-xs);
-    display: block;
+    margin-bottom: 0;
+    /* display: block; */
 }
-
+.resume-form {
+    max-width: 100%;
+}
 .form-control {
     width: 100%;
-    padding: var(--space-sm);
+    height: 50px;
+    padding: 0 var(--space-md);
     border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: var(--font-size-sm);
+    border-radius: 8px;
+    font-size: var(--font-size-base);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background-color: var(--surface);
 }
 
 .form-control:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     outline: none;
 }
 
 .required {
     color: var(--danger);
+    margin-left: 4px;
+    font-size: var(--font-size-base);
+}
+.form-control:hover:not(:focus) {
+    border-color: var(--secondary-light);
 }
 
+.form-control::placeholder {
+    color: #a0aec0;
+    opacity: 0.7;
+}
 .form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-md);
+    gap: var(--space-lg);
 }
 
 .compact-form .form-control {
@@ -710,8 +737,9 @@ body {
 
 .auto-expand {
     resize: vertical;
-    min-height: 80px;
-    max-height: 200px;
+    min-height: 120px;
+    max-height: 300px;
+    line-height: 1.6;
 }
 
 /* Skills */
@@ -1020,6 +1048,22 @@ body {
     animation: spin 0.8s linear infinite;
 }
 
+.form-control:invalid:focus {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-control:valid:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+
+.form-control:focus::placeholder {
+    opacity: 0.4;
+    transform: translateY(-5px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
@@ -1049,8 +1093,8 @@ body {
     }
 
     .slide-panel {
-        width: 70vw;
-        max-width: 360px;
+        width: 90vw;
+        max-width: 550px;
     }
 }
 
@@ -1058,7 +1102,9 @@ body {
     .sidebar-toggle {
         display: flex;
     }
-
+    .form-control {
+        height: 46px;
+    }
     .floating-controls-left.collapsed {
         transform: translateX(-100%);
     }
@@ -1078,6 +1124,7 @@ body {
 
     .form-grid {
         grid-template-columns: 1fr;
+        gap: var(--space-md);
     }
 
     .add-section-options {
@@ -1266,28 +1313,29 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(255, 255, 255, 0.9);
-    padding: var(--space-md);
+    background: rgba(255, 255, 255, 0.95);
+    padding: var(--space-lg);
     border-radius: 8px;
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-lg);
     display: flex;
     flex-direction: column;
     align-items: center;
-    z-index: 10;
+    z-index: 100;
 }
 
 .loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--border);
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--primary-light);
     border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    margin-bottom: var(--space-sm);
+    margin-bottom: var(--space-md);
 }
 
 .loading-text {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
     color: var(--secondary);
 }
 
@@ -1319,4 +1367,115 @@ body {
     .preview-iframe {
         height: calc(100vh - var(--navbar-height) - var(--space-sm) * 2 - 60px); /* Account for bottom navigation */
     }
+}
+/* Styling for the add sections in edit panel */
+.add-section-container {
+    margin-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--space-md);
+}
+
+.section-header-divider {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+    cursor: pointer;
+}
+
+.section-header-divider h3 {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+    color: var(--primary);
+    margin: 0;
+}
+
+.toggle-add-sections {
+    color: var(--secondary-light);
+    transition: transform 0.3s ease;
+}
+
+.toggle-add-sections.active i {
+    transform: rotate(180deg);
+}
+
+.add-section-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+}
+
+/* Make section options more compact in edit panel */
+.add-section-options .section-option {
+    padding: var(--space-sm);
+}
+
+.add-section-options .section-option-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+}
+
+.add-section-options .section-option-details h3 {
+    font-size: var(--font-size-base);
+}
+
+.add-section-options .section-option-details p {
+    font-size: var(--font-size-sm);
+    line-height: 1.3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .add-section-options {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Add these to your CSS */
+.add-sections-container {
+    margin-top: var(--space-xl);
+    border-top: 1px dashed var(--border);
+    padding-top: var(--space-lg);
+}
+
+.add-sections-container .section-header {
+    background-color: var(--accent-light);
+}
+
+.add-sections-container .section-header:hover {
+    background-color: var(--primary-light);
+}
+
+.add-sections-container .add-section-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: var(--space-md);
+}
+
+/* Adjust the section options to fit better in the wider panel */
+.section-option {
+    padding: var(--space-md);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+}
+
+.section-option-icon {
+    min-width: 48px;
+    height: 48px;
+}
+
+@media (max-width: 768px) {
+    .add-sections-container .add-section-options {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-label-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--space-sm);
 }

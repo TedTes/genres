@@ -278,7 +278,7 @@ const initPanels = () => {
 
 // Initialize Collapsible Sections
 const initCollapsibleSections = () => {
-  const sectionHeaders = document.querySelectorAll(".section-header");
+  const sectionHeaders = document.querySelectorAll(".section-header.collapsible");
 
   sectionHeaders.forEach((header) => {
     header.addEventListener("click", function () {
@@ -303,6 +303,36 @@ const initCollapsibleSections = () => {
   }
 };
 
+const initSectionOptions = () => {
+  const sectionOptions = document.querySelectorAll(".section-option");
+  
+  sectionOptions.forEach(option => {
+    option.addEventListener("click", function() {
+      const sectionType = this.dataset.section;
+      // Implement section addition logic here
+      console.log(`Adding section: ${sectionType}`);
+      
+      // Show temporary feedback
+      const feedback = document.createElement("div");
+      feedback.className = "success-feedback";
+      feedback.textContent = `${sectionType} section added!`;
+      feedback.style.opacity = "1";
+      this.appendChild(feedback);
+      
+      setTimeout(() => {
+        feedback.style.opacity = "0";
+        setTimeout(() => {
+          if (feedback.parentNode) {
+            feedback.parentNode.removeChild(feedback);
+          }
+        }, 300);
+      }, 2000);
+      
+      // Actual implementation would add the new section to the UI
+      // and manage the data structure
+    });
+  });
+};
 // Setup Auto Resize Inputs
 const setupAutoResizeInputs = () => {
   document.querySelectorAll(".auto-resize").forEach((input) => {
@@ -353,7 +383,6 @@ const setupAutoSave = () => {
       `resume-${resumeId}-${section}-${field.name}`,
       value
     );
-    showFeedback(field, "success", "Saved");
     
     // Update progress after save
     updateProgress();
@@ -658,23 +687,121 @@ const updateProgress = () => {
     progressText.textContent = `${progressPercentage}%`;
   }
 };
-
+// Enhance form field behavior
+const enhanceFormFields = () => {
+  // Add floating label effect
+  document.querySelectorAll('.form-control').forEach(field => {
+    // Add event listeners for focus and blur to improve the visual feedback
+    field.addEventListener('focus', function() {
+      this.parentElement.classList.add('focused');
+    });
+    
+    field.addEventListener('blur', function() {
+      this.parentElement.classList.remove('focused');
+      
+      // Add 'filled' class if the field has a value
+      if (this.value.trim()) {
+        this.parentElement.classList.add('filled');
+      } else {
+        this.parentElement.classList.remove('filled');
+      }
+    });
+    
+    // Initialize filled state
+    if (field.value.trim()) {
+      field.parentElement.classList.add('filled');
+    }
+  });
+};
+const initStyles = ()=>{
+  const style = document.createElement('style');
+  style.textContent = `
+    .preview-loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      border-radius: 8px;
+    }
+    
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(59, 130, 246, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s linear infinite;
+    }
+    
+    .loading-text {
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--secondary);
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(style);
+}
 // Initialize Everything
 document.addEventListener("DOMContentLoaded", () => {
   // Initialize everything
   initPanels();
+  initStyles();
   initCollapsibleSections();
   setupAutoResizeInputs();
   setupAutoExpandTextareas();
   setupAutoSave();
-  // initSkillsManager();
-  // initExperienceManager();
-  // initEducationManager();
+  enhanceFormFields();
   initAIEnhancement();
-  // initAddSectionOptions();
+  initSectionOptions();
   initTemplates(); // Add template initialization
   updateProgress();
 
+  // Add this to your document.addEventListener("DOMContentLoaded", ...)
+const toggleAddSections = document.getElementById("toggle-add-sections");
+const addSectionOptions = document.getElementById("add-section-options");
+
+if (toggleAddSections && addSectionOptions) {
+    toggleAddSections.addEventListener("click", function() {
+        const isVisible = addSectionOptions.style.display !== "none";
+        
+        if (isVisible) {
+            addSectionOptions.style.display = "none";
+            this.classList.remove("active");
+        } else {
+            addSectionOptions.style.display = "grid";
+            this.classList.add("active");
+        }
+    });
+    
+    // Set up section option handlers
+    const sectionOptions = document.querySelectorAll(".section-option");
+    sectionOptions.forEach(option => {
+        option.addEventListener("click", function() {
+            const sectionType = this.dataset.section;
+            // Implement section addition logic here
+            console.log(`Adding section: ${sectionType}`);
+            
+            // Show feedback
+            showFeedback(this, "success", `${sectionType} section added!`);
+            
+            // Close the options panel after selection
+            addSectionOptions.style.display = "none";
+            toggleAddSections.classList.remove("active");
+        });
+    });
+}
 
   const refreshBtn = document.getElementById("preview-refresh");
   if (refreshBtn) {
@@ -732,45 +859,4 @@ Click on the Edit button in the sidebar to continue building your resume.`;
   });
 });
 
-
-document.addEventListener('DOMContentLoaded', () => {
-  const style = document.createElement('style');
-  style.textContent = `
-    .preview-loading-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(255, 255, 255, 0.8);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-      border-radius: 8px;
-    }
-    
-    .loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid rgba(59, 130, 246, 0.3);
-      border-radius: 50%;
-      border-top-color: var(--primary);
-      animation: spin 1s linear infinite;
-    }
-    
-    .loading-text {
-      margin-top: 10px;
-      font-size: 14px;
-      color: var(--secondary);
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  `;
-  document.head.appendChild(style);
-});
 
