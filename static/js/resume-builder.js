@@ -2338,6 +2338,123 @@ const initEducationManager = () => {
   initEventListeners();
 };
 
+
+const initAdvancedSectionManager = () => {
+  const addSectionsContainer = document.querySelector('.add-sections-container');
+  const sectionOptions = document.querySelectorAll('.section-option');
+  const sectionHeader = document.querySelector('.add-sections-container .section-header');
+  
+  if (!addSectionsContainer || !sectionOptions.length) return;
+  
+  // Add hover animations for section options
+  sectionOptions.forEach(option => {
+    // Create icon animation effect
+    const icon = option.querySelector('.section-option-icon');
+    if (icon) {
+      option.addEventListener('mouseenter', () => {
+        icon.style.transform = 'scale(1.15) rotate(5deg)';
+        icon.style.transition = 'transform 0.3s ease';
+      });
+      
+      option.addEventListener('mouseleave', () => {
+        icon.style.transform = 'scale(1) rotate(0)';
+      });
+    }
+    
+    // Add click handler with visual feedback
+    option.addEventListener('click', function() {
+      const sectionType = this.dataset.section;
+      
+      // Add pulse animation
+      this.classList.add('pulse-animation');
+      
+      // Show more detailed feedback than the original
+      const feedback = document.createElement('div');
+      feedback.className = 'section-added-feedback';
+      
+      // Customize message based on section type
+      let feedbackMsg = '';
+      switch(sectionType) {
+        case 'certifications':
+          feedbackMsg = 'Showcase your professional credentials!';
+          break;
+        case 'projects':
+          feedbackMsg = 'Highlight your accomplishments!';
+          break;
+        case 'languages':
+          feedbackMsg = 'Demonstrate your communication skills!';
+          break;
+        case 'awards':
+          feedbackMsg = 'Display your achievements!';
+          break;
+        case 'volunteering':
+          feedbackMsg = 'Show your community involvement!';
+          break;
+        case 'publications':
+          feedbackMsg = 'Share your expertise!';
+          break;
+        default:
+          feedbackMsg = 'Added to your resume!';
+      }
+      
+      feedback.innerHTML = `
+        <div class="feedback-icon"><i class="fas fa-check-circle"></i></div>
+        <div class="feedback-content">
+          <h4>${sectionType.charAt(0).toUpperCase() + sectionType.slice(1)} section added!</h4>
+          <p>${feedbackMsg}</p>
+        </div>
+      `;
+      
+      this.appendChild(feedback);
+      
+      // Remove after animation
+      setTimeout(() => {
+        this.classList.remove('pulse-animation');
+        if (feedback.parentNode) {
+          feedback.classList.add('fade-out');
+          setTimeout(() => {
+            if (feedback.parentNode) feedback.parentNode.removeChild(feedback);
+          }, 300);
+        }
+      }, 2000);
+      
+      // Actual implementation would add the new section to the UI
+      // and manage the data structure
+      console.log(`Adding section: ${sectionType}`);
+    });
+  });
+  
+  // Add a more interactive section header
+  if (sectionHeader) {
+    const newHeader = document.createElement('div');
+    newHeader.className = 'section-header collapsible enhanced';
+    newHeader.innerHTML = `
+      <div class="section-title-wrapper">
+        <h3>Customize Your Resume</h3>
+        <span class="section-subtitle">Add more sections to stand out</span>
+      </div>
+      <div class="section-toggle">
+        <span class="sections-counter">+6 sections available</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+    `;
+    
+    sectionHeader.parentNode.replaceChild(newHeader, sectionHeader);
+    
+    // Make the new header functional
+    newHeader.addEventListener('click', function() {
+      const section = this.closest('.resume-section-collapsible');
+      section.classList.toggle('active');
+      
+      const chevron = this.querySelector('.fa-chevron-down');
+      if (section.classList.contains('active')) {
+        chevron.style.transform = 'rotate(180deg)';
+      } else {
+        chevron.style.transform = 'rotate(0deg)';
+      }
+    });
+  }
+};
 // Initialize Everything
 document.addEventListener("DOMContentLoaded", () => {
   // Initialize everything
@@ -2358,6 +2475,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initTemplates(); // Add template initialization
   updateProgress();
   initEducationManager();
+  initAdvancedSectionManager();
   // Add this to your document.addEventListener("DOMContentLoaded", ...)
 const toggleAddSections = document.getElementById("toggle-add-sections");
 const addSectionOptions = document.getElementById("add-section-options");
