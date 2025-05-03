@@ -8,7 +8,8 @@ class TemplateRegistry:
     
     def __init__(self, templates_dir=None):
         """Initialize the template registry"""
-        self.templates_dir = templates_dir or os.path.join(os.getcwd(), 'pages/templates')
+        self.templates_dir = templates_dir or os.path.join(os.getcwd(), 'config')
+        print(self.templates_dir)
         self.templates = {}
         self.load_templates()
     

@@ -13,7 +13,7 @@ from forms import ContactForm,SummaryForm,ExperienceForm,EducationForm,SkillsFor
 from db import db
 
 resume_bp = Blueprint("resume", __name__)
-template_registry = TemplateRegistry('pages/templates')
+template_registry = TemplateRegistry('config')
 
 @resume_bp.route('/resume/start/<int:job_id>')
 @login_required
