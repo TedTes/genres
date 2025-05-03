@@ -8,8 +8,7 @@ import json
 from models import Job, Resume,Application
 from sqlalchemy.orm import attributes
 from datetime import datetime
-from helpers.job_helper import analyze_job_description
-from helpers.resume_helper import extract_skills_from_text,generate_resume
+from helpers import enhance_resume_content,analyze_job_description,extract_skills_from_text,generate_resume
 from forms import ContactForm,SummaryForm,ExperienceForm,EducationForm,SkillsForm
 from db import db
 
