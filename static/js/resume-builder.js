@@ -822,11 +822,7 @@ const initSummaryManager = () => {
   const summaryTextarea = document.getElementById("summary-textarea");
   const charCounter = document.getElementById("summary-char-counter");
   const enhanceButtons = document.querySelectorAll(".enhance-summary");
-  const toggleExamples = document.getElementById("toggle-examples");
-  const examplesContainer = document.getElementById("examples-container");
-  const exampleTabs = document.querySelectorAll(".example-tab");
-  const exampleContents = document.querySelectorAll(".example-content");
-  const useExampleBtns = document.querySelectorAll(".use-example-btn");
+
   
   if (!summaryTextarea) return;
   
@@ -924,69 +920,8 @@ const initSummaryManager = () => {
       });
     });
   }
-  
-  // Toggle Examples
-  if (toggleExamples && examplesContainer) {
-    toggleExamples.addEventListener("click", function() {
-      const isExpanded = this.getAttribute("aria-expanded") === "true";
-      
-      if (isExpanded) {
-        examplesContainer.classList.add("collapse");
-        this.setAttribute("aria-expanded", "false");
-      } else {
-        examplesContainer.classList.remove("collapse");
-        this.setAttribute("aria-expanded", "true");
-      }
-    });
-  }
-  
-  // Example Tabs
-  if (exampleTabs) {
-    exampleTabs.forEach(tab => {
-      tab.addEventListener("click", function() {
-        // Remove active class from all tabs and contents
-        exampleTabs.forEach(t => t.classList.remove("active"));
-        exampleContents.forEach(c => c.classList.remove("active"));
-        
-        // Add active class to the clicked tab
-        this.classList.add("active");
-        
-        // Show the corresponding content
-        const exampleType = this.dataset.example;
-        document.getElementById(`example-${exampleType}`).classList.add("active");
-      });
-    });
-  }
-  
-  // Use Example buttons
-  if (useExampleBtns) {
-    useExampleBtns.forEach(btn => {
-      btn.addEventListener("click", function() {
-        const exampleType = this.dataset.example;
-        const exampleContent = document.getElementById(`example-${exampleType}`).querySelector("p").textContent;
-        
-        // Confirm before overwriting existing content
-        if (summaryTextarea.value.trim() && !confirm("This will replace your current summary. Continue?")) {
-          return;
-        }
-        
-        // Apply the example text
-        summaryTextarea.value = exampleContent;
-        summaryTextarea.dispatchEvent(new Event('input'));
-        
-        // Trigger autosave
-        const event = new Event('change', { bubbles: true });
-        summaryTextarea.dispatchEvent(event);
-        
-        // Close examples container
-        examplesContainer.classList.add("collapse");
-        toggleExamples.setAttribute("aria-expanded", "false");
-        
-        // Show confirmation message
-        showTooltip(summaryTextarea, "Example applied! Customize it to match your experience.");
-      });
-    });
-  }
+   
+
   
   // Helper function to show tooltip
   function showTooltip(element, message) {

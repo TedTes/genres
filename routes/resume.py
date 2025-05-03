@@ -76,7 +76,6 @@ def generate_job_resume(job_id):
 @login_required
 def download_resume(resume_id):
     resume = Resume.query.get_or_404(resume_id)
-    print("its coming ")
     if resume.user_id != current_user.id:
         abort(403)
     
