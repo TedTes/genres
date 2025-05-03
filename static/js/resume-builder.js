@@ -568,6 +568,7 @@ const initAISkillsIntegration = () => {
 // Initialize AI Enhancement
 const initAIEnhancement = () => {
   const enhanceButtons = document.querySelectorAll(".enhance-summary");
+  const resumeId = document.querySelector(".resume-builder").dataset.resumeId;
 
   enhanceButtons.forEach((button) => {
     button.addEventListener("click", async () => {
@@ -580,68 +581,63 @@ const initAIEnhancement = () => {
         return;
       }
 
+      // Disable button and show loading state
       button.disabled = true;
       button.classList.add("loading");
-
-      // Simulate AI enhancement (replace with actual API call)
-      setTimeout(() => {
-        let enhancedSummary = summary;
-        if (type === "professional") {
-          enhancedSummary = enhanceProfessional(summary);
-        } else if (type === "concise") {
-          enhancedSummary = enhanceConcise(summary);
-        } else if (type === "keywords") {
-          enhancedSummary = enhanceKeywords(summary);
-        }
-
-        summaryField.value = enhancedSummary;
-        showFeedback(summaryField, "success", "Summary enhanced");
-        summaryField.dispatchEvent(new Event("input"));
+      
+      try {
+        // Get CSRF token
+        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
         
-        // Trigger auto-save
-        const event = new Event('change', { bubbles: true });
-        summaryField.dispatchEvent(event);
+        // Call the API
+        const response = await fetch(`/resume/${resumeId}/enhance-summary`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrfToken
+          },
+          body: JSON.stringify({
+            summary: summary,
+            type: type
+          })
+        });
 
+        const data = await response.json();
+        
+        if (data.success) {
+          // Update the summary field with enhanced content
+          summaryField.value = data.enhanced_summary;
+          showFeedback(summaryField, "success", "Summary enhanced");
+          
+          // Trigger input event for auto-resize
+          summaryField.dispatchEvent(new Event("input"));
+          
+          // Trigger auto-save
+          const event = new Event('change', { bubbles: true });
+          summaryField.dispatchEvent(event);
+          
+          // Add a subtle highlight animation
+          summaryField.classList.add("enhanced");
+          setTimeout(() => {
+            summaryField.classList.remove("enhanced");
+          }, 1000);
+        } else {
+          console.log("from the fetch api");
+          console.log(data)
+          showFeedback(summaryField, "error", data.error || "Failed to enhance summary");
+        }
+      } catch (error) {
+        console.error("Error enhancing summary:", error);
+        showFeedback(summaryField, "error", "An error occurred while enhancing summary");
+      } finally {
+        // Re-enable button and remove loading state
         button.disabled = false;
         button.classList.remove("loading");
-      }, 1000);
+      }
     });
   });
 
-  // Helper functions for AI enhancement
-  function enhanceProfessional(text) {
-    // Simple simulation of professional enhancement
-    return text
-      .replace(/I am/g, "I'm")
-      .replace(/I have/g, "I've")
-      .replace(/worked on/g, "delivered")
-      .replace(/good/g, "exceptional")
-      .replace(/made/g, "created")
-      .replace(/did/g, "executed")
-      .replace(/used/g, "leveraged")
-      .replace(/responsible for/g, "spearheaded")
-      .replace(/team player/g, "collaborative professional");
-  }
-
-  function enhanceConcise(text) {
-    // Simple simulation of making text more concise
-    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-    if (sentences.length <= 2) return text;
-    return sentences.slice(0, 2).join(". ") + ".";
-  }
-
-  function enhanceKeywords(text) {
-    // Simple simulation of adding keywords
-    const keywords = [
-      "strategic leadership",
-      "cross-functional collaboration",
-      "agile methodology",
-      "data-driven decision making",
-      "stakeholder management"
-    ];
-    const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];
-    return `${text} Expertise in ${randomKeyword}.`;
-  }
 };
 
 
