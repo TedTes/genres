@@ -325,358 +325,374 @@
 
                 <!-- Experience Section -->
             <section class="resume-section-collapsible" data-section="experience">
+                    <div class="section-header collapsible">
+                        <h3>Work Experience</h3>
+                        <div class="section-toggle">
+                            <i class="fas fa-check-circle section-complete-icon"></i>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <!-- Experience List Container -->
+                        <div class="experience-container">
+                            <div class="experience-timeline" id="experience-timeline">
+                                <!-- Timeline will be generated via JavaScript -->
+                                <div class="timeline-empty-state" id="timeline-empty-state">
+                                    <div class="empty-state-icon">
+                                        <i class="fas fa-briefcase"></i>
+                                    </div>
+                                    <h4>No experience added yet</h4>
+                                    <p>Add your work history to showcase your professional journey</p>
+                                </div>
+                            </div>
+                            
+                            <button type="button" class="add-experience-btn primary-action-btn" id="add-experience-btn">
+                                <div class="btn-icon">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                                <span>Add Work Experience</span>
+                            </button>
+                        </div>
+                        
+                        <input type="hidden" name="experience_data" id="experience-data" value="">
+                    </div>
+                </section>
+                
+                <!-- Experience Form Modal -->
+                <div class="experience-form-modal" id="experience-form-container" style="display: none;">
+                    <div class="modal-overlay"></div>
+                    <div class="form-card">
+                        <div class="form-card-header">
+                            <h3 id="experience-form-title">Add Work Experience</h3>
+                            <button type="button" class="form-card-close" id="experience-form-close">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <form id="experience-form" class="resume-form">
+                            <input type="hidden" id="experience-index" value="-1">
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <div class="form-label-container">
+                                        <label class="form-label">Job Title</label>
+                                        <span class="required">*</span>
+                                    </div>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-user-tie"></i>
+                                        <input type="text" id="job-title" class="form-control" placeholder="e.g. Software Engineer" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div class="form-label-container">
+                                        <label class="form-label">Company</label>
+                                        <span class="required">*</span>
+                                    </div>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-building"></i>
+                                        <input type="text" id="company" class="form-control" placeholder="e.g. Acme Corporation" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <div class="form-label-container">
+                                        <label class="form-label">Start Date</label>
+                                        <span class="required">*</span>
+                                    </div>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        <input type="text" id="start-date" class="form-control" placeholder="e.g. Jan 2020" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div class="form-label-container">
+                                        <label class="form-label">End Date</label>
+                                    </div>
+                                    <div class="end-date-group">
+                                        <div class="input-icon-wrapper">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            <input type="text" id="end-date" class="form-control" placeholder="e.g. Dec 2022">
+                                        </div>
+                                        <label class="current-job-checkbox">
+                                            <input type="checkbox" id="current-job"> 
+                                            <span class="checkmark"></span>
+                                            <span class="checkbox-label">Current Position</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="form-label-container">
+                                    <label class="form-label">Responsibilities & Achievements</label>
+                                    <span class="required">*</span>
+                                    <div class="form-hint">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Use bullet points (•) to list each accomplishment separately</span>
+                                    </div>
+                                </div>
+                                <div class="textarea-tools">
+                                    <textarea id="job-description" class="form-control auto-expand" rows="6" 
+                                        placeholder="• Developed a new feature that increased user engagement by 25%
+                • Led a team of 5 developers to deliver projects on time and under budget
+                • Reduced system response time by 40% through optimization" required></textarea>
+                                    
+                                    <div class="textarea-toolbar">
+                                        <button type="button" class="toolbar-btn" data-action="bullet" title="Add Bullet Point">
+                                            <i class="fas fa-list-ul"></i>
+                                        </button>
+                                        <button type="button" class="toolbar-btn" data-action="achievement" title="Add Achievement">
+                                            <i class="fas fa-trophy"></i>
+                                        </button>
+                                        <button type="button" class="toolbar-btn" data-action="skills" title="Insert Skills">
+                                            <i class="fas fa-tools"></i>
+                                        </button>
+                                        <button type="button" class="toolbar-btn ai-enhance" data-action="enhance" title="Enhance with AI">
+                                            <i class="fas fa-magic"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- AI Enhancement Panel -->
+                            <div class="ai-enhance-panel" id="ai-enhance-panel" style="display: none;">
+                                <div class="panel-header">
+                                    <h4><i class="fas fa-magic"></i> AI Enhancement Options</h4>
+                                    <p>Select an option to improve your job description</p>
+                                </div>
+                                <div class="enhance-options">
+                                    <button type="button" class="enhance-option" data-enhance="achievements">
+                                        <i class="fas fa-chart-line"></i>
+                                        <span>Add Measurable Achievements</span>
+                                    </button>
+                                    <button type="button" class="enhance-option" data-enhance="action-verbs">
+                                        <i class="fas fa-bolt"></i>
+                                        <span>Use Power Verbs</span>
+                                    </button>
+                                    <button type="button" class="enhance-option" data-enhance="skills">
+                                        <i class="fas fa-cogs"></i>
+                                        <span>Highlight Technical Skills</span>
+                                    </button>
+                                    <button type="button" class="enhance-option" data-enhance="concise">
+                                        <i class="fas fa-cut"></i>
+                                        <span>Make More Concise</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Relevant Skills Section -->
+                            {% if skills %}
+                            <div class="job-skills-match">
+                                <div class="form-label-container">
+                                    <label class="form-label">Relevant Skills for This Job</label>
+                                    <button type="button" class="toggle-skills" id="toggle-job-skills" aria-expanded="true">
+                                        <i class="fas fa-chevron-up"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="skills-tags-container" id="job-skills-container">
+                                    <div class="skills-tags">
+                                        {% for skill in skills %}
+                                        <span class="skill-tag suggested" data-skill="{{ skill }}">{{ skill }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="skills-help">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <span>Click on skills to add them to your job description</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="form-actions">
+                                <button type="button" id="cancel-experience" class="btn btn-outline">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                                <button type="submit" id="save-experience" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+             <!-- Education Section -->
+             <section class="resume-section-collapsible" data-section="education">
                 <div class="section-header collapsible">
-                    <h3>Work Experience</h3>
+                    <h3>Education</h3>
                     <div class="section-toggle">
                         <i class="fas fa-check-circle section-complete-icon"></i>
                         <i class="fas fa-chevron-down"></i>
                     </div>
                 </div>
                 <div class="section-content">
-                        <!-- Experience Form -->
-                    <div class="experience-form-container" id="experience-form-container" style="display: none;">
-                        <div class="form-card">
-                            <div class="form-card-header">
-                                <h3 id="experience-form-title">Add Work Experience</h3>
-                                <button type="button" class="form-card-close" id="experience-form-close">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            
-                            <form id="experience-form" class="resume-form">
-                                <input type="hidden" id="experience-index" value="-1">
-                                
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <div class="form-label-container">
-                                            <label class="form-label">Job Title</label>
-                                            <span class="required">*</span>
-                                        </div>
-                                        <div class="input-icon-wrapper">
-                                            <i class="fas fa-user-tie"></i>
-                                            <input type="text" id="job-title" class="form-control" placeholder="e.g. Software Engineer" required>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <div class="form-label-container">
-                                            <label class="form-label">Company</label>
-                                            <span class="required">*</span>
-                                        </div>
-                                        <div class="input-icon-wrapper">
-                                            <i class="fas fa-building"></i>
-                                            <input type="text" id="company" class="form-control" placeholder="e.g. Acme Corporation" required>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <div class="form-label-container">
-                                            <label class="form-label">Start Date</label>
-                                            <span class="required">*</span>
-                                        </div>
-                                        <div class="input-icon-wrapper">
-                                            <i class="fas fa-calendar-alt"></i>
-                                            <input type="text" id="start-date" class="form-control" placeholder="e.g. Jan 2020" required>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <div class="form-label-container">
-                                            <label class="form-label">End Date</label>
-                                        </div>
-                                        <div class="end-date-group">
-                                            <div class="input-icon-wrapper">
-                                                <i class="fas fa-calendar-alt"></i>
-                                                <input type="text" id="end-date" class="form-control" placeholder="e.g. Dec 2022">
-                                            </div>
-                                            <label class="current-job-checkbox">
-                                                <input type="checkbox" id="current-job"> 
-                                                <span class="checkmark"></span>
-                                                <span class="checkbox-label">Current Position</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <div class="form-label-container">
-                                        <label class="form-label">Responsibilities & Achievements</label>
-                                        <span class="required">*</span>
-                                        <span class="bullet-tip">Use bullet points • for each accomplishment</span>
-                                    </div>
-                                    <div class="textarea-tools">
-                                        <textarea id="job-description" class="form-control auto-expand" rows="5" 
-                                            placeholder="• Developed a new feature that increased user engagement by 25%
-            - Led a team of 5 developers to deliver projects on time and under budget
-            - Reduced system response time by 40% through optimization" required></textarea>
-                                        
-                                        <div class="textarea-toolbar">
-                                            <button type="button" class="toolbar-btn" data-action="bullet">
-                                                <i class="fas fa-list-ul"></i>
-                                            </button>
-                                            <button type="button" class="toolbar-btn" data-action="achievement">
-                                                <i class="fas fa-trophy"></i>
-                                            </button>
-                                            <button type="button" class="toolbar-btn" data-action="skills">
-                                                <i class="fas fa-tools"></i>
-                                            </button>
-                                            <button type="button" class="toolbar-btn ai-enhance" data-action="enhance" data-tooltip="Enhance with AI">
-                                                <i class="fas fa-magic"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Tooltips Panel for AI Enhancement -->
-                                <div class="ai-enhance-panel" id="ai-enhance-panel" style="display: none;">
-                                    <div class="enhance-options">
-                                        <button type="button" class="enhance-option" data-enhance="achievements">
-                                            <i class="fas fa-chart-line"></i>
-                                            <span>Add Measurable Achievements</span>
-                                        </button>
-                                        <button type="button" class="enhance-option" data-enhance="action-verbs">
-                                            <i class="fas fa-bolt"></i>
-                                            <span>Use Power Verbs</span>
-                                        </button>
-                                        <button type="button" class="enhance-option" data-enhance="skills">
-                                            <i class="fas fa-cogs"></i>
-                                            <span>Highlight Technical Skills</span>
-                                        </button>
-                                        <button type="button" class="enhance-option" data-enhance="concise">
-                                            <i class="fas fa-cut"></i>
-                                            <span>Make More Concise</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                {% if skills %}
-                                <div class="job-skills-match">
-                                    <div class="form-label-container">
-                                        <label class="form-label">Relevant Skills for This Job</label>
-                                        <button type="button" class="toggle-skills" id="toggle-job-skills" aria-expanded="false">
-                                            <i class="fas fa-chevron-down"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="skills-tags-container collapse" id="job-skills-container">
-                                        <div class="skills-tags">
-                                            {% for skill in skills %}
-                                            <span class="skill-tag suggested" data-skill="{{ skill }}">{{ skill }}</span>
-                                            {% endfor %}
-                                        </div>
-                                        <div class="skills-help">
-                                            <i class="fas fa-lightbulb"></i>
-                                            <span>Click on skills to add them to your job description</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
-                                
-                                <div class="form-actions">
-                                    <button type="button" id="cancel-experience" class="btn btn-outline">
-                                        <i class="fas fa-times"></i> Cancel
-                                    </button>
-                                    <button type="submit" id="save-experience" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> Save
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <!-- Experience List Container -->
-                    <div class="experience-container">
-                        <div class="experience-timeline" id="experience-timeline">
+                    <!-- Education Timeline Container -->
+                    <div class="education-container">
+                        <div class="education-timeline" id="education-timeline">
                             <!-- Timeline will be generated via JavaScript -->
-                            <div class="timeline-empty-state" id="timeline-empty-state">
+                            <div class="timeline-empty-state" id="education-empty-state">
                                 <div class="empty-state-icon">
-                                    <i class="fas fa-briefcase"></i>
+                                    <i class="fas fa-graduation-cap"></i>
                                 </div>
-                                <h4>No experience added yet</h4>
-                                <p>Add your work history to showcase your professional journey</p>
+                                <h4>No education added yet</h4>
+                                <p>Add your educational background to showcase your academic achievements</p>
                             </div>
                         </div>
                         
-                        <button type="button" class="add-experience-btn" id="add-experience-btn">
+                        <button type="button" class="primary-action-btn add-education-btn" id="add-education-btn">
                             <div class="btn-icon">
                                 <i class="fas fa-plus"></i>
                             </div>
-                            <span>Add Experience</span>
+                            <span>Add Education</span>
                         </button>
                     </div>
                     
-                
-                    
-                    <input type="hidden" name="experience_data" id="experience-data" value="">
+                    <input type="hidden" name="education_data" id="education-data" value="">
                 </div>
             </section>
-
-             <!-- Education Section -->
-        <section class="resume-section-collapsible" data-section="education">
-            <div class="section-header collapsible">
-                <h3>Education</h3>
-                <div class="section-toggle">
-                    <i class="fas fa-check-circle section-complete-icon"></i>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-            </div>
-            <div class="section-content">
-                <!-- Education Timeline Container -->
-                <div class="education-container">
-                    <div class="education-timeline" id="education-timeline">
-                        <!-- Timeline will be generated via JavaScript -->
-                        <div class="timeline-empty-state" id="education-empty-state">
-                            <div class="empty-state-icon">
-                                <i class="fas fa-graduation-cap"></i>
-                            </div>
-                            <h4>No education added yet</h4>
-                            <p>Add your educational background to showcase your academic achievements</p>
-                        </div>
+            
+            <!-- Education Form Modal  -->
+            <div class="education-form-modal" id="education-form-container" style="display: none;">
+                <div class="modal-overlay"></div>
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <h3 id="education-form-title">Add Education</h3>
+                        <button type="button" class="form-card-close" id="education-form-close">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                     
-                    <button type="button" class="add-education-btn" id="add-education-btn">
-                        <div class="btn-icon">
-                            <i class="fas fa-plus"></i>
-                        </div>
-                        <span>Add Education</span>
-                    </button>
-                </div>
-                
-                        <!-- Education Form -->
-                <div class="education-form-container" id="education-form-container" style="display: none;">
-                            <div class="form-card">
-                                <div class="form-card-header">
-                                    <h3 id="education-form-title">Add Education</h3>
-                                    <button type="button" class="form-card-close" id="education-form-close">
-                                        <i class="fas fa-times"></i>
-                                    </button>
+                    <form id="education-form" class="resume-form">
+                        <input type="hidden" id="education-index" value="-1">
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <div class="form-label-container">
+                                    <label class="form-label">Degree / Certificate</label>
+                                    <span class="required">*</span>
                                 </div>
-                                
-                                <form id="education-form" class="resume-form">
-                                    <input type="hidden" id="education-index" value="-1">
-                                    
-                                    <div class="form-grid">
-                                        <div class="form-group">
-                                            <div class="form-label-container">
-                                                <label class="form-label">Degree / Certificate</label>
-                                                <span class="required">*</span>
-                                            </div>
-                                            <div class="input-icon-wrapper">
-                                                <i class="fas fa-scroll"></i>
-                                                <input type="text" id="degree" class="form-control" placeholder="e.g. Bachelor of Science in Computer Science" required>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <div class="form-label-container">
-                                                <label class="form-label">School / University</label>
-                                                <span class="required">*</span>
-                                            </div>
-                                            <div class="input-icon-wrapper">
-                                                <i class="fas fa-university"></i>
-                                                <input type="text" id="school" class="form-control" placeholder="e.g. University of California, Berkeley" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-grid">
-                                        <div class="form-group">
-                                            <div class="form-label-container">
-                                                <label class="form-label">Start Year</label>
-                                                <span class="required">*</span>
-                                            </div>
-                                            <div class="input-icon-wrapper">
-                                                <i class="fas fa-calendar-alt"></i>
-                                                <input type="text" id="education-start" class="form-control" placeholder="e.g. 2018" required>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <div class="form-label-container">
-                                                <label class="form-label">End Year</label>
-                                            </div>
-                                            <div class="end-date-group">
-                                                <div class="input-icon-wrapper">
-                                                    <i class="fas fa-calendar-check"></i>
-                                                    <input type="text" id="education-end" class="form-control" placeholder="e.g. 2022">
-                                                </div>
-                                                <label class="current-education-checkbox">
-                                                    <input type="checkbox" id="current-education"> 
-                                                    <span class="checkmark"></span>
-                                                    <span class="checkbox-label">Currently Studying</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <div class="form-label-container">
-                                            <label class="form-label">Description</label>
-                                            <span class="optional-label">(Optional)</span>
-                                        </div>
-                                        <div class="textarea-tools">
-                                            <textarea id="education-description" class="form-control auto-expand" rows="4" 
-                                                placeholder="Add relevant coursework, achievements, honors, GPA, or activities. For example:
-                - Major: Computer Science with minor in Data Analytics
-                - GPA: 3.8/4.0, Dean's List all semesters
-                - Relevant coursework: Data Structures, Algorithms, Machine Learning
-                - President of Computer Science Club"></textarea>
-                                            
-                                            <div class="textarea-toolbar">
-                                                <button type="button" class="toolbar-btn" data-action="bullet">
-                                                    <i class="fas fa-list-ul"></i>
-                                                </button>
-                                                <button type="button" class="toolbar-btn" data-action="course">
-                                                    <i class="fas fa-book"></i>
-                                                </button>
-                                                <button type="button" class="toolbar-btn" data-action="gpa">
-                                                    <i class="fas fa-award"></i>
-                                                </button>
-                                                <button type="button" class="toolbar-btn ai-enhance" data-action="enhance" data-tooltip="Enhance with AI">
-                                                    <i class="fas fa-magic"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- AI Enhancement Panel for Education -->
-                                    <div class="ai-enhance-panel" id="education-enhance-panel" style="display: none;">
-                                        <div class="enhance-options">
-                                            <button type="button" class="enhance-option" data-enhance="coursework">
-                                                <i class="fas fa-book"></i>
-                                                <span>Add Relevant Coursework</span>
-                                            </button>
-                                            <button type="button" class="enhance-option" data-enhance="achievements">
-                                                <i class="fas fa-medal"></i>
-                                                <span>Add Academic Achievements</span>
-                                            </button>
-                                            <button type="button" class="enhance-option" data-enhance="concise">
-                                                <i class="fas fa-cut"></i>
-                                                <span>Make More Concise</span>
-                                            </button>
-                                            <button type="button" class="enhance-option" data-enhance="format">
-                                                <i class="fas fa-align-left"></i>
-                                                <span>Improve Formatting</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-actions">
-                                        <button type="button" id="cancel-education" class="btn btn-outline">
-                                            <i class="fas fa-times"></i> Cancel
-                                        </button>
-                                        <button type="submit" id="save-education" class="btn btn-primary">
-                                            <i class="fas fa-save"></i> Save
-                                        </button>
-                                    </div>
-                                </form>
+                                <div class="input-icon-wrapper">
+                                    <i class="fas fa-scroll"></i>
+                                    <input type="text" id="degree" class="form-control" placeholder="e.g. Bachelor of Science in Computer Science" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="form-label-container">
+                                    <label class="form-label">School / University</label>
+                                    <span class="required">*</span>
+                                </div>
+                                <div class="input-icon-wrapper">
+                                    <i class="fas fa-university"></i>
+                                    <input type="text" id="school" class="form-control" placeholder="e.g. University of California, Berkeley" required>
+                                </div>
                             </div>
                         </div>
                         
-                        <input type="hidden" name="education_data" id="education-data" value="">
-                    </div>
-                </section>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <div class="form-label-container">
+                                    <label class="form-label">Start Year</label>
+                                    <span class="required">*</span>
+                                </div>
+                                <div class="input-icon-wrapper">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <input type="text" id="education-start" class="form-control" placeholder="e.g. 2018" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="form-label-container">
+                                    <label class="form-label">End Year</label>
+                                </div>
+                                <div class="end-date-group">
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-calendar-check"></i>
+                                        <input type="text" id="education-end" class="form-control" placeholder="e.g. 2022">
+                                    </div>
+                                    <label class="current-education-checkbox">
+                                        <input type="checkbox" id="current-education"> 
+                                        <span class="checkmark"></span>
+                                        <span class="checkbox-label">Currently Studying</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="form-label-container">
+                                <label class="form-label">Description</label>
+                                <span class="optional-label">(Optional)</span>
+                                <div class="form-hint">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>Add relevant coursework, achievements, or other academic details</span>
+                                </div>
+                            </div>
+                            <div class="textarea-tools">
+                                <textarea id="education-description" class="form-control auto-expand" rows="5" 
+                                    placeholder="• Major: Computer Science with minor in Data Analytics
+            • GPA: 3.8/4.0, Dean's List all semesters
+            • Relevant coursework: Data Structures, Algorithms, Machine Learning
+            • President of Computer Science Club"></textarea>
+                                
+                                <div class="textarea-toolbar">
+                                    <button type="button" class="toolbar-btn" data-action="bullet" title="Add Bullet Point">
+                                        <i class="fas fa-list-ul"></i>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" data-action="course" title="Add Coursework">
+                                        <i class="fas fa-book"></i>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" data-action="gpa" title="Add GPA">
+                                        <i class="fas fa-award"></i>
+                                    </button>
+                                    <button type="button" class="toolbar-btn ai-enhance" data-action="enhance" title="Enhance with AI">
+                                        <i class="fas fa-magic"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- AI Enhancement Panel for Education -->
+                        <div class="ai-enhance-panel" id="education-enhance-panel" style="display: none;">
+                            <div class="panel-header">
+                                <h4><i class="fas fa-magic"></i> AI Enhancement Options</h4>
+                                <p>Select an option to improve your education details</p>
+                            </div>
+                            <div class="enhance-options">
+                                <button type="button" class="enhance-option" data-enhance="coursework">
+                                    <i class="fas fa-book"></i>
+                                    <span>Add Relevant Coursework</span>
+                                </button>
+                                <button type="button" class="enhance-option" data-enhance="achievements">
+                                    <i class="fas fa-medal"></i>
+                                    <span>Add Academic Achievements</span>
+                                </button>
+                                <button type="button" class="enhance-option" data-enhance="concise">
+                                    <i class="fas fa-cut"></i>
+                                    <span>Make More Concise</span>
+                                </button>
+                                <button type="button" class="enhance-option" data-enhance="format">
+                                    <i class="fas fa-align-left"></i>
+                                    <span>Improve Formatting</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" id="cancel-education" class="btn btn-outline">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                            <button type="submit" id="save-education" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
                 <section class="resume-section-collapsible add-sections-container" data-section="add-sections">
                     <div class="section-header collapsible">
                         <h3>Add More Sections</h3>

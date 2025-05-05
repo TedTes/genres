@@ -1062,6 +1062,7 @@ const initExperienceManager = () => {
   const aiEnhancePanel = document.getElementById("ai-enhance-panel");
   const enhanceOptions = document.querySelectorAll(".enhance-option");
   const toolbarBtns = document.querySelectorAll(".toolbar-btn");
+  const modalOverlay = document.querySelector(".modal-overlay");
   
   if (!experienceTimeline || !addExperienceBtn || !experienceForm) return;
   
@@ -1080,12 +1081,12 @@ const initExperienceManager = () => {
     }
     
     renderExperiences();
+    updateProgress();
   };
   
   // Render experiences to timeline
   const renderExperiences = () => {
-    // Clear the timeline
-    // Keep the empty state element
+    // Clear the timeline except for empty state
     Array.from(experienceTimeline.children).forEach(child => {
       if (child.id !== "timeline-empty-state") {
         experienceTimeline.removeChild(child);
@@ -1099,6 +1100,14 @@ const initExperienceManager = () => {
     } else {
       emptyState.style.display = "none";
     }
+    
+    // Sort experiences by start date (most recent first)
+    experiences.sort((a, b) => {
+      // Convert date strings to comparable format (assuming MM/YYYY or similar consistent format)
+      const dateA = parseExperienceDate(a.startDate);
+      const dateB = parseExperienceDate(b.startDate);
+      return dateB - dateA;
+    });
     
     // Render each experience
     experiences.forEach((exp, index) => {
@@ -1168,507 +1177,746 @@ const initExperienceManager = () => {
         deleteExperience(index);
       });
     });
-    
-    // Update progress
-    updateProgress();
   };
-  
-// Add experience
-const addExperience = () => {
-  // Reset the form
-  experienceForm.reset();
-  experienceIndex.value = -1;
-  experienceFormTitle.textContent = "Add Work Experience";
-  
-  // Show the form
-  experienceFormContainer.style.display = "flex";
-  setTimeout(() => {
-    experienceFormContainer.classList.add("active");
-  }, 10);
-  
-  // Focus on the first input
-  jobTitle.focus();
-};
 
-// Edit experience
-const editExperience = (index) => {
-  const experience = experiences[index];
-  if (!experience) return;
-  
-  // Set form values
-  experienceIndex.value = index;
-  jobTitle.value = experience.title;
-  company.value = experience.company;
-  startDate.value = experience.startDate;
-  
-  if (experience.current) {
-    currentJob.checked = true;
-    endDate.value = "";
-    endDate.disabled = true;
-  } else {
-    currentJob.checked = false;
-    endDate.value = experience.endDate;
-    endDate.disabled = false;
-  }
-  
-  jobDescription.value = experience.description;
-  
-  // Update form title
-  experienceFormTitle.textContent = "Edit Work Experience";
-  
-  // Show the form
-  experienceFormContainer.style.display = "flex";
-  setTimeout(() => {
-    experienceFormContainer.classList.add("active");
-  }, 10);
-  
-  // Expand the textarea to fit content
-  jobDescription.style.height = "auto";
-  jobDescription.style.height = jobDescription.scrollHeight + "px";
-};
-
-// Delete experience
-const deleteExperience = (index) => {
-  // Confirm before deleting
-  if (confirm("Are you sure you want to delete this experience?")) {
-    experiences.splice(index, 1);
-    updateExperienceData();
-    renderExperiences();
-  }
-};
-
-// Update the hidden input with experiences data
-const updateExperienceData = () => {
-  experienceData.value = JSON.stringify(experiences);
-  // Trigger change event for autosave
-  const event = new Event('change', { bubbles: true });
-  experienceData.dispatchEvent(event);
-};
-
-// Format the job description to ensure bullet points
-const formatDescription = (text) => {
-  if (!text) return "";
-  
-  return text
-    .split("\n")
-    .map(line => {
-      const trimmed = line.trim();
-      if (!trimmed) return "";
-      if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("*")) {
-        return trimmed;
+  // Parse experience date for sorting
+  const parseExperienceDate = (dateStr) => {
+    try {
+      // Handle common date formats like "Jan 2020", "January 2020", "01/2020", etc.
+      const parts = dateStr.replace(/,/g, '').split(/\s+|\/|-/);
+      let year, month;
+      
+      // Find the year (4-digit number)
+      const yearPart = parts.find(part => /^\d{4}$/.test(part));
+      year = yearPart ? parseInt(yearPart) : 2000; // Default to 2000 if no year found
+      
+      // Try to find month
+      const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+      const monthPart = parts.find(part => {
+        const normalized = part.toLowerCase().substr(0, 3);
+        return monthNames.includes(normalized) || /^\d{1,2}$/.test(part);
+      });
+      
+      if (monthPart) {
+        if (/^\d{1,2}$/.test(monthPart)) {
+          // Numeric month
+          month = parseInt(monthPart) - 1; // JS months are 0-based
+        } else {
+          // Text month
+          const normalized = monthPart.toLowerCase().substr(0, 3);
+          month = monthNames.indexOf(normalized);
+        }
       } else {
-        return `• ${trimmed}`;
+        month = 0; // Default to January if no month found
       }
-    })
-    .filter(line => line)
-    .join("\n");
-};
-
-// Handle form submission
-const handleFormSubmit = (e) => {
-  e.preventDefault();
-  
-  // Basic validation
-  if (!jobTitle.value || !company.value || !startDate.value || !jobDescription.value) {
-    showTooltip(experienceForm, "Please fill in all required fields");
-    return;
-  }
-  
-  const index = parseInt(experienceIndex.value);
-  const isNewExperience = index === -1;
-  
-  // Format the description
-  const formattedDescription = formatDescription(jobDescription.value);
-  
-  // Create experience object
-  const experience = {
-    title: jobTitle.value,
-    company: company.value,
-    startDate: startDate.value,
-    endDate: currentJob.checked ? "" : endDate.value,
-    current: currentJob.checked,
-    description: formattedDescription
+      
+      return new Date(year, month, 1).getTime();
+    } catch (e) {
+      console.warn("Error parsing date:", dateStr, e);
+      return 0; // Return minimum date for invalid formats
+    }
   };
   
-  // Update or add the experience
-  if (isNewExperience) {
-    experiences.push(experience);
-  } else {
-    experiences[index] = experience;
-  }
-  
-  // Update data and render
-  updateExperienceData();
-  renderExperiences();
-  
-  // Close the form
-  closeForm();
-  
-  // Show success toast
-  showTooltip(addExperienceBtn, isNewExperience ? "Experience added successfully" : "Experience updated successfully");
-};
+  // Update progress indicator
+  const updateProgress = () => {
+    const sectionComplete = experiences.length > 0;
+    const completeIcon = document.querySelector(".section-complete-icon");
+    
+    if (completeIcon) {
+      if (sectionComplete) {
+        completeIcon.style.display = "inline-block";
+      } else {
+        completeIcon.style.display = "none";
+      }
+    }
+    
+    // Dispatch event to notify parent component of progress
+    const progressEvent = new CustomEvent("resume-section-progress", {
+      detail: { section: "experience", complete: sectionComplete }
+    });
+    document.dispatchEvent(progressEvent);
+  };
 
-// Close the form
-const closeForm = () => {
-  experienceFormContainer.classList.remove("active");
-  setTimeout(() => {
-    experienceFormContainer.style.display = "none";
-  }, 300);
-};
+  // Add experience
+  const addExperience = () => {
+    // Reset the form
+    experienceForm.reset();
+    experienceIndex.value = -1;
+    experienceFormTitle.textContent = "Add Work Experience";
+    
+    // Enable end date by default
+    endDate.disabled = false;
+    
+    // Show the form
+    experienceFormContainer.style.display = "flex";
+    setTimeout(() => {
+      experienceFormContainer.classList.add("active");
+    }, 10);
+    
+    // Focus on the first input
+    jobTitle.focus();
+  };
 
-// Initialize event listeners
-const initEventListeners = () => {
-  // Add experience button
-  addExperienceBtn.addEventListener("click", addExperience);
-  
-  // Form submission
-  experienceForm.addEventListener("submit", handleFormSubmit);
-  
-  // Close form buttons
-  experienceFormClose.addEventListener("click", closeForm);
-  cancelExperienceBtn.addEventListener("click", closeForm);
-  
-  // Current job checkbox
-  currentJob.addEventListener("change", function() {
-    if (this.checked) {
+  // Edit experience
+  const editExperience = (index) => {
+    const experience = experiences[index];
+    if (!experience) return;
+    
+    // Set form values
+    experienceIndex.value = index;
+    jobTitle.value = experience.title;
+    company.value = experience.company;
+    startDate.value = experience.startDate;
+    
+    if (experience.current) {
+      currentJob.checked = true;
       endDate.value = "";
       endDate.disabled = true;
     } else {
+      currentJob.checked = false;
+      endDate.value = experience.endDate || "";
       endDate.disabled = false;
     }
-  });
-  
-  // Close on click outside form
-  experienceFormContainer.addEventListener("click", function(e) {
-    if (e.target === this) {
-      closeForm();
-    }
-  });
-  
-  // Toggle job skills
-  if (toggleJobSkills && jobSkillsContainer) {
-    toggleJobSkills.addEventListener("click", function() {
-      const isExpanded = this.getAttribute("aria-expanded") === "true";
-      
-      if (isExpanded) {
-        jobSkillsContainer.classList.add("collapse");
-        this.setAttribute("aria-expanded", "false");
-      } else {
-        jobSkillsContainer.classList.remove("collapse");
-        this.setAttribute("aria-expanded", "true");
-      }
-    });
-  }
-  
-  // Skill tag click
-  if (skillTags) {
-    skillTags.forEach(tag => {
-      tag.addEventListener("click", function() {
-        const skill = this.dataset.skill;
-        // Add to job description with a bullet point
-        const currentText = jobDescription.value;
-        const newBullet = `• Utilized ${skill} to improve project outcomes`;
-        
-        if (currentText) {
-          jobDescription.value = currentText + (currentText.endsWith("\n") ? "" : "\n") + newBullet + "\n";
-        } else {
-          jobDescription.value = newBullet + "\n";
-        }
-        
-        // Show visual feedback
-        this.classList.add("selected");
-        setTimeout(() => {
-          this.classList.remove("selected");
-        }, 1500);
-        
-        // Focus and resize the textarea
-        jobDescription.focus();
-        jobDescription.style.height = "auto";
-        jobDescription.style.height = jobDescription.scrollHeight + "px";
-      });
-    });
-  }
-  
-  // AI Enhance button
-  if (aiEnhanceBtn && aiEnhancePanel) {
-    aiEnhanceBtn.addEventListener("click", function() {
-      // Toggle the AI enhancement panel
-      if (aiEnhancePanel.style.display === "none") {
-        aiEnhancePanel.style.display = "block";
-      } else {
-        aiEnhancePanel.style.display = "none";
-      }
-    });
-  }
-  
-  // Enhancement options
-  if (enhanceOptions) {
-    enhanceOptions.forEach(option => {
-      option.addEventListener("click", function() {
-        const enhanceType = this.dataset.enhance;
-        
-        if (!jobDescription.value.trim()) {
-          showTooltip(jobDescription, "Please add job description first");
-          return;
-        }
-        
-        // Add loading effect
-        this.classList.add("loading");
-        const originalContent = this.innerHTML;
-        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Processing...</span>';
-        
-        // Simulate AI processing (replace with actual API call later)
-        setTimeout(() => {
-          let enhancedText = "";
-          
-          switch (enhanceType) {
-            case "achievements":
-              enhancedText = enhanceWithAchievements(jobDescription.value);
-              break;
-            case "action-verbs":
-              enhancedText = enhanceWithActionVerbs(jobDescription.value);
-              break;
-            case "skills":
-              enhancedText = enhanceWithSkills(jobDescription.value);
-              break;
-            case "concise":
-              enhancedText = enhanceConcise(jobDescription.value);
-              break;
-            default:
-              enhancedText = jobDescription.value;
-          }
-          
-          // Apply the enhanced text
-          jobDescription.value = enhancedText;
-          
-          // Auto-resize the textarea
-          jobDescription.style.height = "auto";
-          jobDescription.style.height = jobDescription.scrollHeight + "px";
-          
-          // Reset the button
-          this.classList.remove("loading");
-          this.innerHTML = originalContent;
-          
-          // Hide the enhancement panel
-          aiEnhancePanel.style.display = "none";
-          
-          // Show feedback
-          const enhanceName = enhanceType.split('-').map(word => 
-            word.charAt(0).toUpperCase() + word.slice(1)
-          ).join(' ');
-          showTooltip(jobDescription, `Enhanced with ${enhanceName}`);
-        }, 1500);
-      });
-    });
-  }
-  
-  // Toolbar buttons
-  if (toolbarBtns) {
-    toolbarBtns.forEach(btn => {
-      btn.addEventListener("click", function() {
-        const action = this.dataset.action;
-        
-        // Skip if it's the AI enhance button (handled separately)
-        if (action === "enhance") return;
-        
-        switch (action) {
-          case "bullet":
-            // Add bullet point at cursor or at end
-            const cursorPos = jobDescription.selectionStart;
-            const textBefore = jobDescription.value.substring(0, cursorPos);
-            const textAfter = jobDescription.value.substring(cursorPos);
-            
-            if (cursorPos === 0 || jobDescription.value.charAt(cursorPos - 1) === '\n') {
-              // Add bullet at cursor
-              jobDescription.value = textBefore + "• " + textAfter;
-              jobDescription.selectionStart = jobDescription.selectionEnd = cursorPos + 2;
-            } else if (cursorPos === jobDescription.value.length) {
-              // Add new line and bullet at end
-              jobDescription.value = textBefore + "\n• ";
-              jobDescription.selectionStart = jobDescription.selectionEnd = jobDescription.value.length;
-            } else {
-              // Add new line and bullet in the middle
-              jobDescription.value = textBefore + "\n• " + textAfter;
-              jobDescription.selectionStart = jobDescription.selectionEnd = cursorPos + 3;
-            }
-            break;
-            
-          case "achievement":
-            // Add achievement phrase
-            const achievements = [
-              "resulting in ",
-              "which increased ",
-              "leading to ",
-              "improving ",
-              "reducing "
-            ];
-            const randomAchievement = achievements[Math.floor(Math.random() * achievements.length)];
-            
-            // Add at cursor or end
-            const pos = jobDescription.selectionEnd;
-            jobDescription.value = jobDescription.value.substring(0, pos) + 
-                                 " " + randomAchievement + 
-                                 jobDescription.value.substring(pos);
-            jobDescription.selectionStart = jobDescription.selectionEnd = pos + randomAchievement.length + 1;
-            break;
-            
-          case "skills":
-            // Toggle skills panel
-            if (toggleJobSkills) {
-              const isExpanded = toggleJobSkills.getAttribute("aria-expanded") === "true";
-              if (!isExpanded) {
-                jobSkillsContainer.classList.remove("collapse");
-                toggleJobSkills.setAttribute("aria-expanded", "true");
-              }
-            }
-            break;
-        }
-        
-        // Focus the textarea and update its height
-        jobDescription.focus();
-        jobDescription.style.height = "auto";
-        jobDescription.style.height = jobDescription.scrollHeight + "px";
-      });
-    });
-  }
-  
-  // Auto expand textarea on input
-  jobDescription.addEventListener("input", function() {
-    this.style.height = "auto";
-    this.style.height = this.scrollHeight + "px";
-  });
-};
+    
+    jobDescription.value = experience.description || "";
+    
+    // Update form title
+    experienceFormTitle.textContent = "Edit Work Experience";
+    
+    // Show the form
+    experienceFormContainer.style.display = "flex";
+    setTimeout(() => {
+      experienceFormContainer.classList.add("active");
+    }, 10);
+    
+    // Expand the textarea to fit content
+    autoResizeTextarea(jobDescription);
+  };
 
-// Enhancement helper functions (placeholders for future AI integration)
-const enhanceWithAchievements = (text) => {
-  // Add quantifiable achievements to bullet points
-  const lines = text.split('\n');
-  const achievementPhrases = [
-    "resulting in a 20% increase in efficiency",
-    "which improved team productivity by 15%",
-    "leading to a 30% reduction in costs",
-    "generating an additional $50,000 in revenue",
-    "reducing project completion time by 25%",
-    "increasing customer satisfaction by 40%",
-    "which decreased error rates by 35%",
-    "improving system performance by 50%"
-  ];
-  
-  return lines.map(line => {
-    if (!line.trim() || line.includes("resulting in") || line.includes("which improved") || 
-        line.includes("leading to") || line.includes("increasing") || line.includes("reducing")) {
-      return line; // Skip empty lines or lines that already have achievements
+  // Delete experience
+  const deleteExperience = (index) => {
+    if (confirm("Are you sure you want to delete this work experience?")) {
+      experiences.splice(index, 1);
+      updateExperienceData();
+      renderExperiences();
+      
+      showToast("Work experience deleted successfully", "success");
+    }
+  };
+
+  // Update the hidden input with experiences data
+  const updateExperienceData = () => {
+    experienceData.value = JSON.stringify(experiences);
+    
+    // Trigger change event for autosave
+    const event = new Event('change', { bubbles: true });
+    experienceData.dispatchEvent(event);
+  };
+
+  // Format the job description to ensure bullet points
+  const formatDescription = (text) => {
+    if (!text) return "";
+    
+    return text
+      .split("\n")
+      .map(line => {
+        const trimmed = line.trim();
+        if (!trimmed) return "";
+        if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("*")) {
+          return trimmed;
+        } else {
+          return `• ${trimmed}`;
+        }
+      })
+      .filter(line => line)
+      .join("\n");
+  };
+
+  // Auto resize textarea to fit content
+  const autoResizeTextarea = (textarea) => {
+    if (!textarea) return;
+    
+    textarea.style.height = "auto";
+    textarea.style.height = (textarea.scrollHeight) + "px";
+  };
+
+  // Handle form submission
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    
+    // Basic validation
+    if (!jobTitle.value.trim()) {
+      showToast("Please enter a job title", "error");
+      jobTitle.focus();
+      return;
     }
     
-    const randomAchievement = achievementPhrases[Math.floor(Math.random() * achievementPhrases.length)];
-    return `${line.trim()}, ${randomAchievement}`;
-  }).join('\n');
-};
-
-const enhanceWithActionVerbs = (text) => {
-  // Replace weak verbs with strong action verbs
-  const weakToStrong = {
-    "worked on": "spearheaded",
-    "helped": "facilitated",
-    "made": "created",
-    "did": "executed",
-    "used": "leveraged",
-    "responsible for": "led",
-    "handled": "managed",
-    "took care of": "orchestrated",
-    "in charge of": "directed",
-    "managed": "strategized"
+    if (!company.value.trim()) {
+      showToast("Please enter a company name", "error");
+      company.focus();
+      return;
+    }
+    
+    if (!startDate.value.trim()) {
+      showToast("Please enter a start date", "error");
+      startDate.focus();
+      return;
+    }
+    
+    if (!currentJob.checked && !endDate.value.trim()) {
+      showToast("Please enter an end date or select 'Current Position'", "error");
+      endDate.focus();
+      return;
+    }
+    
+    if (!jobDescription.value.trim()) {
+      showToast("Please enter job responsibilities or achievements", "error");
+      jobDescription.focus();
+      return;
+    }
+    
+    const index = parseInt(experienceIndex.value);
+    const isNewExperience = index === -1;
+    
+    // Format the description
+    const formattedDescription = formatDescription(jobDescription.value);
+    
+    // Create experience object
+    const experience = {
+      title: jobTitle.value.trim(),
+      company: company.value.trim(),
+      startDate: startDate.value.trim(),
+      endDate: currentJob.checked ? "" : endDate.value.trim(),
+      current: currentJob.checked,
+      description: formattedDescription
+    };
+    
+    // Update or add the experience
+    if (isNewExperience) {
+      experiences.push(experience);
+    } else {
+      experiences[index] = experience;
+    }
+    
+    // Update data and render
+    updateExperienceData();
+    renderExperiences();
+    
+    // Close the form
+    closeForm();
+    
+    // Show success toast
+    showToast(
+      isNewExperience 
+        ? "Work experience added successfully" 
+        : "Work experience updated successfully", 
+      "success"
+    );
   };
-  
-  let enhancedText = text;
-  Object.entries(weakToStrong).forEach(([weak, strong]) => {
-    const regex = new RegExp(`\\b${weak}\\b`, 'gi');
-    enhancedText = enhancedText.replace(regex, strong);
-  });
-  
-  return enhancedText;
+
+  // Close the form
+  const closeForm = () => {
+    experienceFormContainer.classList.remove("active");
+    setTimeout(() => {
+      experienceFormContainer.style.display = "none";
+    }, 300);
+  };
+
+  // Show toast notification
+  const showToast = (message, type = "info") => {
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+      <div class="toast-content">
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+        <span>${message}</span>
+      </div>
+      <button class="toast-close"><i class="fas fa-times"></i></button>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Show toast with animation
+    setTimeout(() => {
+      toast.classList.add("show");
+    }, 10);
+    
+    // Auto-close after 4 seconds
+    const timeout = setTimeout(() => {
+      closeToast(toast);
+    }, 4000);
+    
+    // Close button
+    const closeBtn = toast.querySelector(".toast-close");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
+        clearTimeout(timeout);
+        closeToast(toast);
+      });
+    }
+  };
+
+  // Close toast animation
+  const closeToast = (toast) => {
+    toast.classList.remove("show");
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  };
+
+  // Initialize event listeners
+  const initEventListeners = () => {
+    // Add experience button
+    addExperienceBtn.addEventListener("click", addExperience);
+    
+    // Form submission
+    experienceForm.addEventListener("submit", handleFormSubmit);
+    
+    // Close form buttons
+    experienceFormClose.addEventListener("click", closeForm);
+    cancelExperienceBtn.addEventListener("click", closeForm);
+    
+    // Current job checkbox
+    currentJob.addEventListener("change", function() {
+      if (this.checked) {
+        endDate.value = "";
+        endDate.disabled = true;
+      } else {
+        endDate.disabled = false;
+        endDate.focus();
+      }
+    });
+    
+    // Close on click outside form (modal overlay)
+    if (modalOverlay) {
+      modalOverlay.addEventListener("click", closeForm);
+    }
+    
+    // Toggle job skills
+    if (toggleJobSkills && jobSkillsContainer) {
+      toggleJobSkills.addEventListener("click", function() {
+        const isExpanded = this.getAttribute("aria-expanded") === "true";
+        
+        if (isExpanded) {
+          jobSkillsContainer.classList.add("collapse");
+          this.setAttribute("aria-expanded", "false");
+          this.querySelector("i").className = "fas fa-chevron-down";
+        } else {
+          jobSkillsContainer.classList.remove("collapse");
+          this.setAttribute("aria-expanded", "true");
+          this.querySelector("i").className = "fas fa-chevron-up";
+        }
+      });
+    }
+    
+    // Skill tag click
+    if (skillTags && skillTags.length) {
+      skillTags.forEach(tag => {
+        tag.addEventListener("click", function() {
+          const skill = this.dataset.skill;
+          // Add to job description with a bullet point
+          const currentText = jobDescription.value;
+          const newBullet = `• Utilized ${skill} to improve project outcomes`;
+          
+          if (currentText) {
+            jobDescription.value = currentText + (currentText.endsWith("\n") ? "" : "\n") + newBullet;
+          } else {
+            jobDescription.value = newBullet;
+          }
+          
+          // Show visual feedback
+          this.classList.add("selected");
+          setTimeout(() => {
+            this.classList.remove("selected");
+          }, 1500);
+          
+          // Focus and resize the textarea
+          jobDescription.focus();
+          autoResizeTextarea(jobDescription);
+        });
+      });
+    }
+    
+    // AI Enhance button
+    if (aiEnhanceBtn && aiEnhancePanel) {
+      aiEnhanceBtn.addEventListener("click", function() {
+        // Toggle the AI enhancement panel
+        if (aiEnhancePanel.style.display === "none") {
+          aiEnhancePanel.style.display = "block";
+          // Smooth animation
+          setTimeout(() => {
+            aiEnhancePanel.style.opacity = "1";
+            aiEnhancePanel.style.transform = "translateY(0)";
+          }, 10);
+        } else {
+          aiEnhancePanel.style.opacity = "0";
+          aiEnhancePanel.style.transform = "translateY(-10px)";
+          setTimeout(() => {
+            aiEnhancePanel.style.display = "none";
+          }, 300);
+        }
+      });
+    }
+    
+    // Enhancement options
+    if (enhanceOptions && enhanceOptions.length) {
+      enhanceOptions.forEach(option => {
+        option.addEventListener("click", function() {
+          const enhanceType = this.dataset.enhance;
+          
+          if (!jobDescription.value.trim()) {
+            showToast("Please add job description first", "error");
+            jobDescription.focus();
+            return;
+          }
+          
+          // Add loading effect
+          this.classList.add("loading");
+          const originalContent = this.innerHTML;
+          this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Processing...</span>';
+          
+          // Simulate AI processing (replace with actual API call later)
+          setTimeout(() => {
+            let enhancedText = "";
+            
+            switch (enhanceType) {
+              case "achievements":
+                enhancedText = enhanceWithAchievements(jobDescription.value);
+                break;
+              case "action-verbs":
+                enhancedText = enhanceWithActionVerbs(jobDescription.value);
+                break;
+              case "skills":
+                enhancedText = enhanceWithSkills(jobDescription.value);
+                break;
+              case "concise":
+                enhancedText = enhanceConcise(jobDescription.value);
+                break;
+              default:
+                enhancedText = jobDescription.value;
+            }
+            
+            // Apply the enhanced text
+            jobDescription.value = enhancedText;
+            
+            // Auto-resize the textarea
+            autoResizeTextarea(jobDescription);
+            
+            // Reset the button
+            this.classList.remove("loading");
+            this.innerHTML = originalContent;
+            
+            // Hide the enhancement panel with animation
+            aiEnhancePanel.style.opacity = "0";
+            aiEnhancePanel.style.transform = "translateY(-10px)";
+            setTimeout(() => {
+              aiEnhancePanel.style.display = "none";
+            }, 300);
+            
+            // Show feedback
+            const enhanceName = enhanceType.split('-').map(word => 
+              word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+            showToast(`Enhanced with ${enhanceName}`, "success");
+          }, 1500);
+        });
+      });
+    }
+    
+    // Toolbar buttons
+    if (toolbarBtns && toolbarBtns.length) {
+      toolbarBtns.forEach(btn => {
+        btn.addEventListener("click", function() {
+          const action = this.dataset.action;
+          
+          // Skip if it's the AI enhance button (handled separately)
+          if (action === "enhance") return;
+          
+          switch (action) {
+            case "bullet":
+              // Add bullet point at cursor or at end
+              const cursorPos = jobDescription.selectionStart;
+              const textBefore = jobDescription.value.substring(0, cursorPos);
+              const textAfter = jobDescription.value.substring(cursorPos);
+              
+              if (cursorPos === 0 || jobDescription.value.charAt(cursorPos - 1) === '\n') {
+                // Add bullet at cursor
+                jobDescription.value = textBefore + "• " + textAfter;
+                jobDescription.selectionStart = jobDescription.selectionEnd = cursorPos + 2;
+              } else if (cursorPos === jobDescription.value.length) {
+                // Add new line and bullet at end
+                jobDescription.value = textBefore + "\n• ";
+                jobDescription.selectionStart = jobDescription.selectionEnd = jobDescription.value.length;
+              } else {
+                // Add new line and bullet in the middle
+                jobDescription.value = textBefore + "\n• " + textAfter;
+                jobDescription.selectionStart = jobDescription.selectionEnd = cursorPos + 3;
+              }
+              break;
+              
+            case "achievement":
+              // Add achievement phrase
+              const achievements = [
+                "resulting in ",
+                "which increased ",
+                "leading to ",
+                "improving ",
+                "reducing "
+              ];
+              const randomAchievement = achievements[Math.floor(Math.random() * achievements.length)];
+              
+              // Add at cursor or end
+              const pos = jobDescription.selectionEnd;
+              jobDescription.value = jobDescription.value.substring(0, pos) + 
+                                   " " + randomAchievement + 
+                                   jobDescription.value.substring(pos);
+              jobDescription.selectionStart = jobDescription.selectionEnd = pos + randomAchievement.length + 1;
+              break;
+              
+            case "skills":
+              // Toggle skills panel
+              if (toggleJobSkills) {
+                const isExpanded = toggleJobSkills.getAttribute("aria-expanded") === "true";
+                if (!isExpanded) {
+                  jobSkillsContainer.classList.remove("collapse");
+                  toggleJobSkills.setAttribute("aria-expanded", "true");
+                  toggleJobSkills.querySelector("i").className = "fas fa-chevron-up";
+                }
+              }
+              break;
+          }
+          
+          // Focus the textarea and update its height
+          jobDescription.focus();
+          autoResizeTextarea(jobDescription);
+        });
+      });
+    }
+    
+    // Auto expand textarea on input
+    jobDescription.addEventListener("input", function() {
+      autoResizeTextarea(this);
+    });
+    
+    // Collapsible section header
+    const sectionHeader = document.querySelector(".section-header.collapsible");
+    const sectionContent = document.querySelector(".section-content");
+    
+    if (sectionHeader && sectionContent) {
+      sectionHeader.addEventListener("click", function() {
+        const isCollapsed = !sectionContent.classList.contains("collapsed");
+        
+        if (isCollapsed) {
+          sectionContent.classList.add("collapsed");
+          sectionContent.style.maxHeight = "0";
+          this.querySelector(".fa-chevron-down").classList.remove("fa-chevron-down");
+          this.querySelector(".section-toggle i:last-child").classList.add("fa-chevron-right");
+        } else {
+          sectionContent.classList.remove("collapsed");
+          sectionContent.style.maxHeight = sectionContent.scrollHeight + "px";
+          this.querySelector(".fa-chevron-right").classList.remove("fa-chevron-right");
+          this.querySelector(".section-toggle i:last-child").classList.add("fa-chevron-down");
+        }
+      });
+    }
+  };
+
+  // Enhancement helper functions (placeholders for future AI integration)
+  const enhanceWithAchievements = (text) => {
+    // Add quantifiable achievements to bullet points
+    const lines = text.split('\n');
+    const achievementPhrases = [
+      "resulting in a 20% increase in efficiency",
+      "which improved team productivity by 15%",
+      "leading to a 30% reduction in costs",
+      "generating an additional $50,000 in revenue",
+      "reducing project completion time by 25%",
+      "increasing customer satisfaction by 40%",
+      "which decreased error rates by 35%",
+      "improving system performance by 50%"
+    ];
+    
+    return lines.map(line => {
+      if (!line.trim() || line.includes("resulting in") || line.includes("which improved") || 
+          line.includes("leading to") || line.includes("increasing") || line.includes("reducing")) {
+        return line; // Skip empty lines or lines that already have achievements
+      }
+      
+      const randomAchievement = achievementPhrases[Math.floor(Math.random() * achievementPhrases.length)];
+      return `${line.trim()}, ${randomAchievement}`;
+    }).join('\n');
+  };
+
+  const enhanceWithActionVerbs = (text) => {
+    // Replace weak verbs with strong action verbs
+    const weakToStrong = {
+      "worked on": "spearheaded",
+      "helped": "facilitated",
+      "made": "created",
+      "did": "executed",
+      "used": "leveraged",
+      "responsible for": "led",
+      "handled": "managed",
+      "took care of": "orchestrated",
+      "in charge of": "directed",
+      "managed": "strategized"
+    };
+    
+    let enhancedText = text;
+    Object.entries(weakToStrong).forEach(([weak, strong]) => {
+      const regex = new RegExp(`\\b${weak}\\b`, 'gi');
+      enhancedText = enhancedText.replace(regex, strong);
+    });
+    
+    return enhancedText;
+  };
+
+  const enhanceWithSkills = (text) => {
+    // Add technical skills and keywords
+    const techSkills = [
+      "SQL", "Python", "JavaScript", "Data Analysis", 
+      "Project Management", "Agile Methodology", "Strategic Planning",
+      "Cross-functional Collaboration", "Cloud Computing", "Machine Learning",
+      "Digital Marketing", "Financial Analysis", "UI/UX Design"
+    ];
+    
+    const lines = text.split('\n');
+    
+    return lines.map((line, index) => {
+      // Only add skills to some lines (not all)
+      if (line.trim() && index % 2 === 0 && !lines.some(l => 
+        techSkills.some(skill => l.includes(skill)))) {
+        const skill = techSkills[Math.floor(Math.random() * techSkills.length)];
+        if (!line.includes(skill)) {
+          return `${line.trim()} using ${skill}`;
+        }
+      }
+      return line;
+    }).join('\n');
+  };
+
+  const enhanceConcise = (text) => {
+    // Make text more concise by removing filler words
+    const fillerWords = [
+      "basically", "actually", "literally", "very", "really", "just",
+      "quite", "simply", "that", "in order to", "I think that", "kind of",
+      "sort of", "type of", "for the most part", "needless to say"
+    ];
+    
+    let conciseText = text;
+    fillerWords.forEach(word => {
+      const regex = new RegExp(`\\b${word}\\b`, 'gi');
+      conciseText = conciseText.replace(regex, '');
+    });
+    
+    // Clean up double spaces
+    conciseText = conciseText.replace(/\s+/g, ' ');
+    
+    // Restore line breaks
+    conciseText = conciseText.replace(/• /g, '\n• ');
+    if (!conciseText.startsWith('•')) {
+      conciseText = '• ' + conciseText.trim();
+    }
+    
+    return conciseText;
+  };
+
+  // Initialize
+  initializeExperiences();
+  initEventListeners();
 };
 
-const enhanceWithSkills = (text) => {
-  // Add technical skills and keywords
-  const techSkills = [
-    "SQL", "Python", "JavaScript", "Data Analysis", 
-    "Project Management", "Agile Methodology", "Strategic Planning",
-    "Cross-functional Collaboration", "Cloud Computing", "Machine Learning",
-    "Digital Marketing", "Financial Analysis", "UI/UX Design"
-  ];
-  
-  const lines = text.split('\n');
-  
-  return lines.map((line, index) => {
-    // Only add skills to some lines (not all)
-    if (line.trim() && index % 2 === 0 && !lines.some(l => 
-      techSkills.some(skill => l.includes(skill)))) {
-      const skill = techSkills[Math.floor(Math.random() * techSkills.length)];
-      if (!line.includes(skill)) {
-        return `${line.trim()} using ${skill}`;
+
+// Add CSS for toast notifications
+const addToastStyles = () => {
+  const styleSheet = document.createElement("style");
+  styleSheet.textContent = `
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: white;
+      border-radius: 8px;
+      padding: 12px 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-width: 300px;
+      max-width: 80%;
+      z-index: 1050;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .toast-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .toast-content i {
+      font-size: 20px;
+    }
+    
+    .toast-success {
+      border-left: 4px solid #48bb78;
+    }
+    
+    .toast-success .toast-content i {
+      color: #48bb78;
+    }
+    
+    .toast-error {
+      border-left: 4px solid #e53e3e;
+    }
+    
+    .toast-error .toast-content i {
+      color: #e53e3e;
+    }
+    
+    .toast-info {
+      border-left: 4px solid #3b82f6;
+    }
+    
+    .toast-info .toast-content i {
+      color: #3b82f6;
+    }
+    
+    .toast-close {
+      background: none;
+      border: none;
+      color: #a0aec0;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px;
+      transition: color 0.2s ease;
+    }
+    
+    .toast-close:hover {
+      color: #4a5568;
+    }
+    
+    @media (max-width: 768px) {
+      .toast {
+        left: 20px;
+        right: 20px;
+        min-width: auto;
       }
     }
-    return line;
-  }).join('\n');
+  `;
+  document.head.appendChild(styleSheet);
 };
 
-const enhanceConcise = (text) => {
-  // Make text more concise by removing filler words
-  const fillerWords = [
-    "basically", "actually", "literally", "very", "really", "just",
-    "quite", "simply", "that", "in order to", "I think that", "kind of",
-    "sort of", "type of", "for the most part", "needless to say"
-  ];
-  
-  let conciseText = text;
-  fillerWords.forEach(word => {
-    const regex = new RegExp(`\\b${word}\\b`, 'gi');
-    conciseText = conciseText.replace(regex, '');
-  });
-  
-  // Clean up double spaces
-  conciseText = conciseText.replace(/\s+/g, ' ');
-  
-  // Restore line breaks
-  conciseText = conciseText.replace(/• /g, '\n• ');
-  if (!conciseText.startsWith('•')) {
-    conciseText = '• ' + conciseText.trim();
-  }
-  
-  return conciseText;
-};
-
-// Helper function to show tooltip
-const showTooltip = (element, message) => {
-  const tooltip = document.createElement("div");
-  tooltip.className = "floating-tooltip";
-  tooltip.textContent = message;
-  
-  document.body.appendChild(tooltip);
-  
-  const rect = element.getBoundingClientRect();
-  tooltip.style.top = `${rect.top + window.scrollY - 30}px`;
-  tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
-  tooltip.style.transform = "translate(-50%, -100%)";
-  
-  setTimeout(() => {
-    tooltip.classList.add("show");
-  }, 10);
-  
-  setTimeout(() => {
-    tooltip.classList.remove("show");
-    setTimeout(() => {
-      document.body.removeChild(tooltip);
-    }, 300);
-  }, 3000);
-};
-
-// Initialize
-initializeExperiences();
-initEventListeners();
-};
-// Education Manager
+// Education Section Manager
 const initEducationManager = () => {
   // Elements
   const educationTimeline = document.getElementById("education-timeline");
@@ -1691,6 +1939,7 @@ const initEducationManager = () => {
   const aiEnhancePanel = document.getElementById("education-enhance-panel");
   const enhanceOptions = document.querySelectorAll("#education-enhance-panel .enhance-option");
   const toolbarBtns = document.querySelectorAll("#education-form .toolbar-btn");
+  const modalOverlay = document.querySelector(".modal-overlay");
   
   if (!educationTimeline || !addEducationBtn || !educationForm) return;
   
@@ -1709,11 +1958,12 @@ const initEducationManager = () => {
     }
     
     renderEducations();
+    updateProgress();
   };
   
   // Render educations to timeline
   const renderEducations = () => {
-    // Clear the timeline except empty state
+    // Clear the timeline except for empty state
     Array.from(educationTimeline.children).forEach(child => {
       if (child.id !== "education-empty-state") {
         educationTimeline.removeChild(child);
@@ -1727,6 +1977,13 @@ const initEducationManager = () => {
     } else {
       emptyState.style.display = "none";
     }
+    
+    // Sort educations by start year (most recent first)
+    educations.sort((a, b) => {
+      const yearA = parseInt(a.startYear) || 0;
+      const yearB = parseInt(b.startYear) || 0;
+      return yearB - yearA;
+    });
     
     // Render each education
     educations.forEach((edu, index) => {
@@ -1796,9 +2053,26 @@ const initEducationManager = () => {
         deleteEducation(index);
       });
     });
+  };
+  
+  // Update progress indicator
+  const updateProgress = () => {
+    const sectionComplete = educations.length > 0;
+    const completeIcon = document.querySelector(".section-complete-icon");
     
-    // Update progress
-    updateProgress();
+    if (completeIcon) {
+      if (sectionComplete) {
+        completeIcon.style.display = "inline-block";
+      } else {
+        completeIcon.style.display = "none";
+      }
+    }
+    
+    // Dispatch event to notify parent component of progress
+    const progressEvent = new CustomEvent("resume-section-progress", {
+      detail: { section: "education", complete: sectionComplete }
+    });
+    document.dispatchEvent(progressEvent);
   };
   
   // Add education
@@ -1807,6 +2081,9 @@ const initEducationManager = () => {
     educationForm.reset();
     educationIndex.value = -1;
     educationFormTitle.textContent = "Add Education";
+    
+    // Enable end year by default
+    endYear.disabled = false;
     
     // Show the form
     educationFormContainer.style.display = "flex";
@@ -1835,7 +2112,7 @@ const initEducationManager = () => {
       endYear.disabled = true;
     } else {
       currentEducation.checked = false;
-      endYear.value = education.endYear;
+      endYear.value = education.endYear || "";
       endYear.disabled = false;
     }
     
@@ -1851,23 +2128,24 @@ const initEducationManager = () => {
     }, 10);
     
     // Expand the textarea to fit content
-    educationDescription.style.height = "auto";
-    educationDescription.style.height = educationDescription.scrollHeight + "px";
+    autoResizeTextarea(educationDescription);
   };
   
   // Delete education
   const deleteEducation = (index) => {
-    // Confirm before deleting
     if (confirm("Are you sure you want to delete this education entry?")) {
       educations.splice(index, 1);
       updateEducationData();
       renderEducations();
+      
+      showToast("Education entry deleted successfully", "success");
     }
   };
   
   // Update the hidden input with educations data
   const updateEducationData = () => {
     educationData.value = JSON.stringify(educations);
+    
     // Trigger change event for autosave
     const event = new Event('change', { bubbles: true });
     educationData.dispatchEvent(event);
@@ -1892,13 +2170,40 @@ const initEducationManager = () => {
       .join("\n");
   };
   
+  // Auto resize textarea to fit content
+  const autoResizeTextarea = (textarea) => {
+    if (!textarea) return;
+    
+    textarea.style.height = "auto";
+    textarea.style.height = (textarea.scrollHeight) + "px";
+  };
+  
   // Handle form submission
   const handleFormSubmit = (e) => {
     e.preventDefault();
     
     // Basic validation
-    if (!degree.value || !school.value || !startYear.value) {
-      showTooltip(educationForm, "Please fill in all required fields");
+    if (!degree.value.trim()) {
+      showToast("Please enter a degree or certificate", "error");
+      degree.focus();
+      return;
+    }
+    
+    if (!school.value.trim()) {
+      showToast("Please enter a school or university", "error");
+      school.focus();
+      return;
+    }
+    
+    if (!startYear.value.trim()) {
+      showToast("Please enter a start year", "error");
+      startYear.focus();
+      return;
+    }
+    
+    if (!currentEducation.checked && !endYear.value.trim()) {
+      showToast("Please enter an end year or check 'Currently Studying'", "error");
+      endYear.focus();
       return;
     }
     
@@ -1910,10 +2215,10 @@ const initEducationManager = () => {
     
     // Create education object
     const education = {
-      degree: degree.value,
-      school: school.value,
-      startYear: startYear.value,
-      endYear: currentEducation.checked ? "" : endYear.value,
+      degree: degree.value.trim(),
+      school: school.value.trim(),
+      startYear: startYear.value.trim(),
+      endYear: currentEducation.checked ? "" : endYear.value.trim(),
       current: currentEducation.checked,
       description: formattedDescription
     };
@@ -1933,7 +2238,12 @@ const initEducationManager = () => {
     closeForm();
     
     // Show success toast
-    showTooltip(addEducationBtn, isNewEducation ? "Education added successfully" : "Education updated successfully");
+    showToast(
+      isNewEducation 
+        ? "Education added successfully" 
+        : "Education updated successfully", 
+      "success"
+    );
   };
   
   // Close the form
@@ -1942,6 +2252,86 @@ const initEducationManager = () => {
     setTimeout(() => {
       educationFormContainer.style.display = "none";
     }, 300);
+  };
+  
+  // Show toast notification
+  const showToast = (message, type = "info") => {
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+      <div class="toast-content">
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+        <span>${message}</span>
+      </div>
+      <button class="toast-close"><i class="fas fa-times"></i></button>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Show toast with animation
+    setTimeout(() => {
+      toast.classList.add("show");
+    }, 10);
+    
+    // Auto-close after 4 seconds
+    const timeout = setTimeout(() => {
+      closeToast(toast);
+    }, 4000);
+    
+    // Close button
+    const closeBtn = toast.querySelector(".toast-close");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
+        clearTimeout(timeout);
+        closeToast(toast);
+      });
+    }
+  };
+  
+  // Close toast animation
+  const closeToast = (toast) => {
+    toast.classList.remove("show");
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  };
+  
+  // Add course template based on degree
+  const addCourseTemplate = () => {
+    if (!degree.value) {
+      showToast("Please enter your degree first", "error");
+      degree.focus();
+      return;
+    }
+    
+    const degreeText = degree.value.toLowerCase();
+    let courseTemplate = "• Relevant coursework: ";
+    
+    if (degreeText.includes("computer science") || degreeText.includes("cs")) {
+      courseTemplate += "Data Structures, Algorithms, Operating Systems, Database Systems, Web Development";
+    } else if (degreeText.includes("business") || degreeText.includes("mba")) {
+      courseTemplate += "Financial Accounting, Marketing Management, Business Strategy, Organizational Behavior";
+    } else if (degreeText.includes("engineering")) {
+      courseTemplate += "Engineering Design, Thermodynamics, Fluid Mechanics, Materials Science";
+    } else if (degreeText.includes("data") || degreeText.includes("analytics")) {
+      courseTemplate += "Statistical Methods, Data Mining, Machine Learning, Big Data Technologies";
+    } else {
+      courseTemplate += "[Add your relevant courses here]";
+    }
+    
+    // Add to description
+    if (educationDescription.value) {
+      const lastChar = educationDescription.value.slice(-1);
+      educationDescription.value += (lastChar === '\n' ? '' : '\n') + courseTemplate;
+    } else {
+      educationDescription.value = courseTemplate;
+    }
+    
+    educationDescription.selectionStart = educationDescription.selectionEnd = educationDescription.value.length;
+    educationDescription.focus();
+    autoResizeTextarea(educationDescription);
   };
   
   // Initialize event listeners
@@ -1963,15 +2353,14 @@ const initEducationManager = () => {
         endYear.disabled = true;
       } else {
         endYear.disabled = false;
+        endYear.focus();
       }
     });
     
-    // Close on click outside form
-    educationFormContainer.addEventListener("click", function(e) {
-      if (e.target === this) {
-        closeForm();
-      }
-    });
+    // Close on click outside form (modal overlay)
+    if (modalOverlay) {
+      modalOverlay.addEventListener("click", closeForm);
+    }
     
     // AI Enhance button
     if (aiEnhanceBtn && aiEnhancePanel) {
@@ -1979,20 +2368,30 @@ const initEducationManager = () => {
         // Toggle the AI enhancement panel
         if (aiEnhancePanel.style.display === "none") {
           aiEnhancePanel.style.display = "block";
+          // Smooth animation
+          setTimeout(() => {
+            aiEnhancePanel.style.opacity = "1";
+            aiEnhancePanel.style.transform = "translateY(0)";
+          }, 10);
         } else {
-          aiEnhancePanel.style.display = "none";
+          aiEnhancePanel.style.opacity = "0";
+          aiEnhancePanel.style.transform = "translateY(-10px)";
+          setTimeout(() => {
+            aiEnhancePanel.style.display = "none";
+          }, 300);
         }
       });
     }
     
     // Enhancement options
-    if (enhanceOptions) {
+    if (enhanceOptions && enhanceOptions.length) {
       enhanceOptions.forEach(option => {
         option.addEventListener("click", function() {
           const enhanceType = this.dataset.enhance;
           
           if (!educationDescription.value.trim() && enhanceType !== 'coursework') {
-            showTooltip(educationDescription, "Please add a description first");
+            showToast("Please add a description first", "error");
+            educationDescription.focus();
             return;
           }
           
@@ -2026,28 +2425,31 @@ const initEducationManager = () => {
             educationDescription.value = enhancedText;
             
             // Auto-resize the textarea
-            educationDescription.style.height = "auto";
-            educationDescription.style.height = educationDescription.scrollHeight + "px";
+            autoResizeTextarea(educationDescription);
             
             // Reset the button
             this.classList.remove("loading");
             this.innerHTML = originalContent;
             
-            // Hide the enhancement panel
-            aiEnhancePanel.style.display = "none";
+            // Hide the enhancement panel with animation
+            aiEnhancePanel.style.opacity = "0";
+            aiEnhancePanel.style.transform = "translateY(-10px)";
+            setTimeout(() => {
+              aiEnhancePanel.style.display = "none";
+            }, 300);
             
             // Show feedback
             const enhanceName = enhanceType.split('-').map(word => 
               word.charAt(0).toUpperCase() + word.slice(1)
             ).join(' ');
-            showTooltip(educationDescription, `Enhanced with ${enhanceName}`);
+            showToast(`Enhanced with ${enhanceName}`, "success");
           }, 1500);
         });
       });
     }
     
     // Toolbar buttons
-    if (toolbarBtns) {
+    if (toolbarBtns && toolbarBtns.length) {
       toolbarBtns.forEach(btn => {
         btn.addEventListener("click", function() {
           const action = this.dataset.action;
@@ -2084,7 +2486,6 @@ const initEducationManager = () => {
               
             case "gpa":
               // Add GPA template
-              const gpaPos = educationDescription.selectionEnd;
               const gpaTemplate = "• GPA: 3.8/4.0, Dean's List";
               
               if (educationDescription.value) {
@@ -2100,56 +2501,41 @@ const initEducationManager = () => {
           
           // Focus the textarea and update its height
           educationDescription.focus();
-          educationDescription.style.height = "auto";
-          educationDescription.style.height = educationDescription.scrollHeight + "px";
+          autoResizeTextarea(educationDescription);
         });
       });
     }
     
     // Auto expand textarea on input
     educationDescription.addEventListener("input", function() {
-      this.style.height = "auto";
-      this.style.height = this.scrollHeight + "px";
+      autoResizeTextarea(this);
     });
+    
+    // Collapsible section header
+    const sectionHeader = document.querySelector(".section-header.collapsible");
+    const sectionContent = document.querySelector(".section-content");
+    
+    if (sectionHeader && sectionContent) {
+      sectionHeader.addEventListener("click", function() {
+        const isCollapsed = !sectionContent.classList.contains("collapsed");
+        
+        if (isCollapsed) {
+          sectionContent.classList.add("collapsed");
+          sectionContent.style.maxHeight = "0";
+          this.querySelector(".fa-chevron-down").classList.remove("fa-chevron-down");
+          this.querySelector(".section-toggle i:last-child").classList.add("fa-chevron-right");
+        } else {
+          sectionContent.classList.remove("collapsed");
+          sectionContent.style.maxHeight = sectionContent.scrollHeight + "px";
+          this.querySelector(".fa-chevron-right").classList.remove("fa-chevron-right");
+          this.querySelector(".section-toggle i:last-child").classList.add("fa-chevron-down");
+        }
+      });
+    }
+   
   };
   
-  // Add course template based on degree
-  const addCourseTemplate = () => {
-    if (!degree.value) {
-      showTooltip(degree, "Please enter your degree first");
-      degree.focus();
-      return;
-    }
-    
-    const degreeText = degree.value.toLowerCase();
-    let courseTemplate = "• Relevant coursework: ";
-    
-    if (degreeText.includes("computer science") || degreeText.includes("cs")) {
-      courseTemplate += "Data Structures, Algorithms, Operating Systems, Database Systems, Web Development";
-    } else if (degreeText.includes("business") || degreeText.includes("mba")) {
-      courseTemplate += "Financial Accounting, Marketing Management, Business Strategy, Organizational Behavior";
-    } else if (degreeText.includes("engineering")) {
-      courseTemplate += "Engineering Design, Thermodynamics, Fluid Mechanics, Materials Science";
-    } else if (degreeText.includes("data") || degreeText.includes("analytics")) {
-      courseTemplate += "Statistical Methods, Data Mining, Machine Learning, Big Data Technologies";
-    } else {
-      courseTemplate += "[Add your relevant courses here]";
-    }
-    
-    // Add to description
-    if (educationDescription.value) {
-      const lastChar = educationDescription.value.slice(-1);
-      educationDescription.value += (lastChar === '\n' ? '' : '\n') + courseTemplate;
-    } else {
-      educationDescription.value = courseTemplate;
-    }
-    
-    educationDescription.selectionStart = educationDescription.selectionEnd = educationDescription.value.length;
-    educationDescription.focus();
-    educationDescription.style.height = "auto";
-    educationDescription.style.height = educationDescription.scrollHeight + "px";
-  };
-  
+  // Enhancement helper functions (placeholders for future AI integration)
   const addRelevantCoursework = (degreeText, currentText) => {
     // Generate relevant coursework based on degree
     const degree = degreeText.toLowerCase();
@@ -2304,31 +2690,6 @@ const initEducationManager = () => {
     return formattedLines.join('\n');
   };
   
-  // Helper function to show tooltip
-  const showTooltip = (element, message) => {
-    const tooltip = document.createElement("div");
-    tooltip.className = "floating-tooltip";
-    tooltip.textContent = message;
-    
-    document.body.appendChild(tooltip);
-    
-    const rect = element.getBoundingClientRect();
-    tooltip.style.top = `${rect.top + window.scrollY - 30}px`;
-    tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
-    tooltip.style.transform = "translate(-50%, -100%)";
-    
-    setTimeout(() => {
-      tooltip.classList.add("show");
-    }, 10);
-    
-    setTimeout(() => {
-      tooltip.classList.remove("show");
-      setTimeout(() => {
-        document.body.removeChild(tooltip);
-      }, 300);
-    }, 3000);
-  };
-  
   // Initialize
   initializeEducations();
   initEventListeners();
@@ -2472,6 +2833,7 @@ document.addEventListener("DOMContentLoaded", () => {
   updateProgress();
   initEducationManager();
   initAdvancedSectionManager();
+  addToastStyles();
   // Add this to your document.addEventListener("DOMContentLoaded", ...)
 const toggleAddSections = document.getElementById("toggle-add-sections");
 const addSectionOptions = document.getElementById("add-section-options");
