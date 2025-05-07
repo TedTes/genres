@@ -142,7 +142,6 @@ def resume_render(resume_id):
         abort(403)
     # Default to standard template if none specified
     template_id = resume.template or 'professional_classic'
-    template = template_registry.get_template(template_id)
    
     html_output  = generate_resume(g.app,resume)
     # Render the resume template
