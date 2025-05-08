@@ -2,32 +2,24 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/resume-builder.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="{{url_for('static', filename='/css/ai-assistant.css')}}">
 {% endblock %}
 {% block content %}
 {% include 'partials/navbar.html' %}
 <div class="resume-builder" data-resume-id="{{ resume.id }}">
-    <!-- Floating Controls (Left Side) -->
+
     <div class="floating-controls-left">
         <div class="tooltip-container">
-            <button class="float-control-btn" data-panel="edit-panel" title="Edit Sections">
-                <i class="fas fa-edit"></i>
+            <button id="ai-assistant-btn" class="toolbar-btn toolbar-btn-primary float-control-btn">
+                <i class="fas fa-robot"></i> AI Assistant
             </button>
-            <div class="btn-tooltip">Edit Sections</div>
         </div>
-        
+     
         <div class="tooltip-container">
             <button class="float-control-btn" data-panel="templates-panel" title="Choose Template">
                 <i class="fas fa-palette"></i>
             </button>
             <div class="btn-tooltip">Choose Template</div>
-        </div>
-        
-        
-        <div class="tooltip-container">
-            <button class="float-control-btn" id="preview-toggle" title="Toggle Preview Size">
-                <i class="fas fa-expand"></i>
-            </button>
-            <div class="btn-tooltip">Toggle Preview</div>
         </div>
         
         <div class="tooltip-container">
@@ -52,721 +44,7 @@
         <span class="progress-percentage">0%</span>
     </div>
 
-    <!-- Slide Out Panels -->
-    <!-- Edit Panel -->
-    <div class="slide-panel" id="edit-panel">
-        <div class="panel-header">
-            <h2>Edit Resume</h2>
-            <button class="panel-close" data-panel="edit-panel">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="panel-content">
-            <div class="resume-sections">
-                <!-- Contact Section -->
-                    <section class="resume-section-collapsible" data-section="contact">
-                        <div class="section-header collapsible">
-                            <h3>Contact Information</h3>
-                            <div class="section-toggle">
-                                <i class="fas fa-check-circle section-complete-icon"></i>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </div>
-                        <div class="section-content">
-                            <form method="POST" class="resume-form" id="contact-form">
-                                {{ contact_form.hidden_tag() }}
-                                
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <div class="form-label-container">
-                                            {{ contact_form.name.label(class="form-label") }}
-                                            <span class="required">*</span>
-                                        </div>
-                                        {{ contact_form.name(class="form-control resume-field", **{"placeholder": "e.g. John Smith", "required": "required", "data-section": "contact"}) }}
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <div class="form-label-container">
-                                            {{ contact_form.email.label(class="form-label") }}
-                                            <span class="required">*</span>
-                                        </div>
-                                        {{ contact_form.email(class="form-control resume-field", **{"placeholder": "e.g. john.smith@example.com", "required": "required", "data-section": "contact"}) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <div class="form-label-container">
-                                            {{ contact_form.phone.label(class="form-label") }}
-                                            <span class="required">*</span>
-                                        </div>
-                                        {{ contact_form.phone(class="form-control resume-field", **{"placeholder": "e.g. (555) 123-4567", "required": "required", "data-section": "contact"}) }}
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <div class="form-label-container">
-                                            <label class="form-label">Location</label>
-                                        </div>
-                                        <input type="text" name="location" class="form-control resume-field" placeholder="e.g. New York, NY" data-section="contact">
-                                    </div>
-                                </div>
-                                
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <div class="form-label-container">
-                                            <label class="form-label">LinkedIn</label>
-                                        </div>
-                                        <input type="text" name="linkedin" class="form-control resume-field" placeholder="e.g. linkedin.com/in/johnsmith" data-section="contact">
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <div class="form-label-container">
-                                            <label class="form-label">Website</label>
-                                        </div>
-                                        <input type="text" name="website" class="form-control resume-field" placeholder="e.g. johnsmith.com" data-section="contact">
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </section>
 
-                <!-- Skills Section -->
-                <section class="resume-section-collapsible" data-section="skills">
-                    <div class="section-header collapsible">
-                        <h3>Skills</h3>
-                        <div class="section-toggle">
-                            <i class="fas fa-check-circle section-complete-icon"></i>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                    </div>
-                    <div class="section-content">
-                        <form method="POST" class="resume-form" id="skills-form">
-                            {{ skills_form.hidden_tag() }}
-                            
-                            <div class="form-group">
-                                <div class="form-label-container">
-                                    <label class="form-label">Add Your Skills</label>
-                                </div>
-                                
-                                <div class="skills-input-wrapper">
-                                    <input type="text" class="form-control" id="skill-input" placeholder="Type a skill and press Enter">
-                                    <input type="hidden" name="skills" id="skills-hidden">
-                                </div>
-                                
-                                <div class="help-text">
-                                    <i class="fas fa-info-circle"></i>
-                                    <span>Press Enter after each skill or separate with commas</span>
-                                </div>
-                            </div>
-                            
-                            <div class="skills-container">
-                                <div class="form-label-container">
-                                    <label class="form-label">Your Skills</label>
-                                </div>
-                                
-                                <div class="skills-list-container">
-                                    <div class="skills-list" id="skills-list">
-                                        <!-- Skills will be added here dynamically -->
-                                        <div class="empty-skills-message" id="empty-skills-message">
-                                            No skills added yet. Use the field above to add your skills.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- AI Integration Placeholder for Future Implementation -->
-                            <div class="ai-skills-section">
-                                <div class="form-label-container">
-                                    <label class="form-label">AI Skill Suggestions</label>
-                                    <span class="beta-tag">Coming Soon</span>
-                                </div>
-                                
-                                <div class="ai-action-wrapper">
-                                    <button type="button" class="btn btn-ai" id="ai-extract-skills" disabled>
-                                        <i class="fas fa-magic"></i> Extract from Experience
-                                    </button>
-                                    <button type="button" class="btn btn-ai" id="ai-suggest-skills" disabled>
-                                        <i class="fas fa-lightbulb"></i> Suggest Skills
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            {% if skills %}
-                            <div class="job-skills-match">
-                                <div class="form-label-container">
-                                    <label class="form-label">Suggested Skills for This Job</label>
-                                    <button type="button" class="toggle-skills" id="toggle-skills" aria-expanded="false">
-                                        <i class="fas fa-chevron-down"></i>
-                                    </button>
-                                </div>
-                                
-                                <div class="skills-tags-container collapse" id="skills-tags-container">
-                                    <div class="skills-tags">
-                                        {% for skill in skills %}
-                                        <span class="skill-tag suggested" data-skill="{{ skill }}">{{ skill }}</span>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-                        </form>
-                    </div>
-                </section>
-
-             <!-- Professional Summary Section -->
-            <section class="resume-section-collapsible" data-section="summary">
-                <div class="section-header collapsible">
-                    <h3>Professional Summary</h3>
-                    <div class="section-toggle">
-                        <i class="fas fa-check-circle section-complete-icon"></i>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                </div>
-                <div class="section-content">
-                    <form method="POST" class="resume-form" id="summary-form">
-                        {{ summary_form.hidden_tag() }}
-                        
-                        <div class="form-group">
-                            <div class="form-label-container">
-                                <label class="form-label">Your Professional Summary</label>
-                                <span class="required">*</span>
-                                <span class="char-counter" id="summary-char-counter">0/400</span>
-                            </div>
-                            
-                            <div class="summary-textarea-wrapper">
-                                {{ summary_form.summary(class="form-control resume-field auto-expand", **{
-                                    "rows": "5", 
-                                    "required": "required", 
-                                    "data-section": "summary", 
-                                    "placeholder": "Write a concise overview of your professional background, key skills, and career goals...",
-                                    "maxlength": "400",
-                                    "id": "summary-textarea"
-                                }) }}
-                                <div class="summary-help-tooltip">
-                                    <i class="fas fa-info-circle"></i>
-                                    <div class="tooltip-content">
-                                        <h4>Writing a Great Summary</h4>
-                                        <ul>
-                                            <li>Keep it concise (3-5 sentences)</li>
-                                            <li>Focus on achievements and skills</li>
-                                            <li>Tailor it to your target role</li>
-                                            <li>Use industry keywords</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="ai-enhancement-section">
-                            <div class="form-label-container">
-                                <label class="form-label">Enhance with AI</label>
-                                <span class="pro-tag">Professional</span>
-                            </div>
-                            
-                            <div class="enhancement-options">
-                                <div class="enhancement-option" data-type="professional">
-                                    <div class="option-icon">
-                                        <i class="fas fa-briefcase"></i>
-                                    </div>
-                                    <div class="option-content">
-                                        <h4>Professional</h4>
-                                        <p>Polish your summary with professional language</p>
-                                    </div>
-                                    <button type="button" class="enhance-button enhance-summary" data-type="professional">
-                                        <i class="fas fa-magic"></i>
-                                    </button>
-                                </div>
-                                
-                                <div class="enhancement-option" data-type="concise">
-                                    <div class="option-icon">
-                                        <i class="fas fa-cut"></i>
-                                    </div>
-                                    <div class="option-content">
-                                        <h4>Concise</h4>
-                                        <p>Make your summary more focused and direct</p>
-                                    </div>
-                                    <button type="button" class="enhance-button enhance-summary" data-type="concise">
-                                        <i class="fas fa-magic"></i>
-                                    </button>
-                                </div>
-                                
-                                <div class="enhancement-option" data-type="keywords">
-                                    <div class="option-icon">
-                                        <i class="fas fa-key"></i>
-                                    </div>
-                                    <div class="option-content">
-                                        <h4>Add Keywords</h4>
-                                        <p>Optimize for ATS with industry-relevant terms</p>
-                                    </div>
-                                    <button type="button" class="enhance-button enhance-summary" data-type="keywords">
-                                        <i class="fas fa-magic"></i>
-                                    </button>
-                                </div>
-                                
-                                <div class="enhancement-option" data-type="achievement">
-                                    <div class="option-icon">
-                                        <i class="fas fa-trophy"></i>
-                                    </div>
-                                    <div class="option-content">
-                                        <h4>Achievement-Focused</h4>
-                                        <p>Highlight accomplishments and results</p>
-                                    </div>
-                                    <button type="button" class="enhance-button enhance-summary" data-type="achievement">
-                                        <i class="fas fa-magic"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                      
-                    </form>
-                </div>
-            </section>
-
-                <!-- Experience Section -->
-            <section class="resume-section-collapsible" data-section="experience">
-                    <div class="section-header collapsible">
-                        <h3>Work Experience</h3>
-                        <div class="section-toggle">
-                            <i class="fas fa-check-circle section-complete-icon"></i>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                    </div>
-                    <div class="section-content">
-                        <!-- Experience List Container -->
-                        <div class="experience-container">
-                            <div class="experience-timeline" id="experience-timeline">
-                                <!-- Timeline will be generated via JavaScript -->
-                                <div class="timeline-empty-state" id="timeline-empty-state">
-                                    <div class="empty-state-icon">
-                                        <i class="fas fa-briefcase"></i>
-                                    </div>
-                                    <h4>No experience added yet</h4>
-                                    <p>Add your work history to showcase your professional journey</p>
-                                </div>
-                            </div>
-                            
-                            <button type="button" class="add-experience-btn primary-action-btn" id="add-experience-btn">
-                                <div class="btn-icon">
-                                    <i class="fas fa-plus"></i>
-                                </div>
-                                <span>Add Work Experience</span>
-                            </button>
-                        </div>
-                        
-                        <input type="hidden" name="experience_data" id="experience-data" value="">
-                    </div>
-                </section>
-                
-                <!-- Experience Form Modal -->
-                <div class="experience-form-modal" id="experience-form-container" style="display: none;">
-                    <div class="modal-overlay"></div>
-                    <div class="form-card">
-                        <div class="form-card-header">
-                            <h3 id="experience-form-title">Add Work Experience</h3>
-                            <button type="button" class="form-card-close" id="experience-form-close">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        
-                        <form id="experience-form" class="resume-form">
-                            <input type="hidden" id="experience-index" value="-1">
-                            
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <div class="form-label-container">
-                                        <label class="form-label">Job Title</label>
-                                        <span class="required">*</span>
-                                    </div>
-                                    <div class="input-icon-wrapper">
-                                        <i class="fas fa-user-tie"></i>
-                                        <input type="text" id="job-title" class="form-control" placeholder="e.g. Software Engineer" required>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <div class="form-label-container">
-                                        <label class="form-label">Company</label>
-                                        <span class="required">*</span>
-                                    </div>
-                                    <div class="input-icon-wrapper">
-                                        <i class="fas fa-building"></i>
-                                        <input type="text" id="company" class="form-control" placeholder="e.g. Acme Corporation" required>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <div class="form-label-container">
-                                        <label class="form-label">Start Date</label>
-                                        <span class="required">*</span>
-                                    </div>
-                                    <div class="input-icon-wrapper">
-                                        <i class="fas fa-calendar-alt"></i>
-                                        <input type="text" id="start-date" class="form-control" placeholder="e.g. Jan 2020" required>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <div class="form-label-container">
-                                        <label class="form-label">End Date</label>
-                                    </div>
-                                    <div class="end-date-group">
-                                        <div class="input-icon-wrapper">
-                                            <i class="fas fa-calendar-alt"></i>
-                                            <input type="text" id="end-date" class="form-control" placeholder="e.g. Dec 2022">
-                                        </div>
-                                        <label class="current-job-checkbox">
-                                            <input type="checkbox" id="current-job"> 
-                                            <span class="checkmark"></span>
-                                            <span class="checkbox-label">Current Position</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <div class="form-label-container">
-                                    <label class="form-label">Responsibilities & Achievements</label>
-                                    <span class="required">*</span>
-                                    <div class="form-hint">
-                                        <i class="fas fa-info-circle"></i>
-                                        <span>Use bullet points (•) to list each accomplishment separately</span>
-                                    </div>
-                                </div>
-                                <div class="textarea-tools">
-                                    <textarea id="job-description" class="form-control auto-expand" rows="6" 
-                                        placeholder="• Developed a new feature that increased user engagement by 25%
-                • Led a team of 5 developers to deliver projects on time and under budget
-                • Reduced system response time by 40% through optimization" required></textarea>
-                                    
-                                    <div class="textarea-toolbar">
-                                        <button type="button" class="toolbar-btn" data-action="bullet" title="Add Bullet Point">
-                                            <i class="fas fa-list-ul"></i>
-                                        </button>
-                                        <button type="button" class="toolbar-btn" data-action="achievement" title="Add Achievement">
-                                            <i class="fas fa-trophy"></i>
-                                        </button>
-                                        <button type="button" class="toolbar-btn" data-action="skills" title="Insert Skills">
-                                            <i class="fas fa-tools"></i>
-                                        </button>
-                                        <button type="button" class="toolbar-btn ai-enhance" data-action="enhance" title="Enhance with AI">
-                                            <i class="fas fa-magic"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- AI Enhancement Panel -->
-                            <div class="ai-enhance-panel" id="ai-enhance-panel" style="display: none;">
-                                <div class="panel-header">
-                                    <h4><i class="fas fa-magic"></i> AI Enhancement Options</h4>
-                                    <p>Select an option to improve your job description</p>
-                                </div>
-                                <div class="enhance-options">
-                                    <button type="button" class="enhance-option" data-enhance="achievements">
-                                        <i class="fas fa-chart-line"></i>
-                                        <span>Add Measurable Achievements</span>
-                                    </button>
-                                    <button type="button" class="enhance-option" data-enhance="action-verbs">
-                                        <i class="fas fa-bolt"></i>
-                                        <span>Use Power Verbs</span>
-                                    </button>
-                                    <button type="button" class="enhance-option" data-enhance="skills">
-                                        <i class="fas fa-cogs"></i>
-                                        <span>Highlight Technical Skills</span>
-                                    </button>
-                                    <button type="button" class="enhance-option" data-enhance="concise">
-                                        <i class="fas fa-cut"></i>
-                                        <span>Make More Concise</span>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Relevant Skills Section -->
-                            {% if skills %}
-                            <div class="job-skills-match">
-                                <div class="form-label-container">
-                                    <label class="form-label">Relevant Skills for This Job</label>
-                                    <button type="button" class="toggle-skills" id="toggle-job-skills" aria-expanded="true">
-                                        <i class="fas fa-chevron-up"></i>
-                                    </button>
-                                </div>
-                                
-                                <div class="skills-tags-container" id="job-skills-container">
-                                    <div class="skills-tags">
-                                        {% for skill in skills %}
-                                        <span class="skill-tag suggested" data-skill="{{ skill }}">{{ skill }}</span>
-                                        {% endfor %}
-                                    </div>
-                                    <div class="skills-help">
-                                        <i class="fas fa-lightbulb"></i>
-                                        <span>Click on skills to add them to your job description</span>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-                            
-                            <div class="form-actions">
-                                <button type="button" id="cancel-experience" class="btn btn-outline">
-                                    <i class="fas fa-times"></i> Cancel
-                                </button>
-                                <button type="submit" id="save-experience" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Save
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-             <!-- Education Section -->
-             <section class="resume-section-collapsible" data-section="education">
-                <div class="section-header collapsible">
-                    <h3>Education</h3>
-                    <div class="section-toggle">
-                        <i class="fas fa-check-circle section-complete-icon"></i>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                </div>
-                <div class="section-content">
-                    <!-- Education Timeline Container -->
-                    <div class="education-container">
-                        <div class="education-timeline" id="education-timeline">
-                            <!-- Timeline will be generated via JavaScript -->
-                            <div class="timeline-empty-state" id="education-empty-state">
-                                <div class="empty-state-icon">
-                                    <i class="fas fa-graduation-cap"></i>
-                                </div>
-                                <h4>No education added yet</h4>
-                                <p>Add your educational background to showcase your academic achievements</p>
-                            </div>
-                        </div>
-                        
-                        <button type="button" class="primary-action-btn add-education-btn" id="add-education-btn">
-                            <div class="btn-icon">
-                                <i class="fas fa-plus"></i>
-                            </div>
-                            <span>Add Education</span>
-                        </button>
-                    </div>
-                    
-                    <input type="hidden" name="education_data" id="education-data" value="">
-                </div>
-            </section>
-            
-            <!-- Education Form Modal  -->
-            <div class="education-form-modal" id="education-form-container" style="display: none;">
-                <div class="modal-overlay"></div>
-                <div class="form-card">
-                    <div class="form-card-header">
-                        <h3 id="education-form-title">Add Education</h3>
-                        <button type="button" class="form-card-close" id="education-form-close">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    
-                    <form id="education-form" class="resume-form">
-                        <input type="hidden" id="education-index" value="-1">
-                        
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <div class="form-label-container">
-                                    <label class="form-label">Degree / Certificate</label>
-                                    <span class="required">*</span>
-                                </div>
-                                <div class="input-icon-wrapper">
-                                    <i class="fas fa-scroll"></i>
-                                    <input type="text" id="degree" class="form-control" placeholder="e.g. Bachelor of Science in Computer Science" required>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <div class="form-label-container">
-                                    <label class="form-label">School / University</label>
-                                    <span class="required">*</span>
-                                </div>
-                                <div class="input-icon-wrapper">
-                                    <i class="fas fa-university"></i>
-                                    <input type="text" id="school" class="form-control" placeholder="e.g. University of California, Berkeley" required>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <div class="form-label-container">
-                                    <label class="form-label">Start Year</label>
-                                    <span class="required">*</span>
-                                </div>
-                                <div class="input-icon-wrapper">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    <input type="text" id="education-start" class="form-control" placeholder="e.g. 2018" required>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <div class="form-label-container">
-                                    <label class="form-label">End Year</label>
-                                </div>
-                                <div class="end-date-group">
-                                    <div class="input-icon-wrapper">
-                                        <i class="fas fa-calendar-check"></i>
-                                        <input type="text" id="education-end" class="form-control" placeholder="e.g. 2022">
-                                    </div>
-                                    <label class="current-education-checkbox">
-                                        <input type="checkbox" id="current-education"> 
-                                        <span class="checkmark"></span>
-                                        <span class="checkbox-label">Currently Studying</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <div class="form-label-container">
-                                <label class="form-label">Description</label>
-                                <span class="optional-label">(Optional)</span>
-                                <div class="form-hint">
-                                    <i class="fas fa-info-circle"></i>
-                                    <span>Add relevant coursework, achievements, or other academic details</span>
-                                </div>
-                            </div>
-                            <div class="textarea-tools">
-                                <textarea id="education-description" class="form-control auto-expand" rows="5" 
-                                    placeholder="• Major: Computer Science with minor in Data Analytics
-            • GPA: 3.8/4.0, Dean's List all semesters
-            • Relevant coursework: Data Structures, Algorithms, Machine Learning
-            • President of Computer Science Club"></textarea>
-                                
-                                <div class="textarea-toolbar">
-                                    <button type="button" class="toolbar-btn" data-action="bullet" title="Add Bullet Point">
-                                        <i class="fas fa-list-ul"></i>
-                                    </button>
-                                    <button type="button" class="toolbar-btn" data-action="course" title="Add Coursework">
-                                        <i class="fas fa-book"></i>
-                                    </button>
-                                    <button type="button" class="toolbar-btn" data-action="gpa" title="Add GPA">
-                                        <i class="fas fa-award"></i>
-                                    </button>
-                                    <button type="button" class="toolbar-btn ai-enhance" data-action="enhance" title="Enhance with AI">
-                                        <i class="fas fa-magic"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- AI Enhancement Panel for Education -->
-                        <div class="ai-enhance-panel" id="education-enhance-panel" style="display: none;">
-                            <div class="panel-header">
-                                <h4><i class="fas fa-magic"></i> AI Enhancement Options</h4>
-                                <p>Select an option to improve your education details</p>
-                            </div>
-                            <div class="enhance-options">
-                                <button type="button" class="enhance-option" data-enhance="coursework">
-                                    <i class="fas fa-book"></i>
-                                    <span>Add Relevant Coursework</span>
-                                </button>
-                                <button type="button" class="enhance-option" data-enhance="achievements">
-                                    <i class="fas fa-medal"></i>
-                                    <span>Add Academic Achievements</span>
-                                </button>
-                                <button type="button" class="enhance-option" data-enhance="concise">
-                                    <i class="fas fa-cut"></i>
-                                    <span>Make More Concise</span>
-                                </button>
-                                <button type="button" class="enhance-option" data-enhance="format">
-                                    <i class="fas fa-align-left"></i>
-                                    <span>Improve Formatting</span>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button type="button" id="cancel-education" class="btn btn-outline">
-                                <i class="fas fa-times"></i> Cancel
-                            </button>
-                            <button type="submit" id="save-education" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Save
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-                <section class="resume-section-collapsible add-sections-container" data-section="add-sections">
-                    <div class="section-header collapsible">
-                        <h3>Add More Sections</h3>
-                        <div class="section-toggle">
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                    </div>
-                    <div class="section-content">
-                        <div class="add-section-options">
-                            <div class="section-option" data-section="certifications">
-                                <div class="section-option-icon">
-                                    <i class="fas fa-certificate"></i>
-                                </div>
-                                <div class="section-option-details">
-                                    <h3>Certifications</h3>
-                                    <p>Add professional certifications and licenses</p>
-                                </div>
-                            </div>
-                            
-                            <div class="section-option" data-section="projects">
-                                <div class="section-option-icon">
-                                    <i class="fas fa-project-diagram"></i>
-                                </div>
-                                <div class="section-option-details">
-                                    <h3>Projects</h3>
-                                    <p>Showcase personal or professional projects</p>
-                                </div>
-                            </div>
-                            
-                            <div class="section-option" data-section="languages">
-                                <div class="section-option-icon">
-                                    <i class="fas fa-language"></i>
-                                </div>
-                                <div class="section-option-details">
-                                    <h3>Languages</h3>
-                                    <p>Add languages you speak and proficiency levels</p>
-                                </div>
-                            </div>
-                            
-                            <div class="section-option" data-section="awards">
-                                <div class="section-option-icon">
-                                    <i class="fas fa-trophy"></i>
-                                </div>
-                                <div class="section-option-details">
-                                    <h3>Awards & Honors</h3>
-                                    <p>Highlight achievements and recognition</p>
-                                </div>
-                            </div>
-                            
-                            <div class="section-option" data-section="volunteering">
-                                <div class="section-option-icon">
-                                    <i class="fas fa-hands-helping"></i>
-                                </div>
-                                <div class="section-option-details">
-                                    <h3>Volunteer Experience</h3>
-                                    <p>Show community involvement and volunteer work</p>
-                                </div>
-                            </div>
-                            
-                            <div class="section-option" data-section="publications">
-                                <div class="section-option-icon">
-                                    <i class="fas fa-book"></i>
-                                </div>
-                                <div class="section-option-details">
-                                    <h3>Publications</h3>
-                                    <p>List articles, papers, or books you've published</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
-    </div>
     
     <!-- Templates Panel -->
     <div class="slide-panel" id="templates-panel">
@@ -801,7 +79,64 @@
         </div>
     </div>
     
-
+    <!-- AI Assistant Modal -->
+    <div class="ai-modal" id="ai-assistant-modal">
+      <div class="ai-modal-content">
+        <div class="ai-modal-header">
+          <h3 class="ai-modal-title">AI Assistant</h3>
+          <button class="ai-modal-close">&times;</button>
+        </div>
+        <div class="ai-modal-body">
+          <div class="ai-assistant-menu">
+            <h4>How can I help improve your resume?</h4>
+            <div class="ai-feature-cards">
+              <div class="ai-feature-card" data-action="generate-summary">
+                <div class="ai-feature-icon"><i class="fas fa-magic"></i></div>
+                <div class="ai-feature-text">
+                  <h5>Generate Summary</h5>
+                  <p>Create a professional summary based on your experience</p>
+                </div>
+              </div>
+              <div class="ai-feature-card" data-action="enhance-bullets">
+                <div class="ai-feature-icon"><i class="fas fa-star"></i></div>
+                <div class="ai-feature-text">
+                  <h5>Enhance Experience</h5>
+                  <p>Improve your work experience bullet points</p>
+                </div>
+              </div>
+              <div class="ai-feature-card" data-action="suggest-skills">
+                <div class="ai-feature-icon"><i class="fas fa-lightbulb"></i></div>
+                <div class="ai-feature-text">
+                  <h5>Suggest Skills</h5>
+                  <p>Recommend relevant skills based on your background</p>
+                </div>
+              </div>
+              <div class="ai-feature-card" data-action="tailor-to-job">
+                <div class="ai-feature-icon"><i class="fas fa-bullseye"></i></div>
+                <div class="ai-feature-text">
+                  <h5>Tailor to Job</h5>
+                  <p>Customize your resume for a specific job description</p>
+                </div>
+              </div>
+              <div class="ai-feature-card" data-action="ats-scan">
+                <div class="ai-feature-icon"><i class="fas fa-robot"></i></div>
+                <div class="ai-feature-text">
+                  <h5>ATS Optimization</h5>
+                  <p>Check and improve ATS compatibility</p>
+                </div>
+              </div>
+              <div class="ai-feature-card" data-action="extract-skills">
+                <div class="ai-feature-icon"><i class="fas fa-clipboard-check"></i></div>
+                <div class="ai-feature-text">
+                  <h5>Extract Skills</h5>
+                  <p>Extract skills from your work experience</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Main Preview Area -->
     <div class="resume-preview-container">
@@ -816,4 +151,5 @@
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/resume-builder.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ai-assistant.js') }}"></script>
 {% endblock %}
