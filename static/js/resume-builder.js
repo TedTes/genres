@@ -1,2928 +1,409 @@
-
-// Initialize Template Selection
-const initTemplates = () => {
-  const templateForm = document.getElementById("template-form");
-  const templateOptions = document.querySelectorAll('.template-option input[type="radio"]');
-  const resumeId = document.querySelector(".resume-builder").dataset.resumeId;
-  const previewContainer = document.querySelector(".preview-container");
+document.addEventListener('DOMContentLoaded', function() {
+  // Theme color changer
+  const root = document.documentElement;
   
-  // Store the current template ID
-  let currentTemplate = document.querySelector('.template-option input[type="radio"]:checked')?.value || '';
-  
-  templateOptions.forEach(option => {
-    option.addEventListener("change", function() {
-      const templateId = this.value;
-      if (templateId === currentTemplate) return; // Don't update if same template
-      
-      // Show loading indicator
-      const previewContent = document.getElementById("dynamic-preview-content");
-      if (previewContent) {
-        const loadingOverlay = document.createElement("div");
-        loadingOverlay.className = "preview-loading-overlay";
-        loadingOverlay.innerHTML = `
-          <div class="loading-spinner"></div>
-          <div class="loading-text">Updating template...</div>
-        `;
-        previewContent.parentNode.insertBefore(loadingOverlay, previewContent);
-      }
-      
-      currentTemplate = templateId;
-      
-      // Update the UI to reflect the new template
-      updateTemplatePreview(templateId);
-      
-      // Send AJAX request to update template
-      const formData = new FormData();
-      formData.append('template', templateId);
-      formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
-      
-      // Update the URL to match the correct endpoint
-      const updateUrl = `http://localhost:5000/resume/${resumeId}/update-template`;
-      
-      fetch(updateUrl, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      })
-      .then(response => {
-        // If the server doesn't return JSON, we can still consider it a success
-        if (response.ok) {
-          return { success: true };
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (data.success) {
-          // Remove loading overlay
-          document.querySelector(".preview-loading-overlay")?.remove();
-          
-          // Refresh the preview with the new template
-          // updatePreview();
-          
-          // Show success feedback
-          showFeedback(templateForm, "success", "Template updated!");
-        } else {
-          document.querySelector(".preview-loading-overlay")?.remove();
-          showFeedback(templateForm, "error", data.error || "Error updating template");
-        }
-      })
-      .catch(error => {
-        console.error("Error updating template:", error);
-        document.querySelector(".preview-loading-overlay")?.remove();
-        showFeedback(templateForm, "error", "Error updating template");
-      });
-    });
-  });
-  
-  // Function to update the preview with the new template
-  function updateTemplatePreview(templateId) {
-    // First, update class on preview container to reflect template
-    if (!previewContainer) return;
-    
-    // Remove any existing template classes
-    const classes = previewContainer.className.split(' ');
-    const templateClasses = classes.filter(cls => cls.startsWith('template-'));
-    templateClasses.forEach(cls => previewContainer.classList.remove(cls));
-    
-    // Add new template class
-    previewContainer.classList.add(`template-${templateId}`);
-  }
-};
-// Global state
-let experiences = [];
-let educations = [];
-let skills = [];
-let additionalSections = {};
+  // Print functionality
+  // document.getElementById('print-btn').addEventListener('click', function() {
+  //   window.print();
+  // });
 
-// Utility: Debounce function to limit frequent updates
-const debounce = (func, wait) => {
-  let timeout;
-  return function (...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-};
+  // Add new section
+  // document.getElementById('add-section-btn').addEventListener('click', function() {
+  //   const sectionTitle = prompt('Enter section title:');
+  //   if (sectionTitle) {
+  //     const sectionType = prompt('Enter section type (text, list, tags):');
+  //     const newSection = document.createElement('section');
+  //     newSection.className = 'resume-section';
+  //     let sectionHTML = `
+  //       <h2 class="section-title" contenteditable="true">
+  //         <i class="fas fa-star"></i>
+  //         ${sectionTitle}
+  //       </h2>
+  //     `;
+  //     if (sectionType === 'tags') {
+  //       sectionHTML += `
+  //         <div class="section-container">
+  //           <button class="add-tag-btn" id="add-custom-tag-btn-${Date.now()}">
+  //             <i class="fas fa-plus"></i> Add Item
+  //           </button>
+  //         </div>
+  //       `;
+  //     } else if (sectionType === 'list') {
+  //       sectionHTML += `
+  //         <button class="add-item-btn" id="add-custom-item-btn-${Date.now()}">
+  //           <i class="fas fa-plus"></i> Add Item
+  //         </button>
+  //       `;
+  //     } else {
+  //       sectionHTML += `
+  //         <div class="section-content" contenteditable="true">
+  //           Add your content here...
+  //         </div>
+  //       `;
+  //     }
+  //     newSection.innerHTML = sectionHTML;
+  //     document.querySelector('.resume-container').appendChild(newSection);
+  //     if (sectionType === 'tags') {
+  //       const addTagBtn = newSection.querySelector('.add-tag-btn');
+  //       addTagBtn.addEventListener('click', function() {
+  //         addNewTag(this);
+  //       });
+  //     } else if (sectionType === 'list') {
+  //       const addItemBtn = newSection.querySelector('.add-item-btn');
+  //       addItemBtn.addEventListener('click', function() {
+  //         addNewItem(this, 'custom');
+  //       });
+  //     }
+  //     autoSave();
+  //   }
+  // });
 
-// Utility: Show feedback messages
-const showFeedback = (element, type, message) => {
-  const feedbackClass = `${type}-feedback`;
-  let feedback = element.parentElement.querySelector(`.${feedbackClass}`);
-
-  if (!feedback) {
-    feedback = document.createElement("div");
-    feedback.className = feedbackClass;
-    element.parentElement.appendChild(feedback);
-  }
-
-  feedback.textContent = message;
-  feedback.style.opacity = "1";
-
-  setTimeout(() => {
-    feedback.style.opacity = "0";
-    setTimeout(() => {
-      if (feedback.parentNode) {
-        feedback.parentNode.removeChild(feedback);
-      }
-    }, 300);
-  }, 2000);
-};
-
-// Initialize Panels (Sidebar and Slide-Out Panels)
-const initPanels = () => {
-  const floatControlBtns = document.querySelectorAll(".float-control-btn[data-panel]");
-  const panelCloseBtns = document.querySelectorAll(".panel-close");
-  const slidePanels = document.querySelectorAll(".slide-panel");
-  const sidebarToggleBtn = document.getElementById("sidebar-toggle");
-  const sidebar = document.querySelector(".floating-controls-left");
-  const previewToggleBtn = document.getElementById("preview-toggle");
-  const container = document.querySelector(".resume-builder-container");
-
-  // Handle sidebar toggle for mobile
-  if (sidebarToggleBtn && sidebar) {
-    sidebarToggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("collapsed");
-      
-      if (sidebar.classList.contains("collapsed")) {
-        sidebarToggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
-        container.classList.add("sidebar-collapsed");
-      } else {
-        sidebarToggleBtn.innerHTML = '<i class="fas fa-times"></i>';
-        container.classList.remove("sidebar-collapsed");
-      }
-    });
-  }
-
-  // Initialize sidebar state for mobile
-  if (window.innerWidth <= 768) {
-    sidebar.classList.add("collapsed");
-    container.classList.add("sidebar-collapsed");
-  } else {
-    sidebar.classList.remove("collapsed");
-    // container.classList.remove("sidebar-collapsed");
-  }
-
-  // Toggle panels
-  floatControlBtns.forEach((btn) => {
-    btn.addEventListener("click", function () {
-      const panelId = this.dataset.panel;
-      const panel = document.getElementById(panelId);
-
-      // Close other panels
-      slidePanels.forEach((p) => {
-        if (p.id !== panelId) {
-          p.classList.remove("active");
-          document
-            .querySelector(`.float-control-btn[data-panel="${p.id}"]`)
-            ?.classList.remove("active");
-        }
-      });
-
-      // Toggle current panel
-      panel.classList.toggle("active");
-      this.classList.toggle("active", panel.classList.contains("active"));
-
-      // Adjust container
-      const anyPanelActive = Array.from(slidePanels).some((p) =>
-        p.classList.contains("active")
-      );
-      
-      if (anyPanelActive) {
-        container.classList.add("expanded");
-      } else {
-        container.classList.remove("expanded");
-      }
-    });
-  });
-
-  // Close panels
-  panelCloseBtns.forEach((btn) => {
-    btn.addEventListener("click", function () {
-      const panelId = this.closest(".slide-panel").id;
-      const panel = document.getElementById(panelId);
-      panel.classList.remove("active");
-
-      const controlBtn = document.querySelector(
-        `.float-control-btn[data-panel="${panelId}"]`
-      );
-      if (controlBtn) controlBtn.classList.remove("active");
-
-      const anyPanelActive = Array.from(slidePanels).some((p) =>
-        p.classList.contains("active")
-      );
-      if (!anyPanelActive) {
-        document
-          .querySelector(".resume-builder-container")
-          .classList.remove("expanded");
-      }
-    });
-  });
-
-  // Toggle preview size
-  if (previewToggleBtn) {
-    previewToggleBtn.addEventListener("click", () => {
-      const container = document.querySelector(".resume-builder-container");
-      const isFullScreen = container.classList.contains("preview-fullscreen");
-
-      if (isFullScreen) {
-        container.classList.remove("preview-fullscreen");
-        previewToggleBtn.innerHTML = '<i class="fas fa-expand"></i>';
-        previewToggleBtn.title = "Expand Preview";
-      } else {
-        container.classList.add("preview-fullscreen");
-        previewToggleBtn.innerHTML = '<i class="fas fa-compress"></i>';
-        previewToggleBtn.title = "Collapse Preview";
-      }
-    });
-  }
-
-  // Add info icon for current template
-  const templateInfoBtn = document.createElement("div");
-  templateInfoBtn.className = "tooltip-container";
-  templateInfoBtn.innerHTML = `
-    <button class="float-control-btn" title="Current Template Info">
-      <i class="fas fa-info-circle"></i>
-    </button>
-    <div class="btn-tooltip">View current template</div>
-  `;
-  if (sidebar) {
-    sidebar.appendChild(templateInfoBtn);
-  }
-
-  templateInfoBtn.addEventListener("click", () => {
-    const selectedTemplate = document.querySelector(
-      '.template-option input[type="radio"]:checked'
-    );
-    const templateName = selectedTemplate
-      ? selectedTemplate.nextElementSibling.querySelector(".template-name")
-          .textContent
-      : "No template selected";
-    alert(`Current Template: ${templateName}`);
-  });
-
-  // Handle click outside to close sidebar on mobile
-  document.addEventListener("click", (event) => {
-    const isClickInsideSidebar = sidebar.contains(event.target);
-    const isClickInsideSidebarToggle = sidebarToggleBtn && sidebarToggleBtn.contains(event.target);
-    
-    if (window.innerWidth <= 768 && !isClickInsideSidebar && !isClickInsideSidebarToggle && !sidebar.classList.contains("collapsed")) {
-      sidebar.classList.add("collapsed");
-      container.classList.add("sidebar-collapsed");
-      if (sidebarToggleBtn) {
-        sidebarToggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
-      }
-    }
-  });
-};
-
-// Initialize Collapsible Sections
-const initCollapsibleSections = () => {
-  const sectionHeaders = document.querySelectorAll(".section-header.collapsible");
-
-  sectionHeaders.forEach((header) => {
-    header.addEventListener("click", function () {
-      const section = this.closest(".resume-section-collapsible");
-      section.classList.toggle("active");
-
-      const chevron = this.querySelector(".fa-chevron-down");
-      if (section.classList.contains("active")) {
-        chevron.style.transform = "rotate(180deg)";
-      } else {
-        chevron.style.transform = "rotate(0deg)";
-      }
-    });
-  });
-
-  // Open first section by default
-  const firstSection = document.querySelector(".resume-section-collapsible");
-  if (firstSection) {
-    firstSection.classList.add("active");
-    const chevron = firstSection.querySelector(".fa-chevron-down");
-    if (chevron) chevron.style.transform = "rotate(180deg)";
-  }
-};
-
-const initSectionOptions = () => {
-  const sectionOptions = document.querySelectorAll(".section-option");
-  
-  sectionOptions.forEach(option => {
-    option.addEventListener("click", function() {
-      const sectionType = this.dataset.section;
-      // Implement section addition logic here
-      console.log(`Adding section: ${sectionType}`);
-      
-      // Show temporary feedback
-      const feedback = document.createElement("div");
-      feedback.className = "success-feedback";
-      feedback.textContent = `${sectionType} section added!`;
-      feedback.style.opacity = "1";
-      this.appendChild(feedback);
-      
-      setTimeout(() => {
-        feedback.style.opacity = "0";
-        setTimeout(() => {
-          if (feedback.parentNode) {
-            feedback.parentNode.removeChild(feedback);
-          }
-        }, 300);
-      }, 2000);
-      
-      // Actual implementation would add the new section to the UI
-      // and manage the data structure
-    });
-  });
-};
-// Setup Auto Resize Inputs
-const setupAutoResizeInputs = () => {
-  document.querySelectorAll(".auto-resize").forEach((input) => {
-    input.addEventListener("input", function () {
-      if (!this.dataset.hasOwnProperty("originalWidth")) {
-        this.dataset.originalWidth = this.style.width || "";
-        this.dataset.originalMinWidth = this.style.minWidth || "";
-      }
-
-      const span = document.createElement("span");
-      span.style.position = "absolute";
-      span.style.left = "-9999px";
-      span.style.fontSize = window.getComputedStyle(this).fontSize;
-      span.style.fontFamily = window.getComputedStyle(this).fontFamily;
-      span.style.whiteSpace = "pre";
-      span.textContent = this.value || this.placeholder;
-      document.body.appendChild(span);
-
-      const paddingWidth = 20;
-      const newWidth = Math.min(span.offsetWidth + paddingWidth, 300);
-      this.style.width = Math.max(newWidth, 80) + "px";
-
-      document.body.removeChild(span);
-    });
-    input.dispatchEvent(new Event("input"));
-  });
-};
-
-// Setup Auto Expand Textareas
-const setupAutoExpandTextareas = () => {
-  document.querySelectorAll(".auto-expand").forEach((textarea) => {
-    textarea.addEventListener("input", function () {
-      this.style.height = "auto";
-      this.style.height = `${this.scrollHeight}px`;
-    });
-    textarea.dispatchEvent(new Event("input"));
-  });
-};
-
-// Setup Auto Save
-const setupAutoSave = () => {
-  const autoSave = debounce((field, value) => {
-    const resumeId = document.querySelector(".resume-builder").dataset.resumeId;
-    const section = field.closest("[data-section]")?.dataset.section || 'general';
-
-    // Simulate saving to localStorage (replace with backend API call)
-    localStorage.setItem(
-      `resume-${resumeId}-${section}-${field.name}`,
-      value
-    );
-    
-    // Update progress after save
-    updateProgress();
-  }, 800);
-
-  document.querySelectorAll(".resume-field").forEach((field) => {
-    field.addEventListener("input", () =>
-      autoSave(field, field.value)
-    );
-    field.addEventListener("change", () =>
-      autoSave(field, field.value)
-    );
-  });
-};
-
-//  Skills Manager
-const initSkillsManager = () => {
-  const skillsInput = document.getElementById("skill-input");
-  const skillsList = document.getElementById("skills-list");
-  const skillsHidden = document.getElementById("skills-hidden");
-  const skillSuggestions = document.querySelectorAll(".skill-tag.suggested");
-  const toggleSkills = document.getElementById("toggle-skills");
-  const emptySkillsMessage = document.getElementById("empty-skills-message");
-  
-  if (!skillsInput || !skillsList || !skillsHidden) return;
-
-  // Initialize skills from hidden input
-  let skills = [];
-  try {
-    skills = skillsHidden.value ? JSON.parse(skillsHidden.value) : [];
-  } catch (e) {
-    console.error("Error parsing skills JSON:", e);
-    skills = [];
-  }
-  
-  renderSkills();
-
-  // Add skill on Enter or comma
-  skillsInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      addSkill(skillsInput.value.trim());
-      skillsInput.value = "";
-    }
-  });
-
-  // Add skill on blur
-  skillsInput.addEventListener("blur", () => {
-    if (skillsInput.value.trim()) {
-      addSkill(skillsInput.value.trim());
-      skillsInput.value = "";
-    }
-  });
-
-  // Toggle suggested skills
-  if (toggleSkills) {
-    toggleSkills.addEventListener("click", function () {
-      const skillsContainer = document.getElementById("skills-tags-container");
-      const isExpanded = this.getAttribute("aria-expanded") === "true";
-
-      if (isExpanded) {
-        skillsContainer.classList.add("collapse");
-        this.setAttribute("aria-expanded", "false");
-      } else {
-        skillsContainer.classList.remove("collapse");
-        this.setAttribute("aria-expanded", "true");
-      }
-    });
-  }
-
-  // Add suggested skills
-  if (skillSuggestions) {
-    skillSuggestions.forEach((suggestion) => {
-      suggestion.addEventListener("click", function () {
-        addSkill(this.dataset.skill);
-        this.classList.add("added");
-        
-        // Visual feedback
-        this.style.backgroundColor = "#d1fae5"; // Success light green
-        this.style.borderColor = "#10b981"; // Success
-        this.style.color = "#10b981"; // Success
-        
-        // Reset after a moment
-        setTimeout(() => {
-          this.style.backgroundColor = "";
-          this.style.borderColor = "";
-          this.style.color = "";
-        }, 1500);
-      });
-    });
-  }
-
-  function addSkill(skillText) {
-    if (!skillText) return;
-    
-    const skillsToAdd = skillText
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => s && !skills.includes(s));
-      
-    if (skillsToAdd.length === 0) return;
-    
-    skills.push(...skillsToAdd);
-    renderSkills();
-    updateSkillsField();
-    
-    // Provide subtle feedback
-    skillsInput.style.borderColor = "#10b981";
-    setTimeout(() => {
-      skillsInput.style.borderColor = "";
-    }, 800);
-  }
-
-  function removeSkill(index) {
-    skills.splice(index, 1);
-    renderSkills();
-    updateSkillsField();
-  }
-
-  function renderSkills() {
-    skillsList.innerHTML = "";
-    
-    if (skills.length === 0) {
-      skillsList.appendChild(emptySkillsMessage || createEmptyMessage());
-      return;
-    }
-    
-    skills.forEach((skill, index) => {
-      const tag = document.createElement("div");
-      tag.className = "skill-tag";
-      tag.innerHTML = `
-        <span>${skill}</span>
-        <button type="button" class="remove-skill" data-index="${index}" aria-label="Remove ${skill}">×</button>
-      `;
-      skillsList.appendChild(tag);
-    });
-
-    document.querySelectorAll(".remove-skill").forEach((button) => {
-      button.addEventListener("click", function () {
-        removeSkill(parseInt(this.dataset.index));
-      });
-    });
-  }
-
-  function createEmptyMessage() {
-    const message = document.createElement("div");
-    message.className = "empty-skills-message";
-    message.id = "empty-skills-message";
-    message.textContent = "No skills added yet. Use the field above to add your skills.";
-    return message;
-  }
-
-  function updateSkillsField() {
-    skillsHidden.value = JSON.stringify(skills);
-    // Trigger change event for auto-save
-    const event = new Event('change', { bubbles: true });
-    skillsHidden.dispatchEvent(event);
-    
-    // Update progress
-    updateProgress();
-  }
-};
-
-// Add placeholder for future AI integration
-const initAISkillsIntegration = () => {
-  const aiExtractBtn = document.getElementById('ai-extract-skills');
-  const aiSuggestBtn = document.getElementById('ai-suggest-skills');
-  
-  if (!aiExtractBtn || !aiSuggestBtn) return;
-  
-  // Just stub functions for now that will be implemented later
-  aiExtractBtn.addEventListener('click', function() {
-    console.log('AI Extract Skills functionality will be implemented in future steps');
-  });
-  
-  aiSuggestBtn.addEventListener('click', function() {
-    console.log('AI Suggest Skills functionality will be implemented in future steps');
-  });
-};
-
-
-
-// Initialize AI Enhancement
-const initAIEnhancement = () => {
-  const enhanceButtons = document.querySelectorAll(".enhance-summary");
-  const resumeId = document.querySelector(".resume-builder").dataset.resumeId;
-
-  enhanceButtons.forEach((button) => {
-    button.addEventListener("click", async () => {
-      const type = button.dataset.type;
-      const summaryField = document.querySelector('textarea[name="summary"]');
-      const summary = summaryField.value;
-
-      if (!summary) {
-        showFeedback(summaryField, "error", "Please enter a summary first");
-        return;
-      }
-
-      // Disable button and show loading state
-      button.disabled = true;
-      button.classList.add("loading");
-      
-      try {
-        // Get CSRF token
-        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
-        
-        // Call the API
-        const response = await fetch(`/resume/${resumeId}/enhance-summary`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRFToken': csrfToken
-          },
-          body: JSON.stringify({
-            summary: summary,
-            type: type
-          })
+  // Add event listeners to all "Add" buttons
+  document.querySelectorAll('.add-item-btn, .add-tag-btn').forEach(btn => {
+    if (btn.id.startsWith('add-')) {
+      const type = btn.id.replace('add-', '').replace('-btn', '');
+      if (type === 'skills') {
+        btn.addEventListener('click', function() {
+          addNewTag(this);
         });
-
-        const data = await response.json();
-        
-        if (data.success) {
-          // Update the summary field with enhanced content
-          summaryField.value = data.enhanced_summary;
-          showFeedback(summaryField, "success", "Summary enhanced");
-          
-          // Trigger input event for auto-resize
-          summaryField.dispatchEvent(new Event("input"));
-          
-          // Trigger auto-save
-          const event = new Event('change', { bubbles: true });
-          summaryField.dispatchEvent(event);
-          
-          // Add a subtle highlight animation
-          summaryField.classList.add("enhanced");
-          setTimeout(() => {
-            summaryField.classList.remove("enhanced");
-          }, 1000);
-        } else {
-          console.log("from the fetch api");
-          console.log(data)
-          showFeedback(summaryField, "error", data.error || "Failed to enhance summary");
-        }
-      } catch (error) {
-        console.error("Error enhancing summary:", error);
-        showFeedback(summaryField, "error", "An error occurred while enhancing summary");
-      } finally {
-        // Re-enable button and remove loading state
-        button.disabled = false;
-        button.classList.remove("loading");
-      }
-    });
-  });
-
-};
-
-
-// Helper function to create a preview section
-function createPreviewSection(title, dataAttribute, content, contentElement) {
-  const section = document.createElement("div");
-  section.className = "preview-section";
-  
-  const heading = document.createElement("h2");
-  heading.textContent = title;
-  section.appendChild(heading);
-  
-  if (contentElement) {
-    section.appendChild(contentElement);
-  } else if (dataAttribute) {
-    const contentDiv = document.createElement(content && content.includes('<') ? "div" : "p");
-    contentDiv.setAttribute("data-preview", dataAttribute);
-    contentDiv.innerHTML = content;
-    section.appendChild(contentDiv);
-  }
-  
-  return section;
-}
-
-// Format description helper for experience items
-function formatDescription(text) {
-  if (!text) return "";
-  const lines = text
-    .split("\n")
-    .filter((line) => line.trim())
-    .map((line) => {
-      line = line.trim();
-      if (
-        !line.startsWith("•") &&
-        !line.startsWith("-") &&
-        !line.startsWith("*")
-      ) {
-        line = `• ${line}`;
-      }
-      return `<li>${line.replace(/^[•\-*]\s*/, "")}</li>`;
-    });
-  return lines.length ? `<ul>${lines.join("")}</ul>` : "";
-}
-
-// Update Progress Indicator
-const updateProgress = () => {
-  const sections = document.querySelectorAll("[data-section]");
-  let totalRequiredFields = 0;
-  let completedRequiredFields = 0;
-  let completedSections = 0;
-
-  sections.forEach((section) => {
-    const requiredFields = section.querySelectorAll("[required]");
-    totalRequiredFields += requiredFields.length;
-
-    let sectionComplete = true;
-    requiredFields.forEach((field) => {
-      if (field.value.trim()) {
-        completedRequiredFields++;
-      } else {
-        sectionComplete = false;
-      }
-    });
-
-    if (sectionComplete && requiredFields.length > 0) {
-      completedSections++;
-      section.classList.add("complete");
-    } else {
-      section.classList.remove("complete");
-    }
-
-    // For sections without required fields (like skills)
-    if (requiredFields.length === 0) {
-      const contentFields = section.querySelectorAll("input, textarea");
-      const hasContent = Array.from(contentFields).some(
-        (field) => field.value.trim() !== ""
-      );
-      
-      // For skills section, check if we have skills
-      if (section.dataset.section === "skills" && skills.length > 0) {
-        section.classList.add("complete");
-        completedSections++;
-      } else if (hasContent) {
-        section.classList.add("complete");
-        completedSections++;
+      } else if (type !== 'summary') {
+        btn.addEventListener('click', function() {
+          addNewItem(this, type);
+        });
       }
     }
   });
 
-  // Calculate progress as a percentage
-  const progressPercentage = totalRequiredFields > 0
-    ? Math.round((completedRequiredFields / totalRequiredFields) * 100)
-    : 0;
+  // Add event listeners to delete buttons for existing tags
 
-  // Update circular progress indicator
-  const progressRingFill = document.querySelector(".progress-ring-fill");
-  const progressText = document.querySelector(".progress-percentage");
-  
-  if (progressRingFill) {
-    const circleLength = progressRingFill.getTotalLength || 100;
-    // Setting the stroke dasharray to reflect the progress percentage
-    progressRingFill.style.strokeDasharray = `${progressPercentage}, 100`;
-  }
-  
-  if (progressText) {
-    progressText.textContent = `${progressPercentage}%`;
-  }
-};
-// Enhance form field behavior
-const enhanceFormFields = () => {
-  // Add floating label effect
-  document.querySelectorAll('.form-control').forEach(field => {
-    // Add event listeners for focus and blur to improve the visual feedback
-    field.addEventListener('focus', function() {
-      this.parentElement.classList.add('focused');
-    });
-    
-    field.addEventListener('blur', function() {
-      this.parentElement.classList.remove('focused');
-      
-      // Add 'filled' class if the field has a value
-      if (this.value.trim()) {
-        this.parentElement.classList.add('filled');
-      } else {
-        this.parentElement.classList.remove('filled');
-      }
-    });
-    
-    // Initialize filled state
-    if (field.value.trim()) {
-      field.parentElement.classList.add('filled');
-    }
-  });
-};
-const initStyles = ()=>{
-  const style = document.createElement('style');
-  style.textContent = `
-    .preview-loading-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(255, 255, 255, 0.8);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-      border-radius: 8px;
-    }
-    
-    .loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid rgba(59, 130, 246, 0.3);
-      border-radius: 50%;
-      border-top-color: var(--primary);
-      animation: spin 1s linear infinite;
-    }
-    
-    .loading-text {
-      margin-top: 10px;
-      font-size: 14px;
-      color: var(--secondary);
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  `;
-  document.head.appendChild(style);
-}
+  document.querySelectorAll('.section-tag').forEach(addTagEventListeners);
 
-// Enhanced Summary Manager
-const initSummaryManager = () => {
-  const summaryTextarea = document.getElementById("summary-textarea");
-  const charCounter = document.getElementById("summary-char-counter");
-  const enhanceButtons = document.querySelectorAll(".enhance-summary");
+  // Add event listeners to existing items
+  document.querySelectorAll('.section-item').forEach(addItemEventListeners);
 
-  
-  if (!summaryTextarea) return;
-  
-  // Initialize character counter
-  const updateCharCounter = () => {
-    const maxLength = parseInt(summaryTextarea.getAttribute("maxlength") || 400);
-    const currentLength = summaryTextarea.value.length;
-    
-    charCounter.textContent = `${currentLength}/${maxLength}`;
-    
-    // Update visual feedback based on limit
-    if (currentLength >= maxLength) {
-      charCounter.classList.add("limit-reached");
-      charCounter.classList.remove("limit-near");
-    } else if (currentLength >= maxLength * 0.8) {
-      charCounter.classList.add("limit-near");
-      charCounter.classList.remove("limit-reached");
-    } else {
-      charCounter.classList.remove("limit-near", "limit-reached");
-    }
-  };
-  
-  // Initialize character counter if textarea exists
-  if (summaryTextarea) {
-    updateCharCounter();
-    
-    summaryTextarea.addEventListener("input", () => {
-      updateCharCounter();
-      
-      // Auto expand height
-      summaryTextarea.style.height = "auto";
-      summaryTextarea.style.height = (summaryTextarea.scrollHeight) + "px";
-    });
-  }
-  
-  // AI Enhancement Buttons
-  if (enhanceButtons) {
-    enhanceButtons.forEach(button => {
-      button.addEventListener("click", function() {
-        const enhancementType = this.dataset.type;
-        
-        if (!summaryTextarea.value.trim()) {
-          showTooltip(summaryTextarea, "Please write a summary first");
-          return;
-        }
-        
-        // Show loading state
-        this.classList.add("loading");
-        const originalIcon = this.innerHTML;
-        this.innerHTML = '';
-        
-        // Simulate AI processing (replace with actual API call later)
-        setTimeout(() => {
-          let enhancedText = "";
-          
-          switch (enhancementType) {
-            case "professional":
-              enhancedText = enhanceProfessional(summaryTextarea.value);
-              break;
-            case "concise":
-              enhancedText = enhanceConcise(summaryTextarea.value);
-              break;
-            case "keywords":
-              enhancedText = enhanceKeywords(summaryTextarea.value);
-              break;
-            case "achievement":
-              enhancedText = enhanceAchievement(summaryTextarea.value);
-              break;
-            default:
-              enhancedText = summaryTextarea.value;
-          }
-          
-          // Apply the enhanced text
-          summaryTextarea.value = enhancedText;
-          summaryTextarea.dispatchEvent(new Event('input'));
-          
-          // Add enhancement effect
-          summaryTextarea.classList.add("enhanced");
-          setTimeout(() => {
-            summaryTextarea.classList.remove("enhanced");
-          }, 1000);
-          
-          // Remove loading state
-          this.classList.remove("loading");
-          this.innerHTML = originalIcon;
-          
-          // Trigger autosave
-          const event = new Event('change', { bubbles: true });
-          summaryTextarea.dispatchEvent(event);
-          
-          // Show success message
-          const enhancementName = this.closest('.enhancement-option').querySelector('h4').textContent;
-          showTooltip(summaryTextarea, `Enhanced with ${enhancementName} style`);
-        }, 1500);
-      });
-    });
-  }
-   
 
-  
-  // Helper function to show tooltip
-  function showTooltip(element, message) {
-    const tooltip = document.createElement("div");
-    tooltip.className = "floating-tooltip";
-    tooltip.textContent = message;
-    
-    document.body.appendChild(tooltip);
-    
-    const rect = element.getBoundingClientRect();
-    tooltip.style.top = `${rect.top + window.scrollY - 30}px`;
-    tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
-    tooltip.style.transform = "translate(-50%, -100%)";
-    
-    setTimeout(() => {
-      tooltip.classList.add("show");
-    }, 10);
-    
-    setTimeout(() => {
-      tooltip.classList.remove("show");
-      setTimeout(() => {
-        document.body.removeChild(tooltip);
-      }, 300);
-    }, 3000);
-  }
-  
-  // Helper functions for AI enhancement (placeholder implementations)
-  function enhanceProfessional(text) {
-    // Placeholder for professional enhancement
-    return text
-      .replace(/I am/g, "I am a")
-      .replace(/I have/g, "I have")
-      .replace(/worked on/g, "successfully delivered")
-      .replace(/good/g, "exceptional")
-      .replace(/made/g, "developed")
-      .replace(/did/g, "executed")
-      .replace(/used/g, "leveraged")
-      .replace(/responsible for/g, "spearheaded")
-      .replace(/team player/g, "collaborative professional");
-  }
-  
-  function enhanceConcise(text) {
-    // Placeholder for concise enhancement
-    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-    if (sentences.length <= 2) return text;
-    return sentences.slice(0, 2).join(". ") + ".";
-  }
-  
-  function enhanceKeywords(text) {
-    // Placeholder for keywords enhancement
-    const keywords = [
-      "strategic leadership",
-      "cross-functional collaboration",
-      "agile methodology",
-      "data-driven decision making",
-      "stakeholder management",
-      "revenue growth",
-      "process optimization"
-    ];
-    const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];
-    return `${text} Adept at ${randomKeyword}.`;
-  }
-  
-  function enhanceAchievement(text) {
-    // Placeholder for achievement-focused enhancement
-    const achievements = [
-      "Increased revenue by 30% through strategic initiatives",
-      "Reduced operational costs by 25% by streamlining processes",
-      "Led cross-functional team that delivered project ahead of schedule",
-      "Improved customer satisfaction scores from 85% to 95%",
-      "Recognized with performance award for exceptional contributions"
-    ];
-    const randomAchievement = achievements[Math.floor(Math.random() * achievements.length)];
-    
-    return text + ` Achievements include: ${randomAchievement}.`;
-  }
-};
 
-// Add this CSS for the tooltip
-const addTooltipStyles = () => {
-  const style = document.createElement('style');
-  style.textContent = `
-    .floating-tooltip {
-      position: absolute;
-      z-index: 1000;
-      background-color: var(--secondary);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 4px;
-      font-size: 14px;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-      white-space: nowrap;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    
-    .floating-tooltip::after {
-      content: '';
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      border-width: 6px;
-      border-style: solid;
-      border-color: var(--secondary) transparent transparent transparent;
-    }
-    
-    .floating-tooltip.show {
-      opacity: 0.95;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  `;
-  document.head.appendChild(style);
-};
-// Enhanced Experience Manager
-const initExperienceManager = () => {
-  // Elements
-  const experienceTimeline = document.getElementById("experience-timeline");
-  const addExperienceBtn = document.getElementById("add-experience-btn");
-  const experienceFormContainer = document.getElementById("experience-form-container");
-  const experienceForm = document.getElementById("experience-form");
-  const experienceFormClose = document.getElementById("experience-form-close");
-  const cancelExperienceBtn = document.getElementById("cancel-experience");
-  const experienceFormTitle = document.getElementById("experience-form-title");
-  const experienceIndex = document.getElementById("experience-index");
-  const jobTitle = document.getElementById("job-title");
-  const company = document.getElementById("company");
-  const startDate = document.getElementById("start-date");
-  const endDate = document.getElementById("end-date");
-  const currentJob = document.getElementById("current-job");
-  const jobDescription = document.getElementById("job-description");
-  const experienceData = document.getElementById("experience-data");
-  const emptyState = document.getElementById("timeline-empty-state");
-  const toggleJobSkills = document.getElementById("toggle-job-skills");
-  const jobSkillsContainer = document.getElementById("job-skills-container");
-  const skillTags = document.querySelectorAll(".skill-tag.suggested");
-  const aiEnhanceBtn = document.querySelector(".toolbar-btn.ai-enhance");
-  const aiEnhancePanel = document.getElementById("ai-enhance-panel");
-  const enhanceOptions = document.querySelectorAll(".enhance-option");
-  const toolbarBtns = document.querySelectorAll(".toolbar-btn");
-  const modalOverlay = document.querySelector(".modal-overlay");
-  
-  if (!experienceTimeline || !addExperienceBtn || !experienceForm) return;
-  
-  // Experience data
-  let experiences = [];
-  
-  // Initialize from existing data if available
-  const initializeExperiences = () => {
-    try {
-      experiences = experienceData && experienceData.value 
-        ? JSON.parse(experienceData.value) 
-        : [];
-    } catch (e) {
-      console.error("Error parsing experience data:", e);
-      experiences = [];
-    }
-    
-    renderExperiences();
-    updateProgress();
-  };
-  
-  // Render experiences to timeline
-  const renderExperiences = () => {
-    // Clear the timeline except for empty state
-    Array.from(experienceTimeline.children).forEach(child => {
-      if (child.id !== "timeline-empty-state") {
-        experienceTimeline.removeChild(child);
-      }
-    });
-    
-    // Toggle empty state visibility
-    if (experiences.length === 0) {
-      emptyState.style.display = "block";
-      return;
-    } else {
-      emptyState.style.display = "none";
-    }
-    
-    // Sort experiences by start date (most recent first)
-    experiences.sort((a, b) => {
-      // Convert date strings to comparable format (assuming MM/YYYY or similar consistent format)
-      const dateA = parseExperienceDate(a.startDate);
-      const dateB = parseExperienceDate(b.startDate);
-      return dateB - dateA;
-    });
-    
-    // Render each experience
-    experiences.forEach((exp, index) => {
-      const timelineItem = document.createElement("div");
-      timelineItem.className = "timeline-item";
-      timelineItem.dataset.index = index;
-      
-      // Format description as bullet points
-      let descriptionHTML = "";
-      if (exp.description) {
-        const items = exp.description
-          .split("\n")
-          .filter(line => line.trim())
-          .map(line => {
-            // Ensure each line starts with a bullet
-            const trimmed = line.trim();
-            if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("*")) {
-              return `<li>${trimmed.substring(1).trim()}</li>`;
-            } else {
-              return `<li>${trimmed}</li>`;
-            }
-          });
-        
-        if (items.length) {
-          descriptionHTML = `<ul>${items.join("")}</ul>`;
-        }
-      }
-      
-      // Current or past position
-      const dateDisplay = exp.current 
-        ? `${exp.startDate} - Present` 
-        : `${exp.startDate} - ${exp.endDate}`;
-      
-      timelineItem.innerHTML = `
-        <div class="timeline-date">${dateDisplay}</div>
-        <div class="timeline-actions">
-          <button type="button" class="timeline-action edit" data-index="${index}" aria-label="Edit">
-            <i class="fas fa-pencil-alt"></i>
-          </button>
-          <button type="button" class="timeline-action delete" data-index="${index}" aria-label="Delete">
-            <i class="fas fa-trash-alt"></i>
-          </button>
-        </div>
-        <div class="timeline-content">
-          <h4>${exp.title}</h4>
-          <div class="timeline-company">${exp.company}</div>
-          <div class="timeline-description">
-            ${descriptionHTML}
-          </div>
-        </div>
-      `;
-      
-      experienceTimeline.appendChild(timelineItem);
-    });
-    
-    // Add event listeners to the action buttons
-    document.querySelectorAll(".timeline-action.edit").forEach(btn => {
-      btn.addEventListener("click", function() {
-        const index = parseInt(this.dataset.index);
-        editExperience(index);
-      });
-    });
-    
-    document.querySelectorAll(".timeline-action.delete").forEach(btn => {
-      btn.addEventListener("click", function() {
-        const index = parseInt(this.dataset.index);
-        deleteExperience(index);
-      });
-    });
-  };
-
-  // Parse experience date for sorting
-  const parseExperienceDate = (dateStr) => {
-    try {
-      // Handle common date formats like "Jan 2020", "January 2020", "01/2020", etc.
-      const parts = dateStr.replace(/,/g, '').split(/\s+|\/|-/);
-      let year, month;
-      
-      // Find the year (4-digit number)
-      const yearPart = parts.find(part => /^\d{4}$/.test(part));
-      year = yearPart ? parseInt(yearPart) : 2000; // Default to 2000 if no year found
-      
-      // Try to find month
-      const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-      const monthPart = parts.find(part => {
-        const normalized = part.toLowerCase().substr(0, 3);
-        return monthNames.includes(normalized) || /^\d{1,2}$/.test(part);
-      });
-      
-      if (monthPart) {
-        if (/^\d{1,2}$/.test(monthPart)) {
-          // Numeric month
-          month = parseInt(monthPart) - 1; // JS months are 0-based
-        } else {
-          // Text month
-          const normalized = monthPart.toLowerCase().substr(0, 3);
-          month = monthNames.indexOf(normalized);
-        }
-      } else {
-        month = 0; // Default to January if no month found
-      }
-      
-      return new Date(year, month, 1).getTime();
-    } catch (e) {
-      console.warn("Error parsing date:", dateStr, e);
-      return 0; // Return minimum date for invalid formats
-    }
-  };
-  
-  // Update progress indicator
-  const updateProgress = () => {
-    const sectionComplete = experiences.length > 0;
-    const completeIcon = document.querySelector(".section-complete-icon");
-    
-    if (completeIcon) {
-      if (sectionComplete) {
-        completeIcon.style.display = "inline-block";
-      } else {
-        completeIcon.style.display = "none";
-      }
-    }
-    
-    // Dispatch event to notify parent component of progress
-    const progressEvent = new CustomEvent("resume-section-progress", {
-      detail: { section: "experience", complete: sectionComplete }
-    });
-    document.dispatchEvent(progressEvent);
-  };
-
-  // Add experience
-  const addExperience = () => {
-    // Reset the form
-    experienceForm.reset();
-    experienceIndex.value = -1;
-    experienceFormTitle.textContent = "Add Work Experience";
-    
-    // Enable end date by default
-    endDate.disabled = false;
-    
-    // Show the form
-    experienceFormContainer.style.display = "flex";
-    setTimeout(() => {
-      experienceFormContainer.classList.add("active");
-    }, 10);
-    
-    // Focus on the first input
-    jobTitle.focus();
-  };
-
-  // Edit experience
-  const editExperience = (index) => {
-    const experience = experiences[index];
-    if (!experience) return;
-    
-    // Set form values
-    experienceIndex.value = index;
-    jobTitle.value = experience.title;
-    company.value = experience.company;
-    startDate.value = experience.startDate;
-    
-    if (experience.current) {
-      currentJob.checked = true;
-      endDate.value = "";
-      endDate.disabled = true;
-    } else {
-      currentJob.checked = false;
-      endDate.value = experience.endDate || "";
-      endDate.disabled = false;
-    }
-    
-    jobDescription.value = experience.description || "";
-    
-    // Update form title
-    experienceFormTitle.textContent = "Edit Work Experience";
-    
-    // Show the form
-    experienceFormContainer.style.display = "flex";
-    setTimeout(() => {
-      experienceFormContainer.classList.add("active");
-    }, 10);
-    
-    // Expand the textarea to fit content
-    autoResizeTextarea(jobDescription);
-  };
-
-  // Delete experience
-  const deleteExperience = (index) => {
-    if (confirm("Are you sure you want to delete this work experience?")) {
-      experiences.splice(index, 1);
-      updateExperienceData();
-      renderExperiences();
-      
-      showToast("Work experience deleted successfully", "success");
-    }
-  };
-
-  // Update the hidden input with experiences data
-  const updateExperienceData = () => {
-    experienceData.value = JSON.stringify(experiences);
-    
-    // Trigger change event for autosave
-    const event = new Event('change', { bubbles: true });
-    experienceData.dispatchEvent(event);
-  };
-
-  // Format the job description to ensure bullet points
-  const formatDescription = (text) => {
-    if (!text) return "";
-    
-    return text
-      .split("\n")
-      .map(line => {
-        const trimmed = line.trim();
-        if (!trimmed) return "";
-        if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("*")) {
-          return trimmed;
-        } else {
-          return `• ${trimmed}`;
-        }
-      })
-      .filter(line => line)
-      .join("\n");
-  };
-
-  // Auto resize textarea to fit content
-  const autoResizeTextarea = (textarea) => {
-    if (!textarea) return;
-    
-    textarea.style.height = "auto";
-    textarea.style.height = (textarea.scrollHeight) + "px";
-  };
-
-  // Handle form submission
-  const handleFormSubmit = (e) => {
+  // Handle dropping files
+  document.addEventListener('dragover', function(e) {
     e.preventDefault();
-    
-    // Basic validation
-    if (!jobTitle.value.trim()) {
-      showToast("Please enter a job title", "error");
-      jobTitle.focus();
-      return;
-    }
-    
-    if (!company.value.trim()) {
-      showToast("Please enter a company name", "error");
-      company.focus();
-      return;
-    }
-    
-    if (!startDate.value.trim()) {
-      showToast("Please enter a start date", "error");
-      startDate.focus();
-      return;
-    }
-    
-    if (!currentJob.checked && !endDate.value.trim()) {
-      showToast("Please enter an end date or select 'Current Position'", "error");
-      endDate.focus();
-      return;
-    }
-    
-    if (!jobDescription.value.trim()) {
-      showToast("Please enter job responsibilities or achievements", "error");
-      jobDescription.focus();
-      return;
-    }
-    
-    const index = parseInt(experienceIndex.value);
-    const isNewExperience = index === -1;
-    
-    // Format the description
-    const formattedDescription = formatDescription(jobDescription.value);
-    
-    // Create experience object
-    const experience = {
-      title: jobTitle.value.trim(),
-      company: company.value.trim(),
-      startDate: startDate.value.trim(),
-      endDate: currentJob.checked ? "" : endDate.value.trim(),
-      current: currentJob.checked,
-      description: formattedDescription
-    };
-    
-    // Update or add the experience
-    if (isNewExperience) {
-      experiences.push(experience);
-    } else {
-      experiences[index] = experience;
-    }
-    
-    // Update data and render
-    updateExperienceData();
-    renderExperiences();
-    
-    // Close the form
-    closeForm();
-    
-    // Show success toast
-    showToast(
-      isNewExperience 
-        ? "Work experience added successfully" 
-        : "Work experience updated successfully", 
-      "success"
-    );
-  };
-
-  // Close the form
-  const closeForm = () => {
-    experienceFormContainer.classList.remove("active");
-    setTimeout(() => {
-      experienceFormContainer.style.display = "none";
-    }, 300);
-  };
-
-  // Show toast notification
-  const showToast = (message, type = "info") => {
-    const toast = document.createElement("div");
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `
-      <div class="toast-content">
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
-        <span>${message}</span>
-      </div>
-      <button class="toast-close"><i class="fas fa-times"></i></button>
-    `;
-    
-    document.body.appendChild(toast);
-    
-    // Show toast with animation
-    setTimeout(() => {
-      toast.classList.add("show");
-    }, 10);
-    
-    // Auto-close after 4 seconds
-    const timeout = setTimeout(() => {
-      closeToast(toast);
-    }, 4000);
-    
-    // Close button
-    const closeBtn = toast.querySelector(".toast-close");
-    if (closeBtn) {
-      closeBtn.addEventListener("click", () => {
-        clearTimeout(timeout);
-        closeToast(toast);
-      });
-    }
-  };
-
-  // Close toast animation
-  const closeToast = (toast) => {
-    toast.classList.remove("show");
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.parentNode.removeChild(toast);
-      }
-    }, 300);
-  };
-
-  // Initialize event listeners
-  const initEventListeners = () => {
-    // Add experience button
-    addExperienceBtn.addEventListener("click", addExperience);
-    
-    // Form submission
-    experienceForm.addEventListener("submit", handleFormSubmit);
-    
-    // Close form buttons
-    experienceFormClose.addEventListener("click", closeForm);
-    cancelExperienceBtn.addEventListener("click", closeForm);
-    
-    // Current job checkbox
-    currentJob.addEventListener("change", function() {
-      if (this.checked) {
-        endDate.value = "";
-        endDate.disabled = true;
-      } else {
-        endDate.disabled = false;
-        endDate.focus();
-      }
-    });
-    
-    // Close on click outside form (modal overlay)
-    if (modalOverlay) {
-      modalOverlay.addEventListener("click", closeForm);
-    }
-    
-    // Toggle job skills
-    if (toggleJobSkills && jobSkillsContainer) {
-      toggleJobSkills.addEventListener("click", function() {
-        const isExpanded = this.getAttribute("aria-expanded") === "true";
-        
-        if (isExpanded) {
-          jobSkillsContainer.classList.add("collapse");
-          this.setAttribute("aria-expanded", "false");
-          this.querySelector("i").className = "fas fa-chevron-down";
-        } else {
-          jobSkillsContainer.classList.remove("collapse");
-          this.setAttribute("aria-expanded", "true");
-          this.querySelector("i").className = "fas fa-chevron-up";
-        }
-      });
-    }
-    
-    // Skill tag click
-    if (skillTags && skillTags.length) {
-      skillTags.forEach(tag => {
-        tag.addEventListener("click", function() {
-          const skill = this.dataset.skill;
-          // Add to job description with a bullet point
-          const currentText = jobDescription.value;
-          const newBullet = `• Utilized ${skill} to improve project outcomes`;
-          
-          if (currentText) {
-            jobDescription.value = currentText + (currentText.endsWith("\n") ? "" : "\n") + newBullet;
-          } else {
-            jobDescription.value = newBullet;
-          }
-          
-          // Show visual feedback
-          this.classList.add("selected");
-          setTimeout(() => {
-            this.classList.remove("selected");
-          }, 1500);
-          
-          // Focus and resize the textarea
-          jobDescription.focus();
-          autoResizeTextarea(jobDescription);
-        });
-      });
-    }
-    
-    // AI Enhance button
-    if (aiEnhanceBtn && aiEnhancePanel) {
-      aiEnhanceBtn.addEventListener("click", function() {
-        // Toggle the AI enhancement panel
-        if (aiEnhancePanel.style.display === "none") {
-          aiEnhancePanel.style.display = "block";
-          // Smooth animation
-          setTimeout(() => {
-            aiEnhancePanel.style.opacity = "1";
-            aiEnhancePanel.style.transform = "translateY(0)";
-          }, 10);
-        } else {
-          aiEnhancePanel.style.opacity = "0";
-          aiEnhancePanel.style.transform = "translateY(-10px)";
-          setTimeout(() => {
-            aiEnhancePanel.style.display = "none";
-          }, 300);
-        }
-      });
-    }
-    
-    // Enhancement options
-    if (enhanceOptions && enhanceOptions.length) {
-      enhanceOptions.forEach(option => {
-        option.addEventListener("click", function() {
-          const enhanceType = this.dataset.enhance;
-          
-          if (!jobDescription.value.trim()) {
-            showToast("Please add job description first", "error");
-            jobDescription.focus();
-            return;
-          }
-          
-          // Add loading effect
-          this.classList.add("loading");
-          const originalContent = this.innerHTML;
-          this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Processing...</span>';
-          
-          // Simulate AI processing (replace with actual API call later)
-          setTimeout(() => {
-            let enhancedText = "";
-            
-            switch (enhanceType) {
-              case "achievements":
-                enhancedText = enhanceWithAchievements(jobDescription.value);
-                break;
-              case "action-verbs":
-                enhancedText = enhanceWithActionVerbs(jobDescription.value);
-                break;
-              case "skills":
-                enhancedText = enhanceWithSkills(jobDescription.value);
-                break;
-              case "concise":
-                enhancedText = enhanceConcise(jobDescription.value);
-                break;
-              default:
-                enhancedText = jobDescription.value;
-            }
-            
-            // Apply the enhanced text
-            jobDescription.value = enhancedText;
-            
-            // Auto-resize the textarea
-            autoResizeTextarea(jobDescription);
-            
-            // Reset the button
-            this.classList.remove("loading");
-            this.innerHTML = originalContent;
-            
-            // Hide the enhancement panel with animation
-            aiEnhancePanel.style.opacity = "0";
-            aiEnhancePanel.style.transform = "translateY(-10px)";
-            setTimeout(() => {
-              aiEnhancePanel.style.display = "none";
-            }, 300);
-            
-            // Show feedback
-            const enhanceName = enhanceType.split('-').map(word => 
-              word.charAt(0).toUpperCase() + word.slice(1)
-            ).join(' ');
-            showToast(`Enhanced with ${enhanceName}`, "success");
-          }, 1500);
-        });
-      });
-    }
-    
-    // Toolbar buttons
-    if (toolbarBtns && toolbarBtns.length) {
-      toolbarBtns.forEach(btn => {
-        btn.addEventListener("click", function() {
-          const action = this.dataset.action;
-          
-          // Skip if it's the AI enhance button (handled separately)
-          if (action === "enhance") return;
-          
-          switch (action) {
-            case "bullet":
-              // Add bullet point at cursor or at end
-              const cursorPos = jobDescription.selectionStart;
-              const textBefore = jobDescription.value.substring(0, cursorPos);
-              const textAfter = jobDescription.value.substring(cursorPos);
-              
-              if (cursorPos === 0 || jobDescription.value.charAt(cursorPos - 1) === '\n') {
-                // Add bullet at cursor
-                jobDescription.value = textBefore + "• " + textAfter;
-                jobDescription.selectionStart = jobDescription.selectionEnd = cursorPos + 2;
-              } else if (cursorPos === jobDescription.value.length) {
-                // Add new line and bullet at end
-                jobDescription.value = textBefore + "\n• ";
-                jobDescription.selectionStart = jobDescription.selectionEnd = jobDescription.value.length;
-              } else {
-                // Add new line and bullet in the middle
-                jobDescription.value = textBefore + "\n• " + textAfter;
-                jobDescription.selectionStart = jobDescription.selectionEnd = cursorPos + 3;
-              }
-              break;
-              
-            case "achievement":
-              // Add achievement phrase
-              const achievements = [
-                "resulting in ",
-                "which increased ",
-                "leading to ",
-                "improving ",
-                "reducing "
-              ];
-              const randomAchievement = achievements[Math.floor(Math.random() * achievements.length)];
-              
-              // Add at cursor or end
-              const pos = jobDescription.selectionEnd;
-              jobDescription.value = jobDescription.value.substring(0, pos) + 
-                                   " " + randomAchievement + 
-                                   jobDescription.value.substring(pos);
-              jobDescription.selectionStart = jobDescription.selectionEnd = pos + randomAchievement.length + 1;
-              break;
-              
-            case "skills":
-              // Toggle skills panel
-              if (toggleJobSkills) {
-                const isExpanded = toggleJobSkills.getAttribute("aria-expanded") === "true";
-                if (!isExpanded) {
-                  jobSkillsContainer.classList.remove("collapse");
-                  toggleJobSkills.setAttribute("aria-expanded", "true");
-                  toggleJobSkills.querySelector("i").className = "fas fa-chevron-up";
-                }
-              }
-              break;
-          }
-          
-          // Focus the textarea and update its height
-          jobDescription.focus();
-          autoResizeTextarea(jobDescription);
-        });
-      });
-    }
-    
-    // Auto expand textarea on input
-    jobDescription.addEventListener("input", function() {
-      autoResizeTextarea(this);
-    });
-    
-    // Collapsible section header
-    const sectionHeader = document.querySelector(".section-header.collapsible");
-    const sectionContent = document.querySelector(".section-content");
-    
-    if (sectionHeader && sectionContent) {
-      sectionHeader.addEventListener("click", function() {
-        const isCollapsed = !sectionContent.classList.contains("collapsed");
-        
-        if (isCollapsed) {
-          sectionContent.classList.add("collapsed");
-          sectionContent.style.maxHeight = "0";
-          this.querySelector(".fa-chevron-down").classList.remove("fa-chevron-down");
-          this.querySelector(".section-toggle i:last-child").classList.add("fa-chevron-right");
-        } else {
-          sectionContent.classList.remove("collapsed");
-          sectionContent.style.maxHeight = sectionContent.scrollHeight + "px";
-          this.querySelector(".fa-chevron-right").classList.remove("fa-chevron-right");
-          this.querySelector(".section-toggle i:last-child").classList.add("fa-chevron-down");
-        }
-      });
-    }
-  };
-
-  // Enhancement helper functions (placeholders for future AI integration)
-  const enhanceWithAchievements = (text) => {
-    // Add quantifiable achievements to bullet points
-    const lines = text.split('\n');
-    const achievementPhrases = [
-      "resulting in a 20% increase in efficiency",
-      "which improved team productivity by 15%",
-      "leading to a 30% reduction in costs",
-      "generating an additional $50,000 in revenue",
-      "reducing project completion time by 25%",
-      "increasing customer satisfaction by 40%",
-      "which decreased error rates by 35%",
-      "improving system performance by 50%"
-    ];
-    
-    return lines.map(line => {
-      if (!line.trim() || line.includes("resulting in") || line.includes("which improved") || 
-          line.includes("leading to") || line.includes("increasing") || line.includes("reducing")) {
-        return line; // Skip empty lines or lines that already have achievements
-      }
-      
-      const randomAchievement = achievementPhrases[Math.floor(Math.random() * achievementPhrases.length)];
-      return `${line.trim()}, ${randomAchievement}`;
-    }).join('\n');
-  };
-
-  const enhanceWithActionVerbs = (text) => {
-    // Replace weak verbs with strong action verbs
-    const weakToStrong = {
-      "worked on": "spearheaded",
-      "helped": "facilitated",
-      "made": "created",
-      "did": "executed",
-      "used": "leveraged",
-      "responsible for": "led",
-      "handled": "managed",
-      "took care of": "orchestrated",
-      "in charge of": "directed",
-      "managed": "strategized"
-    };
-    
-    let enhancedText = text;
-    Object.entries(weakToStrong).forEach(([weak, strong]) => {
-      const regex = new RegExp(`\\b${weak}\\b`, 'gi');
-      enhancedText = enhancedText.replace(regex, strong);
-    });
-    
-    return enhancedText;
-  };
-
-  const enhanceWithSkills = (text) => {
-    // Add technical skills and keywords
-    const techSkills = [
-      "SQL", "Python", "JavaScript", "Data Analysis", 
-      "Project Management", "Agile Methodology", "Strategic Planning",
-      "Cross-functional Collaboration", "Cloud Computing", "Machine Learning",
-      "Digital Marketing", "Financial Analysis", "UI/UX Design"
-    ];
-    
-    const lines = text.split('\n');
-    
-    return lines.map((line, index) => {
-      // Only add skills to some lines (not all)
-      if (line.trim() && index % 2 === 0 && !lines.some(l => 
-        techSkills.some(skill => l.includes(skill)))) {
-        const skill = techSkills[Math.floor(Math.random() * techSkills.length)];
-        if (!line.includes(skill)) {
-          return `${line.trim()} using ${skill}`;
-        }
-      }
-      return line;
-    }).join('\n');
-  };
-
-  const enhanceConcise = (text) => {
-    // Make text more concise by removing filler words
-    const fillerWords = [
-      "basically", "actually", "literally", "very", "really", "just",
-      "quite", "simply", "that", "in order to", "I think that", "kind of",
-      "sort of", "type of", "for the most part", "needless to say"
-    ];
-    
-    let conciseText = text;
-    fillerWords.forEach(word => {
-      const regex = new RegExp(`\\b${word}\\b`, 'gi');
-      conciseText = conciseText.replace(regex, '');
-    });
-    
-    // Clean up double spaces
-    conciseText = conciseText.replace(/\s+/g, ' ');
-    
-    // Restore line breaks
-    conciseText = conciseText.replace(/• /g, '\n• ');
-    if (!conciseText.startsWith('•')) {
-      conciseText = '• ' + conciseText.trim();
-    }
-    
-    return conciseText;
-  };
-
-  // Initialize
-  initializeExperiences();
-  initEventListeners();
-};
-
-
-// Add CSS for toast notifications
-const addToastStyles = () => {
-  const styleSheet = document.createElement("style");
-  styleSheet.textContent = `
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: white;
-      border-radius: 8px;
-      padding: 12px 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      min-width: 300px;
-      max-width: 80%;
-      z-index: 1050;
-      transform: translateY(100px);
-      opacity: 0;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-    }
-    
-    .toast.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
-    
-    .toast-content {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .toast-content i {
-      font-size: 20px;
-    }
-    
-    .toast-success {
-      border-left: 4px solid #48bb78;
-    }
-    
-    .toast-success .toast-content i {
-      color: #48bb78;
-    }
-    
-    .toast-error {
-      border-left: 4px solid #e53e3e;
-    }
-    
-    .toast-error .toast-content i {
-      color: #e53e3e;
-    }
-    
-    .toast-info {
-      border-left: 4px solid #3b82f6;
-    }
-    
-    .toast-info .toast-content i {
-      color: #3b82f6;
-    }
-    
-    .toast-close {
-      background: none;
-      border: none;
-      color: #a0aec0;
-      cursor: pointer;
-      font-size: 14px;
-      padding: 4px;
-      transition: color 0.2s ease;
-    }
-    
-    .toast-close:hover {
-      color: #4a5568;
-    }
-    
-    @media (max-width: 768px) {
-      .toast {
-        left: 20px;
-        right: 20px;
-        min-width: auto;
-      }
-    }
-  `;
-  document.head.appendChild(styleSheet);
-};
-
-// Education Section Manager
-const initEducationManager = () => {
-  // Elements
-  const educationTimeline = document.getElementById("education-timeline");
-  const addEducationBtn = document.getElementById("add-education-btn");
-  const educationFormContainer = document.getElementById("education-form-container");
-  const educationForm = document.getElementById("education-form");
-  const educationFormClose = document.getElementById("education-form-close");
-  const cancelEducationBtn = document.getElementById("cancel-education");
-  const educationFormTitle = document.getElementById("education-form-title");
-  const educationIndex = document.getElementById("education-index");
-  const degree = document.getElementById("degree");
-  const school = document.getElementById("school");
-  const startYear = document.getElementById("education-start");
-  const endYear = document.getElementById("education-end");
-  const currentEducation = document.getElementById("current-education");
-  const educationDescription = document.getElementById("education-description");
-  const educationData = document.getElementById("education-data");
-  const emptyState = document.getElementById("education-empty-state");
-  const aiEnhanceBtn = document.querySelector("#education-form .toolbar-btn.ai-enhance");
-  const aiEnhancePanel = document.getElementById("education-enhance-panel");
-  const enhanceOptions = document.querySelectorAll("#education-enhance-panel .enhance-option");
-  const toolbarBtns = document.querySelectorAll("#education-form .toolbar-btn");
-  const modalOverlay = document.querySelector(".modal-overlay");
-  
-  if (!educationTimeline || !addEducationBtn || !educationForm) return;
-  
-  // Education data
-  let educations = [];
-  
-  // Initialize from existing data if available
-  const initializeEducations = () => {
-    try {
-      educations = educationData && educationData.value 
-        ? JSON.parse(educationData.value) 
-        : [];
-    } catch (e) {
-      console.error("Error parsing education data:", e);
-      educations = [];
-    }
-    
-    renderEducations();
-    updateProgress();
-  };
-  
-  // Render educations to timeline
-  const renderEducations = () => {
-    // Clear the timeline except for empty state
-    Array.from(educationTimeline.children).forEach(child => {
-      if (child.id !== "education-empty-state") {
-        educationTimeline.removeChild(child);
-      }
-    });
-    
-    // Toggle empty state visibility
-    if (educations.length === 0) {
-      emptyState.style.display = "block";
-      return;
-    } else {
-      emptyState.style.display = "none";
-    }
-    
-    // Sort educations by start year (most recent first)
-    educations.sort((a, b) => {
-      const yearA = parseInt(a.startYear) || 0;
-      const yearB = parseInt(b.startYear) || 0;
-      return yearB - yearA;
-    });
-    
-    // Render each education
-    educations.forEach((edu, index) => {
-      const timelineItem = document.createElement("div");
-      timelineItem.className = "education-timeline-item";
-      timelineItem.dataset.index = index;
-      
-      // Format description as bullet points
-      let descriptionHTML = "";
-      if (edu.description) {
-        const items = edu.description
-          .split("\n")
-          .filter(line => line.trim())
-          .map(line => {
-            // Ensure each line starts with a bullet
-            const trimmed = line.trim();
-            if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("*")) {
-              return `<li>${trimmed.substring(1).trim()}</li>`;
-            } else {
-              return `<li>${trimmed}</li>`;
-            }
-          });
-        
-        if (items.length) {
-          descriptionHTML = `<ul>${items.join("")}</ul>`;
-        }
-      }
-      
-      // Current or past education
-      const dateDisplay = edu.current 
-        ? `${edu.startYear} - Present` 
-        : `${edu.startYear} - ${edu.endYear}`;
-      
-      timelineItem.innerHTML = `
-        <div class="education-date">${dateDisplay}</div>
-        <div class="education-actions">
-          <button type="button" class="education-action edit" data-index="${index}" aria-label="Edit">
-            <i class="fas fa-pencil-alt"></i>
-          </button>
-          <button type="button" class="education-action delete" data-index="${index}" aria-label="Delete">
-            <i class="fas fa-trash-alt"></i>
-          </button>
-        </div>
-        <div class="education-content">
-          <h4>${edu.degree}</h4>
-          <div class="education-school">${edu.school}</div>
-          <div class="education-description">
-            ${descriptionHTML}
-          </div>
-        </div>
-      `;
-      
-      educationTimeline.appendChild(timelineItem);
-    });
-    
-    // Add event listeners to the action buttons
-    document.querySelectorAll(".education-action.edit").forEach(btn => {
-      btn.addEventListener("click", function() {
-        const index = parseInt(this.dataset.index);
-        editEducation(index);
-      });
-    });
-    
-    document.querySelectorAll(".education-action.delete").forEach(btn => {
-      btn.addEventListener("click", function() {
-        const index = parseInt(this.dataset.index);
-        deleteEducation(index);
-      });
-    });
-  };
-  
-  // Update progress indicator
-  const updateProgress = () => {
-    const sectionComplete = educations.length > 0;
-    const completeIcon = document.querySelector(".section-complete-icon");
-    
-    if (completeIcon) {
-      if (sectionComplete) {
-        completeIcon.style.display = "inline-block";
-      } else {
-        completeIcon.style.display = "none";
-      }
-    }
-    
-    // Dispatch event to notify parent component of progress
-    const progressEvent = new CustomEvent("resume-section-progress", {
-      detail: { section: "education", complete: sectionComplete }
-    });
-    document.dispatchEvent(progressEvent);
-  };
-  
-  // Add education
-  const addEducation = () => {
-    // Reset the form
-    educationForm.reset();
-    educationIndex.value = -1;
-    educationFormTitle.textContent = "Add Education";
-    
-    // Enable end year by default
-    endYear.disabled = false;
-    
-    // Show the form
-    educationFormContainer.style.display = "flex";
-    setTimeout(() => {
-      educationFormContainer.classList.add("active");
-    }, 10);
-    
-    // Focus on the first input
-    degree.focus();
-  };
-  
-  // Edit education
-  const editEducation = (index) => {
-    const education = educations[index];
-    if (!education) return;
-    
-    // Set form values
-    educationIndex.value = index;
-    degree.value = education.degree;
-    school.value = education.school;
-    startYear.value = education.startYear;
-    
-    if (education.current) {
-      currentEducation.checked = true;
-      endYear.value = "";
-      endYear.disabled = true;
-    } else {
-      currentEducation.checked = false;
-      endYear.value = education.endYear || "";
-      endYear.disabled = false;
-    }
-    
-    educationDescription.value = education.description || '';
-    
-    // Update form title
-    educationFormTitle.textContent = "Edit Education";
-    
-    // Show the form
-    educationFormContainer.style.display = "flex";
-    setTimeout(() => {
-      educationFormContainer.classList.add("active");
-    }, 10);
-    
-    // Expand the textarea to fit content
-    autoResizeTextarea(educationDescription);
-  };
-  
-  // Delete education
-  const deleteEducation = (index) => {
-    if (confirm("Are you sure you want to delete this education entry?")) {
-      educations.splice(index, 1);
-      updateEducationData();
-      renderEducations();
-      
-      showToast("Education entry deleted successfully", "success");
-    }
-  };
-  
-  // Update the hidden input with educations data
-  const updateEducationData = () => {
-    educationData.value = JSON.stringify(educations);
-    
-    // Trigger change event for autosave
-    const event = new Event('change', { bubbles: true });
-    educationData.dispatchEvent(event);
-  };
-  
-  // Format the education description to ensure bullet points
-  const formatDescription = (text) => {
-    if (!text) return "";
-    
-    return text
-      .split("\n")
-      .map(line => {
-        const trimmed = line.trim();
-        if (!trimmed) return "";
-        if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("*")) {
-          return trimmed;
-        } else {
-          return `• ${trimmed}`;
-        }
-      })
-      .filter(line => line)
-      .join("\n");
-  };
-  
-  // Auto resize textarea to fit content
-  const autoResizeTextarea = (textarea) => {
-    if (!textarea) return;
-    
-    textarea.style.height = "auto";
-    textarea.style.height = (textarea.scrollHeight) + "px";
-  };
-  
-  // Handle form submission
-  const handleFormSubmit = (e) => {
+  });
+  document.addEventListener('drop', function(e) {
     e.preventDefault();
-    
-    // Basic validation
-    if (!degree.value.trim()) {
-      showToast("Please enter a degree or certificate", "error");
-      degree.focus();
-      return;
-    }
-    
-    if (!school.value.trim()) {
-      showToast("Please enter a school or university", "error");
-      school.focus();
-      return;
-    }
-    
-    if (!startYear.value.trim()) {
-      showToast("Please enter a start year", "error");
-      startYear.focus();
-      return;
-    }
-    
-    if (!currentEducation.checked && !endYear.value.trim()) {
-      showToast("Please enter an end year or check 'Currently Studying'", "error");
-      endYear.focus();
-      return;
-    }
-    
-    const index = parseInt(educationIndex.value);
-    const isNewEducation = index === -1;
-    
-    // Format the description
-    const formattedDescription = formatDescription(educationDescription.value);
-    
-    // Create education object
-    const education = {
-      degree: degree.value.trim(),
-      school: school.value.trim(),
-      startYear: startYear.value.trim(),
-      endYear: currentEducation.checked ? "" : endYear.value.trim(),
-      current: currentEducation.checked,
-      description: formattedDescription
-    };
-    
-    // Update or add the education
-    if (isNewEducation) {
-      educations.push(education);
-    } else {
-      educations[index] = education;
-    }
-    
-    // Update data and render
-    updateEducationData();
-    renderEducations();
-    
-    // Close the form
-    closeForm();
-    
-    // Show success toast
-    showToast(
-      isNewEducation 
-        ? "Education added successfully" 
-        : "Education updated successfully", 
-      "success"
-    );
-  };
-  
-  // Close the form
-  const closeForm = () => {
-    educationFormContainer.classList.remove("active");
-    setTimeout(() => {
-      educationFormContainer.style.display = "none";
-    }, 300);
-  };
-  
-  // Show toast notification
-  const showToast = (message, type = "info") => {
-    const toast = document.createElement("div");
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `
-      <div class="toast-content">
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
-        <span>${message}</span>
-      </div>
-      <button class="toast-close"><i class="fas fa-times"></i></button>
-    `;
-    
-    document.body.appendChild(toast);
-    
-    // Show toast with animation
-    setTimeout(() => {
-      toast.classList.add("show");
-    }, 10);
-    
-    // Auto-close after 4 seconds
-    const timeout = setTimeout(() => {
-      closeToast(toast);
-    }, 4000);
-    
-    // Close button
-    const closeBtn = toast.querySelector(".toast-close");
-    if (closeBtn) {
-      closeBtn.addEventListener("click", () => {
-        clearTimeout(timeout);
-        closeToast(toast);
-      });
-    }
-  };
-  
-  // Close toast animation
-  const closeToast = (toast) => {
-    toast.classList.remove("show");
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.parentNode.removeChild(toast);
-      }
-    }, 300);
-  };
-  
-  // Add course template based on degree
-  const addCourseTemplate = () => {
-    if (!degree.value) {
-      showToast("Please enter your degree first", "error");
-      degree.focus();
-      return;
-    }
-    
-    const degreeText = degree.value.toLowerCase();
-    let courseTemplate = "• Relevant coursework: ";
-    
-    if (degreeText.includes("computer science") || degreeText.includes("cs")) {
-      courseTemplate += "Data Structures, Algorithms, Operating Systems, Database Systems, Web Development";
-    } else if (degreeText.includes("business") || degreeText.includes("mba")) {
-      courseTemplate += "Financial Accounting, Marketing Management, Business Strategy, Organizational Behavior";
-    } else if (degreeText.includes("engineering")) {
-      courseTemplate += "Engineering Design, Thermodynamics, Fluid Mechanics, Materials Science";
-    } else if (degreeText.includes("data") || degreeText.includes("analytics")) {
-      courseTemplate += "Statistical Methods, Data Mining, Machine Learning, Big Data Technologies";
-    } else {
-      courseTemplate += "[Add your relevant courses here]";
-    }
-    
-    // Add to description
-    if (educationDescription.value) {
-      const lastChar = educationDescription.value.slice(-1);
-      educationDescription.value += (lastChar === '\n' ? '' : '\n') + courseTemplate;
-    } else {
-      educationDescription.value = courseTemplate;
-    }
-    
-    educationDescription.selectionStart = educationDescription.selectionEnd = educationDescription.value.length;
-    educationDescription.focus();
-    autoResizeTextarea(educationDescription);
-  };
-  
-  // Initialize event listeners
-  const initEventListeners = () => {
-    // Add education button
-    addEducationBtn.addEventListener("click", addEducation);
-    
-    // Form submission
-    educationForm.addEventListener("submit", handleFormSubmit);
-    
-    // Close form buttons
-    educationFormClose.addEventListener("click", closeForm);
-    cancelEducationBtn.addEventListener("click", closeForm);
-    
-    // Current education checkbox
-    currentEducation.addEventListener("change", function() {
-      if (this.checked) {
-        endYear.value = "";
-        endYear.disabled = true;
-      } else {
-        endYear.disabled = false;
-        endYear.focus();
-      }
-    });
-    
-    // Close on click outside form (modal overlay)
-    if (modalOverlay) {
-      modalOverlay.addEventListener("click", closeForm);
-    }
-    
-    // AI Enhance button
-    if (aiEnhanceBtn && aiEnhancePanel) {
-      aiEnhanceBtn.addEventListener("click", function() {
-        // Toggle the AI enhancement panel
-        if (aiEnhancePanel.style.display === "none") {
-          aiEnhancePanel.style.display = "block";
-          // Smooth animation
-          setTimeout(() => {
-            aiEnhancePanel.style.opacity = "1";
-            aiEnhancePanel.style.transform = "translateY(0)";
-          }, 10);
-        } else {
-          aiEnhancePanel.style.opacity = "0";
-          aiEnhancePanel.style.transform = "translateY(-10px)";
-          setTimeout(() => {
-            aiEnhancePanel.style.display = "none";
-          }, 300);
-        }
-      });
-    }
-    
-    // Enhancement options
-    if (enhanceOptions && enhanceOptions.length) {
-      enhanceOptions.forEach(option => {
-        option.addEventListener("click", function() {
-          const enhanceType = this.dataset.enhance;
-          
-          if (!educationDescription.value.trim() && enhanceType !== 'coursework') {
-            showToast("Please add a description first", "error");
-            educationDescription.focus();
-            return;
-          }
-          
-          // Add loading effect
-          this.classList.add("loading");
-          const originalContent = this.innerHTML;
-          this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Processing...</span>';
-          
-          // Simulate AI processing (replace with actual API call later)
-          setTimeout(() => {
-            let enhancedText = "";
-            
-            switch (enhanceType) {
-              case "coursework":
-                enhancedText = addRelevantCoursework(degree.value, educationDescription.value);
-                break;
-              case "achievements":
-                enhancedText = addAcademicAchievements(educationDescription.value);
-                break;
-              case "concise":
-                enhancedText = makeEducationConcise(educationDescription.value);
-                break;
-              case "format":
-                enhancedText = improveEducationFormat(educationDescription.value);
-                break;
-              default:
-                enhancedText = educationDescription.value;
-            }
-            
-            // Apply the enhanced text
-            educationDescription.value = enhancedText;
-            
-            // Auto-resize the textarea
-            autoResizeTextarea(educationDescription);
-            
-            // Reset the button
-            this.classList.remove("loading");
-            this.innerHTML = originalContent;
-            
-            // Hide the enhancement panel with animation
-            aiEnhancePanel.style.opacity = "0";
-            aiEnhancePanel.style.transform = "translateY(-10px)";
-            setTimeout(() => {
-              aiEnhancePanel.style.display = "none";
-            }, 300);
-            
-            // Show feedback
-            const enhanceName = enhanceType.split('-').map(word => 
-              word.charAt(0).toUpperCase() + word.slice(1)
-            ).join(' ');
-            showToast(`Enhanced with ${enhanceName}`, "success");
-          }, 1500);
-        });
-      });
-    }
-    
-    // Toolbar buttons
-    if (toolbarBtns && toolbarBtns.length) {
-      toolbarBtns.forEach(btn => {
-        btn.addEventListener("click", function() {
-          const action = this.dataset.action;
-          
-          // Skip if it's the AI enhance button (handled separately)
-          if (action === "enhance") return;
-          
-          switch (action) {
-            case "bullet":
-              // Add bullet point at cursor or at end
-              const cursorPos = educationDescription.selectionStart;
-              const textBefore = educationDescription.value.substring(0, cursorPos);
-              const textAfter = educationDescription.value.substring(cursorPos);
-              
-              if (cursorPos === 0 || educationDescription.value.charAt(cursorPos - 1) === '\n') {
-                // Add bullet at cursor
-                educationDescription.value = textBefore + "• " + textAfter;
-                educationDescription.selectionStart = educationDescription.selectionEnd = cursorPos + 2;
-              } else if (cursorPos === educationDescription.value.length) {
-                // Add new line and bullet at end
-                educationDescription.value = textBefore + "\n• ";
-                educationDescription.selectionStart = educationDescription.selectionEnd = educationDescription.value.length;
-              } else {
-                // Add new line and bullet in the middle
-                educationDescription.value = textBefore + "\n• " + textAfter;
-                educationDescription.selectionStart = educationDescription.selectionEnd = cursorPos + 3;
-              }
-              break;
-              
-            case "course":
-              // Add coursework template based on degree
-              addCourseTemplate();
-              break;
-              
-            case "gpa":
-              // Add GPA template
-              const gpaTemplate = "• GPA: 3.8/4.0, Dean's List";
-              
-              if (educationDescription.value) {
-                const lastChar = educationDescription.value.slice(-1);
-                educationDescription.value += (lastChar === '\n' ? '' : '\n') + gpaTemplate;
-              } else {
-                educationDescription.value = gpaTemplate;
-              }
-              
-              educationDescription.selectionStart = educationDescription.selectionEnd = educationDescription.value.length;
-              break;
-          }
-          
-          // Focus the textarea and update its height
-          educationDescription.focus();
-          autoResizeTextarea(educationDescription);
-        });
-      });
-    }
-    
-    // Auto expand textarea on input
-    educationDescription.addEventListener("input", function() {
-      autoResizeTextarea(this);
-    });
-    
-    // Collapsible section header
-    const sectionHeader = document.querySelector(".section-header.collapsible");
-    const sectionContent = document.querySelector(".section-content");
-    
-    if (sectionHeader && sectionContent) {
-      sectionHeader.addEventListener("click", function() {
-        const isCollapsed = !sectionContent.classList.contains("collapsed");
-        
-        if (isCollapsed) {
-          sectionContent.classList.add("collapsed");
-          sectionContent.style.maxHeight = "0";
-          this.querySelector(".fa-chevron-down").classList.remove("fa-chevron-down");
-          this.querySelector(".section-toggle i:last-child").classList.add("fa-chevron-right");
-        } else {
-          sectionContent.classList.remove("collapsed");
-          sectionContent.style.maxHeight = sectionContent.scrollHeight + "px";
-          this.querySelector(".fa-chevron-right").classList.remove("fa-chevron-right");
-          this.querySelector(".section-toggle i:last-child").classList.add("fa-chevron-down");
-        }
-      });
-    }
-   
-  };
-  
-  // Enhancement helper functions (placeholders for future AI integration)
-  const addRelevantCoursework = (degreeText, currentText) => {
-    // Generate relevant coursework based on degree
-    const degree = degreeText.toLowerCase();
-    let coursework = "";
-    
-    if (degree.includes("computer science") || degree.includes("cs")) {
-      coursework = "• Relevant coursework: Data Structures, Algorithms, Operating Systems, Database Systems, Computer Networks, Software Engineering, Artificial Intelligence, Machine Learning";
-    } else if (degree.includes("business") || degree.includes("mba")) {
-      coursework = "• Relevant coursework: Financial Accounting, Marketing Management, Business Strategy, Organizational Behavior, Corporate Finance, Economics, Business Ethics";
-    } else if (degree.includes("engineering")) {
-      coursework = "• Relevant coursework: Engineering Mathematics, Thermodynamics, Fluid Mechanics, Materials Science, Control Systems, Engineering Design, Project Management";
-    } else if (degree.includes("psychology")) {
-      coursework = "• Relevant coursework: Cognitive Psychology, Developmental Psychology, Social Psychology, Research Methods, Statistics, Abnormal Psychology";
-    } else if (degree.includes("data") || degree.includes("analytics")) {
-      coursework = "• Relevant coursework: Statistical Methods, Data Mining, Machine Learning, Big Data Technologies, Data Visualization, Predictive Modeling";
-    } else {
-      coursework = "• Relevant coursework: [Add your major-specific courses here]";
-    }
-    
-    // Add to existing content or replace
-    if (currentText.trim() && !currentText.includes("Relevant coursework")) {
-      return currentText + (currentText.endsWith('\n') ? '' : '\n') + coursework;
-    } else if (currentText.includes("Relevant coursework")) {
-      // Replace existing coursework line
-      const lines = currentText.split('\n');
-      const updatedLines = lines.map(line => {
-        if (line.includes("Relevant coursework")) {
-          return coursework;
-        }
-        return line;
-      });
-      return updatedLines.join('\n');
-    } else {
-      return coursework;
-    }
-  };
-  
-  const addAcademicAchievements = (currentText) => {
-    // Add academic achievements
-    const achievements = [
-      "• Dean's List for all semesters",
-      "• Graduated Magna Cum Laude",
-      "• Recipient of Academic Excellence Scholarship",
-      "• Selected for Honors Program",
-      "• Awarded Department Recognition for Outstanding Performance",
-      "• Participated in Undergraduate Research Program",
-      "• Selected as Teaching Assistant for core courses"
-    ];
-    
-    // Select 2-3 random achievements
-    const numAchievements = Math.floor(Math.random() * 2) + 2; // 2-3
-    const selectedAchievements = [];
-    
-    for (let i = 0; i < numAchievements; i++) {
-      const randomIndex = Math.floor(Math.random() * achievements.length);
-      selectedAchievements.push(achievements[randomIndex]);
-      achievements.splice(randomIndex, 1); // Remove selected achievement
-    }
-    
-    const achievementsText = selectedAchievements.join('\n');
-    
-    // Add to existing content
-    if (currentText.trim()) {
-      return currentText + (currentText.endsWith('\n') ? '' : '\n') + achievementsText;
-    } else {
-      return achievementsText;
-    }
-  };
-  
-  const makeEducationConcise = (currentText) => {
-    if (!currentText.trim()) return "";
-    
-    // Split into lines and remove redundant/verbose content
-    const lines = currentText.split('\n').filter(line => line.trim());
-    
-    // Filter out filler words and shorten lines
-    const conciseLines = lines.map(line => {
-      // Remove filler words
-      let conciseLine = line
-        .replace(/I was |I have been |I am |I've been /g, '')
-        .replace(/was responsible for|was tasked with/g, 'handled')
-        .replace(/In this program,|During my time here,|Throughout my studies,/g, '')
-        .replace(/\bvery\b|\breally\b|\bquite\b|\bbasically\b|\bjust\b/g, '')
-        .trim();
-      
-      // Ensure bullet point
-      if (!conciseLine.startsWith('•') && !conciseLine.startsWith('-') && !conciseLine.startsWith('*')) {
-        conciseLine = '• ' + conciseLine;
-      }
-      
-      return conciseLine;
-    });
-    
-    // Limit to 4-5 most important points
-    const importantLines = conciseLines.slice(0, Math.min(5, conciseLines.length));
-    
-    return importantLines.join('\n');
-  };
-  
-  const improveEducationFormat = (currentText) => {
-    if (!currentText.trim()) return "";
-    
-    // Split into lines
-    let lines = currentText.split('\n').filter(line => line.trim());
-    
-    // Make sure each line starts with a bullet point
-    lines = lines.map(line => {
-      line = line.trim();
-      if (!line.startsWith('•') && !line.startsWith('-') && !line.startsWith('*')) {
-        return '• ' + line;
-      }
-      return line;
-    });
-    
-    // Organize by categories
-    const categorized = {
-      gpa: [],
-      coursework: [],
-      achievements: [],
-      activities: [],
-      other: []
-    };
-    
-    lines.forEach(line => {
-      const lowerLine = line.toLowerCase();
-      if (lowerLine.includes('gpa') || lowerLine.includes('grade') || lowerLine.includes('cum laude')) {
-        categorized.gpa.push(line);
-      } else if (lowerLine.includes('course') || lowerLine.includes('class') || lowerLine.includes('studied')) {
-        categorized.coursework.push(line);
-      } else if (lowerLine.includes('award') || lowerLine.includes('honor') || lowerLine.includes('scholarship') || 
-                lowerLine.includes('dean') || lowerLine.includes('recognition')) {
-        categorized.achievements.push(line);
-      } else if (lowerLine.includes('club') || lowerLine.includes('society') || 
-                lowerLine.includes('association') || lowerLine.includes('volunteer') ||
-                lowerLine.includes('member') || lowerLine.includes('president') ||
-                lowerLine.includes('leader') || lowerLine.includes('captain')) {
-        categorized.activities.push(line);
-      } else {
-        categorized.other.push(line);
-      }
-    });
-    
-    // Reassemble in a logical order
-    const formattedLines = [
-      ...categorized.gpa,
-      ...categorized.coursework,
-      ...categorized.achievements,
-      ...categorized.activities,
-      ...categorized.other
-    ];
-    
-    return formattedLines.join('\n');
-  };
-  
-  // Initialize
-  initializeEducations();
-  initEventListeners();
-};
-
-
-const initAdvancedSectionManager = () => {
-  const addSectionsContainer = document.querySelector('.add-sections-container');
-  const sectionOptions = document.querySelectorAll('.section-option');
-  const sectionHeader = document.querySelector('.add-sections-container .section-header');
-  
-  if (!addSectionsContainer || !sectionOptions.length) return;
-  
-  // Add hover animations for section options
-  sectionOptions.forEach(option => {
-    // Create icon animation effect
-    const icon = option.querySelector('.section-option-icon');
-    if (icon) {
-      option.addEventListener('mouseenter', () => {
-        icon.style.transform = 'scale(1.15) rotate(5deg)';
-        icon.style.transition = 'transform 0.3s ease';
-      });
-      
-      option.addEventListener('mouseleave', () => {
-        icon.style.transform = 'scale(1) rotate(0)';
-      });
-    }
-    
-    // Add click handler with visual feedback
-    option.addEventListener('click', function() {
-      const sectionType = this.dataset.section;
-      
-      // Add pulse animation
-      this.classList.add('pulse-animation');
-      
-      // Show more detailed feedback than the original
-      const feedback = document.createElement('div');
-      feedback.className = 'section-added-feedback';
-      
-      // Customize message based on section type
-      let feedbackMsg = '';
-      switch(sectionType) {
-        case 'certifications':
-          feedbackMsg = 'Showcase your professional credentials!';
-          break;
-        case 'projects':
-          feedbackMsg = 'Highlight your accomplishments!';
-          break;
-        case 'languages':
-          feedbackMsg = 'Demonstrate your communication skills!';
-          break;
-        case 'awards':
-          feedbackMsg = 'Display your achievements!';
-          break;
-        case 'volunteering':
-          feedbackMsg = 'Show your community involvement!';
-          break;
-        case 'publications':
-          feedbackMsg = 'Share your expertise!';
-          break;
-        default:
-          feedbackMsg = 'Added to your resume!';
-      }
-      
-      feedback.innerHTML = `
-        <div class="feedback-icon"><i class="fas fa-check-circle"></i></div>
-        <div class="feedback-content">
-          <h4>${sectionType.charAt(0).toUpperCase() + sectionType.slice(1)} section added!</h4>
-          <p>${feedbackMsg}</p>
-        </div>
-      `;
-      
-      this.appendChild(feedback);
-      
-      // Remove after animation
-      setTimeout(() => {
-        this.classList.remove('pulse-animation');
-        if (feedback.parentNode) {
-          feedback.classList.add('fade-out');
-          setTimeout(() => {
-            if (feedback.parentNode) feedback.parentNode.removeChild(feedback);
-          }, 300);
-        }
-      }, 2000);
-      
-      // Actual implementation would add the new section to the UI
-      // and manage the data structure
-      console.log(`Adding section: ${sectionType}`);
-    });
+    alert('File uploads will be supported in a future version.');
   });
-  
-  // Add a more interactive section header
-  if (sectionHeader) {
-    const newHeader = document.createElement('div');
-    newHeader.className = 'section-header collapsible enhanced';
-    newHeader.innerHTML = `
-      <div class="section-title-wrapper">
-        <h3>Customize Your Resume</h3>
-        <span class="section-subtitle">Add more sections to stand out</span>
-      </div>
-      <div class="section-toggle">
-        <span class="sections-counter">+6 sections available</span>
-        <i class="fas fa-chevron-down"></i>
-      </div>
-    `;
-    
-    sectionHeader.parentNode.replaceChild(newHeader, sectionHeader);
-    
-    // Make the new header functional
-    newHeader.addEventListener('click', function() {
-      const section = this.closest('.resume-section-collapsible');
-      section.classList.toggle('active');
-      
-      const chevron = this.querySelector('.fa-chevron-down');
-      if (section.classList.contains('active')) {
-        chevron.style.transform = 'rotate(180deg)';
-      } else {
-        chevron.style.transform = 'rotate(0deg)';
-      }
-    });
-  }
-};
-// Initialize Everything
-document.addEventListener("DOMContentLoaded", () => {
-  // Initialize everything
-  initPanels();
-  initStyles();
-  initSkillsManager();
-  initAISkillsIntegration();
-  initExperienceManager();
-  initSummaryManager();
-  addTooltipStyles();
-  initCollapsibleSections();
-  setupAutoResizeInputs();
-  setupAutoExpandTextareas();
-  setupAutoSave();
-  enhanceFormFields();
-  initAIEnhancement();
-  initSectionOptions();
-  initTemplates(); // Add template initialization
-  updateProgress();
-  initEducationManager();
-  initAdvancedSectionManager();
-  addToastStyles();
-  // Add this to your document.addEventListener("DOMContentLoaded", ...)
-const toggleAddSections = document.getElementById("toggle-add-sections");
-const addSectionOptions = document.getElementById("add-section-options");
 
-if (toggleAddSections && addSectionOptions) {
-    toggleAddSections.addEventListener("click", function() {
-        const isVisible = addSectionOptions.style.display !== "none";
-        
-        if (isVisible) {
-            addSectionOptions.style.display = "none";
-            this.classList.remove("active");
-        } else {
-            addSectionOptions.style.display = "grid";
-            this.classList.add("active");
-        }
-    });
-    
-    // Set up section option handlers
-    const sectionOptions = document.querySelectorAll(".section-option");
-    sectionOptions.forEach(option => {
-        option.addEventListener("click", function() {
-            const sectionType = this.dataset.section;
-            // Implement section addition logic here
-            console.log(`Adding section: ${sectionType}`);
-            
-            // Show feedback
-            showFeedback(this, "success", `${sectionType} section added!`);
-            
-            // Close the options panel after selection
-            addSectionOptions.style.display = "none";
-            toggleAddSections.classList.remove("active");
-        });
-    });
-}
-
-  const refreshBtn = document.getElementById("preview-refresh");
-  if (refreshBtn) {
-    // refreshBtn.addEventListener("click", updatePreview);
-  }
-
-  // Handle download button feedback
-  const downloadBtn = document.querySelector(
-    '.float-control-btn[href*="/download_resume"]'
-  );
-  if (downloadBtn) {
-    downloadBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      showFeedback(downloadBtn, "success", "Downloading resume...");
-      setTimeout(() => {
-        window.location.href = downloadBtn.href;
-      }, 1000);
-    });
-  }
-  
-  // Initialize circular progress click to show details
-  const circularProgress = document.querySelector('.circular-progress');
-  if (circularProgress) {
-    circularProgress.addEventListener('click', () => {
-      const percentage = document.querySelector('.progress-percentage').textContent;
-      
-      const sections = document.querySelectorAll('.resume-section-collapsible');
-      const completedSections = document.querySelectorAll('.resume-section-collapsible.complete');
-      
-      const message = `Resume completion: ${percentage}
-Completed sections: ${completedSections.length} of ${sections.length}
-
-Click on the Edit button in the sidebar to continue building your resume.`;
-      
-      alert(message);
-    });
-  }
-
-  // Listen for window resize to adjust sidebar visibility
-  window.addEventListener('resize', () => {
-    const sidebar = document.querySelector('.floating-controls-left');
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const container = document.querySelector('.resume-builder-container');
-    
-    if (window.innerWidth <= 768) {
-      sidebar.classList.add('collapsed');
-      container.classList.add('sidebar-collapsed');
-      if (sidebarToggle) {
-        sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
-      }
-    } else {
-      sidebar.classList.remove('collapsed');
-      container.classList.remove('sidebar-collapsed');
+  // Listen for input changes and save
+  document.addEventListener('input', function(e) {
+    if (e.target.getAttribute('contenteditable') === 'true') {
+      clearTimeout(window.autoSaveTimeout);
+      window.autoSaveTimeout = setTimeout(autoSave, 1500);
     }
   });
+
+  // Export these functions for global use
+  window.addItemEventListeners = addItemEventListeners;
+  window.addTagEventListeners = addTagEventListeners;
+  window.addNewTag = addNewTag;
+  window.addNewItem = addNewItem;
+  window.autoSave = autoSave;
+
+  // Initial auto-save
+  setTimeout(autoSave, 3000);
 });
 
+function addTagEventListeners(tag) {
+  const deleteBtn = tag.querySelector('.tag-delete');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', function() {
+      tag.remove();
+      autoSave();
+    });
+  }
+}
 
+function autoSave() {
+  console.log('Auto-saving resume...');
+  const savedIndicator = document.createElement('div');
+  savedIndicator.style.position = 'fixed';
+  savedIndicator.style.bottom = '20px';
+  savedIndicator.style.left = '20px';
+  savedIndicator.style.backgroundColor = 'var(--success)';
+  savedIndicator.style.color = 'white';
+  savedIndicator.style.padding = '10px 20px';
+  savedIndicator.style.borderRadius = '4px';
+  savedIndicator.style.boxShadow = 'var(--shadow-md)';
+  savedIndicator.style.opacity = '0';
+  savedIndicator.style.transition = 'opacity 0.3s';
+  savedIndicator.innerHTML = '<i class="fas fa-check"></i> Changes saved';
+  document.body.appendChild(savedIndicator);
+  setTimeout(() => {
+    savedIndicator.style.opacity = '1';
+    setTimeout(() => {
+      savedIndicator.style.opacity = '0';
+      setTimeout(() => {
+        document.body.removeChild(savedIndicator);
+      }, 300);
+    }, 2000);
+  }, 100);
+}
+  // Add new tag
+function addNewTag(button) {
+    const tagName = prompt('Enter item name:');
+    if (tagName) {
+      const tagsContainer = button.parentElement;
+      const newTag = document.createElement('span');
+      newTag.className = 'section-tag';
+      newTag.innerHTML = `
+        <i class="fas fa-check"></i>
+        ${tagName}
+        <i class="fas fa-times tag-delete"></i>
+      `;
+      tagsContainer.insertBefore(newTag, button);
+      addTagEventListeners(newTag);
+      autoSave();
+    }
+  }
+
+
+    // Add item event listeners
+function addItemEventListeners(item) {
+      const moveUpBtn = item.querySelector('.move-up');
+      const moveDownBtn = item.querySelector('.move-down');
+      const deleteBtn = item.querySelector('.delete');
+      if (moveUpBtn) {
+        moveUpBtn.addEventListener('click', function() {
+          const prevItem = item.previousElementSibling;
+          if (prevItem && !prevItem.classList.contains('add-item-btn') && prevItem.classList.contains('section-item')) {
+            item.parentNode.insertBefore(item, prevItem);
+            autoSave();
+          }
+        });
+      }
+      if (moveDownBtn) {
+        moveDownBtn.addEventListener('click', function() {
+          const nextItem = item.nextElementSibling;
+          if (nextItem && !nextItem.classList.contains('add-item-btn')) {
+            item.parentNode.insertBefore(nextItem, item);
+            autoSave();
+          }
+        });
+      }
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', function() {
+          if (confirm('Are you sure you want to delete this item?')) {
+            item.remove();
+            autoSave();
+          }
+        });
+      }
+    }
+
+  // Add new item
+  function addNewItem(button, type) {
+    const section = button.parentElement;
+    const newItem = document.createElement('div');
+    newItem.className = 'section-item';
+    let itemHTML = `
+      <div class="item-actions">
+        <button class="item-btn move-up" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+        <button class="item-btn move-down" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+        <button class="item-btn delete" title="Delete"><i class="fas fa-trash"></i></button>
+      </div>
+    `;
+    switch(type) {
+      case 'experience':
+        itemHTML += `
+          <div class="section-job-title" contenteditable="true">
+            <i class="fas fa-chevron-right"></i>
+            Job Title
+          </div>
+          <div class="section-company" contenteditable="true">
+            <i class="fas fa-building"></i>
+            Company Name
+          </div>
+          <div class="section-date" contenteditable="true">
+            <i class="fas fa-calendar-alt"></i>
+            Start Date - End Date
+          </div>
+          <div class="section-description" contenteditable="true">
+            <ul class="section-duties">
+              <li>Add your responsibilities and achievements here...</li>
+              <li>Use bullet points to highlight your accomplishments...</li>
+              <li>Include metrics and results where possible (e.g., "Increased sales by 20%")</li>
+              <li>Focus on achievements rather than just duties</li>
+            </ul>
+          </div>
+        `;
+        break;
+      case 'education':
+        itemHTML += `
+          <div class="section-degree" contenteditable="true">
+            <i class="fas fa-chevron-right"></i>
+            Degree / Certification
+          </div>
+          <div class="section-school" contenteditable="true">
+            <i class="fas fa-university"></i>
+            Institution Name
+          </div>
+          <div class="section-date" contenteditable="true">
+            <i class="fas fa-calendar-alt"></i>
+            Start Year - End Year
+          </div>
+          <div class="section-description" contenteditable="true">
+            Add details about your educational achievements, relevant coursework, honors, extracurricular activities, or GPA if notable.
+          </div>
+        `;
+        break;
+      case 'certification':
+        itemHTML += `
+          <div class="section-degree" contenteditable="true">
+            <i class="fas fa-award"></i>
+            Certification Name
+          </div>
+          <div class="section-school" contenteditable="true">
+            <i class="fas fa-building"></i>
+            Issuing Organization
+          </div>
+          <div class="section-date" contenteditable="true">
+            <i class="fas fa-calendar-alt"></i>
+            Year Obtained (and expiration if applicable)
+          </div>
+          <div class="section-description" contenteditable="true">
+            Include additional details about the certification, such as skills validated or special achievements.
+          </div>
+        `;
+        break;
+      case 'project':
+        itemHTML += `
+          <div class="section-degree" contenteditable="true">
+            <i class="fas fa-folder-open"></i>
+            Project Name
+          </div>
+          <div class="section-school" contenteditable="true">
+            <i class="fas fa-link"></i>
+            Project URL (if available)
+          </div>
+          <div class="section-date" contenteditable="true">
+            <i class="fas fa-calendar-alt"></i>
+            Completion Date / Duration
+          </div>
+          <div class="section-description" contenteditable="true">
+            <ul class="section-duties">
+              <li>Describe the purpose and scope of the project</li>
+              <li>List technologies, tools, and methodologies used</li>
+              <li>Explain your specific role and contributions</li>
+              <li>Highlight outcomes, impact, or key achievements</li>
+            </ul>
+          </div>
+        `;
+        break;
+      case 'volunteer':
+        itemHTML += `
+          <div class="section-degree" contenteditable="true">
+            <i class="fas fa-hands-helping"></i>
+            Volunteer Position
+          </div>
+          <div class="section-school" contenteditable="true">
+            <i class="fas fa-building"></i>
+            Organization
+          </div>
+          <div class="section-date" contenteditable="true">
+            <i class="fas fa-calendar-alt"></i>
+            Start Date - End Date
+          </div>
+          <div class="section-description" contenteditable="true">
+            <ul class="section-duties">
+              <li>Describe your volunteer contributions and responsibilities</li>
+              <li>Highlight any leadership roles or special projects</li>
+              <li>Include skills developed or utilized</li>
+            </ul>
+          </div>
+        `;
+        break;
+      case 'award':
+        itemHTML += `
+          <div class="section-degree" contenteditable="true">
+            <i class="fas fa-trophy"></i>
+            Award/Recognition Name
+          </div>
+          <div class="section-school" contenteditable="true">
+            <i class="fas fa-building"></i>
+            Awarding Organization
+          </div>
+          <div class="section-date" contenteditable="true">
+            <i class="fas fa-calendar-alt"></i>
+            Date Received
+          </div>
+          <div class="section-description" contenteditable="true">
+            Describe the significance of this award, what it recognizes, and why you received it. Include any relevant context like competition size or selection criteria.
+          </div>
+        `;
+        break;
+      case 'publication':
+        itemHTML += `
+          <div class="section-degree" contenteditable="true">
+            <i class="fas fa-book"></i>
+            Publication Title
+          </div>
+          <div class="section-school" contenteditable="true">
+            <i class="fas fa-newspaper"></i>
+            Publisher/Journal
+          </div>
+          <div class="section-date" contenteditable="true">
+            <i class="fas fa-calendar-alt"></i>
+            Publication Date
+          </div>
+          <div class="section-description" contenteditable="true">
+            Briefly describe the publication, your contribution, and its significance. Include co-authors if applicable and any important details about reach or impact.
+          </div>
+        `;
+        break;
+      case 'language':
+        itemHTML += `
+          <div class="section-degree" contenteditable="true">
+            <i class="fas fa-language"></i>
+            Language Name
+          </div>
+          <div class="section-school" contenteditable="true">
+            <i class="fas fa-star"></i>
+            Proficiency Level (e.g., Fluent, Native, Intermediate)
+          </div>
+        `;
+        break;
+      default:
+        const sectionTitle = section.querySelector('.section-title').textContent.trim().toLowerCase();
+        if (sectionTitle.includes('volunteer')) {
+          return addNewItem(button, 'volunteer');
+        } else if (sectionTitle.includes('award') || sectionTitle.includes('honor')) {
+          return addNewItem(button, 'award');
+        } else if (sectionTitle.includes('publication') || sectionTitle.includes('research')) {
+          return addNewItem(button, 'publication');
+        } else if (sectionTitle.includes('language')) {
+          return addNewItem(button, 'language');
+        } else if (sectionTitle.includes('project')) {
+          return addNewItem(button, 'project');
+        } else {
+          itemHTML += `
+            <div class="section-degree" contenteditable="true">
+              <i class="fas fa-chevron-right"></i>
+              Item Title
+            </div>
+            <div class="section-school" contenteditable="true">
+              <i class="fas fa-building"></i>
+              Organization / Entity
+            </div>
+            <div class="section-date" contenteditable="true">
+              <i class="fas fa-calendar-alt"></i>
+              Relevant Date
+            </div>
+            <div class="section-description" contenteditable="true">
+              Add details here to describe this item...
+            </div>
+          `;
+        }
+    }
+    newItem.innerHTML = itemHTML;
+    section.insertBefore(newItem, button);
+    addItemEventListeners(newItem);
+    autoSave();
+  }
