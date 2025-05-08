@@ -1,0 +1,338 @@
+/* AI Assistant Global Styles */
+.toolbar-btn-primary {
+    background-color: var(--primary);
+    color: white;
+  }
+  
+  .toolbar-btn-primary:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  /* AI Modal and Components */
+  .ai-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+  }
+  
+  .ai-modal.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .ai-modal-content {
+    background-color: var(--background);
+    border-radius: var(--border-radius);
+    width: 90%;
+    max-width: 700px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 25px;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(20px);
+    transition: transform 0.3s;
+  }
+  
+  .ai-modal.active .ai-modal-content {
+    transform: translateY(0);
+  }
+  
+  .ai-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .ai-modal-title {
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--text);
+  }
+  
+  .ai-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: var(--transition);
+  }
+  
+  .ai-modal-close:hover {
+    color: var(--danger);
+  }
+  
+  /* AI Feature Cards */
+  .ai-assistant-menu h4 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--text);
+    font-size: 18px;
+  }
+  
+  .ai-feature-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+  }
+  
+  .ai-feature-card {
+    display: flex;
+    align-items: center;
+    background-color: var(--background-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  
+  .ai-feature-card:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  
+  .ai-feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 15px;
+  }
+  
+  .ai-feature-text h5 {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--text);
+  }
+  
+  .ai-feature-text p {
+    font-size: 13px;
+    color: var(--text-light);
+    margin: 0;
+  }
+  
+  /* ATS Score Button */
+  .ats-score-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 16px;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    transition: var(--transition);
+  }
+  
+  .ats-score-btn:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+  
+  /* AI Components for Modal States */
+  .ai-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+  }
+  
+  .ai-spinner {
+    border: 3px solid var(--border-light);
+    border-top: 3px solid var(--primary);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .ai-job-description {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    font-size: 14px;
+    margin-bottom: 20px;
+    resize: vertical;
+    min-height: 120px;
+  }
+  
+  .ai-option {
+    background-color: var(--border-light);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  
+  .ai-option:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary);
+  }
+  
+  .ai-option-title {
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: var(--text);
+  }
+  
+  .ai-option-content {
+    font-size: 14px;
+    color: var(--text-light);
+  }
+  
+  .ai-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .ai-skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .ai-skill-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .ai-skill-checkbox {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .ai-skill-name {
+    color: var(--text);
+    font-size: 14px;
+  }
+  
+  .ai-skill-relevance {
+    color: var(--text-light);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  
+  .ai-keywords {
+    margin: 15px 0;
+  }
+  
+  .ai-keyword {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin: 4px;
+    display: inline-block;
+    font-size: 13px;
+  }
+  
+  .ai-comparison {
+    display: grid;
+    gap: 15px;
+    margin: 20px 0;
+  }
+  
+  .ai-before, .ai-after {
+    padding: 15px;
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    background-color: var(--background-alt);
+  }
+  
+  .ai-before h4, .ai-after h4 {
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  
+  .ai-bullet-pair {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--background-alt);
+    border-radius: var(--border-radius);
+  }
+  
+  .ai-bullet-original, .ai-bullet-enhanced {
+    font-size: 14px;
+    padding: 8px;
+    background-color: white;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border);
+  }
+  
+  .ai-bullet-arrow {
+    color: var(--primary);
+    font-weight: bold;
+  }
+  
+  .ai-bullet-checkbox {
+    display: flex;
+    align-items: center;
+  }
+  
+  @media print {
+    .ats-score-btn, .ai-modal {
+      display: none !important;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .ai-feature-cards {
+      grid-template-columns: 1fr;
+    }
+    
+    .ai-bullet-pair {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto auto;
+    }
+    
+    .ai-bullet-arrow {
+      transform: rotate(90deg);
+      margin: 10px 0;
+      text-align: center;
+    }
+  }
