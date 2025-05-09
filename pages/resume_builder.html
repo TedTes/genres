@@ -22,19 +22,23 @@
             </button>
             <div class="btn-tooltip">Choose Template</div>
         </div>
-        
+        <div class = "tooltip-container">
+            <!-- ATS Score Button -->
+            <button class="float-control-btn ats-score-btn" data-action="ats-scan">
+                <i class="fas fa-robot"></i> <div class = "btn-tooltip">Check ATS Score</div>
+            </button>
+        </div>
+             
         <div class="tooltip-container">
             <a href="{{ url_for('resume.download_resume', resume_id=resume.id) }}" class="float-control-btn">
                 <i class="fas fa-download"></i>
             </a>
             <div class="btn-tooltip">Download Resume</div>
         </div>
+
+       
     </div>
 
-    <!-- Mobile Sidebar Toggle -->
-    <button class="sidebar-toggle" id="sidebar-toggle">
-        <i class="fas fa-bars"></i>
-    </button>
 
     <!-- Circular Progress Indicator -->
     <div class="circular-progress">
