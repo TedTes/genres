@@ -1,10 +1,15 @@
-{% extends "partials/base_resume.html" %}
+{% extends "resume-builder.html" %}
 
 {% block title %} {{ resume.contact.name|default('Resume') }} {% endblock %}
 
-{% block resume_content %}
 
+{% block content %}
 
+{% block extra_css %}
+<style>
+  {{css_content | safe }}
+</style>
+{% endblock %}
     <!-- Header -->
     <div class="resume-header content-editable">
       <h1 class="name" contenteditable="true">{{ resume.contact.name|default('John Doe') }}</h1>
@@ -114,10 +119,6 @@
     </section>
     {% endfor %}
 
-    <!-- ATS Score Button -->
-    <button class="ats-score-btn" data-action="ats-scan">
-      <i class="fas fa-robot"></i> Check ATS Score
-    </button>
 
  
 {% endblock %}
