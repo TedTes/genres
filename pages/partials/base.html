@@ -8,15 +8,15 @@
     <title>{% block title %}ResumeMatch - AI-Powered Resume Builder{% endblock %}</title>
     
     <!-- Styles -->
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume-progress.css') }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+
     <!-- Favicon -->
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
-    
-    {% block extra_css %}{% endblock %}
+
 </head>
 <body>
     <!-- Flash Messages -->
@@ -34,7 +34,9 @@
     {% block content %}{% endblock %}
     
     <!-- Scripts -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    {% block extra_js %}{% endblock %}
+
+    {% block extra_js %}
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% endblock %}
 </body>
 </html>
