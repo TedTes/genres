@@ -1,10 +1,12 @@
-{% block title %}Resume Builder - ResumeMatch{% endblock %}
+{% extends "partials/base.html" %}
+
+
+{% block content %}
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/resume-builder.css') }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="{{url_for('static', filename='/css/ai-assistant.css')}}">
-{% endblock %}
-{% block content %}
+{%endblock %}
+
 {% include 'partials/navbar.html' %}
 <div class="resume-builder" data-resume-id="{{ resume.id }}">
 
@@ -35,10 +37,16 @@
             </a>
             <div class="btn-tooltip">Download Resume</div>
         </div>
-
-       
     </div>
 
+    <!-- Save Button -->
+    <div class="save-button-container">
+        <div class="save-status" id="save-status">Changes saved successfully!</div>
+        <button id="save-resume-btn" class="save-button">
+            <i class="fas fa-save"></i>
+            <span>Save Changes</span>
+        </button>
+    </div>
 
     <!-- Circular Progress Indicator -->
     <div class="circular-progress">
@@ -48,8 +56,6 @@
         </svg>
         <span class="progress-percentage">0%</span>
     </div>
-
-
     
     <!-- Templates Panel -->
     <div class="slide-panel" id="templates-panel">
@@ -153,8 +159,7 @@
     </div>
 </div>
 {% endblock %}
-
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/resume-builder.js') }}"></script>
 <script src="{{ url_for('static', filename='js/ai-assistant.js') }}"></script>
-{% endblock %}
+{%endblock %}
