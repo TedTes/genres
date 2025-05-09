@@ -8,16 +8,26 @@ document.addEventListener('DOMContentLoaded', function() {
   function setupAIAssistant() {
     // Main AI assistant button
     const aiModal = document.getElementById('ai-assistant-modal');
-    const featureCards = aiModal.querySelectorAll('.ai-feature-card');
+ 
+   
     const atsButton = document.querySelector('.ats-score-btn');
-
-    // Handle AI feature card clicks
-    featureCards.forEach(card => {
-      card.addEventListener('click', function() {
-        const action = this.getAttribute('data-action');
-        handleAIAction(action);
+    if(aiModal) {
+      const featureCards = aiModal.querySelectorAll('.ai-feature-card');
+      // Handle AI feature card clicks
+      featureCards.forEach(card => {
+        card.addEventListener('click', function() {
+          const action = this.getAttribute('data-action');
+          handleAIAction(action);
+        });
       });
+       // Close modal when clicking outside
+    aiModal.addEventListener('click', function(e) {
+      if (e.target === aiModal) {
+        aiModal.classList.remove('active');
+      }
     });
+    }
+  
     
     // Handle ATS score button
     if (atsButton) {
@@ -26,12 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
     
-    // Close modal when clicking outside
-    aiModal.addEventListener('click', function(e) {
-      if (e.target === aiModal) {
-        aiModal.classList.remove('active');
-      }
-    });
+   
   }
   
   // Handle AI actions
@@ -532,6 +537,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
     
+    // TODO : CHECKING WHERE ITS RENDERING
     // Show job description input for tailoring
   function showJobDescriptionInput() {
       showAIModal('Tailor Resume to Job Description', `
