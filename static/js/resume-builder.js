@@ -1,62 +1,10 @@
+let autoSaveTimeout;
+let hasUnsavedChanges = false;
 document.addEventListener('DOMContentLoaded', function() {
   // Theme color changer
   const root = document.documentElement;
   
-  // Print functionality
-  // document.getElementById('print-btn').addEventListener('click', function() {
-  //   window.print();
-  // });
 
-  // Add new section
-  // document.getElementById('add-section-btn').addEventListener('click', function() {
-  //   const sectionTitle = prompt('Enter section title:');
-  //   if (sectionTitle) {
-  //     const sectionType = prompt('Enter section type (text, list, tags):');
-  //     const newSection = document.createElement('section');
-  //     newSection.className = 'resume-section';
-  //     let sectionHTML = `
-  //       <h2 class="section-title" contenteditable="true">
-  //         <i class="fas fa-star"></i>
-  //         ${sectionTitle}
-  //       </h2>
-  //     `;
-  //     if (sectionType === 'tags') {
-  //       sectionHTML += `
-  //         <div class="section-container">
-  //           <button class="add-tag-btn" id="add-custom-tag-btn-${Date.now()}">
-  //             <i class="fas fa-plus"></i> Add Item
-  //           </button>
-  //         </div>
-  //       `;
-  //     } else if (sectionType === 'list') {
-  //       sectionHTML += `
-  //         <button class="add-item-btn" id="add-custom-item-btn-${Date.now()}">
-  //           <i class="fas fa-plus"></i> Add Item
-  //         </button>
-  //       `;
-  //     } else {
-  //       sectionHTML += `
-  //         <div class="section-content" contenteditable="true">
-  //           Add your content here...
-  //         </div>
-  //       `;
-  //     }
-  //     newSection.innerHTML = sectionHTML;
-  //     document.querySelector('.resume-container').appendChild(newSection);
-  //     if (sectionType === 'tags') {
-  //       const addTagBtn = newSection.querySelector('.add-tag-btn');
-  //       addTagBtn.addEventListener('click', function() {
-  //         addNewTag(this);
-  //       });
-  //     } else if (sectionType === 'list') {
-  //       const addItemBtn = newSection.querySelector('.add-item-btn');
-  //       addItemBtn.addEventListener('click', function() {
-  //         addNewItem(this, 'custom');
-  //       });
-  //     }
-  //     autoSave();
-  //   }
-  // });
   const templateButton = document.querySelector('.float-control-btn[data-panel="templates-panel"]');
   const templatesPanel = document.getElementById('templates-panel');
   const closePanelButtons = document.querySelectorAll('.panel-close');
@@ -65,6 +13,36 @@ document.addEventListener('DOMContentLoaded', function() {
   const aiModal = document.getElementById('ai-assistant-modal');
   const aiModalClose = document.querySelector('.ai-modal-close');
 
+  const saveButton = document.getElementById('save-resume-btn');
+  const iframe = document.getElementById('preview-iframe');
+
+  if(saveButton) {
+    // Save button click handler
+    saveButton.addEventListener('click', function() {
+      saveResume();
+    });
+  }
+
+  if(iframe) {
+      // Listen for content changes in iframe
+    
+      iframe.addEventListener('load', function() {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        
+        // Listen for input events inside the iframe
+        iframeDoc.addEventListener('input', function() {
+            hasUnsavedChanges = true;
+            
+            // Clear any existing auto-save timeout
+            clearTimeout(autoSaveTimeout);
+            
+            // Set auto-save timeout
+            autoSaveTimeout = setTimeout(() => {
+                saveResume();
+            }, 30000); // Auto-save after 30 seconds of inactivity
+        });
+    });
+  }
   // Setup AI modal if elements exist
   if (aiButton && aiModal && aiModalClose) {
     // Open AI modal and close templates panel if open
@@ -176,6 +154,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  
+
+    // Warn before leaving with unsaved changes
+    window.addEventListener('beforeunload', function(e) {
+      if (hasUnsavedChanges) {
+          e.preventDefault();
+          e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+          return e.returnValue;
+      }
+  });
   // Export these functions for global use
   window.addItemEventListeners = addItemEventListeners;
   window.addTagEventListeners = addTagEventListeners;
@@ -186,6 +174,130 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initial auto-save
   setTimeout(autoSave, 3000);
 });
+
+// Function to show save status message
+function showSaveStatus(message, isError = false) {
+  const saveStatus = document.getElementById('save-status');
+    saveStatus.textContent = message;
+    saveStatus.classList.add('show');
+    
+    if (isError) {
+        saveStatus.classList.add('error');
+    } else {
+        saveStatus.classList.remove('error');
+    }
+    
+    setTimeout(() => {
+        saveStatus.classList.remove('show');
+    }, 3000);
+}
+
+// Function to save resume changes
+function saveResume() {
+
+  // const saveButton = document.getElementById('save-resume-btn');
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+  const resumeId = document.querySelector('.resume-builder').dataset.resumeId;
+
+
+    if (!hasUnsavedChanges) return;
+    
+    saveButton.classList.add('saving');
+    
+    // Get content from iframe
+    const iframe = document.getElementById('preview-iframe');
+    let resumeContent;
+    
+    try {
+        // Try to get all editable content from the iframe
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        
+        // Collect resume data from the iframe
+        resumeContent = collectResumeData(iframeDoc);
+        
+        // AJAX request to save the resume
+        fetch(`/resume/${resumeId}/save-data`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ resume_data: resumeContent })
+        })
+        .then(response => response.json())
+        .then(data => {
+            saveButton.classList.remove('saving');
+            
+            if (data.success) {
+                showSaveStatus('Changes saved successfully!');
+                hasUnsavedChanges = false;
+            } else {
+                showSaveStatus('Error saving changes. Please try again.', true);
+            }
+        })
+        .catch(error => {
+            console.error('Error saving resume:', error);
+            saveButton.classList.remove('saving');
+            showSaveStatus('Error saving changes. Please try again.', true);
+        });
+    } catch (error) {
+        console.error('Error collecting resume data:', error);
+        saveButton.classList.remove('saving');
+        showSaveStatus('Error accessing resume content. Please try again.', true);
+    }
+}
+
+    // Function to collect resume data from iframe document
+function collectResumeData(iframeDoc) {
+      // TODO: adjust with resume structure
+      const resumeData = {
+          contact: {},
+          sections: []
+      };
+      
+      // Collect name and title
+      resumeData.name = iframeDoc.querySelector('.name')?.textContent || '';
+      resumeData.title = iframeDoc.querySelector('.title')?.textContent || '';
+      
+      // Collect contact information
+      const contactItems = iframeDoc.querySelectorAll('.contact-item');
+      contactItems.forEach(item => {
+          const icon = item.querySelector('.contact-icon')?.className.match(/fa-(\w+)/)?.[1];
+          const content = item.querySelector('.contact-content')?.textContent;
+          if (icon && content) {
+              resumeData.contact[icon] = content;
+          }
+      });
+      
+      // Collect sections
+      const sections = iframeDoc.querySelectorAll('.resume-section');
+      sections.forEach(section => {
+          const sectionType = section.className.match(/(\w+)-section/)?.[1];
+          const sectionTitle = section.querySelector('.section-title')?.textContent.trim();
+          const sectionData = { type: sectionType, title: sectionTitle, content: '' };
+          
+          if (section.querySelector('.section-content')) {
+              sectionData.content = section.querySelector('.section-content')?.innerHTML || '';
+          } else if (section.querySelector('.section-container')) {
+              sectionData.items = Array.from(section.querySelectorAll('.section-tag')).map(tag => 
+                  tag.textContent.trim().replace(/^\s*[✓✔]\s*|\s*[×✖]\s*$/g, '')
+              );
+          } else {
+              sectionData.items = Array.from(section.querySelectorAll('.section-item')).map(item => {
+                  const itemData = {};
+                  item.querySelectorAll('[class^="section-"]').forEach(el => {
+                      const key = el.className.replace('section-', '').replace('-', '_');
+                      itemData[key] = el.textContent.trim();
+                  });
+                  return itemData;
+              });
+          }
+          
+          resumeData.sections.push(sectionData);
+      });
+      
+      return resumeData;
+  }
 
 function addTagEventListeners(tag) {
   const deleteBtn = tag.querySelector('.tag-delete');
