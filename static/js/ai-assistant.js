@@ -7,21 +7,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // Setup the main AI assistant
   function setupAIAssistant() {
     // Main AI assistant button
-    const aiButton = document.getElementById('ai-assistant-btn');
     const aiModal = document.getElementById('ai-assistant-modal');
-    const closeButton = aiModal.querySelector('.ai-modal-close');
     const featureCards = aiModal.querySelectorAll('.ai-feature-card');
     const atsButton = document.querySelector('.ats-score-btn');
-    // // Open the AI assistant modal
-    aiButton.addEventListener('click', function() {
-      aiModal.classList.add('active');
-    });
-    
-    // Close the AI assistant modal
-    closeButton.addEventListener('click', function() {
-      aiModal.classList.remove('active');
-    });
-    
+
     // Handle AI feature card clicks
     featureCards.forEach(card => {
       card.addEventListener('click', function() {

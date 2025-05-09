@@ -57,6 +57,82 @@ document.addEventListener('DOMContentLoaded', function() {
   //     autoSave();
   //   }
   // });
+  const templateButton = document.querySelector('.float-control-btn[data-panel="templates-panel"]');
+  const templatesPanel = document.getElementById('templates-panel');
+  const closePanelButtons = document.querySelectorAll('.panel-close');
+
+  const aiButton = document.getElementById('ai-assistant-btn');
+  const aiModal = document.getElementById('ai-assistant-modal');
+  const aiModalClose = document.querySelector('.ai-modal-close');
+
+  // Setup AI modal if elements exist
+  if (aiButton && aiModal && aiModalClose) {
+    // Open AI modal and close templates panel if open
+    aiButton.addEventListener('click', function() {
+        if (templatesPanel && templatesPanel.classList.contains('active')) {
+            templatesPanel.classList.remove('active');
+        }
+        aiModal.classList.add('active');
+    });
+    
+    // Close AI modal
+    aiModalClose.addEventListener('click', function() {
+        aiModal.classList.remove('active');
+    });
+    
+    // Close AI modal when clicking outside
+    aiModal.addEventListener('click', function(e) {
+        if (e.target === aiModal) {
+            aiModal.classList.remove('active');
+        }
+    });
+  }
+  // Toggle templates panel when clicking the template button
+  if (templateButton && templatesPanel) {
+      templateButton.addEventListener('click', function() {
+        if (aiModal && aiModal.classList.contains('active')) {
+          aiModal.classList.remove('active');
+      }
+          templatesPanel.classList.toggle('active');
+      });
+  }
+
+  const tooltipContainers = document.querySelectorAll('.tooltip-container');
+  tooltipContainers.forEach(container => {
+      const tooltip = container.querySelector('.btn-tooltip');
+      if (tooltip) {
+          // Show tooltip on hover
+          container.addEventListener('mouseenter', function() {
+              tooltip.style.opacity = '1';
+              tooltip.style.visibility = 'visible';
+          });
+          
+          // Hide tooltip when mouse leaves
+          container.addEventListener('mouseleave', function() {
+              tooltip.style.opacity = '0';
+              tooltip.style.visibility = 'hidden';
+          });
+      }
+  });
+     // Close panel buttons
+  closePanelButtons.forEach(button => {
+      button.addEventListener('click', function() {
+          const panelId = this.getAttribute('data-panel');
+          const panel = document.getElementById(panelId);
+          if (panel) {
+              panel.classList.remove('active');
+          }
+      });
+  });
+
+ // Close panel when clicking outside
+ document.addEventListener('click', function(e) {
+  if (!e.target.closest('.slide-panel') && 
+      !e.target.closest('.float-control-btn') && 
+      templatesPanel.classList.contains('active')) {
+      templatesPanel.classList.remove('active');
+  }
+});
 
   // Add event listeners to all "Add" buttons
   document.querySelectorAll('.add-item-btn, .add-tag-btn').forEach(btn => {
