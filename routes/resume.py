@@ -305,7 +305,7 @@ def resume_builder(resume_id):
     # Get all available templates
     templates = template_registry.get_all_templates()
 
-    return render_template('resume_builder.html',
+    return render_template('resume-builder.html',
                          resume=resume,
                          initial_resume_data=resume.resume_data,
                          contact_form=contact_form,
