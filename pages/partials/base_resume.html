@@ -19,11 +19,10 @@
   <div class="resume-container {% block template_class %}{% endblock %}">
     {% block resume_content %}{% endblock %}
   </div>
-  
+
 
   {% block scripts %}
-      <script src="{{url_for('static', filename='/js/resume.js')}}"></script>
-  <script src="{{url_for('static', filename='/js/ai-assistant.js')}}"></script>
+      <script src="{{url_for('static', filename='/js/resume-builder.js')}}"></script>
   {% endblock %}
 
 </body>
