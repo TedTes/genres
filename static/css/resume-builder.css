@@ -483,30 +483,8 @@ LAYOUT STYLES
 }
 
 /* Sidebar toggle button for mobile */
-.sidebar-toggle {
-    display: none;
-    position: fixed;
-    top: calc(var(--navbar-height) + var(--space-md));
-    left: var(--space-md);
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--primary);
-    color: white;
-    border: none;
-    box-shadow: var(--shadow-md);
-    z-index: 1200;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 18px;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-}
 
-.sidebar-toggle:hover {
-    background: var(--primary-dark);
-    transform: scale(1.05);
-}
+
 
 /* Float control buttons */
 .float-control-btn {
@@ -3252,9 +3230,6 @@ RESPONSIVE STYLES
 }
 
 @media (max-width: 768px) {
-    .sidebar-toggle {
-        display: flex;
-    }
     
     .form-control {
         height: 46px;

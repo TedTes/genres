@@ -131,25 +131,6 @@
     margin: 0;
   }
   
-  /* ATS Score Button */
-  .ats-score-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 30px;
-    padding: 10px 16px;
-    cursor: pointer;
-    box-shadow: var(--shadow-md);
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 14px;
-    transition: var(--transition);
-  }
   
   .ats-score-btn:hover {
     background-color: var(--primary-dark);
