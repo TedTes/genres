@@ -389,3 +389,40 @@ def enhance_summary(resume_id):
         })
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+
+@resume_bp.route('/<int:resume_id>/save-data', methods=['POST'])
+@login_required
+def save_resume_data(resume_id):
+    """Save complete resume data submitted via AJAX."""
+    print("hellow??????")
+    resume = Resume.query.get_or_404(resume_id)
+    
+    # Verify ownership
+    if resume.user_id != current_user.id:
+        return jsonify({"success": False, "error": "Unauthorized"}), 403
+    
+    # Get JSON data from request
+    data = request.get_json()
+    if not data or 'resume_data' not in data:
+        return jsonify({"success": False, "error": "Missing resume data"}), 400
+    
+    resume_data = data['resume_data']
+    
+    try:
+        # Update the resume data
+        resume.resume_data = resume_data
+        
+        # Flag the resume_data field as modified so SQLAlchemy detects the change
+        attributes.flag_modified(resume, 'resume_data')
+        
+        # Save changes
+        db.session.commit()
+        
+        return jsonify({"success": True, "message": "Resume saved successfully"})
+    
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error saving resume data: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
