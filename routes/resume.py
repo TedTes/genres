@@ -15,7 +15,7 @@ from db import db
 resume_bp = Blueprint("resume", __name__)
 template_registry = TemplateRegistry('config')
 
-@resume_bp.route('/resume/start/<int:job_id>')
+@resume_bp.route('/start/<int:job_id>')
 @login_required
 def generate_job_resume(job_id):
     """
@@ -71,7 +71,7 @@ def generate_job_resume(job_id):
     
     flash('Resume created with your information! Customize it for this job posting.', 'success')
     return redirect(url_for('resume.resume_builder', resume_id=new_resume.id)) 
-@resume_bp.route('/resume/<int:resume_id>/download')
+@resume_bp.route('/<int:resume_id>/download')
 @login_required
 def download_resume(resume_id):
     resume = Resume.query.get_or_404(resume_id)
@@ -108,7 +108,7 @@ def download_resume(resume_id):
         flash(f"Error generating PDF: {str(e)}", 'danger')
         return redirect(url_for('resume.resume_builder', resume_id=resume_id))
 
-@resume_bp.route('/resume/<int:resume_id>/update-template', methods=['POST'])
+@resume_bp.route('/<int:resume_id>/update-template', methods=['POST'])
 @login_required
 def update_resume_template(resume_id):
     """Update the resume template without reloading the page."""
@@ -134,7 +134,7 @@ def update_resume_template(resume_id):
         flash(f"Error updating template: {str(e)}", "error")
         return redirect(url_for('resume.resume_builder', resume_id=resume_id))
 
-@resume_bp.route('/resume/<int:resume_id>/render')
+@resume_bp.route('/<int:resume_id>/render')
 @login_required
 def resume_render(resume_id):
     resume = Resume.query.get_or_404(resume_id)
@@ -148,7 +148,7 @@ def resume_render(resume_id):
     return Response(html_output, mimetype="text/html")
 
 
-@resume_bp.route('/resume/<int:resume_id>/delete', methods=['POST'])
+@resume_bp.route('/<int:resume_id>/delete', methods=['POST'])
 @login_required
 def delete_resume(resume_id):
     resume = Resume.query.get_or_404(resume_id)
@@ -189,7 +189,7 @@ def delete_resume(resume_id):
 
 
 
-@resume_bp.route('/resume/<int:resume_id>/view')
+@resume_bp.route('/<int:resume_id>/view')
 @login_required
 def view_resume(resume_id):
     resume = Resume.query.get_or_404(resume_id)
@@ -204,7 +204,7 @@ def view_resume(resume_id):
 
 
 
-@resume_bp.route('/resume/create/general')
+@resume_bp.route('/create/general')
 @login_required
 def generate_general_resume():
     """
@@ -237,7 +237,7 @@ def generate_general_resume():
 
 
 
-@resume_bp.route('/resume/<int:resume_id>/customize', methods=['POST'])
+@resume_bp.route('/<int:resume_id>/customize', methods=['POST'])
 @login_required
 def customize_template(resume_id):
     resume = Resume.query.get_or_404(resume_id)
@@ -266,7 +266,7 @@ def customize_template(resume_id):
     return redirect(url_for('resume.resume_preview', resume_id=resume.id))
 
 
-@resume_bp.route('/resume/<int:resume_id>/builder', methods=['GET', 'POST'])
+@resume_bp.route('/<int:resume_id>/builder', methods=['GET', 'POST'])
 @login_required
 def resume_builder(resume_id):
     resume = Resume.query.get_or_404(resume_id)
@@ -317,7 +317,7 @@ def resume_builder(resume_id):
                          templates=templates,
                          selected_template=(resume.template if resume and resume.template else  'professional_classic') )
 
-@resume_bp.route('/resume/<int:resume_id>/save-field', methods=['POST'])
+@resume_bp.route('/<int:resume_id>/save-field', methods=['POST'])
 @login_required
 def save_resume_field(resume_id):
     """Save a single field from a resume form via AJAX."""
@@ -351,7 +351,7 @@ def save_resume_field(resume_id):
         db.session.rollback()
         return jsonify({"success": False, "error": str(e)}), 500
 
-@resume_bp.route('/resume/<int:resume_id>/enhance-summary', methods=['POST'])
+@resume_bp.route('/<int:resume_id>/enhance-summary', methods=['POST'])
 @login_required
 def enhance_summary(resume_id):
     """Enhance resume summary using AI."""
