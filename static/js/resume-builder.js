@@ -25,14 +25,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   if(iframe) {
       // Listen for content changes in iframe
-    
+
       iframe.addEventListener('load', function() {
         const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        
+
         // Listen for input events inside the iframe
         iframeDoc.addEventListener('input', function() {
             hasUnsavedChanges = true;
-            
+
             // Clear any existing auto-save timeout
             clearTimeout(autoSaveTimeout);
             
@@ -195,7 +195,7 @@ function showSaveStatus(message, isError = false) {
 // Function to save resume changes
 function saveResume() {
 
-  // const saveButton = document.getElementById('save-resume-btn');
+  const saveButton = document.getElementById('save-resume-btn');
   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
   const resumeId = document.querySelector('.resume-builder').dataset.resumeId;
 
@@ -214,9 +214,9 @@ function saveResume() {
         
         // Collect resume data from the iframe
         resumeContent = collectResumeData(iframeDoc);
-        
+
         // AJAX request to save the resume
-        fetch(`/resume/${resumeId}/save-data`, {
+        fetch(`/api/v1/resume/${resumeId}/save-data`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
