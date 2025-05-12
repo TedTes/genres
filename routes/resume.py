@@ -396,7 +396,6 @@ def enhance_summary(resume_id):
 @login_required
 def save_resume_data(resume_id):
     """Save complete resume data submitted via AJAX."""
-    print("hellow??????")
     resume = Resume.query.get_or_404(resume_id)
     
     # Verify ownership
@@ -405,16 +404,17 @@ def save_resume_data(resume_id):
     
     # Get JSON data from request
     data = request.get_json()
+
     if not data or 'resume_data' not in data:
         return jsonify({"success": False, "error": "Missing resume data"}), 400
     
     resume_data = data['resume_data']
     
     try:
-        # Update the resume data
+         # Update the resume data
         resume.resume_data = resume_data
         
-        # Flag the resume_data field as modified so SQLAlchemy detects the change
+         # Flag the resume_data field as modified so SQLAlchemy detects the change
         attributes.flag_modified(resume, 'resume_data')
         
         # Save changes

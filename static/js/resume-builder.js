@@ -248,47 +248,112 @@ function saveResume() {
 }
 
     // Function to collect resume data from iframe document
-function collectResumeData(iframeDoc) {
-      // TODO: adjust with resume structure
+    function collectResumeData(iframeDoc) {
       const resumeData = {
           contact: {},
-          sections: []
+          sections: [],
+          bio: {
+              name: '',
+              title: ''
+          }
       };
       
-      // Collect name and title
-      resumeData.name = iframeDoc.querySelector('.name')?.textContent || '';
-      resumeData.title = iframeDoc.querySelector('.title')?.textContent || '';
+      // Collect name and title into bio object
+      resumeData.bio.name = iframeDoc.querySelector('.name')?.textContent || '';
+      resumeData.bio.title = iframeDoc.querySelector('.title')?.textContent || '';
       
       // Collect contact information
       const contactItems = iframeDoc.querySelectorAll('.contact-item');
       contactItems.forEach(item => {
-          const icon = item.querySelector('.contact-icon')?.className.match(/fa-(\w+)/)?.[1];
+          const iconClass = item.querySelector('.contact-icon')?.className;
           const content = item.querySelector('.contact-content')?.textContent;
-          if (icon && content) {
-              resumeData.contact[icon] = content;
+          
+          if (iconClass && content) {
+              // Extract key from icon class (fa-envelope, fa-phone, etc.)
+              const match = iconClass.match(/fa-(\w+)/);
+              if (match) {
+                  const key = match[1] === "envelope"?"email":match[1];
+                
+                  resumeData.contact[key] = content;
+              }
           }
       });
       
       // Collect sections
       const sections = iframeDoc.querySelectorAll('.resume-section');
+
       sections.forEach(section => {
           const sectionType = section.className.match(/(\w+)-section/)?.[1];
           const sectionTitle = section.querySelector('.section-title')?.textContent.trim();
-          const sectionData = { type: sectionType, title: sectionTitle, content: '' };
           
+          const sectionData = { 
+              type: sectionType, 
+              title: sectionTitle,
+              display: 'list', // default display type
+              content: '',
+              items: []
+          };
+          
+          // Check for section-content (text display type)
           if (section.querySelector('.section-content')) {
-              sectionData.content = section.querySelector('.section-content')?.innerHTML || '';
-          } else if (section.querySelector('.section-container')) {
+              sectionData.display = 'text';
+              sectionData.content = section.querySelector('.section-content')?.textContent || '';
+          } 
+          // Check for section-container (tags display type)
+          else if (section.querySelector('.section-container')) {
+              sectionData.display = 'tags';
               sectionData.items = Array.from(section.querySelectorAll('.section-tag')).map(tag => 
-                  tag.textContent.trim().replace(/^\s*[✓✔]\s*|\s*[×✖]\s*$/g, '')
+                  tag.textContent.trim()
+                      .replace(/\s*✓\s*/, '')
+                      .replace(/\s*×\s*/, '')
+                      .trim()
               );
-          } else {
+          } 
+          // Otherwise it's a list display type
+          else {
+              sectionData.display = 'list';
               sectionData.items = Array.from(section.querySelectorAll('.section-item')).map(item => {
                   const itemData = {};
-                  item.querySelectorAll('[class^="section-"]').forEach(el => {
-                      const key = el.className.replace('section-', '').replace('-', '_');
-                      itemData[key] = el.textContent.trim();
+                  
+                  // Get all elements with section- prefix classes
+                  item.querySelectorAll('[class^="section-"], [class*=" section-"]').forEach(el => {
+                      const classes = el.className.split(' ');
+                      classes.forEach(className => {
+                          if (className.startsWith('section-')) {
+                              let key = className.replace('section-', '').replace(/-/g, '_');
+                              
+                              // For certifications, 'degree' should be 'name'
+                              if (sectionType === 'certification' && key === 'degree') {
+                                  key = 'name';
+                              }
+                              
+                              // For certifications, 'school' should be 'issuer'
+                              if (sectionType === 'certification' && key === 'school') {
+                                  key = 'issuer';
+                              }
+                              
+                              // For experience, 'date' should be 'duration'
+                              if (sectionType === 'experience' && key === 'date') {
+                                  key = 'duration';
+                              }
+                              
+                              // Handle description/duties content
+                              if (key === 'description' || key === 'duties') {
+                                  const dutiesList = el.querySelector('.section-duties');
+                                  if (dutiesList) {
+                                      const bulletPoints = Array.from(dutiesList.querySelectorAll('li'))
+                                          .map(li => li.textContent.trim());
+                                      itemData[key] = bulletPoints.join('\n');
+                                  } else {
+                                      itemData[key] = el.textContent.trim();
+                                  }
+                              } else {
+                                  itemData[key] = el.textContent.trim();
+                              }
+                          }
+                      });
                   });
+                  
                   return itemData;
               });
           }
