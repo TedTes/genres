@@ -12,8 +12,8 @@
 {% endblock %}
     <!-- Header -->
     <div class="resume-header content-editable">
-      <h1 class="name" contenteditable="true">{{ resume.contact.name|default('John Doe') }}</h1>
-      <h2 class="title" contenteditable="true">{{ resume.title|default('Professional Title') }}</h2>
+      <h1 class="name" contenteditable="true">{{ resume.bio.name|default('John Doe') }}</h1>
+      <h2 class="title" contenteditable="true">{{ resume.bio.title|default('Professional Title') }}</h2>
       
       {% if resume.contact %}
       <div class="contact-grid">
@@ -110,7 +110,7 @@
             {% endfor %}
           </div>
         {% endfor %}
-        {% if section.type != "skills" and section.type != "summary" %}
+        {% if section.type != "Skills" and section.type != "Summary" %}
         <button class="add-item-btn" id="add-{{section.type}}-btn">
           <i class="fas fa-plus"></i> Add {{section.type}}
         </button>
