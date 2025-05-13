@@ -248,7 +248,7 @@ function saveResume() {
 }
 
     // Function to collect resume data from iframe document
-    function collectResumeData(iframeDoc) {
+function collectResumeData(iframeDoc) {
       const resumeData = {
           contact: {},
           sections: [],
@@ -281,11 +281,9 @@ function saveResume() {
       
       // Collect sections
       const sections = iframeDoc.querySelectorAll('.resume-section');
-
       sections.forEach(section => {
-          const sectionType = section.className.match(/(\w+)-section/)?.[1];
+          const sectionType = section.className.match(/(\w+)-section/g)?.pop()?.match(/(\w+)-section/)?.[1];
           const sectionTitle = section.querySelector('.section-title')?.textContent.trim();
-          
           const sectionData = { 
               type: sectionType, 
               title: sectionTitle,
@@ -360,7 +358,6 @@ function saveResume() {
           
           resumeData.sections.push(sectionData);
       });
-      
       return resumeData;
   }
 
