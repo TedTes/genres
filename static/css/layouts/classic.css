@@ -458,10 +458,13 @@ body {
   gap: 6px;
   opacity: 0;
   transition: var(--transition);
+  pointer-events: none;
+  z-index: 999;
 }
 
 .section-item:hover .item-actions {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .item-btn {
