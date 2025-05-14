@@ -3,7 +3,6 @@ let hasUnsavedChanges = false;
 document.addEventListener('DOMContentLoaded', function() {
   // Theme color changer
   const root = document.documentElement;
-  
 
   const templateButton = document.querySelector('.float-control-btn[data-panel="templates-panel"]');
   const templatesPanel = document.getElementById('templates-panel');
@@ -23,26 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  if(iframe) {
-      // Listen for content changes in iframe
 
-      iframe.addEventListener('load', function() {
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-
-        // Listen for input events inside the iframe
-        iframeDoc.addEventListener('input', function() {
-            hasUnsavedChanges = true;
-
-            // Clear any existing auto-save timeout
-            clearTimeout(autoSaveTimeout);
-            
-            // Set auto-save timeout
-            autoSaveTimeout = setTimeout(() => {
-                saveResume();
-            }, 30000); // Auto-save after 30 seconds of inactivity
-        });
-    });
-  }
   // Setup AI modal if elements exist
   if (aiButton && aiModal && aiModalClose) {
     // Open AI modal and close templates panel if open
@@ -107,8 +87,8 @@ document.addEventListener('DOMContentLoaded', function() {
  document.addEventListener('click', function(e) {
   if (!e.target.closest('.slide-panel') && 
       !e.target.closest('.float-control-btn') && 
-      templatesPanel.classList.contains('active')) {
-      templatesPanel.classList.remove('active');
+      templatesPanel?.classList.contains('active')) {
+      templatesPanel?.classList.remove('active');
   }
 });
 
@@ -153,8 +133,6 @@ document.addEventListener('DOMContentLoaded', function() {
       window.autoSaveTimeout = setTimeout(autoSave, 1500);
     }
   });
-
-  
 
     // Warn before leaving with unsaved changes
     window.addEventListener('beforeunload', function(e) {
@@ -373,6 +351,7 @@ function addTagEventListeners(tag) {
 
 function autoSave() {
   console.log('Auto-saving resume...');
+  hasUnsavedChanges = true;
   const savedIndicator = document.createElement('div');
   savedIndicator.style.position = 'fixed';
   savedIndicator.style.bottom = '20px';
@@ -386,6 +365,21 @@ function autoSave() {
   savedIndicator.style.transition = 'opacity 0.3s';
   savedIndicator.innerHTML = '<i class="fas fa-check"></i> Changes saved';
   document.body.appendChild(savedIndicator);
+
+  // Clear any existing timeout
+  clearTimeout(autoSaveTimeout);
+
+  // Set new timeout for actual save
+  autoSaveTimeout = setTimeout(() => {
+        saveResume();
+    }, 1500); // Save after 1.5 seconds of inactivity
+
+  // Show save indicator
+  const saveStatus = document.getElementById('save-status');
+
+  if (saveStatus) {
+    showSaveStatus('Changes saved', false);
+   }  
   setTimeout(() => {
     savedIndicator.style.opacity = '1';
     setTimeout(() => {
@@ -415,245 +409,264 @@ function addNewTag(button) {
   }
 
 
-    // Add item event listeners
-function addItemEventListeners(item) {
-      const moveUpBtn = item.querySelector('.move-up');
-      const moveDownBtn = item.querySelector('.move-down');
-      const deleteBtn = item.querySelector('.delete');
-      if (moveUpBtn) {
-        moveUpBtn.addEventListener('click', function() {
-          const prevItem = item.previousElementSibling;
-          if (prevItem && !prevItem.classList.contains('add-item-btn') && prevItem.classList.contains('section-item')) {
-            item.parentNode.insertBefore(item, prevItem);
-            autoSave();
-          }
-        });
-      }
-      if (moveDownBtn) {
-        moveDownBtn.addEventListener('click', function() {
-          const nextItem = item.nextElementSibling;
-          if (nextItem && !nextItem.classList.contains('add-item-btn')) {
-            item.parentNode.insertBefore(nextItem, item);
-            autoSave();
-          }
-        });
-      }
-      if (deleteBtn) {
-        deleteBtn.addEventListener('click', function() {
-          if (confirm('Are you sure you want to delete this item?')) {
-            item.remove();
-            autoSave();
-          }
-        });
-      }
-    }
 
-  // Add new item
-  function addNewItem(button, type) {
-    const section = button.parentElement;
-    const newItem = document.createElement('div');
-    newItem.className = 'section-item';
-    let itemHTML = `
-      <div class="item-actions">
-        <button class="item-btn move-up" title="Move Up"><i class="fas fa-arrow-up"></i></button>
-        <button class="item-btn move-down" title="Move Down"><i class="fas fa-arrow-down"></i></button>
-        <button class="item-btn delete" title="Delete"><i class="fas fa-trash"></i></button>
-      </div>
-    `;
-    switch(type) {
-      case 'experience':
-        itemHTML += `
-          <div class="section-job-title" contenteditable="true">
-            <i class="fas fa-chevron-right"></i>
-            Job Title
-          </div>
-          <div class="section-company" contenteditable="true">
-            <i class="fas fa-building"></i>
-            Company Name
-          </div>
-          <div class="section-date" contenteditable="true">
-            <i class="fas fa-calendar-alt"></i>
-            Start Date - End Date
-          </div>
-          <div class="section-description" contenteditable="true">
-            <ul class="section-duties">
-              <li>Add your responsibilities and achievements here...</li>
-              <li>Use bullet points to highlight your accomplishments...</li>
-              <li>Include metrics and results where possible (e.g., "Increased sales by 20%")</li>
-              <li>Focus on achievements rather than just duties</li>
-            </ul>
-          </div>
-        `;
-        break;
-      case 'education':
+// Add new item
+function addNewItem(button, type) {
+  const section = button.parentElement;
+  const newItem = document.createElement('div');
+  newItem.className = 'section-item';
+  let itemHTML = `
+    <div class="item-actions">
+      <button class="item-btn delete" title="Delete"><i class="fas fa-trash"></i></button>
+    </div>
+  `;
+  switch(type) {
+    case 'experience':
+      itemHTML += `
+        <div class="section-job-title" contenteditable="true">
+          <i class="fas fa-chevron-right"></i>
+          Job Title
+        </div>
+        <div class="section-company" contenteditable="true">
+          <i class="fas fa-building"></i>
+          Company Name
+        </div>
+        <div class="section-date" contenteditable="true">
+          <i class="fas fa-calendar-alt"></i>
+          Start Date - End Date
+        </div>
+        <div class="section-description" contenteditable="true">
+          <ul class="section-duties">
+            <li>Add your responsibilities and achievements here...</li>
+            <li>Use bullet points to highlight your accomplishments...</li>
+            <li>Include metrics and results where possible (e.g., "Increased sales by 20%")</li>
+            <li>Focus on achievements rather than just duties</li>
+          </ul>
+        </div>
+      `;
+      break;
+    case 'education':
+      itemHTML += `
+        <div class="section-degree" contenteditable="true">
+          <i class="fas fa-chevron-right"></i>
+          Degree / Certification
+        </div>
+        <div class="section-school" contenteditable="true">
+          <i class="fas fa-university"></i>
+          Institution Name
+        </div>
+        <div class="section-date" contenteditable="true">
+          <i class="fas fa-calendar-alt"></i>
+          Start Year - End Year
+        </div>
+        <div class="section-description" contenteditable="true">
+          Add details about your educational achievements, relevant coursework, honors, extracurricular activities, or GPA if notable.
+        </div>
+      `;
+      break;
+    case 'certification':
+      itemHTML += `
+        <div class="section-degree" contenteditable="true">
+          <i class="fas fa-award"></i>
+          Certification Name
+        </div>
+        <div class="section-school" contenteditable="true">
+          <i class="fas fa-building"></i>
+          Issuing Organization
+        </div>
+        <div class="section-date" contenteditable="true">
+          <i class="fas fa-calendar-alt"></i>
+          Year Obtained (and expiration if applicable)
+        </div>
+        <div class="section-description" contenteditable="true">
+          Include additional details about the certification, such as skills validated or special achievements.
+        </div>
+      `;
+      break;
+    case 'project':
+      itemHTML += `
+        <div class="section-degree" contenteditable="true">
+          <i class="fas fa-folder-open"></i>
+          Project Name
+        </div>
+        <div class="section-school" contenteditable="true">
+          <i class="fas fa-link"></i>
+          Project URL (if available)
+        </div>
+        <div class="section-date" contenteditable="true">
+          <i class="fas fa-calendar-alt"></i>
+          Completion Date / Duration
+        </div>
+        <div class="section-description" contenteditable="true">
+          <ul class="section-duties">
+            <li>Describe the purpose and scope of the project</li>
+            <li>List technologies, tools, and methodologies used</li>
+            <li>Explain your specific role and contributions</li>
+            <li>Highlight outcomes, impact, or key achievements</li>
+          </ul>
+        </div>
+      `;
+      break;
+    case 'volunteer':
+      itemHTML += `
+        <div class="section-degree" contenteditable="true">
+          <i class="fas fa-hands-helping"></i>
+          Volunteer Position
+        </div>
+        <div class="section-school" contenteditable="true">
+          <i class="fas fa-building"></i>
+          Organization
+        </div>
+        <div class="section-date" contenteditable="true">
+          <i class="fas fa-calendar-alt"></i>
+          Start Date - End Date
+        </div>
+        <div class="section-description" contenteditable="true">
+          <ul class="section-duties">
+            <li>Describe your volunteer contributions and responsibilities</li>
+            <li>Highlight any leadership roles or special projects</li>
+            <li>Include skills developed or utilized</li>
+          </ul>
+        </div>
+      `;
+      break;
+    case 'award':
+      itemHTML += `
+        <div class="section-degree" contenteditable="true">
+          <i class="fas fa-trophy"></i>
+          Award/Recognition Name
+        </div>
+        <div class="section-school" contenteditable="true">
+          <i class="fas fa-building"></i>
+          Awarding Organization
+        </div>
+        <div class="section-date" contenteditable="true">
+          <i class="fas fa-calendar-alt"></i>
+          Date Received
+        </div>
+        <div class="section-description" contenteditable="true">
+          Describe the significance of this award, what it recognizes, and why you received it. Include any relevant context like competition size or selection criteria.
+        </div>
+      `;
+      break;
+    case 'publication':
+      itemHTML += `
+        <div class="section-degree" contenteditable="true">
+          <i class="fas fa-book"></i>
+          Publication Title
+        </div>
+        <div class="section-school" contenteditable="true">
+          <i class="fas fa-newspaper"></i>
+          Publisher/Journal
+        </div>
+        <div class="section-date" contenteditable="true">
+          <i class="fas fa-calendar-alt"></i>
+          Publication Date
+        </div>
+        <div class="section-description" contenteditable="true">
+          Briefly describe the publication, your contribution, and its significance. Include co-authors if applicable and any important details about reach or impact.
+        </div>
+      `;
+      break;
+    case 'language':
+      itemHTML += `
+        <div class="section-degree" contenteditable="true">
+          <i class="fas fa-language"></i>
+          Language Name
+        </div>
+        <div class="section-school" contenteditable="true">
+          <i class="fas fa-star"></i>
+          Proficiency Level (e.g., Fluent, Native, Intermediate)
+        </div>
+      `;
+      break;
+    default:
+      const sectionTitle = section.querySelector('.section-title').textContent.trim().toLowerCase();
+      if (sectionTitle.includes('volunteer')) {
+        return addNewItem(button, 'volunteer');
+      } else if (sectionTitle.includes('award') || sectionTitle.includes('honor')) {
+        return addNewItem(button, 'award');
+      } else if (sectionTitle.includes('publication') || sectionTitle.includes('research')) {
+        return addNewItem(button, 'publication');
+      } else if (sectionTitle.includes('language')) {
+        return addNewItem(button, 'language');
+      } else if (sectionTitle.includes('project')) {
+        return addNewItem(button, 'project');
+      } else {
         itemHTML += `
           <div class="section-degree" contenteditable="true">
             <i class="fas fa-chevron-right"></i>
-            Degree / Certification
-          </div>
-          <div class="section-school" contenteditable="true">
-            <i class="fas fa-university"></i>
-            Institution Name
-          </div>
-          <div class="section-date" contenteditable="true">
-            <i class="fas fa-calendar-alt"></i>
-            Start Year - End Year
-          </div>
-          <div class="section-description" contenteditable="true">
-            Add details about your educational achievements, relevant coursework, honors, extracurricular activities, or GPA if notable.
-          </div>
-        `;
-        break;
-      case 'certification':
-        itemHTML += `
-          <div class="section-degree" contenteditable="true">
-            <i class="fas fa-award"></i>
-            Certification Name
+            Item Title
           </div>
           <div class="section-school" contenteditable="true">
             <i class="fas fa-building"></i>
-            Issuing Organization
+            Organization / Entity
           </div>
           <div class="section-date" contenteditable="true">
             <i class="fas fa-calendar-alt"></i>
-            Year Obtained (and expiration if applicable)
+            Relevant Date
           </div>
           <div class="section-description" contenteditable="true">
-            Include additional details about the certification, such as skills validated or special achievements.
+            Add details here to describe this item...
           </div>
         `;
-        break;
-      case 'project':
-        itemHTML += `
-          <div class="section-degree" contenteditable="true">
-            <i class="fas fa-folder-open"></i>
-            Project Name
-          </div>
-          <div class="section-school" contenteditable="true">
-            <i class="fas fa-link"></i>
-            Project URL (if available)
-          </div>
-          <div class="section-date" contenteditable="true">
-            <i class="fas fa-calendar-alt"></i>
-            Completion Date / Duration
-          </div>
-          <div class="section-description" contenteditable="true">
-            <ul class="section-duties">
-              <li>Describe the purpose and scope of the project</li>
-              <li>List technologies, tools, and methodologies used</li>
-              <li>Explain your specific role and contributions</li>
-              <li>Highlight outcomes, impact, or key achievements</li>
-            </ul>
-          </div>
-        `;
-        break;
-      case 'volunteer':
-        itemHTML += `
-          <div class="section-degree" contenteditable="true">
-            <i class="fas fa-hands-helping"></i>
-            Volunteer Position
-          </div>
-          <div class="section-school" contenteditable="true">
-            <i class="fas fa-building"></i>
-            Organization
-          </div>
-          <div class="section-date" contenteditable="true">
-            <i class="fas fa-calendar-alt"></i>
-            Start Date - End Date
-          </div>
-          <div class="section-description" contenteditable="true">
-            <ul class="section-duties">
-              <li>Describe your volunteer contributions and responsibilities</li>
-              <li>Highlight any leadership roles or special projects</li>
-              <li>Include skills developed or utilized</li>
-            </ul>
-          </div>
-        `;
-        break;
-      case 'award':
-        itemHTML += `
-          <div class="section-degree" contenteditable="true">
-            <i class="fas fa-trophy"></i>
-            Award/Recognition Name
-          </div>
-          <div class="section-school" contenteditable="true">
-            <i class="fas fa-building"></i>
-            Awarding Organization
-          </div>
-          <div class="section-date" contenteditable="true">
-            <i class="fas fa-calendar-alt"></i>
-            Date Received
-          </div>
-          <div class="section-description" contenteditable="true">
-            Describe the significance of this award, what it recognizes, and why you received it. Include any relevant context like competition size or selection criteria.
-          </div>
-        `;
-        break;
-      case 'publication':
-        itemHTML += `
-          <div class="section-degree" contenteditable="true">
-            <i class="fas fa-book"></i>
-            Publication Title
-          </div>
-          <div class="section-school" contenteditable="true">
-            <i class="fas fa-newspaper"></i>
-            Publisher/Journal
-          </div>
-          <div class="section-date" contenteditable="true">
-            <i class="fas fa-calendar-alt"></i>
-            Publication Date
-          </div>
-          <div class="section-description" contenteditable="true">
-            Briefly describe the publication, your contribution, and its significance. Include co-authors if applicable and any important details about reach or impact.
-          </div>
-        `;
-        break;
-      case 'language':
-        itemHTML += `
-          <div class="section-degree" contenteditable="true">
-            <i class="fas fa-language"></i>
-            Language Name
-          </div>
-          <div class="section-school" contenteditable="true">
-            <i class="fas fa-star"></i>
-            Proficiency Level (e.g., Fluent, Native, Intermediate)
-          </div>
-        `;
-        break;
-      default:
-        const sectionTitle = section.querySelector('.section-title').textContent.trim().toLowerCase();
-        if (sectionTitle.includes('volunteer')) {
-          return addNewItem(button, 'volunteer');
-        } else if (sectionTitle.includes('award') || sectionTitle.includes('honor')) {
-          return addNewItem(button, 'award');
-        } else if (sectionTitle.includes('publication') || sectionTitle.includes('research')) {
-          return addNewItem(button, 'publication');
-        } else if (sectionTitle.includes('language')) {
-          return addNewItem(button, 'language');
-        } else if (sectionTitle.includes('project')) {
-          return addNewItem(button, 'project');
-        } else {
-          itemHTML += `
-            <div class="section-degree" contenteditable="true">
-              <i class="fas fa-chevron-right"></i>
-              Item Title
-            </div>
-            <div class="section-school" contenteditable="true">
-              <i class="fas fa-building"></i>
-              Organization / Entity
-            </div>
-            <div class="section-date" contenteditable="true">
-              <i class="fas fa-calendar-alt"></i>
-              Relevant Date
-            </div>
-            <div class="section-description" contenteditable="true">
-              Add details here to describe this item...
-            </div>
-          `;
-        }
-    }
-    newItem.innerHTML = itemHTML;
-    section.insertBefore(newItem, button);
-    addItemEventListeners(newItem);
-    autoSave();
+      }
   }
+
+  autoSave();
+  newItem.innerHTML = itemHTML;
+  section.insertBefore(newItem, button);
+  addItemEventListeners(newItem);
+}
+
+function addItemEventListeners(item) {
+  const deleteBtn = item.querySelector('.delete');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', async function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (confirm('Are you sure you want to delete this item?')) {
+        // Extract data from the item element
+        const sectionType = item.closest('.resume-section').dataset.sectionType;
+        const itemIndex = Array.from(item.parentNode.children).indexOf(item);
+
+        // Extract resumeId from .resume-builder in parent or current document
+        const resumeContainer = (window.parent ? window.parent.document : document).querySelector('.resume-builder');
+        const resumeId = resumeContainer?.dataset.resumeId;
+
+        // Debug logging
+        console.log('resumeContainer:', resumeContainer);
+        console.log('resumeId:', resumeId, 'sectionType:', sectionType, 'itemIndex:', itemIndex);
+
+        // Check if resumeId exists
+        if (!resumeId) {
+          console.error('Resume ID not found');
+          showNotification('Error: Resume ID not found', 'error');
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/v1/resume/${resumeId}/section/${sectionType}/item/${itemIndex}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': (window.parent ? window.parent.document : document).querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+          });
+
+          if (response.ok) {
+            item.remove();
+            showNotification('Item deleted successfully', 'success');
+          } else {
+            const errorData = await response.json();
+            showNotification(`Failed to delete item: ${errorData.message || 'Unknown error'}`, 'error');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          showNotification('Error deleting item', 'error');
+        }
+      }
+    });
+  }
+}
