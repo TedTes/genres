@@ -11,7 +11,7 @@
 </style>
 {% endblock %}
     <!-- Header -->
-    <div class="resume-header content-editable">
+    <div class="resume-header content-editable resume-content" data-resume-id="{{resume_id}}">
       <h1 class="name" contenteditable="true">{{ resume.bio.name|default('John Doe') }}</h1>
       <h2 class="title" contenteditable="true">{{ resume.bio.title|default('Professional Title') }}</h2>
       
@@ -57,7 +57,7 @@
 
     <!-- Custom Sections -->
     {% for section in resume.sections %}
-    <section class="resume-section {{ section.type }}-section">
+    <section class="resume-section {{ section.type }}-section" data-section-type="{{ section.type }}">
       <h2 class="section-title" contenteditable="true">
         {% set map = {'summary':'user','experience':'briefcase', 'education':'graduation-cap','skills':'cogs','star':'star'} %}
         {% if section.type in map  %}
@@ -91,8 +91,6 @@
         {% for item in section["items"] %}
           <div class="section-item">
             <div class="item-actions">
-              <button class="item-btn move-up" title="Move Up"><i class="fas fa-arrow-up"></i></button>
-              <button class="item-btn move-down" title="Move Down"><i class="fas fa-arrow-down"></i></button>
               <button class="item-btn delete" title="Delete"><i class="fas fa-trash"></i></button>
             </div>
             
@@ -118,7 +116,4 @@
       {% endif %}
     </section>
     {% endfor %}
-
-
- 
 {% endblock %}
