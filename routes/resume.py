@@ -409,7 +409,6 @@ def save_resume_data(resume_id):
         return jsonify({"success": False, "error": "Missing resume data"}), 400
     
     resume_data = data['resume_data']
-    
     try:
          # Update the resume data
         resume.resume_data = resume_data
@@ -426,3 +425,33 @@ def save_resume_data(resume_id):
         db.session.rollback()
         print(f"Error saving resume data: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+@resume_bp.route('/<int:resume_id>/section/<section_type>/item/<item_id>', methods=['DELETE'])
+@login_required
+def delete_resume_item(resume_id, section_type, item_id):
+    print("hello world in this world")
+    resume = Resume.query.get_or_404(resume_id)
+    if resume.user_id != current_user.id:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    try:
+        resume_data = resume.resume_data
+        if not isinstance(resume_data, dict) or 'sections' not in resume_data:
+            return jsonify({'error': 'Invalid resume data structure'}), 400
+
+        target_section = next((section for section in resume_data['sections'] 
+                             if section.get('type') == section_type), None)
+        if not target_section or 'items' not in target_section:
+            return jsonify({'error': 'Section not found'}), 404
+
+        # Find and remove item by item_id
+        target_section['items'] = [item for item in target_section['items'] 
+                                 if item.get('id', '') != item_id]
+        resume.resume_data = resume_data
+        db.session.commit()
+        return jsonify({'success': True})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
