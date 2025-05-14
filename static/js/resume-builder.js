@@ -329,7 +329,7 @@ function collectResumeData(iframeDoc) {
                           }
                       });
                   });
-                  
+                  itemData.id = item.dataset.itemId || Date.now().toString();
                   return itemData;
               });
           }
@@ -415,9 +415,10 @@ function addNewItem(button, type) {
   const section = button.parentElement;
   const newItem = document.createElement('div');
   newItem.className = 'section-item';
+  newItem.dataset.itemId = Date.now().toString();
   let itemHTML = `
     <div class="item-actions">
-      <button class="item-btn delete" title="Delete"><i class="fas fa-trash"></i></button>
+      <button class="item-btn delete" title="Delete" data-item-id = "${newItem.dataset.itemId}"><i class="fas fa-trash"></i></button>
     </div>
   `;
   switch(type) {
@@ -620,7 +621,7 @@ function addNewItem(button, type) {
 }
 
 function addItemEventListeners(item) {
-  const deleteBtn = item.querySelector('.delete');
+  const deleteBtn = item.querySelector('.item-btn.delete');
   if (deleteBtn) {
     deleteBtn.addEventListener('click', async function(e) {
       e.preventDefault();
@@ -629,15 +630,11 @@ function addItemEventListeners(item) {
       if (confirm('Are you sure you want to delete this item?')) {
         // Extract data from the item element
         const sectionType = item.closest('.resume-section').dataset.sectionType;
-        const itemIndex = Array.from(item.parentNode.children).indexOf(item);
+        const itemId =  deleteBtn.dataset.itemId;
 
         // Extract resumeId from .resume-builder in parent or current document
         const resumeContainer = (window.parent ? window.parent.document : document).querySelector('.resume-builder');
         const resumeId = resumeContainer?.dataset.resumeId;
-
-        // Debug logging
-        console.log('resumeContainer:', resumeContainer);
-        console.log('resumeId:', resumeId, 'sectionType:', sectionType, 'itemIndex:', itemIndex);
 
         // Check if resumeId exists
         if (!resumeId) {
@@ -647,7 +644,7 @@ function addItemEventListeners(item) {
         }
 
         try {
-          const response = await fetch(`/api/v1/resume/${resumeId}/section/${sectionType}/item/${itemIndex}`, {
+          const response = await fetch(`/api/v1/resume/${resumeId}/section/${sectionType}/item/${itemId}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',

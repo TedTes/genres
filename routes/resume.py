@@ -430,7 +430,6 @@ def save_resume_data(resume_id):
 @resume_bp.route('/<int:resume_id>/section/<section_type>/item/<item_id>', methods=['DELETE'])
 @login_required
 def delete_resume_item(resume_id, section_type, item_id):
-    print("hello world in this world")
     resume = Resume.query.get_or_404(resume_id)
     if resume.user_id != current_user.id:
         return jsonify({'error': 'Unauthorized'}), 403
