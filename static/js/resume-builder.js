@@ -1,148 +1,147 @@
-let autoSaveTimeout;
-let hasUnsavedChanges = false;
-document.addEventListener('DOMContentLoaded', function() {
-  // Theme color changer
+// Global state and utilities
+const state = {
+  autoSaveTimeout: null,
+  hasUnsavedChanges: false,
+};
+
+// DOM element selectors and event handlers
+const selectors = {
+  saveButton: '#save-resume-btn',
+  iframe: '#preview-iframe',
+  templateButton: '.float-control-btn[data-panel="templates-panel"]',
+  templatesPanel: '#templates-panel',
+  closePanelButtons: '.panel-close',
+  aiButton: '#ai-assistant-btn',
+  aiModal: '#ai-assistant-modal',
+  aiModalClose: '.ai-modal-close',
+  tooltipContainers: '.tooltip-container',
+  addButtons: '.add-item-btn, .add-tag-btn',
+  sectionTags: '.section-tag',
+  sectionItems: '.section-item',
+};
+
+document.addEventListener('DOMContentLoaded', () => {
   const root = document.documentElement;
+  const elements = {
+    saveButton: document.querySelector(selectors.saveButton),
+    iframe: document.querySelector(selectors.iframe),
+    templateButton: document.querySelector(selectors.templateButton),
+    templatesPanel: document.querySelector(selectors.templatesPanel),
+    closePanelButtons: document.querySelectorAll(selectors.closePanelButtons),
+    aiButton: document.querySelector(selectors.aiButton),
+    aiModal: document.querySelector(selectors.aiModal),
+    aiModalClose: document.querySelector(selectors.aiModalClose),
+    tooltipContainers: document.querySelectorAll(selectors.tooltipContainers),
+  };
 
-  const templateButton = document.querySelector('.float-control-btn[data-panel="templates-panel"]');
-  const templatesPanel = document.getElementById('templates-panel');
-  const closePanelButtons = document.querySelectorAll('.panel-close');
-
-  const aiButton = document.getElementById('ai-assistant-btn');
-  const aiModal = document.getElementById('ai-assistant-modal');
-  const aiModalClose = document.querySelector('.ai-modal-close');
-
-  const saveButton = document.getElementById('save-resume-btn');
-  const iframe = document.getElementById('preview-iframe');
-
-  if(saveButton) {
-    // Save button click handler
-    saveButton.addEventListener('click', function() {
-      saveResume();
-    });
+  // Save button handler
+  if (elements.saveButton) {
+    elements.saveButton.addEventListener('click', saveResume);
   }
 
-
-  // Setup AI modal if elements exist
-  if (aiButton && aiModal && aiModalClose) {
-    // Open AI modal and close templates panel if open
-    aiButton.addEventListener('click', function() {
-        if (templatesPanel && templatesPanel.classList.contains('active')) {
-            templatesPanel.classList.remove('active');
-        }
-        aiModal.classList.add('active');
-    });
-    
-    // Close AI modal
-    aiModalClose.addEventListener('click', function() {
-        aiModal.classList.remove('active');
-    });
-    
-    // Close AI modal when clicking outside
-    aiModal.addEventListener('click', function(e) {
-        if (e.target === aiModal) {
-            aiModal.classList.remove('active');
-        }
-    });
-  }
-  // Toggle templates panel when clicking the template button
-  if (templateButton && templatesPanel) {
-      templateButton.addEventListener('click', function() {
-        if (aiModal && aiModal.classList.contains('active')) {
-          aiModal.classList.remove('active');
+  // AI modal handlers
+  if (elements.aiButton && elements.aiModal && elements.aiModalClose) {
+    elements.aiButton.addEventListener('click', () => {
+      if (elements.templatesPanel?.classList.contains('active')) {
+        elements.templatesPanel.classList.remove('active');
       }
-          templatesPanel.classList.toggle('active');
+      elements.aiModal.classList.add('active');
+    });
+
+    elements.aiModalClose.addEventListener('click', () => {
+      elements.aiModal.classList.remove('active');
+    });
+
+    elements.aiModal.addEventListener('click', (e) => {
+      if (e.target === elements.aiModal) {
+        elements.aiModal.classList.remove('active');
+      }
+    });
+  }
+
+  // Template panel toggle
+  if (elements.templateButton && elements.templatesPanel) {
+    elements.templateButton.addEventListener('click', () => {
+      if (elements.aiModal?.classList.contains('active')) {
+        elements.aiModal.classList.remove('active');
+      }
+      elements.templatesPanel.classList.toggle('active');
+    });
+  }
+
+  // Tooltip handlers
+  elements.tooltipContainers.forEach(container => {
+    const tooltip = container.querySelector('.btn-tooltip');
+    if (tooltip) {
+      container.addEventListener('mouseenter', () => {
+        tooltip.style.opacity = '1';
+        tooltip.style.visibility = 'visible';
       });
-  }
-
-  const tooltipContainers = document.querySelectorAll('.tooltip-container');
-  tooltipContainers.forEach(container => {
-      const tooltip = container.querySelector('.btn-tooltip');
-      if (tooltip) {
-          // Show tooltip on hover
-          container.addEventListener('mouseenter', function() {
-              tooltip.style.opacity = '1';
-              tooltip.style.visibility = 'visible';
-          });
-          
-          // Hide tooltip when mouse leaves
-          container.addEventListener('mouseleave', function() {
-              tooltip.style.opacity = '0';
-              tooltip.style.visibility = 'hidden';
-          });
-      }
-  });
-     // Close panel buttons
-  closePanelButtons.forEach(button => {
-      button.addEventListener('click', function() {
-          const panelId = this.getAttribute('data-panel');
-          const panel = document.getElementById(panelId);
-          if (panel) {
-              panel.classList.remove('active');
-          }
+      container.addEventListener('mouseleave', () => {
+        tooltip.style.opacity = '0';
+        tooltip.style.visibility = 'hidden';
       });
-  });
-
- // Close panel when clicking outside
- document.addEventListener('click', function(e) {
-  if (!e.target.closest('.slide-panel') && 
-      !e.target.closest('.float-control-btn') && 
-      templatesPanel?.classList.contains('active')) {
-      templatesPanel?.classList.remove('active');
-  }
-});
-
-  // Add event listeners to all "Add" buttons
-  document.querySelectorAll('.add-item-btn, .add-tag-btn').forEach(btn => {
-    if (btn.id.startsWith('add-')) {
-      const type = btn.id.replace('add-', '').replace('-btn', '');
-      if (type === 'skills') {
-        btn.addEventListener('click', function() {
-          addNewTag(this);
-        });
-      } else if (type !== 'summary') {
-        btn.addEventListener('click', function() {
-          addNewItem(this, type);
-        });
-      }
     }
   });
 
-  // Add event listeners to delete buttons for existing tags
-
-  document.querySelectorAll('.section-tag').forEach(addTagEventListeners);
-
-  // Add event listeners to existing items
-  document.querySelectorAll('.section-item').forEach(addItemEventListeners);
-
-
-
-  // Handle dropping files
-  document.addEventListener('dragover', function(e) {
-    e.preventDefault();
+  // Close panels
+  elements.closePanelButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const panelId = button.getAttribute('data-panel');
+      const panel = document.getElementById(panelId);
+      if (panel) panel.classList.remove('active');
+    });
   });
-  document.addEventListener('drop', function(e) {
+
+  // Close panel when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.slide-panel') && !e.target.closest('.float-control-btn') && 
+        elements.templatesPanel?.classList.contains('active')) {
+      elements.templatesPanel.classList.remove('active');
+    }
+  });
+
+  // Add button handlers
+  document.querySelectorAll(selectors.addButtons).forEach(btn => {
+    if (btn.id.startsWith('add-')) {
+      const type = btn.id.replace('add-', '').replace('-btn', '');
+      btn.addEventListener('click', () => {
+        if (type === 'skills') addNewTag(btn);
+        else if (type !== 'summary') addNewItem(btn, type);
+      });
+    }
+  });
+
+  // Existing tag and item event listeners
+  document.querySelectorAll(selectors.sectionTags).forEach(addTagEventListeners);
+  document.querySelectorAll(selectors.sectionItems).forEach(addItemEventListeners);
+
+  // File drop handlers
+  document.addEventListener('dragover', (e) => e.preventDefault());
+  document.addEventListener('drop', (e) => {
     e.preventDefault();
     alert('File uploads will be supported in a future version.');
   });
 
-  // Listen for input changes and save
-  document.addEventListener('input', function(e) {
+  // Input change handler with debouncing
+  document.addEventListener('input', debounce((e) => {
     if (e.target.getAttribute('contenteditable') === 'true') {
-      clearTimeout(window.autoSaveTimeout);
-      window.autoSaveTimeout = setTimeout(autoSave, 1500);
+      state.hasUnsavedChanges = true;
+      clearTimeout(state.autoSaveTimeout);
+      state.autoSaveTimeout = setTimeout(autoSave, 1500);
+    }
+  }, 100));
+
+  // Warn before unload
+  window.addEventListener('beforeunload', (e) => {
+    if (state.hasUnsavedChanges) {
+      e.preventDefault();
+      e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+      return e.returnValue;
     }
   });
 
-    // Warn before leaving with unsaved changes
-    window.addEventListener('beforeunload', function(e) {
-      if (hasUnsavedChanges) {
-          e.preventDefault();
-          e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
-          return e.returnValue;
-      }
-  });
-  // Export these functions for global use
+  // Export functions globally
   window.addItemEventListeners = addItemEventListeners;
   window.addTagEventListeners = addTagEventListeners;
   window.addNewTag = addNewTag;
@@ -151,199 +150,162 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Initial auto-save
   setTimeout(autoSave, 3000);
+
+  // Setup iframe listeners
+  if (elements.iframe) {
+    elements.iframe.addEventListener('load', () => {
+      const iframeDoc = elements.iframe.contentDocument || elements.iframe.contentWindow.document;
+      setupIframeListeners(iframeDoc);
+    });
+  }
 });
 
-// Function to show save status message
+// Iframe-specific event setup
+function setupIframeListeners(iframeDoc) {
+  iframeDoc.addEventListener('click', (e) => {
+    const deleteBtn = e.target.closest('.item-btn.delete');
+    if (deleteBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      const item = deleteBtn.closest('.section-item');
+      if (item && confirm('Are you sure you want to delete this item?')) {
+        item.remove();
+        state.hasUnsavedChanges = true;
+        autoSave();
+      }
+    }
+  });
+
+  iframeDoc.querySelectorAll('.section-tag').forEach(addTagEventListeners);
+  iframeDoc.addEventListener('input', () => {
+    state.hasUnsavedChanges = true;
+    clearTimeout(state.autoSaveTimeout);
+    state.autoSaveTimeout = setTimeout(autoSave, 3000);
+  });
+}
+
+// Utility functions
 function showSaveStatus(message, isError = false) {
   const saveStatus = document.getElementById('save-status');
+  if (saveStatus) {
     saveStatus.textContent = message;
     saveStatus.classList.add('show');
-    
-    if (isError) {
-        saveStatus.classList.add('error');
-    } else {
-        saveStatus.classList.remove('error');
-    }
-    
-    setTimeout(() => {
-        saveStatus.classList.remove('show');
-    }, 3000);
-}
-
-// Function to save resume changes
-function saveResume() {
-
-  const saveButton = document.getElementById('save-resume-btn');
-  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-  const resumeId = document.querySelector('.resume-builder').dataset.resumeId;
-
-
-    if (!hasUnsavedChanges) return;
-    
-    saveButton.classList.add('saving');
-    
-    // Get content from iframe
-    const iframe = document.getElementById('preview-iframe');
-    let resumeContent;
-    
-    try {
-        // Try to get all editable content from the iframe
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        
-        // Collect resume data from the iframe
-        resumeContent = collectResumeData(iframeDoc);
-
-        // AJAX request to save the resume
-        fetch(`/api/v1/resume/${resumeId}/save-data`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({ resume_data: resumeContent })
-        })
-        .then(response => response.json())
-        .then(data => {
-            saveButton.classList.remove('saving');
-            
-            if (data.success) {
-                showSaveStatus('Changes saved successfully!');
-                hasUnsavedChanges = false;
-            } else {
-                showSaveStatus('Error saving changes. Please try again.', true);
-            }
-        })
-        .catch(error => {
-            console.error('Error saving resume:', error);
-            saveButton.classList.remove('saving');
-            showSaveStatus('Error saving changes. Please try again.', true);
-        });
-    } catch (error) {
-        console.error('Error collecting resume data:', error);
-        saveButton.classList.remove('saving');
-        showSaveStatus('Error accessing resume content. Please try again.', true);
-    }
-}
-
-    // Function to collect resume data from iframe document
-function collectResumeData(iframeDoc) {
-      const resumeData = {
-          contact: {},
-          sections: [],
-          bio: {
-              name: '',
-              title: ''
-          }
-      };
-      
-      // Collect name and title into bio object
-      resumeData.bio.name = iframeDoc.querySelector('.name')?.textContent || '';
-      resumeData.bio.title = iframeDoc.querySelector('.title')?.textContent || '';
-      
-      // Collect contact information
-      const contactItems = iframeDoc.querySelectorAll('.contact-item');
-      contactItems.forEach(item => {
-          const iconClass = item.querySelector('.contact-icon')?.className;
-          const content = item.querySelector('.contact-content')?.textContent;
-          
-          if (iconClass && content) {
-              // Extract key from icon class (fa-envelope, fa-phone, etc.)
-              const match = iconClass.match(/fa-(\w+)/);
-              if (match) {
-                  const key = match[1] === "envelope"?"email":match[1];
-                
-                  resumeData.contact[key] = content;
-              }
-          }
-      });
-      
-      // Collect sections
-      const sections = iframeDoc.querySelectorAll('.resume-section');
-      sections.forEach(section => {
-          const sectionType = section.className.match(/(\w+)-section/g)?.pop()?.match(/(\w+)-section/)?.[1];
-          const sectionTitle = section.querySelector('.section-title')?.textContent.trim();
-          const sectionData = { 
-              type: sectionType, 
-              title: sectionTitle,
-              display: 'list', // default display type
-              content: '',
-              items: []
-          };
-          
-          // Check for section-content (text display type)
-          if (section.querySelector('.section-content')) {
-              sectionData.display = 'text';
-              sectionData.content = section.querySelector('.section-content')?.textContent || '';
-          } 
-          // Check for section-container (tags display type)
-          else if (section.querySelector('.section-container')) {
-              sectionData.display = 'tags';
-              sectionData.items = Array.from(section.querySelectorAll('.section-tag')).map(tag => 
-                  tag.textContent.trim()
-                      .replace(/\s*✓\s*/, '')
-                      .replace(/\s*×\s*/, '')
-                      .trim()
-              );
-          } 
-          // Otherwise it's a list display type
-          else {
-              sectionData.display = 'list';
-              sectionData.items = Array.from(section.querySelectorAll('.section-item')).map(item => {
-                  const itemData = {};
-                  
-                  // Get all elements with section- prefix classes
-                  item.querySelectorAll('[class^="section-"], [class*=" section-"]').forEach(el => {
-                      const classes = el.className.split(' ');
-                      classes.forEach(className => {
-                          if (className.startsWith('section-')) {
-                              let key = className.replace('section-', '').replace(/-/g, '_');
-                              
-                              // For certifications, 'degree' should be 'name'
-                              if (sectionType === 'certification' && key === 'degree') {
-                                  key = 'name';
-                              }
-                              
-                              // For certifications, 'school' should be 'issuer'
-                              if (sectionType === 'certification' && key === 'school') {
-                                  key = 'issuer';
-                              }
-                              
-                              // For experience, 'date' should be 'duration'
-                              if (sectionType === 'experience' && key === 'date') {
-                                  key = 'duration';
-                              }
-                              
-                              // Handle description/duties content
-                              if (key === 'description' || key === 'duties') {
-                                  const dutiesList = el.querySelector('.section-duties');
-                                  if (dutiesList) {
-                                      const bulletPoints = Array.from(dutiesList.querySelectorAll('li'))
-                                          .map(li => li.textContent.trim());
-                                      itemData[key] = bulletPoints.join('\n');
-                                  } else {
-                                      itemData[key] = el.textContent.trim();
-                                  }
-                              } else {
-                                  itemData[key] = el.textContent.trim();
-                              }
-                          }
-                      });
-                  });
-                  itemData.id = item.dataset.itemId || Date.now().toString();
-                  return itemData;
-              });
-          }
-          
-          resumeData.sections.push(sectionData);
-      });
-      return resumeData;
+    if (isError) saveStatus.classList.add('error');
+    else saveStatus.classList.remove('error');
+    setTimeout(() => saveStatus.classList.remove('show'), 3000);
   }
+}
+
+function saveResume() {
+  if (!state.hasUnsavedChanges) return;
+
+  const saveButton = document.querySelector('#save-resume-btn');
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+  const resumeId = document.querySelector('.resume-builder')?.dataset.resumeId;
+  const iframe = document.querySelector('#preview-iframe');
+
+  if (!saveButton || !resumeId || !iframe) return;
+
+  saveButton.classList.add('saving');
+
+  try {
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    const resumeContent = collectResumeData(iframeDoc);
+
+    fetch(`/api/v1/resume/${resumeId}/save-data`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+      body: JSON.stringify({ resume_data: resumeContent }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        saveButton.classList.remove('saving');
+        showSaveStatus(data.success ? 'Changes saved successfully!' : 'Error saving changes. Please try again.', true);
+        if (data.success) state.hasUnsavedChanges = false;
+      })
+      .catch(error => {
+        console.error('Error saving resume:', error);
+        saveButton.classList.remove('saving');
+        showSaveStatus('Error saving changes. Please try again.', true);
+      });
+  } catch (error) {
+    console.error('Error collecting resume data:', error);
+    saveButton.classList.remove('saving');
+    showSaveStatus('Error accessing resume content. Please try again.', true);
+  }
+}
+
+function collectResumeData(iframeDoc) {
+  const resumeData = { contact: {}, sections: [], bio: { name: '', title: '' } };
+
+  resumeData.bio.name = iframeDoc.querySelector('.name')?.textContent || '';
+  resumeData.bio.title = iframeDoc.querySelector('.title')?.textContent || '';
+
+  iframeDoc.querySelectorAll('.contact-item').forEach(item => {
+    const iconClass = item.querySelector('.contact-icon')?.className;
+    const content = item.querySelector('.contact-content')?.textContent;
+    if (iconClass && content) {
+      const match = iconClass.match(/fa-(\w+)/);
+      if (match) resumeData.contact[match[1] === 'envelope' ? 'email' : match[1]] = content;
+    }
+  });
+
+  iframeDoc.querySelectorAll('.resume-section').forEach(section => {
+    const sectionType = section.className.match(/(\w+)-section/)?.[1];
+    const sectionTitle = section.querySelector('.section-title')?.textContent.trim();
+    const sectionData = { type: sectionType, title: sectionTitle, display: 'list', content: '', items: [] };
+
+    if (section.querySelector('.section-content')) {
+      sectionData.display = 'text';
+      sectionData.content = section.querySelector('.section-content')?.textContent || '';
+    } else if (section.querySelector('.section-container')) {
+      sectionData.display = 'tags';
+      sectionData.items = Array.from(section.querySelectorAll('.section-tag')).map(tag =>
+        tag.textContent.trim().replace(/\s*✓\s*/, '').replace(/\s*×\s*/, '').trim()
+      );
+    } else {
+      sectionData.display = 'list';
+      sectionData.items = Array.from(section.querySelectorAll('.section-item')).map(item => {
+        const itemData = {};
+        
+        itemData.id = item.dataset.itemId || `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+       
+        item.dataset.itemId = itemData.id;
+
+        item.querySelectorAll('[class^="section-"], [class*=" section-"]').forEach(el => {
+          const classes = el.className.split(' ');
+          classes.forEach(className => {
+            if (className.startsWith('section-')) {
+              let key = className.replace('section-', '').replace(/-/g, '_');
+              if (sectionType === 'certification' && key === 'degree') key = 'name';
+              if (sectionType === 'certification' && key === 'school') key = 'issuer';
+              if (sectionType === 'experience' && key === 'date') key = 'duration';
+              itemData[key] = (key === 'description' || key === 'duties')
+                ? (el.querySelector('.section-duties')
+                  ? Array.from(el.querySelectorAll('li')).map(li => li.textContent.trim()).join('\n')
+                  : el.textContent.trim())
+                : el.textContent.trim();
+            }
+          });
+        });
+     
+        return itemData;
+      });
+    }
+
+    resumeData.sections.push(sectionData);
+  });
+
+
+  return resumeData;
+}
 
 function addTagEventListeners(tag) {
   const deleteBtn = tag.querySelector('.tag-delete');
   if (deleteBtn) {
-    deleteBtn.addEventListener('click', function() {
+    deleteBtn.addEventListener('click', () => {
       tag.remove();
+      state.hasUnsavedChanges = true;
       autoSave();
     });
   }
@@ -351,319 +313,195 @@ function addTagEventListeners(tag) {
 
 function autoSave() {
   console.log('Auto-saving resume...');
-  hasUnsavedChanges = true;
-  const savedIndicator = document.createElement('div');
-  savedIndicator.style.position = 'fixed';
-  savedIndicator.style.bottom = '20px';
-  savedIndicator.style.left = '20px';
-  savedIndicator.style.backgroundColor = 'var(--success)';
-  savedIndicator.style.color = 'white';
-  savedIndicator.style.padding = '10px 20px';
-  savedIndicator.style.borderRadius = '4px';
-  savedIndicator.style.boxShadow = 'var(--shadow-md)';
-  savedIndicator.style.opacity = '0';
-  savedIndicator.style.transition = 'opacity 0.3s';
-  savedIndicator.innerHTML = '<i class="fas fa-check"></i> Changes saved';
+  state.hasUnsavedChanges = true;
+  const savedIndicator = Object.assign(document.createElement('div'), {
+    style: `position: fixed; bottom: 20px; left: 20px; background-color: var(--success); 
+            color: white; padding: 10px 20px; border-radius: 4px; box-shadow: var(--shadow-md); 
+            opacity: 0; transition: opacity 0.3s`,
+    innerHTML: '<i class="fas fa-check"></i> Changes saved',
+  });
   document.body.appendChild(savedIndicator);
 
-  // Clear any existing timeout
-  clearTimeout(autoSaveTimeout);
+  clearTimeout(state.autoSaveTimeout);
+  state.autoSaveTimeout = setTimeout(saveResume, 1500);
 
-  // Set new timeout for actual save
-  autoSaveTimeout = setTimeout(() => {
-        saveResume();
-    }, 1500); // Save after 1.5 seconds of inactivity
-
-  // Show save indicator
   const saveStatus = document.getElementById('save-status');
+  if (saveStatus) showSaveStatus('Changes saved', false);
 
-  if (saveStatus) {
-    showSaveStatus('Changes saved', false);
-   }  
   setTimeout(() => {
     savedIndicator.style.opacity = '1';
     setTimeout(() => {
       savedIndicator.style.opacity = '0';
-      setTimeout(() => {
-        document.body.removeChild(savedIndicator);
-      }, 300);
+      setTimeout(() => document.body.removeChild(savedIndicator), 300);
     }, 2000);
   }, 100);
 }
-  // Add new tag
+
 function addNewTag(button) {
-    const tagName = prompt('Enter item name:');
-    if (tagName) {
-      const tagsContainer = button.parentElement;
-      const newTag = document.createElement('span');
-      newTag.className = 'section-tag';
-      newTag.innerHTML = `
-        <i class="fas fa-check"></i>
-        ${tagName}
-        <i class="fas fa-times tag-delete"></i>
-      `;
-      tagsContainer.insertBefore(newTag, button);
-      addTagEventListeners(newTag);
-      autoSave();
-    }
+  const tagName = prompt('Enter item name:');
+  if (tagName) {
+    const tagsContainer = button.parentElement;
+    const newTag = Object.assign(document.createElement('span'), {
+      className: 'section-tag',
+      innerHTML: `<i class="fas fa-check"></i>${tagName}<i class="fas fa-times tag-delete"></i>`,
+    });
+    tagsContainer.insertBefore(newTag, button);
+    addTagEventListeners(newTag);
+    state.hasUnsavedChanges = true;
+    autoSave();
   }
+}
 
-
-
-// Add new item
 function addNewItem(button, type) {
   const section = button.parentElement;
   const newItem = document.createElement('div');
   newItem.className = 'section-item';
-  newItem.dataset.itemId = Date.now().toString();
-  let itemHTML = `
-    <div class="item-actions">
-      <button class="item-btn delete" title="Delete" data-item-id = "${newItem.dataset.itemId}"><i class="fas fa-trash"></i></button>
-    </div>
-  `;
-  switch(type) {
+  
+  const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  newItem.dataset.itemId = uniqueId; // Fixed line
+  newItem.id = `item-${uniqueId}`;
+  let itemHTML = '<div class="item-actions"><button class="item-btn delete" title="Delete"><i class="fas fa-trash"></i></button></div>';
+
+  switch (type) {
     case 'experience':
       itemHTML += `
-        <div class="section-job-title" contenteditable="true">
-          <i class="fas fa-chevron-right"></i>
-          Job Title
-        </div>
-        <div class="section-company" contenteditable="true">
-          <i class="fas fa-building"></i>
-          Company Name
-        </div>
-        <div class="section-date" contenteditable="true">
-          <i class="fas fa-calendar-alt"></i>
-          Start Date - End Date
-        </div>
-        <div class="section-description" contenteditable="true">
-          <ul class="section-duties">
-            <li>Add your responsibilities and achievements here...</li>
-            <li>Use bullet points to highlight your accomplishments...</li>
-            <li>Include metrics and results where possible (e.g., "Increased sales by 20%")</li>
-            <li>Focus on achievements rather than just duties</li>
-          </ul>
-        </div>
-      `;
+        <div class="section-job-title" contenteditable="true"><i class="fas fa-chevron-right"></i>Job Title</div>
+        <div class="section-company" contenteditable="true"><i class="fas fa-building"></i>Company Name</div>
+        <div class="section-date" contenteditable="true"><i class="fas fa-calendar-alt"></i>Start Date - End Date</div>
+        <div class="section-description" contenteditable="true"><ul class="section-duties"><li>Add your responsibilities...</li><li>Use bullet points...</li><li>Include metrics...</li><li>Focus on achievements...</li></ul></div>`;
       break;
     case 'education':
       itemHTML += `
-        <div class="section-degree" contenteditable="true">
-          <i class="fas fa-chevron-right"></i>
-          Degree / Certification
-        </div>
-        <div class="section-school" contenteditable="true">
-          <i class="fas fa-university"></i>
-          Institution Name
-        </div>
-        <div class="section-date" contenteditable="true">
-          <i class="fas fa-calendar-alt"></i>
-          Start Year - End Year
-        </div>
-        <div class="section-description" contenteditable="true">
-          Add details about your educational achievements, relevant coursework, honors, extracurricular activities, or GPA if notable.
-        </div>
-      `;
+        <div class="section-degree" contenteditable="true"><i class="fas fa-chevron-right"></i>Degree / Certification</div>
+        <div class="section-school" contenteditable="true"><i class="fas fa-university"></i>Institution Name</div>
+        <div class="section-date" contenteditable="true"><i class="fas fa-calendar-alt"></i>Start Year - End Year</div>
+        <div class="section-description" contenteditable="true">Add details about achievements...</div>`;
       break;
     case 'certification':
       itemHTML += `
-        <div class="section-degree" contenteditable="true">
-          <i class="fas fa-award"></i>
-          Certification Name
-        </div>
-        <div class="section-school" contenteditable="true">
-          <i class="fas fa-building"></i>
-          Issuing Organization
-        </div>
-        <div class="section-date" contenteditable="true">
-          <i class="fas fa-calendar-alt"></i>
-          Year Obtained (and expiration if applicable)
-        </div>
-        <div class="section-description" contenteditable="true">
-          Include additional details about the certification, such as skills validated or special achievements.
-        </div>
-      `;
+        <div class="section-degree" contenteditable="true"><i class="fas fa-award"></i>Certification Name</div>
+        <div class="section-school" contenteditable="true"><i class="fas fa-building"></i>Issuing Organization</div>
+        <div class="section-date" contenteditable="true"><i class="fas fa-calendar-alt"></i>Year Obtained</div>
+        <div class="section-description" contenteditable="true">Include additional details...</div>`;
       break;
     case 'project':
       itemHTML += `
-        <div class="section-degree" contenteditable="true">
-          <i class="fas fa-folder-open"></i>
-          Project Name
-        </div>
-        <div class="section-school" contenteditable="true">
-          <i class="fas fa-link"></i>
-          Project URL (if available)
-        </div>
-        <div class="section-date" contenteditable="true">
-          <i class="fas fa-calendar-alt"></i>
-          Completion Date / Duration
-        </div>
-        <div class="section-description" contenteditable="true">
-          <ul class="section-duties">
-            <li>Describe the purpose and scope of the project</li>
-            <li>List technologies, tools, and methodologies used</li>
-            <li>Explain your specific role and contributions</li>
-            <li>Highlight outcomes, impact, or key achievements</li>
-          </ul>
-        </div>
-      `;
+        <div class="section-degree" contenteditable="true"><i class="fas fa-folder-open"></i>Project Name</div>
+        <div class="section-school" contenteditable="true"><i class="fas fa-link"></i>Project URL</div>
+        <div class="section-date" contenteditable="true"><i class="fas fa-calendar-alt"></i>Completion Date</div>
+        <div class="section-description" contenteditable="true"><ul class="section-duties"><li>Describe purpose...</li><li>List technologies...</li><li>Explain role...</li><li>Highlight outcomes...</li></ul></div>`;
       break;
     case 'volunteer':
       itemHTML += `
-        <div class="section-degree" contenteditable="true">
-          <i class="fas fa-hands-helping"></i>
-          Volunteer Position
-        </div>
-        <div class="section-school" contenteditable="true">
-          <i class="fas fa-building"></i>
-          Organization
-        </div>
-        <div class="section-date" contenteditable="true">
-          <i class="fas fa-calendar-alt"></i>
-          Start Date - End Date
-        </div>
-        <div class="section-description" contenteditable="true">
-          <ul class="section-duties">
-            <li>Describe your volunteer contributions and responsibilities</li>
-            <li>Highlight any leadership roles or special projects</li>
-            <li>Include skills developed or utilized</li>
-          </ul>
-        </div>
-      `;
+        <div class="section-degree" contenteditable="true"><i class="fas fa-hands-helping"></i>Volunteer Position</div>
+        <div class="section-school" contenteditable="true"><i class="fas fa-building"></i>Organization</div>
+        <div class="section-date" contenteditable="true"><i class="fas fa-calendar-alt"></i>Start Date - End Date</div>
+        <div class="section-description" contenteditable="true"><ul class="section-duties"><li>Describe contributions...</li><li>Highlight leadership...</li><li>Include skills...</li></ul></div>`;
       break;
     case 'award':
       itemHTML += `
-        <div class="section-degree" contenteditable="true">
-          <i class="fas fa-trophy"></i>
-          Award/Recognition Name
-        </div>
-        <div class="section-school" contenteditable="true">
-          <i class="fas fa-building"></i>
-          Awarding Organization
-        </div>
-        <div class="section-date" contenteditable="true">
-          <i class="fas fa-calendar-alt"></i>
-          Date Received
-        </div>
-        <div class="section-description" contenteditable="true">
-          Describe the significance of this award, what it recognizes, and why you received it. Include any relevant context like competition size or selection criteria.
-        </div>
-      `;
+        <div class="section-degree" contenteditable="true"><i class="fas fa-trophy"></i>Award Name</div>
+        <div class="section-school" contenteditable="true"><i class="fas fa-building"></i>Awarding Organization</div>
+        <div class="section-date" contenteditable="true"><i class="fas fa-calendar-alt"></i>Date Received</div>
+        <div class="section-description" contenteditable="true">Describe significance...</div>`;
       break;
     case 'publication':
       itemHTML += `
-        <div class="section-degree" contenteditable="true">
-          <i class="fas fa-book"></i>
-          Publication Title
-        </div>
-        <div class="section-school" contenteditable="true">
-          <i class="fas fa-newspaper"></i>
-          Publisher/Journal
-        </div>
-        <div class="section-date" contenteditable="true">
-          <i class="fas fa-calendar-alt"></i>
-          Publication Date
-        </div>
-        <div class="section-description" contenteditable="true">
-          Briefly describe the publication, your contribution, and its significance. Include co-authors if applicable and any important details about reach or impact.
-        </div>
-      `;
+        <div class="section-degree" contenteditable="true"><i class="fas fa-book"></i>Publication Title</div>
+        <div class="section-school" contenteditable="true"><i class="fas fa-newspaper"></i>Publisher</div>
+        <div class="section-date" contenteditable="true"><i class="fas fa-calendar-alt"></i>Publication Date</div>
+        <div class="section-description" contenteditable="true">Describe contribution...</div>`;
       break;
     case 'language':
       itemHTML += `
-        <div class="section-degree" contenteditable="true">
-          <i class="fas fa-language"></i>
-          Language Name
-        </div>
-        <div class="section-school" contenteditable="true">
-          <i class="fas fa-star"></i>
-          Proficiency Level (e.g., Fluent, Native, Intermediate)
-        </div>
-      `;
+        <div class="section-degree" contenteditable="true"><i class="fas fa-language"></i>Language Name</div>
+        <div class="section-school" contenteditable="true"><i class="fas fa-star"></i>Proficiency Level</div>`;
       break;
     default:
-      const sectionTitle = section.querySelector('.section-title').textContent.trim().toLowerCase();
-      if (sectionTitle.includes('volunteer')) {
-        return addNewItem(button, 'volunteer');
-      } else if (sectionTitle.includes('award') || sectionTitle.includes('honor')) {
-        return addNewItem(button, 'award');
-      } else if (sectionTitle.includes('publication') || sectionTitle.includes('research')) {
-        return addNewItem(button, 'publication');
-      } else if (sectionTitle.includes('language')) {
-        return addNewItem(button, 'language');
-      } else if (sectionTitle.includes('project')) {
-        return addNewItem(button, 'project');
-      } else {
-        itemHTML += `
-          <div class="section-degree" contenteditable="true">
-            <i class="fas fa-chevron-right"></i>
-            Item Title
-          </div>
-          <div class="section-school" contenteditable="true">
-            <i class="fas fa-building"></i>
-            Organization / Entity
-          </div>
-          <div class="section-date" contenteditable="true">
-            <i class="fas fa-calendar-alt"></i>
-            Relevant Date
-          </div>
-          <div class="section-description" contenteditable="true">
-            Add details here to describe this item...
-          </div>
-        `;
-      }
+      const sectionTitle = section.querySelector('.section-title')?.textContent.trim().toLowerCase();
+      if (sectionTitle?.includes('volunteer')) return addNewItem(button, 'volunteer');
+      if (sectionTitle?.includes('award') || sectionTitle?.includes('honor')) return addNewItem(button, 'award');
+      if (sectionTitle?.includes('publication') || sectionTitle?.includes('research')) return addNewItem(button, 'publication');
+      if (sectionTitle?.includes('language')) return addNewItem(button, 'language');
+      if (sectionTitle?.includes('project')) return addNewItem(button, 'project');
+      itemHTML += `
+        <div class="section-degree" contenteditable="true"><i class="fas fa-chevron-right"></i>Item Title</div>
+        <div class="section-school" contenteditable="true"><i class="fas fa-building"></i>Organization</div>
+        <div class="section-date" contenteditable="true"><i class="fas fa-calendar-alt"></i>Relevant Date</div>
+        <div class="section-description" contenteditable="true">Add details...</div>`;
   }
 
-  autoSave();
   newItem.innerHTML = itemHTML;
   section.insertBefore(newItem, button);
+  console.log("from item")
+  console.log(newItem);
   addItemEventListeners(newItem);
+  state.hasUnsavedChanges = true;
+  autoSave();
 }
 
 function addItemEventListeners(item) {
+  console.log('Item listener initialized');
+  const itemId = item.dataset.itemId || item.id?.replace('item-', '');
+  console.log('Item ID:', itemId);
   const deleteBtn = item.querySelector('.item-btn.delete');
   if (deleteBtn) {
-    deleteBtn.addEventListener('click', async function(e) {
+    deleteBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
 
-      if (confirm('Are you sure you want to delete this item?')) {
-        // Extract data from the item element
-        const sectionType = item.closest('.resume-section').dataset.sectionType;
-        const itemId =  deleteBtn.dataset.itemId;
+      if (!confirm('Are you sure you want to delete this item?')) return;
 
-        // Extract resumeId from .resume-builder in parent or current document
-        const resumeContainer = (window.parent ? window.parent.document : document).querySelector('.resume-builder');
-        const resumeId = resumeContainer?.dataset.resumeId;
+      const sectionType = item.closest('.resume-section')?.dataset.sectionType;
+      if (!sectionType) {
+        console.error('Section type not found');
+        showNotification('Error: Section type not found', 'error');
+        return;
+      }
 
-        // Check if resumeId exists
-        if (!resumeId) {
-          console.error('Resume ID not found');
-          showNotification('Error: Resume ID not found', 'error');
-          return;
+      const resumeContainer = document.querySelector('.resume-builder') || (window.parent?.document?.querySelector('.resume-builder'));
+      const resumeId = resumeContainer?.dataset.resumeId;
+      if (!resumeId) {
+        console.error('Resume ID not found');
+        showNotification('Error: Resume ID not found', 'error');
+        return;
+      }
+
+      if (!itemId) {
+        console.error('Item ID not found');
+        showNotification('Error: Item ID not found', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/v1/resume/${resumeId}/section/${sectionType}/item/${itemId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          },
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          item.remove();
+          showNotification('Item deleted successfully', 'success');
+        } else {
+          showNotification(`Failed to delete item: ${data.message || 'Unknown error'}`, 'error');
         }
-
-        try {
-          const response = await fetch(`/api/v1/resume/${resumeId}/section/${sectionType}/item/${itemId}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': (window.parent ? window.parent.document : document).querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-          });
-
-          if (response.ok) {
-            item.remove();
-            showNotification('Item deleted successfully', 'success');
-          } else {
-            const errorData = await response.json();
-            showNotification(`Failed to delete item: ${errorData.message || 'Unknown error'}`, 'error');
-          }
-        } catch (error) {
-          console.error('Error:', error);
-          showNotification('Error deleting item', 'error');
-        }
+      } catch (error) {
+        console.error('Delete error:', error);
+        showNotification('Error deleting item', 'error');
       }
     });
   }
+}
+
+// Debounce utility
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
 }
