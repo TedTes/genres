@@ -448,6 +448,8 @@ def delete_resume_item(resume_id, section_type, item_id):
         target_section['items'] = [item for item in target_section['items'] 
                                  if item.get('id', '') != item_id]
         resume.resume_data = resume_data
+        # Flag the resume_data field as modified so SQLAlchemy detects the change
+        attributes.flag_modified(resume, 'resume_data')
         db.session.commit()
         return jsonify({'success': True})
 
