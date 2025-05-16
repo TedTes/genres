@@ -441,14 +441,17 @@ function addNewItem(button, type) {
 }
 
 function addItemEventListeners(item) {
+  
   console.log('Item listener initialized');
-  const itemId = item.dataset.itemId || item.id?.replace('item-', '');
-  console.log('Item ID:', itemId);
+
   const deleteBtn = item.querySelector('.item-btn.delete');
   if (deleteBtn) {
     deleteBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
+
+      const itemId = item.dataset.itemId || item.id?.replace('item-', '');
+   
 
       if (!confirm('Are you sure you want to delete this item?')) return;
 
@@ -504,4 +507,38 @@ function debounce(func, wait) {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
   };
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+      <div class="notification-content">
+        <div class="notification-message">${message}</div>
+        <button class="notification-close">&times;</button>
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Show notification
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 10);
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 300);
+    }, 3000);
+    
+    // Close button functionality
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+      notification.classList.remove('show');
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 300);
+    });
 }
