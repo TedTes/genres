@@ -162,20 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Iframe-specific event setup
 function setupIframeListeners(iframeDoc) {
-  iframeDoc.addEventListener('click', (e) => {
-    const deleteBtn = e.target.closest('.item-btn.delete');
-    if (deleteBtn) {
-      e.preventDefault();
-      e.stopPropagation();
-      const item = deleteBtn.closest('.section-item');
-      if (item && confirm('Are you sure you want to delete this item?')) {
-        item.remove();
-        state.hasUnsavedChanges = true;
-        autoSave();
-      }
-    }
-  });
-
   iframeDoc.querySelectorAll('.section-tag').forEach(addTagEventListeners);
   iframeDoc.addEventListener('input', () => {
     state.hasUnsavedChanges = true;
@@ -196,23 +182,21 @@ function showSaveStatus(message, isError = false) {
   }
 }
 
-function saveResume() {
+async function saveResume() {
   if (!state.hasUnsavedChanges) return;
-
-  const saveButton = document.querySelector('#save-resume-btn');
+  const saveButton = window.parent.document.querySelector('#save-resume-btn');
   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-  const resumeId = document.querySelector('.resume-builder')?.dataset.resumeId;
-  const iframe = document.querySelector('#preview-iframe');
+  const resumeId = window.parent.document.querySelector('.resume-builder')?.dataset.resumeId;
+  const iframe = window.parent.document.querySelector('#preview-iframe');
 
   if (!saveButton || !resumeId || !iframe) return;
-
   saveButton.classList.add('saving');
 
   try {
     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
     const resumeContent = collectResumeData(iframeDoc);
 
-    fetch(`/api/v1/resume/${resumeId}/save-data`, {
+    await fetch(`/api/v1/resume/${resumeId}/save-data`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
       body: JSON.stringify({ resume_data: resumeContent }),
@@ -250,8 +234,44 @@ function collectResumeData(iframeDoc) {
     }
   });
 
+  // Define known section types
+  const knownSectionTypes = [
+    'experience', 'education', 'skills', 'summary', 'certification', 
+    'project', 'volunteer', 'award', 'publication', 'language'
+  ];
+
   iframeDoc.querySelectorAll('.resume-section').forEach(section => {
-    const sectionType = section.className.match(/(\w+)-section/)?.[1];
+
+    let sectionType = 'custom'; // Default type
+    
+
+    if (section.dataset.sectionType) {
+      sectionType = section.dataset.sectionType;
+    } else {
+      // Fall back to class name detection
+      const classList = section.className.split(' ');
+      
+      // Check each class against known section types
+      for (const className of classList) {
+        const match = className.match(/^(\w+)-section$/);
+        if (match && match[1] && knownSectionTypes.includes(match[1])) {
+          sectionType = match[1];
+          break;
+        }
+      }
+      
+      // If  didn't find a known type, try to extract any type from class
+      if (sectionType === 'custom') {
+        for (const className of classList) {
+          const match = className.match(/^(\w+)-section$/);
+          if (match && match[1] && match[1] !== 'resume') {
+            sectionType = match[1];
+            break;
+          }
+        }
+      }
+    }
+
     const sectionTitle = section.querySelector('.section-title')?.textContent.trim();
     const sectionData = { type: sectionType, title: sectionTitle, display: 'list', content: '', items: [] };
 
@@ -269,7 +289,6 @@ function collectResumeData(iframeDoc) {
         const itemData = {};
         
         itemData.id = item.dataset.itemId || `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-       
         item.dataset.itemId = itemData.id;
 
         item.querySelectorAll('[class^="section-"], [class*=" section-"]').forEach(el => {
@@ -296,48 +315,55 @@ function collectResumeData(iframeDoc) {
     resumeData.sections.push(sectionData);
   });
 
-
   return resumeData;
 }
 
 function addTagEventListeners(tag) {
   const deleteBtn = tag.querySelector('.tag-delete');
   if (deleteBtn) {
-    deleteBtn.addEventListener('click', () => {
+    deleteBtn.addEventListener('click', async () => {
       tag.remove();
       state.hasUnsavedChanges = true;
-      autoSave();
+      await autoSave();
     });
   }
 }
 
-function autoSave() {
+async function autoSave() {
   console.log('Auto-saving resume...');
-  state.hasUnsavedChanges = true;
-  const savedIndicator = Object.assign(document.createElement('div'), {
-    style: `position: fixed; bottom: 20px; left: 20px; background-color: var(--success); 
+  // Schedule the actual save
+  clearTimeout(state.autoSaveTimeout);
+   state.autoSaveTimeout = await setTimeout(saveResume, 1500);
+  // Show temporary "Saving..." indicator (not "Saved" yet)
+  const savingIndicator = Object.assign(document.createElement('div'), {
+    style: `position: fixed; bottom: 20px; left: 20px; background-color: var(--primary); 
             color: white; padding: 10px 20px; border-radius: 4px; box-shadow: var(--shadow-md); 
             opacity: 0; transition: opacity 0.3s`,
-    innerHTML: '<i class="fas fa-check"></i> Changes saved',
+    innerHTML: '<i class="fas fa-spinner fa-spin"></i> Saving changes...',
   });
-  document.body.appendChild(savedIndicator);
-
-  clearTimeout(state.autoSaveTimeout);
-  state.autoSaveTimeout = setTimeout(saveResume, 1500);
-
-  const saveStatus = document.getElementById('save-status');
-  if (saveStatus) showSaveStatus('Changes saved', false);
-
+  document.body.appendChild(savingIndicator);
+  
   setTimeout(() => {
-    savedIndicator.style.opacity = '1';
+    savingIndicator.style.opacity = '1';
+    // Remove this indicator after a short time
     setTimeout(() => {
-      savedIndicator.style.opacity = '0';
-      setTimeout(() => document.body.removeChild(savedIndicator), 300);
-    }, 2000);
+      savingIndicator.style.opacity = '0';
+      setTimeout(() => {
+        try {
+          document.body.removeChild(savingIndicator);
+        } catch (e) {
+          console.log('Indicator already removed');
+        }
+      }, 300);
+    }, 1000);
   }, 100);
+  
+  // Update save status if element exists
+  const saveStatus = document.getElementById('save-status');
+  if (saveStatus) showSaveStatus('Saving changes...', false);
 }
 
-function addNewTag(button) {
+async function addNewTag(button) {
   const tagName = prompt('Enter item name:');
   if (tagName) {
     const tagsContainer = button.parentElement;
@@ -348,7 +374,7 @@ function addNewTag(button) {
     tagsContainer.insertBefore(newTag, button);
     addTagEventListeners(newTag);
     state.hasUnsavedChanges = true;
-    autoSave();
+    await autoSave();
   }
 }
 
@@ -356,7 +382,6 @@ function addNewItem(button, type) {
   const section = button.parentElement;
   const newItem = document.createElement('div');
   newItem.className = 'section-item';
-  
   const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   newItem.dataset.itemId = uniqueId; // Fixed line
   newItem.id = `item-${uniqueId}`;
@@ -433,8 +458,6 @@ function addNewItem(button, type) {
 
   newItem.innerHTML = itemHTML;
   section.insertBefore(newItem, button);
-  console.log("from item")
-  console.log(newItem);
   addItemEventListeners(newItem);
   state.hasUnsavedChanges = true;
   autoSave();
@@ -449,7 +472,6 @@ function addItemEventListeners(item) {
     deleteBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
-
       const itemId = item.dataset.itemId || item.id?.replace('item-', '');
    
 
