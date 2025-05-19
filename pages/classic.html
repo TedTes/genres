@@ -89,22 +89,24 @@
       
       {% else %}
         {% for item in section["items"] %}
-          <div class="section-item">
+          <div class="section-item" data-item-id="{{ item.id }}">
             <div class="item-actions">
               <button class="item-btn delete" title="Delete"><i class="fas fa-trash"></i></button>
             </div>
             
             {% for key, value in item.items() %}
-              <div class="section-{{ key | replace('_', '-') }}" contenteditable="true" data-key="{{ key }}">
-                {% if key == 'name' or key == 'job_title' or key == 'degree' %}
-                  <i class="fas fa-chevron-right"></i>
-                {% elif key == 'company' or key == 'school' or key == 'issuer' %}
-                  <i class="fas fa-building"></i>
-                {% elif key == 'date' or key == 'duration' %}
-                  <i class="fas fa-calendar-alt"></i>
-                {% endif %}
-                {{ value }}
-              </div>
+              {% if  key != "id" %}
+                  <div class="section-{{ key | replace('_', '-') }}" contenteditable="true" data-key="{{ key }}">
+                    {% if key == 'name' or key == 'job_title' or key == 'degree' %}
+                      <i class="fas fa-chevron-right"></i>
+                    {% elif key == 'company' or key == 'school' or key == 'issuer' %}
+                      <i class="fas fa-building"></i>
+                    {% elif key == 'date' or key == 'duration' %}
+                      <i class="fas fa-calendar-alt"></i>
+                    {% endif %}
+                    {{ value }}
+                  </div>
+               {%endif%}
             {% endfor %}
           </div>
         {% endfor %}
