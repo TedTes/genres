@@ -1,40 +1,4 @@
-:root {
-  /* Color Variables - easily customizable */
-  --primary: #3b82f6;
-  --primary-dark: #2563eb;
-  --primary-light: rgba(59, 130, 246, 0.1);
-  --secondary: #10b981;
-  --text: #1f2937;
-  --text-light: #6b7280;
-  --text-muted: #94a3b8;
-  --background: #ffffff;
-  --background-alt: #f9fafb;
-  --border: #e5e7eb;
-  --border-light: #f3f4f6;
-  --accent: #f59e0b;
-  --success: #10b981;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  
-  /* Typography Variables */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --heading-family: var(--font-family);
-  --base-size: 14px;
-  --line-height: 1.6;
-  --heading-weight: 600;
-  
-  /* Spacing & Sizing */
-  --border-radius: 6px;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --section-spacing: 18px;
-  --item-spacing: 14px;
-  --transition: all 0.2s ease;
-}
 
-/* Print configuration */
 @page {
   margin: 1cm;
   size: letter portrait;
@@ -269,19 +233,10 @@ body {
   letter-spacing: 0.01em;
 }
 
-/* Contact grid */
-.contact-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 16px 30px;
-  margin-top: 20px;
-}
-
 .contact-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  margin: 0 15px 16px;
   font-size: 14px;
   color: var(--text);
   white-space: nowrap;
@@ -371,8 +326,7 @@ body {
 .section-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
+  margin: 0 -5px 10px;
 }
 
 .section-tag {
@@ -697,228 +651,144 @@ body {
     box-shadow: none !important;
     border: none !important;
     background: white !important;
-    position: relative !important;
   }
   
-  /* Hide UI elements when printing */
-  .toolbar, 
-  .item-actions, 
-  .add-item-btn, 
-  .add-tag-btn, 
-  .tag-delete, 
-  .theme-selector {
+  /* Hide UI elements */
+  .toolbar, .item-actions, .add-item-btn, .add-tag-btn, .tag-delete, .theme-selector {
     display: none !important;
   }
   
-  /* Reset all custom hover/focus states for printing */
-  .editable, 
-  [contenteditable="true"],
-  .section-content,
-  .section-description,
-  .section-job-title,
-  .section-company,
-  .section-degree,
-  .section-school,
-  .section-date,
-  .name,
-  .title,
-  .contact-content,
-  .section-title,
-  .section-item,
-  .section-tag,
-  .section-item::before,
-  .section-item:hover::before,
-  .content-editable,
-  .content-editable::before,
-  .content-editable:hover::before,
-  .contact-item:hover::before,  
-  .contact-grid:hover::before,  
-  .contact-content:hover::before,
-  .resume-section:hover > .section-title::before,
-  .resume-section:hover > .section-content::before {
+  /* Reset hover states */
+  .editable, [contenteditable="true"], .section-content, .section-description,
+  .section-job-title, .section-company, .section-degree, .section-school,
+  .section-date, .name, .title, .contact-content, .section-title, .section-item,
+  .section-tag {
     border: none !important;
     background: none !important;
     padding: 0 !important;
     margin: 0 !important;
     box-shadow: none !important;
     transform: none !important;
-    border-color: transparent !important;
     transition: none !important;
   }
 
-  /* Fix header styling for print */
+  /* Header styling */
   .resume-header {
     text-align: center !important;
     border-bottom: 1px solid #000 !important;
     margin-bottom: 15px !important;
-    padding: 0 0 10px 0 !important;
+    padding: 10px 0 !important;
     background: none !important;
   }
-  
-  .name::after {
-    display: none !important;
-  }
-  
   .name {
     font-size: 24pt !important;
     margin-bottom: 5px !important;
     color: #000 !important;
   }
-  
   .title {
     font-size: 14pt !important;
     margin-bottom: 10px !important;
     color: #333 !important;
   }
-  
-  /* Fix contact items */
+
+  /* Contact items */
   .contact-grid {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: center !important;
-    gap: 15px 30px !important;
+    display: block !important; /* Fallback to block */
     margin: 15px 0 !important;
   }
-  
   .contact-item {
+    display: block !important;
+    margin-bottom: 10px !important; /* Replace gap with margin */
+    padding: 5px 0 !important;
     background: none !important;
-    padding: 0 !important;
-    border: none !important;
     color: #333 !important;
   }
-  
   .contact-icon {
     color: #333 !important;
+    margin-right: 8px !important;
   }
-  
-  /* Fix section spacing and styling */
+
+  /* Sections */
   .resume-section {
     margin-bottom: 15px !important;
     padding: 0 10px !important;
-    page-break-inside: auto !important;
-    break-inside: auto !important;
+    display: block !important;
   }
-  
   .section-title {
     font-size: 16pt !important;
     margin-bottom: 10px !important;
     padding-bottom: 5px !important;
     border-bottom: 1px solid #000 !important;
     color: #000 !important;
-    page-break-after: avoid !important;
-    break-after: avoid !important;
   }
-  
-  .section-title::after {
-    display: none !important;
-  }
-  
   .section-title i {
     color: #333 !important;
-  }
-  .section-item:hover::before {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    border: 2px dotted var(--primary);
-    border-radius: var(--border-radius);
-    pointer-events: none;
-    opacity: 0.6;
-    z-index: 1;
+    margin-right: 10px !important;
   }
 
-  .section-job-title,
-  .section-degree,
-  .section-name {
+  .section-item {
+    margin-bottom: 10px !important;
+    padding: 10px !important;
+    border-bottom: 1px solid #ddd !important;
+  }
+  .section-job-title, .section-degree, .section-name {
     font-size: 14pt !important;
     color: #000 !important;
     margin-bottom: 3px !important;
   }
-  
-  .section-job-title i,
-  .section-degree i,
-  .section-name i {
+  .section-job-title i, .section-degree i, .section-name i {
     color: #333 !important;
+    margin-right: 8px !important;
   }
-  
-  .section-company,
-  .section-school,
-  .section-issuer {
+  .section-company, .section-school, .section-issuer {
     font-size: 12pt !important;
     color: #333 !important;
     margin-bottom: 3px !important;
   }
-  
-  .section-date,
-  .section-duration {
+  .section-date, .section-duration {
     font-size: 11pt !important;
     color: #666 !important;
     margin-bottom: 8px !important;
   }
-  
   .section-description {
     font-size: 12pt !important;
     color: #000 !important;
-    background: none !important;
-    padding: 0 !important;
-    box-shadow: none !important;
     margin-top: 8px !important;
+    padding: 10px !important;
+    background: #f9f9f9 !important; /* Simulate background */
   }
-  
-  /* Fix list styling */
   .section-duties {
     margin-top: 5px !important;
-    margin-bottom: 0 !important;
     padding-left: 20px !important;
     list-style-type: disc !important;
   }
-  
   .section-duties li {
     margin-bottom: 5px !important;
   }
-  
   .section-duties li::marker {
     color: #000 !important;
   }
-  
-  /* Fix skills/tags */
+
+  /* Tags */
   .section-container {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 8px !important;
-    margin-top: 8px !important;
+    display: block !important; /* Fallback to block */
+    margin: 8px 0 !important;
   }
-  
   .section-tag {
-    background: none !important;
-    border: 1px solid #333 !important;
+    display: inline-block !important;
+    margin: 0 5px 5px 0 !important; /* Replace gap with margin */
     padding: 3px 10px !important;
+    border: 1px solid #333 !important;
     border-radius: 15px !important;
     font-size: 11pt !important;
     color: #333 !important;
   }
-  
-  /* Force background colors to print */
+
+  /* Force color printing */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
-  }
-  
-  /* Ensure proper page breaks */
-  .resume-section {
-    page-break-inside: auto !important;
-    break-inside: auto !important;
-  }
-  
-  .section-item {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    page-break-after: avoid !important;
-    break-after: avoid !important;
   }
 }
 
