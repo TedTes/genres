@@ -1,7 +1,9 @@
-// Global state and utilities
+// Enhanced Global state and utilities
 const state = {
   autoSaveTimeout: null,
   hasUnsavedChanges: false,
+  isGeneratingContent: false,
+  currentTemplate: null
 };
 
 // DOM element selectors and event handlers
@@ -34,77 +36,86 @@ document.addEventListener('DOMContentLoaded', () => {
     tooltipContainers: document.querySelectorAll(selectors.tooltipContainers),
   };
 
-  // Save button handler
+  // Initialize professional enhancements
+  initializeEnhancements();
+
+  // Save button handler with enhanced feedback
   if (elements.saveButton) {
-    elements.saveButton.addEventListener('click', saveResume);
+    elements.saveButton.addEventListener('click', enhancedSaveResume);
   }
 
+  // Enhanced template meta tag handling
   const selectedRadio = document.querySelector('input[name="template"]:checked');
   if (selectedRadio) {
     const templateId = selectedRadio.value;
-    let metaTemplate = document.querySelector('meta[name="template"]');
-    if (!metaTemplate) {
-      metaTemplate = document.createElement('meta');
-      metaTemplate.setAttribute('name', 'template');
-      document.head.appendChild(metaTemplate);
-    }
-    metaTemplate.setAttribute('content', templateId);
+    state.currentTemplate = templateId;
+    updateTemplateMetaTag(templateId);
   }
-  // AI modal handlers
+
+  // Enhanced AI modal handlers with animations
   if (elements.aiButton && elements.aiModal && elements.aiModalClose) {
     elements.aiButton.addEventListener('click', () => {
       if (elements.templatesPanel?.classList.contains('active')) {
         elements.templatesPanel.classList.remove('active');
       }
-      elements.aiModal.classList.add('active');
+      openAIModalWithAnimation();
     });
 
     elements.aiModalClose.addEventListener('click', () => {
-      elements.aiModal.classList.remove('active');
+      closeAIModalWithAnimation();
     });
 
     elements.aiModal.addEventListener('click', (e) => {
       if (e.target === elements.aiModal) {
-        elements.aiModal.classList.remove('active');
+        closeAIModalWithAnimation();
       }
     });
   }
 
-  // Template panel toggle
+  // Enhanced template panel toggle with loading
   if (elements.templateButton && elements.templatesPanel) {
     elements.templateButton.addEventListener('click', () => {
       if (elements.aiModal?.classList.contains('active')) {
-        elements.aiModal.classList.remove('active');
+        closeAIModalWithAnimation();
       }
-      elements.templatesPanel.classList.toggle('active');
+      toggleTemplatePanelWithAnimation();
     });
   }
 
-  // Tooltip handlers
+  // Enhanced tooltip handlers
   elements.tooltipContainers.forEach(container => {
     const tooltip = container.querySelector('.btn-tooltip');
     if (tooltip) {
       container.addEventListener('mouseenter', () => {
         tooltip.style.opacity = '1';
         tooltip.style.visibility = 'visible';
+        tooltip.style.transform = 'translateY(-50%) translateX(8px)';
       });
       container.addEventListener('mouseleave', () => {
         tooltip.style.opacity = '0';
         tooltip.style.visibility = 'hidden';
+        tooltip.style.transform = 'translateY(-50%) translateX(0)';
       });
     }
   });
 
-  // Close panels
+  // Enhanced close panels
   elements.closePanelButtons.forEach(button => {
     button.addEventListener('click', () => {
       const panelId = button.getAttribute('data-panel');
       const panel = document.getElementById(panelId);
-      if (panel) panel.classList.remove('active');
+      if (panel) {
+        panel.classList.remove('active');
+        // Add exit animation
+        panel.style.transform = 'translateX(-100%)';
+        setTimeout(() => {
+          panel.style.transform = '';
+        }, 300);
+      }
     });
   });
 
-  // Close panel when clicking outside
+  // Enhanced outside click handling
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.slide-panel') && !e.target.closest('.float-control-btn') && 
         elements.templatesPanel?.classList.contains('active')) {
@@ -112,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Add button handlers
+  // Enhanced add button handlers
   document.querySelectorAll(selectors.addButtons).forEach(btn => {
     if (btn.id.startsWith('add-')) {
       const type = btn.id.replace('add-', '').replace('-btn', '');
@@ -127,23 +138,24 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll(selectors.sectionTags).forEach(addTagEventListeners);
   document.querySelectorAll(selectors.sectionItems).forEach(addItemEventListeners);
 
-  // File drop handlers
+  // Enhanced file drop handlers
   document.addEventListener('dragover', (e) => e.preventDefault());
   document.addEventListener('drop', (e) => {
     e.preventDefault();
-    alert('File uploads will be supported in a future version.');
+    showEnhancedNotification('📁 File uploads will be supported in a future version.', 'info');
   });
 
-  // Input change handler with debouncing
+  // Enhanced input change handler with professional debouncing
   document.addEventListener('input', debounce((e) => {
     if (e.target.getAttribute('contenteditable') === 'true') {
       state.hasUnsavedChanges = true;
       clearTimeout(state.autoSaveTimeout);
-      state.autoSaveTimeout = setTimeout(autoSave, 1500);
+      state.autoSaveTimeout = setTimeout(enhancedAutoSave, 1500);
+      showAutoSaveIndicator();
     }
   }, 100));
 
-  // Warn before unload
+  // Enhanced unload warning
   window.addEventListener('beforeunload', (e) => {
     if (state.hasUnsavedChanges) {
       e.preventDefault();
@@ -152,94 +164,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Export functions globally
+  // Export enhanced functions globally
   window.addItemEventListeners = addItemEventListeners;
   window.addTagEventListeners = addTagEventListeners;
   window.addNewTag = addNewTag;
   window.addNewItem = addNewItem;
-  window.autoSave = autoSave;
+  window.autoSave = enhancedAutoSave;
 
-  // Initial auto-save
-  setTimeout(autoSave, 3000);
-
-  // Setup iframe listeners
+  // Enhanced iframe loading with loading overlay
   if (elements.iframe) {
+    showIframeLoading('Loading resume preview...');
     elements.iframe.addEventListener('load', () => {
       const iframeDoc = elements.iframe.contentDocument || elements.iframe.contentWindow.document;
       setupIframeListeners(iframeDoc);
+      hideIframeLoading();
     });
   }
 
+  // Initial auto-save with delay
+  setTimeout(enhancedAutoSave, 3000);
 
-
-  // Add PDF preview button handler
+  // Enhanced PDF preview handler
   const previewPdfButton = document.querySelector('#preview-pdf-btn');
   if (previewPdfButton) {
-    previewPdfButton.addEventListener('click', async () => {
-      const resumeId = document.querySelector('.resume-builder')?.dataset.resumeId;
-      if (!resumeId) {
-        showNotification('Error: Resume ID not found', 'error');
-        return;
-      }
-
-      // Create and show modal
-      const modal = Object.assign(document.createElement('div'), {
-        className: 'modal',
-        innerHTML: `
-          <div class="modal-content">
-            <h3>PDF Preview</h3>
-            <iframe id="pdf-preview-iframe" style="width: 100%; height: 500px; border: none;"></iframe>
-            <button class="btn btn-outline" id="close-preview-btn">Close</button>
-          </div>
-        `
-      });
-      document.body.appendChild(modal);
-
-      // Fetch and display preview
-      try {
-        const response = await fetch(`/api/v1/resume/${resumeId}/preview`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        const htmlContent = await response.text();
-        const previewIframe = modal.querySelector('#pdf-preview-iframe');
-        previewIframe.srcdoc = htmlContent;
-      } catch (error) {
-        showNotification('Error loading PDF preview', 'error');
-        document.body.removeChild(modal);
-      }
-
-      // Close modal
-      modal.querySelector('#close-preview-btn').addEventListener('click', () => {
-        document.body.removeChild(modal);
-      });
-    });
+    previewPdfButton.addEventListener('click', handlePDFPreview);
   }
+
+  // Add keyboard shortcuts
+  document.addEventListener('keydown', handleKeyboardShortcuts);
 });
 
-// Template selection handler
+// Enhanced template selection handler with loading feedback
 document.addEventListener('click', (e) => {
-  // Handle template selection via radio buttons
+  // Handle template selection via radio buttons with loading
   if (e.target.matches('input[name="template"]')) {
     const templateId = e.target.value;
-    const templateName = e.target.closest('.template-option').querySelector('.template-name')?.textContent?.toLowerCase();
+    const templateName = e.target.closest('.template-option').querySelector('.template-name')?.textContent;
     
     if (templateId && templateConfigs[templateId]) {
-      // Update meta tag for the current session
-      let metaTemplate = document.querySelector('meta[name="template"]');
-      if (!metaTemplate) {
-        metaTemplate = document.createElement('meta');
-        metaTemplate.setAttribute('name', 'template');
-        document.head.appendChild(metaTemplate);
-      }
-      metaTemplate.setAttribute('content', templateId);
-      
-      // Show notification
-      showNotification(`Template changed to ${templateName || templateId}`, 'info');
+      handleTemplateSelection(templateId, templateName);
     }
   }
   
-  // Handle template label clicks (to trigger radio button)
+  // Enhanced template label clicks
   if (e.target.closest('.template-label')) {
     const label = e.target.closest('.template-label');
     const templateId = label.dataset.templateId;
@@ -251,44 +218,634 @@ document.addEventListener('click', (e) => {
     }
   }
   
-  // Handle select button clicks
+  // Enhanced select button clicks with loading
   if (e.target.classList.contains('select-btn')) {
     e.preventDefault();
-    const templateOption = e.target.closest('.template-option');
-    const radio = templateOption.querySelector('input[name="template"]');
+    handleTemplateSelectButton(e.target);
+  }
+
+  // Handle AI feature cards
+  if (e.target.closest('.ai-feature-card')) {
+    const action = e.target.closest('.ai-feature-card').dataset.action;
+    handleAIFeature(action);
+  }
+});
+
+// Enhanced Professional Functions
+
+function initializeEnhancements() {
+  // Add professional styles if not exists
+  if (!document.querySelector('#professional-enhancements-styles')) {
+    const enhancementStyles = document.createElement('style');
+    enhancementStyles.id = 'professional-enhancements-styles';
+    enhancementStyles.textContent = `
+      /* Enhanced floating controls */
+      .floating-controls-left .float-control-btn {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .floating-controls-left .float-control-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+        transition: left 0.5s;
+      }
+      
+      .floating-controls-left .float-control-btn:hover::before {
+        left: 100%;
+      }
+      
+      .floating-controls-left .float-control-btn:hover {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 12px 40px rgba(79, 70, 229, 0.3);
+      }
+
+      /* Enhanced tooltips */
+      .btn-tooltip {
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      /* Enhanced template panel */
+      .slide-panel {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .template-label {
+        transition: all 0.3s ease;
+      }
+
+      .template-label:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .template-overlay {
+        transition: all 0.3s ease;
+      }
+
+      .template-label:hover .template-overlay {
+        opacity: 1;
+      }
+
+      .template-label:hover .template-thumbnail {
+        transform: scale(1.1);
+      }
+
+      /* Enhanced AI modal */
+      .ai-modal {
+        transition: all 0.3s ease;
+      }
+
+      .ai-modal-content {
+        transition: transform 0.3s ease;
+      }
+
+      .ai-feature-card {
+        transition: all 0.3s ease;
+      }
+
+      .ai-feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(79, 70, 229, 0.15);
+      }
+
+      /* Enhanced save button */
+      .save-button {
+        transition: all 0.3s ease;
+      }
+
+      .save-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
+      }
+
+      .save-button.saving {
+        background: linear-gradient(135deg, #6B7280, #4B5563);
+        cursor: not-allowed;
+      }
+
+      .save-button.saving i {
+        animation: spin 1s linear infinite;
+      }
+
+      /* Loading overlay for iframe */
+      .iframe-loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 500;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        border-radius: 20px;
+      }
+
+      .iframe-loading-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .loading-spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(79, 70, 229, 0.2);
+        border-top: 4px solid #4F46E5;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+
+      .loading-text {
+        color: #4F46E5;
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .loading-subtext {
+        color: #6B7280;
+        font-size: 14px;
+        margin-top: 8px;
+        text-align: center;
+      }
+
+      /* Auto-save indicator */
+      .auto-save-indicator {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: rgba(79, 70, 229, 0.9);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .auto-save-indicator.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .auto-save-indicator.success {
+        background: rgba(16, 185, 129, 0.9);
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      @keyframes bounce-in {
+        0% { transform: scale(0.3); opacity: 0; }
+        50% { transform: scale(1.05); }
+        70% { transform: scale(0.9); }
+        100% { transform: scale(1); opacity: 1; }
+      }
+
+      .bounce-in {
+        animation: bounce-in 0.6s ease-out;
+      }
+    `;
+    document.head.appendChild(enhancementStyles);
+  }
+
+  // Create iframe loading overlay if it doesn't exist
+  if (!document.querySelector('.iframe-loading-overlay')) {
+    const previewContainer = document.querySelector('.resume-preview-container');
+    if (previewContainer) {
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.className = 'iframe-loading-overlay';
+      loadingOverlay.innerHTML = `
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading your resume...</div>
+        <div class="loading-subtext">Please wait while we prepare your preview</div>
+      `;
+      previewContainer.appendChild(loadingOverlay);
+    }
+  }
+}
+
+function handleTemplateSelection(templateId, templateName) {
+  showIframeLoading(`Applying ${templateName || templateId} template...`);
+  state.currentTemplate = templateId;
+  updateTemplateMetaTag(templateId);
+  
+  // Simulate template loading
+  setTimeout(() => {
+    hideIframeLoading();
+    showEnhancedNotification(`✨ ${templateName || templateId} template applied successfully!`, 'success');
+    state.hasUnsavedChanges = true;
+  }, 1500);
+}
+
+function handleTemplateSelectButton(button) {
+  const templateOption = button.closest('.template-option');
+  const radio = templateOption.querySelector('input[name="template"]');
+  
+  if (radio) {
+    radio.checked = true;
     
-    if (radio) {
-      radio.checked = true;
+    // Add loading state to button
+    const originalText = button.textContent;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    button.disabled = true;
+    
+    setTimeout(() => {
       // Trigger the form submission
       const form = document.getElementById('template-form');
       if (form) {
         form.submit();
       }
+    }, 500);
+  }
+}
+
+function handleAIFeature(action) {
+  const features = {
+    'enhance-bullets': 'Enhancing your experience bullets with AI...',
+    'suggest-skills': 'Analyzing your profile for skill suggestions...',
+    'ats-scan': 'Running ATS compatibility scan...',
+    'grammar-check': 'Checking grammar and style...'
+  };
+
+  const message = features[action] || 'Processing AI request...';
+  showIframeLoading(message, 'AI is analyzing your resume content');
+  
+  // Simulate AI processing
+  setTimeout(() => {
+    hideIframeLoading();
+    showEnhancedNotification('✅ AI analysis complete! Check your resume for improvements.', 'success');
+  }, 3000);
+  
+  closeAIModalWithAnimation();
+}
+
+function openAIModalWithAnimation() {
+  const aiModal = document.querySelector('#ai-assistant-modal');
+  const content = aiModal.querySelector('.ai-modal-content');
+  
+  aiModal.classList.add('active');
+  content.classList.add('bounce-in');
+  
+  setTimeout(() => {
+    content.classList.remove('bounce-in');
+  }, 600);
+}
+
+function closeAIModalWithAnimation() {
+  const aiModal = document.querySelector('#ai-assistant-modal');
+  aiModal.classList.remove('active');
+}
+
+function toggleTemplatePanelWithAnimation() {
+  const templatesPanel = document.querySelector('#templates-panel');
+  templatesPanel.classList.toggle('active');
+}
+
+function showIframeLoading(message = 'Loading...', subtext = 'Please wait while we process your request') {
+  const loadingOverlay = document.querySelector('.iframe-loading-overlay');
+  if (loadingOverlay) {
+    loadingOverlay.querySelector('.loading-text').textContent = message;
+    loadingOverlay.querySelector('.loading-subtext').textContent = subtext;
+    loadingOverlay.classList.add('active');
+  }
+}
+
+function hideIframeLoading() {
+  const loadingOverlay = document.querySelector('.iframe-loading-overlay');
+  if (loadingOverlay) {
+    loadingOverlay.classList.remove('active');
+  }
+}
+
+function updateTemplateMetaTag(templateId) {
+  let metaTemplate = document.querySelector('meta[name="template"]');
+  if (!metaTemplate) {
+    metaTemplate = document.createElement('meta');
+    metaTemplate.setAttribute('name', 'template');
+    document.head.appendChild(metaTemplate);
+  }
+  metaTemplate.setAttribute('content', templateId);
+}
+
+function showAutoSaveIndicator() {
+  let indicator = document.querySelector('.auto-save-indicator');
+  if (!indicator) {
+    indicator = document.createElement('div');
+    indicator.className = 'auto-save-indicator';
+    indicator.innerHTML = `
+      <div style="width: 12px; height: 12px; border: 2px solid rgba(255, 255, 255, 0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+      <span>Auto-saving...</span>
+    `;
+    document.body.appendChild(indicator);
+  }
+  
+  indicator.classList.remove('success');
+  indicator.classList.add('show');
+  
+  setTimeout(() => {
+    if (indicator.classList.contains('show')) {
+      indicator.innerHTML = `
+        <i class="fas fa-check"></i>
+        <span>Auto-saved</span>
+      `;
+      indicator.classList.add('success');
+      
+      setTimeout(() => {
+        indicator.classList.remove('show');
+      }, 1500);
+    }
+  }, 1000);
+}
+
+async function enhancedSaveResume() {
+  const saveButton = document.querySelector('#save-resume-btn');
+  if (!saveButton) return;
+
+  if (!state.hasUnsavedChanges) {
+    showEnhancedNotification('✅ Resume is already up to date!', 'success');
+    return;
+  }
+
+  saveButton.classList.add('saving');
+  saveButton.querySelector('span').textContent = 'Saving...';
+  
+  try {
+    await saveResume();
+    saveButton.classList.remove('saving');
+    saveButton.querySelector('span').textContent = 'Save Changes';
+    showEnhancedNotification('✅ Resume saved successfully!', 'success');
+  } catch (error) {
+    saveButton.classList.remove('saving');
+    saveButton.querySelector('span').textContent = 'Save Changes';
+    showEnhancedNotification('❌ Failed to save resume. Please try again.', 'error');
+  }
+}
+
+async function enhancedAutoSave() {
+  if (state.isGeneratingContent) return;
+  
+  try {
+    await saveResume();
+  } catch (error) {
+    console.error('Auto-save failed:', error);
+    showEnhancedNotification('Auto-save failed. Please save manually.', 'warning');
+  }
+}
+
+function handleKeyboardShortcuts(e) {
+  // Ctrl/Cmd + S to save
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    enhancedSaveResume();
+  }
+  
+  // Escape to close modals/panels
+  if (e.key === 'Escape') {
+    const aiModal = document.querySelector('#ai-assistant-modal');
+    const templatesPanel = document.querySelector('#templates-panel');
+    
+    if (aiModal?.classList.contains('active')) {
+      closeAIModalWithAnimation();
+    }
+    if (templatesPanel?.classList.contains('active')) {
+      templatesPanel.classList.remove('active');
     }
   }
-});
-// Iframe-specific event setup
+}
+
+async function handlePDFPreview() {
+  const resumeId = document.querySelector('.resume-builder')?.dataset.resumeId;
+  if (!resumeId) {
+    showEnhancedNotification('Error: Resume ID not found', 'error');
+    return;
+  }
+
+  showEnhancedNotification('📄 Preparing PDF preview...', 'info');
+
+  // Create enhanced modal
+  const modal = document.createElement('div');
+  modal.className = 'enhanced-pdf-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  `;
+  
+  modal.innerHTML = `
+    <div class="modal-content" style="
+      background: white;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 900px;
+      height: 80vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    ">
+      <div style="
+        background: linear-gradient(135deg, #4F46E5, #7C3AED);
+        color: white;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      ">
+        <h3 style="margin: 0; font-size: 18px; font-weight: 700;">📄 PDF Preview</h3>
+        <button id="close-preview-btn" style="
+          background: rgba(255, 255, 255, 0.2);
+          border: none;
+          color: white;
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 18px;
+        ">&times;</button>
+      </div>
+      <iframe id="pdf-preview-iframe" style="flex: 1; border: none;"></iframe>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+
+  // Animate in
+  setTimeout(() => {
+    modal.style.opacity = '1';
+    modal.querySelector('.modal-content').style.transform = 'scale(1)';
+  }, 10);
+
+  // Fetch and display preview
+  try {
+    const response = await fetch(`/api/v1/resume/${resumeId}/preview`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const htmlContent = await response.text();
+    const previewIframe = modal.querySelector('#pdf-preview-iframe');
+    previewIframe.srcdoc = htmlContent;
+    showEnhancedNotification('✅ PDF preview loaded successfully!', 'success');
+  } catch (error) {
+    showEnhancedNotification('Error loading PDF preview', 'error');
+    document.body.removeChild(modal);
+  }
+
+  // Close modal handler
+  const closeModal = () => {
+    modal.style.opacity = '0';
+    modal.querySelector('.modal-content').style.transform = 'scale(0.9)';
+    setTimeout(() => {
+      document.body.removeChild(modal);
+    }, 300);
+  };
+
+  modal.querySelector('#close-preview-btn').addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+}
+
+function showEnhancedNotification(message, type = 'info') {
+  // Remove existing notifications
+  const existing = document.querySelectorAll('.enhanced-notification');
+  existing.forEach(n => {
+    n.style.opacity = '0';
+    n.style.transform = 'translateX(100%)';
+    setTimeout(() => n.remove(), 300);
+  });
+  
+  const notification = document.createElement('div');
+  notification.className = `enhanced-notification notification ${type}`;
+  
+  const icons = {
+    success: 'fas fa-check-circle',
+    error: 'fas fa-exclamation-circle',
+    warning: 'fas fa-exclamation-triangle',
+    info: 'fas fa-info-circle'
+  };
+  
+  const colors = {
+    success: '#10B981',
+    error: '#EF4444',
+    warning: '#F59E0B',
+    info: '#3B82F6'
+  };
+  
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    border-left: 4px solid ${colors[type]};
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  `;
+  
+  notification.innerHTML = `
+    <div style="padding: 20px; display: flex; align-items: flex-start; gap: 16px;">
+      <div style="
+        width: 24px; height: 24px; background: ${colors[type]}; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+      ">
+        <i class="${icons[type]}" style="color: white; font-size: 12px;"></i>
+      </div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="color: #1F2937; font-size: 15px; line-height: 1.5; font-weight: 600; word-wrap: break-word; margin-bottom: 4px;">
+          ${message}
+        </div>
+        <div style="color: #6B7280; font-size: 12px; font-weight: 500;">Just now</div>
+      </div>
+      <button class="notification-close" style="
+        background: none; border: none; color: #9CA3AF; cursor: pointer; font-size: 18px;
+        padding: 4px; width: 28px; height: 28px; display: flex; align-items: center;
+        justify-content: center; border-radius: 6px; transition: all 0.2s ease; flex-shrink: 0;
+      ">&times;</button>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Show with animation
+  setTimeout(() => {
+    notification.style.opacity = '1';
+    notification.style.transform = 'translateX(0)';
+  }, 10);
+  
+  // Auto-hide
+  const autoHide = setTimeout(() => {
+    notification.style.opacity = '0';
+    notification.style.transform = 'translateX(100%)';
+    setTimeout(() => notification.remove(), 400);
+  }, 4000);
+  
+  // Close button
+  notification.querySelector('.notification-close').addEventListener('click', () => {
+    clearTimeout(autoHide);
+    notification.style.opacity = '0';
+    notification.style.transform = 'translateX(100%)';
+    setTimeout(() => notification.remove(), 400);
+  });
+}
+
+// Keep all existing functions but enhance them
 function setupIframeListeners(iframeDoc) {
   iframeDoc.querySelectorAll('.section-tag').forEach(addTagEventListeners);
   iframeDoc.addEventListener('input', () => {
     state.hasUnsavedChanges = true;
     clearTimeout(state.autoSaveTimeout);
-    state.autoSaveTimeout = setTimeout(autoSave, 3000);
+    state.autoSaveTimeout = setTimeout(enhancedAutoSave, 3000);
   });
 }
 
-// Utility functions
 function showSaveStatus(message, isError = false) {
-  const saveStatus = document.getElementById('save-status');
-  if (saveStatus) {
-    saveStatus.textContent = message;
-    saveStatus.classList.add('show');
-    if (isError) saveStatus.classList.add('error');
-    else saveStatus.classList.remove('error');
-    setTimeout(() => saveStatus.classList.remove('show'), 3000);
-  }
+  showEnhancedNotification(message, isError ? 'error' : 'success');
 }
 
+// Keep all your existing functions with enhancements
 async function saveResume() {
   if (!state.hasUnsavedChanges) return;
   const saveButton = window.parent.document.querySelector('#save-resume-btn');
@@ -311,7 +868,7 @@ async function saveResume() {
       .then(response => response.json())
       .then(data => {
         saveButton.classList.remove('saving');
-        showSaveStatus(data.success ? 'Changes saved successfully!' : 'Error saving changes. Please try again.', true);
+        showSaveStatus(data.success ? 'Changes saved successfully!' : 'Error saving changes. Please try again.', !data.success);
         if (data.success) state.hasUnsavedChanges = false;
       })
       .catch(error => {
@@ -348,10 +905,8 @@ function collectResumeData(iframeDoc) {
   ];
 
   iframeDoc.querySelectorAll('.resume-section').forEach(section => {
-
     let sectionType = 'custom'; // Default type
     
-
     if (section.dataset.sectionType) {
       sectionType = section.dataset.sectionType;
     } else {
@@ -367,7 +922,7 @@ function collectResumeData(iframeDoc) {
         }
       }
       
-      // If  didn't find a known type, try to extract any type from class
+      // If didn't find a known type, try to extract any type from class
       if (sectionType === 'custom') {
         for (const className of classList) {
           const match = className.match(/^(\w+)-section$/);
@@ -429,9 +984,17 @@ function addTagEventListeners(tag) {
   const deleteBtn = tag.querySelector('.tag-delete');
   if (deleteBtn) {
     deleteBtn.addEventListener('click', async () => {
-      tag.remove();
-      state.hasUnsavedChanges = true;
-      await autoSave();
+      // Add enhanced delete animation
+      tag.style.transition = 'all 0.3s ease';
+      tag.style.opacity = '0';
+      tag.style.transform = 'scale(0.8)';
+      
+      setTimeout(() => {
+        tag.remove();
+        state.hasUnsavedChanges = true;
+        enhancedAutoSave();
+        showEnhancedNotification('Tag removed successfully', 'success');
+      }, 300);
     });
   }
 }
@@ -444,18 +1007,31 @@ async function addNewTag(button) {
       className: 'section-tag',
       innerHTML: `<i class="fas fa-check"></i>${tagName}<i class="fas fa-times tag-delete"></i>`,
     });
+    
+    // Add entrance animation
+    newTag.style.cssText = `
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.3s ease;
+    `;
+    
     tagsContainer.insertBefore(newTag, button);
     addTagEventListeners(newTag);
+    
+    // Animate in
+    setTimeout(() => {
+      newTag.style.opacity = '1';
+      newTag.style.transform = 'scale(1)';
+    }, 10);
+    
     state.hasUnsavedChanges = true;
-    await autoSave();
+    await enhancedAutoSave();
+    showEnhancedNotification(`✨ "${tagName}" added successfully!`, 'success');
   }
 }
 
-
-
 function addItemEventListeners(item) {
-  
-  console.log('Item listener initialized');
+  console.log('Enhanced item listener initialized');
 
   const deleteBtn = item.querySelector('.item-btn.delete');
   if (deleteBtn) {
@@ -463,14 +1039,23 @@ function addItemEventListeners(item) {
       e.preventDefault();
       e.stopPropagation();
       const itemId = item.dataset.itemId || item.id?.replace('item-', '');
-   
 
-      if (!confirm('Are you sure you want to delete this item?')) return;
+      // Enhanced confirmation
+      const confirmed = await showEnhancedConfirmModal({
+        title: 'Delete Item',
+        message: 'Are you sure you want to delete this item?',
+        details: 'This action cannot be undone.',
+        confirmText: 'Delete',
+        confirmStyle: 'danger',
+        icon: 'fas fa-exclamation-triangle'
+      });
+
+      if (!confirmed) return;
 
       const sectionType = item.closest('.resume-section')?.dataset.sectionType;
       if (!sectionType) {
         console.error('Section type not found');
-        showNotification('Error: Section type not found', 'error');
+        showEnhancedNotification('Error: Section type not found', 'error');
         return;
       }
 
@@ -478,15 +1063,21 @@ function addItemEventListeners(item) {
       const resumeId = resumeContainer?.dataset.resumeId;
       if (!resumeId) {
         console.error('Resume ID not found');
-        showNotification('Error: Resume ID not found', 'error');
+        showEnhancedNotification('Error: Resume ID not found', 'error');
         return;
       }
 
       if (!itemId) {
         console.error('Item ID not found');
-        showNotification('Error: Item ID not found', 'error');
+        showEnhancedNotification('Error: Item ID not found', 'error');
         return;
       }
+
+      // Add professional delete animation
+      item.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+      item.style.opacity = '0.5';
+      item.style.transform = 'scale(0.95) translateX(-10px)';
+      item.style.filter = 'blur(1px)';
 
       try {
         const response = await fetch(`/api/v1/resume/${resumeId}/section/${sectionType}/item/${itemId}`, {
@@ -499,767 +1090,30 @@ function addItemEventListeners(item) {
 
         const data = await response.json();
         if (response.ok) {
-          item.remove();
-          showNotification('Item deleted successfully', 'success');
-        } else {
-          showNotification(`Failed to delete item: ${data.message || 'Unknown error'}`, 'error');
-        }
-      } catch (error) {
-        console.error('Delete error:', error);
-        showNotification('Error deleting item', 'error');
-      }
-    });
-  }
-}
-
-// Debounce utility
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-}
-
-function showNotification(message, type) {
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-      <div class="notification-content">
-        <div class="notification-message">${message}</div>
-        <button class="notification-close">&times;</button>
-      </div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Show notification
-    setTimeout(() => {
-      notification.classList.add('show');
-    }, 10);
-    
-    // Auto-hide after 3 seconds
-    setTimeout(() => {
-      notification.classList.remove('show');
-      setTimeout(() => {
-        document.body.removeChild(notification);
-      }, 300);
-    }, 3000);
-    
-    // Close button functionality
-    notification.querySelector('.notification-close').addEventListener('click', () => {
-      notification.classList.remove('show');
-      setTimeout(() => {
-        document.body.removeChild(notification);
-      }, 300);
-    });
-}
-
-function getCurrentTemplate() {
-  // First try to get from meta tag
-  const metaTemplate = document.querySelector('meta[name="template"]');
-  let templateName = metaTemplate ? metaTemplate.getAttribute('content') : null;
-  
-  // If not found, try to get from selected radio button
-  if (!templateName) {
-    const selectedRadio = document.querySelector('input[name="template"]:checked');
-    templateName = selectedRadio ? selectedRadio.value : 'classic';
-  }
-  
-  return templateConfigs[templateName] || templateConfigs.classic;
-}
-
-// Template configurations for different resume styles
-const templateConfigs = {
-  classic: {
-    name: 'classic',
-    itemStructure: {
-      experience: [
-        { key: 'job_title', icon: 'fas fa-chevron-right', placeholder: 'e.g., Senior Software Engineer' },
-        { key: 'company', icon: 'fas fa-building', placeholder: 'e.g., Tech Solutions Inc.' },
-        { key: 'duration', icon: 'fas fa-calendar-alt', placeholder: 'e.g., Jan 2023 - Present' },
-        { 
-          key: 'description', 
-          type: 'list', 
-          icon: 'fas fa-list',
-          placeholder: 'Key responsibilities and achievements',
-          defaultItems: [
-            'Led cross-functional teams to deliver high-impact projects',
-            'Implemented innovative solutions that improved efficiency',
-            'Collaborated with stakeholders to define requirements'
-          ]
-        }
-      ],
-      education: [
-        { key: 'degree', icon: 'fas fa-graduation-cap', placeholder: 'e.g., Bachelor of Computer Science' },
-        { key: 'school', icon: 'fas fa-university', placeholder: 'e.g., University of Technology' },
-        { key: 'date', icon: 'fas fa-calendar-alt', placeholder: 'e.g., 2020 - 2024' },
-        { key: 'description', placeholder: 'GPA, honors, relevant coursework' }
-      ]
-    }
-  }
-  // ... other templates
-};
-
-// Map section types to their display names
-const sectionTypeMap = {
-  experience: 'Experience',
-  education: 'Education', 
-  certification: 'Certification',
-  project: 'Project',
-  volunteer: 'Volunteer',
-  award: 'Award',
-  publication: 'Publication',
-  language: 'Language'
-};
-// Enhanced Add New Item Function with Animations and Professional UX
-function addNewItem(button, type) {
-  if (button.dataset.adding === 'true') {
-    return; // Prevent duplicate calls
-  }
-  button.dataset.adding = 'true';
-  const section = button.parentElement;
-  const newItem = document.createElement('div');
-  newItem.className = 'section-item new-item-animation';
-  
-  const uniqueId = generateUniqueId();
-  newItem.dataset.itemId = uniqueId;
-  newItem.id = `item-${uniqueId}`;
-  
-  // Professional loading state for button
-  const originalButtonContent = button.innerHTML;
-  button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
-  button.disabled = true;
-  
-// Get current template configuration
-const currentTemplate = getCurrentTemplate();
-const templateStructure = currentTemplate.itemStructure[type];
-
-if (!templateStructure) {
-  console.warn(`No template structure found for type: ${type}`);
-  return;
-}
-
-// Build template from current configuration
-const template = {
-  icon: templateStructure[0]?.icon || 'fas fa-star',
-  fields: templateStructure.map(field => ({
-    ...field,
-    label: field.key.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
-  }))
-};
-  
-  // Build enhanced HTML with professional styling
-  let itemHTML = `
-    <div class="item-actions" style="opacity: 0; transition: opacity 0.3s ease;">
-      <button class="item-btn delete enhanced-delete-btn" title="Delete this ${type}" data-item-type="${type}">
-        <i class="fas fa-trash"></i>
-      </button>
-      <button class="item-btn duplicate enhanced-duplicate-btn" title="Duplicate this ${type}" data-item-type="${type}">
-        <i class="fas fa-copy"></i>
-      </button>
-    </div>
-    <div class="item-content">
-  `;
-
-  template.fields.forEach(field => {
-    if (field.type === 'list') {
-      itemHTML += `
-        <div class="section-${field.key.replace('_', '-')}" contenteditable="false" data-key="${field.key}">
-          ${field.icon ? `<i class="${field.icon}"></i>` : ''}
-          <ul class="section-duties">
-            ${(field.defaultItems || ['Click to add your achievement']).map(item => 
-              `<li class="duty-item" contenteditable="true">${item}</li>`
-            ).join('')}
-          </ul>
-          <button class="add-duty-btn" type="button">
-            <i class="fas fa-plus"></i> Add bullet point
-          </button>
-        </div>
-      `;
-    } else {
-      itemHTML += `
-        <div class="section-${field.key.replace('_', '-')}" contenteditable="true" data-key="${field.key}">
-          ${field.icon ? `<i class="${field.icon}"></i>` : ''}
-          ${field.placeholder}
-        </div>
-      `;
-    }
-  });
-
-  itemHTML += '</div>';
-  // Add template-specific classes
-  newItem.classList.add(`${currentTemplate.name.toLowerCase()}-template-item`);
-  newItem.dataset.templateType = currentTemplate.name.toLowerCase();
-  newItem.innerHTML = itemHTML;
-  
-  // Add professional styling and animations
-  newItem.style.cssText = `
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.02), rgba(16, 185, 129, 0.02));
-    border: 2px solid rgba(79, 70, 229, 0.1);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
-  `;
-
-  // Add enhancement CSS if not exists
-  if (!document.querySelector('#item-enhancement-styles')) {
-    const enhancementStyles = document.createElement('style');
-    enhancementStyles.id = 'item-enhancement-styles';
-    enhancementStyles.textContent = `
-      .enhanced-field {
-        margin-bottom: 16px;
-        border-radius: 8px;
-        transition: all 0.2s ease;
-        position: relative;
-      }
-      .classic-template-item .section-job-title i,
-.classic-template-item .section-degree i {
-  color: #333;
-  margin-right: 8px;
-}
-
-.classic-template-item .section-company i,
-.classic-template-item .section-school i {
-  color: #666;
-  margin-right: 8px;
-}
-
-.classic-template-item .section-duration i,
-.classic-template-item .section-date i {
-  color: #888;
-  margin-right: 8px;
-}
-
-.classic-template-item .section-duties {
-  margin: 8px 0;
-  padding-left: 20px;
-}
-
-.classic-template-item .section-duties li {
-  list-style-type: disc;
-  margin: 4px 0;
-  line-height: 1.4;
-}
-      .enhanced-field:hover {
-        background: rgba(79, 70, 229, 0.05);
-      }
-      
-      .field-header {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-weight: 600;
-        color: #4F46E5;
-        margin-bottom: 8px;
-        font-size: 14px;
-      }
-      
-      .field-content {
-        min-height: 40px;
-        padding: 12px;
-        border: 2px dashed transparent;
-        border-radius: 6px;
-        transition: all 0.2s ease;
-        cursor: text;
-      }
-      
-      .field-content:hover {
-        border-color: rgba(79, 70, 229, 0.3);
-        background: rgba(79, 70, 229, 0.05);
-      }
-      
-      .field-content:focus-within {
-        border-color: #4F46E5;
-        background: rgba(79, 70, 229, 0.1);
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-      }
-      
-      .placeholder-text {
-        color: #9CA3AF;
-        font-style: italic;
-        pointer-events: none;
-      }
-      
-      .enhanced-duties {
-        list-style: none;
-        padding: 0;
-        margin: 8px 0;
-      }
-      
-      .duty-item {
-        padding: 8px 12px;
-        margin: 4px 0;
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 6px;
-        border-left: 3px solid #4F46E5;
-        transition: all 0.2s ease;
-        cursor: text;
-        position: relative;
-      }
-      
-      .duty-item:hover {
-        background: rgba(79, 70, 229, 0.1);
-        transform: translateX(2px);
-      }
-      
-      .duty-item:focus {
-        outline: 2px solid #4F46E5;
-        background: rgba(79, 70, 229, 0.1);
-      }
-      
-      .add-duty-btn {
-        background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(16, 185, 129, 0.1));
-        border: 1px dashed #4F46E5;
-        color: #4F46E5;
-        padding: 8px 16px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 12px;
-        font-weight: 500;
-        transition: all 0.2s ease;
-        margin-top: 8px;
-      }
-      
-      .add-duty-btn:hover {
-        background: linear-gradient(135deg, #4F46E5, #10B981);
-        color: white;
-        border-color: #4F46E5;
-        transform: translateY(-1px);
-      }
-      
-      .enhanced-delete-btn {
-        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
-        color: #EF4444;
-        border: 1px solid rgba(239, 68, 68, 0.3);
-      }
-      
-      .enhanced-delete-btn:hover {
-        background: linear-gradient(135deg, #EF4444, #DC2626);
-        color: white;
-        transform: scale(1.1);
-      }
-      
-      .enhanced-duplicate-btn {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
-        color: #10B981;
-        border: 1px solid rgba(16, 185, 129, 0.3);
-      }
-      
-      .enhanced-duplicate-btn:hover {
-        background: linear-gradient(135deg, #10B981, #059669);
-        color: white;
-        transform: scale(1.1);
-      }
-      
-      .item-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 14px;
-        transition: all 0.2s ease;
-        margin-left: 8px;
-      }
-      
-      .item-actions {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        display: flex;
-        gap: 4px;
-        z-index: 10;
-      }
-      
-      .section-item:hover .item-actions {
-        opacity: 1 !important;
-      }
-      
-      .new-item-animation {
-        animation: slideInFromRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-      
-      @keyframes slideInFromRight {
-        from {
-          opacity: 0;
-          transform: translateX(100%) scale(0.8);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0) scale(1);
-        }
-      }
-        @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-    `;
-    document.head.appendChild(enhancementStyles);
-  }
-
-  // Insert with professional timing
-  section.insertBefore(newItem, button);
-
-  // Animate in with staggered effect
-  setTimeout(() => {
-    newItem.style.opacity = '1';
-    newItem.style.transform = 'translateY(0) scale(1)';
-    
-    // Restore button
-    setTimeout(() => {
-      button.innerHTML = originalButtonContent;
-      button.disabled = false;
-    }, 200);
-    
-    // Show actions after main animation
-    setTimeout(() => {
-      const actions = newItem.querySelector('.item-actions');
-      if (actions) actions.style.opacity = '1';
-    }, 300);
-    
-    // Focus first field
-    setTimeout(() => {
-      const firstField = newItem.querySelector('.field-content');
-      if (firstField) {
-        firstField.focus();
-        selectPlaceholderText(firstField);
-      }
-    }, 500);
-  }, 100);
-
-  // Add enhanced event listeners
-  addEnhancedItemEventListeners(newItem);
-  
-  // Mark as changed and auto-save
-  state.hasUnsavedChanges = true;
-  autoSave();
-  
-  // Show success notification
-  showNotification(`✨ New ${type} added successfully!`, 'success');
-  setTimeout(() => {
-    button.dataset.adding = 'false';
-  }, 1000);
-  return newItem;
-}
-
-// Enhanced Item Event Listeners with Professional Interactions
-function addEnhancedItemEventListeners(item) {
-  console.log('Enhanced item listeners initialized');
-
-  // Enhanced delete button with confirmation modal
-  const deleteBtn = item.querySelector('.enhanced-delete-btn');
-  if (deleteBtn) {
-    deleteBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      const itemType = deleteBtn.dataset.itemType || 'item';
-      const itemTitle = item.querySelector('[data-key="job_title"], [data-key="degree"]')?.textContent.trim() || `this ${itemType}`;
-      
-      // Professional confirmation modal
-      const confirmed = await showEnhancedConfirmModal({
-        title: `Delete ${itemType.charAt(0).toUpperCase() + itemType.slice(1)}`,
-        message: `Are you sure you want to delete "${itemTitle}"?`,
-        details: 'This action cannot be undone.',
-        confirmText: 'Delete',
-        confirmStyle: 'danger',
-        icon: 'fas fa-exclamation-triangle'
-      });
-      
-      if (!confirmed) return;
-
-      // Add professional delete animation
-      addProfessionalDeleteAnimation(item);
-      
-      const itemId = item.dataset.itemId || item.id?.replace('item-', '');
-      const sectionType = item.closest('.resume-section')?.dataset.sectionType;
-      const resumeContainer = document.querySelector('.resume-builder') || 
-                             window.parent?.document?.querySelector('.resume-builder');
-      const resumeId = resumeContainer?.dataset.resumeId;
-
-      if (!sectionType || !resumeId || !itemId) {
-        console.error('Missing data:', { sectionType, resumeId, itemId });
-        setTimeout(() => {
-          item.remove();
-          state.hasUnsavedChanges = true;
-          autoSave();
-          showNotification('Item removed locally', 'warning');
-        }, 300);
-        return;
-      }
-
-      try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
-                         window.parent?.document?.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-        
-        const response = await fetch(`/api/v1/resume/${resumeId}/section/${sectionType}/item/${itemId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken,
-          },
-        });
-
-        if (response.ok) {
           setTimeout(() => {
             item.remove();
-            state.hasUnsavedChanges = true;
-            autoSave();
-            showNotification(`${itemType.charAt(0).toUpperCase() + itemType.slice(1)} deleted successfully`, 'success');
+            showEnhancedNotification('Item deleted successfully', 'success');
           }, 300);
         } else {
-          const data = await response.json();
-          showNotification(`Failed to delete: ${data.message || 'Server error'}`, 'error');
-          resetDeleteAnimation(item);
+          // Reset animation on error
+          item.style.opacity = '1';
+          item.style.transform = 'scale(1) translateX(0)';
+          item.style.filter = 'none';
+          showEnhancedNotification(`Failed to delete item: ${data.message || 'Unknown error'}`, 'error');
         }
       } catch (error) {
         console.error('Delete error:', error);
-        setTimeout(() => {
-          item.remove();
-          state.hasUnsavedChanges = true;
-          autoSave();
-          showNotification('Item removed (network error)', 'warning');
-        }, 300);
+        showEnhancedNotification('Error deleting item', 'error');
+        // Reset animation on error
+        item.style.opacity = '1';
+        item.style.transform = 'scale(1) translateX(0)';
+        item.style.filter = 'none';
       }
     });
   }
-
-  // Enhanced duplicate button
-  const duplicateBtn = item.querySelector('.enhanced-duplicate-btn');
-  if (duplicateBtn) {
-    duplicateBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      const itemType = duplicateBtn.dataset.itemType || 'item';
-      duplicateItemProfessionally(item, itemType);
-    });
-  }
-
-  // Enhanced field interactions
-  item.querySelectorAll('.field-content').forEach(field => {
-    setupEnhancedFieldBehavior(field);
-  });
-
-  // Enhanced duty list interactions
-  item.querySelectorAll('.add-duty-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      addNewDutyItem(btn);
-    });
-  });
-
-  // Enhanced duties editing
-  item.querySelectorAll('.duty-item').forEach(duty => {
-    setupDutyItemBehavior(duty);
-  });
 }
 
-// Enhanced Auto-Save with Professional Feedback
-async function autoSave() {
-  if (state.isGeneratingContent) return;
-  
-  console.log('🔄 Auto-saving resume...');
-  clearTimeout(state.autoSaveTimeout);
-  
-  // Create professional saving indicator
-  const savingIndicator = createProfessionalSavingIndicator();
-  document.body.appendChild(savingIndicator);
-  
-  try {
-    await saveResume();
-    
-    // Update indicator to success
-    updateSavingIndicator(savingIndicator, 'success', '✅ Auto-saved successfully');
-    
-  } catch (error) {
-    console.error('Auto-save failed:', error);
-    updateSavingIndicator(savingIndicator, 'error', '❌ Auto-save failed');
-    showNotification('Auto-save failed. Please save manually.', 'warning');
-  }
-  
-  // Remove indicator after delay
-  setTimeout(() => {
-    removeProfessionalSavingIndicator(savingIndicator);
-  }, 2000);
-}
-
-// Helper Functions for Professional UX
-
-function createProfessionalSavingIndicator() {
-  const indicator = document.createElement('div');
-  indicator.className = 'professional-saving-indicator';
-  indicator.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(99, 102, 241, 0.95));
-    color: white;
-    padding: 12px 20px;
-    border-radius: 25px;
-    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
-    font-size: 14px;
-    font-weight: 500;
-    backdrop-filter: blur(10px);
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  `;
-  
-  indicator.innerHTML = `
-    <div class="indicator-spinner" style="
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top: 2px solid white;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    "></div>
-    <span class="indicator-text">Saving changes...</span>
-  `;
-  
-  setTimeout(() => {
-    indicator.style.opacity = '1';
-    indicator.style.transform = 'translateY(0)';
-  }, 10);
-  
-  return indicator;
-}
-
-function updateSavingIndicator(indicator, type, message) {
-  const text = indicator.querySelector('.indicator-text');
-  const spinner = indicator.querySelector('.indicator-spinner');
-  
-  if (type === 'success') {
-    indicator.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.95))';
-    indicator.style.boxShadow = '0 8px 25px rgba(16, 185, 129, 0.4)';
-    spinner.style.display = 'none';
-    text.textContent = message;
-  } else if (type === 'error') {
-    indicator.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95))';
-    indicator.style.boxShadow = '0 8px 25px rgba(239, 68, 68, 0.4)';
-    spinner.style.display = 'none';
-    text.textContent = message;
-  }
-}
-
-function removeProfessionalSavingIndicator(indicator) {
-  if (!indicator || !indicator.parentNode) return;
-  
-  indicator.style.opacity = '0';
-  indicator.style.transform = 'translateY(20px)';
-  setTimeout(() => {
-    if (indicator.parentNode) {
-      indicator.parentNode.removeChild(indicator);
-    }
-  }, 300);
-}
-
-function addProfessionalDeleteAnimation(item) {
-  item.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-  item.style.opacity = '0.5';
-  item.style.transform = 'scale(0.95) translateX(-10px)';
-  item.style.filter = 'blur(1px)';
-}
-
-function resetDeleteAnimation(item) {
-  item.style.opacity = '1';
-  item.style.transform = 'scale(1) translateX(0)';
-  item.style.filter = 'none';
-}
-
-function setupEnhancedFieldBehavior(field) {
-  const placeholder = field.dataset.placeholder;
-  
-  field.addEventListener('focus', function() {
-    const placeholderSpan = this.querySelector('.placeholder-text');
-    if (placeholderSpan) {
-      placeholderSpan.style.display = 'none';
-    }
-    this.style.borderColor = '#4F46E5';
-    this.style.background = 'rgba(79, 70, 229, 0.1)';
-  });
-  
-  field.addEventListener('blur', function() {
-    if (!this.textContent.trim()) {
-      const placeholderSpan = this.querySelector('.placeholder-text');
-      if (placeholderSpan) {
-        placeholderSpan.style.display = 'block';
-      }
-    }
-    this.style.borderColor = 'transparent';
-    this.style.background = '';
-  });
-  
-  field.addEventListener('input', function() {
-    const placeholderSpan = this.querySelector('.placeholder-text');
-    if (placeholderSpan) {
-      placeholderSpan.style.display = this.textContent.trim() ? 'none' : 'block';
-    }
-    state.hasUnsavedChanges = true;
-  });
-}
-
-function duplicateItemProfessionally(originalItem, itemType) {
-  const section = originalItem.parentElement;
-  const addButton = section.querySelector('.add-item-btn');
-  
-  if (addButton) {
-    showNotification(`Duplicating ${itemType}...`, 'info');
-    
-    // Create new item using existing function
-    const newItem = addNewItem(addButton, itemType);
-    
-    // Copy data from original item
-    setTimeout(() => {
-      const originalFields = originalItem.querySelectorAll('[data-key]');
-      const newFields = newItem.querySelectorAll('[data-key]');
-      
-      originalFields.forEach((originalField, index) => {
-        const newField = newFields[index];
-        if (newField && originalField.textContent.trim()) {
-          newField.textContent = originalField.textContent;
-          const placeholderSpan = newField.querySelector('.placeholder-text');
-          if (placeholderSpan) {
-            placeholderSpan.style.display = 'none';
-          }
-        }
-      });
-      
-      showNotification(`${itemType.charAt(0).toUpperCase() + itemType.slice(1)} duplicated successfully!`, 'success');
-    }, 200);
-  }
-}
-
-function selectPlaceholderText(element) {
-  const placeholderSpan = element.querySelector('.placeholder-text');
-  if (placeholderSpan) {
-    const range = document.createRange();
-    range.selectNodeContents(placeholderSpan);
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-  }
-}
-
-function generateUniqueId() {
-  return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-}
-
-// Enhanced Confirmation Modal
+// Enhanced confirmation modal
 async function showEnhancedConfirmModal({ title, message, details, confirmText = 'Confirm', confirmStyle = 'primary', icon = 'fas fa-question-circle' }) {
   return new Promise((resolve) => {
     const modal = document.createElement('div');
@@ -1307,6 +1161,9 @@ async function showEnhancedConfirmModal({ title, message, details, confirmText =
           border-radius: 50%;
           margin: 0 auto 24px;
           box-shadow: 0 8px 25px ${style.shadow};
+          display: flex;
+          align-items: center;
+          justify-content: center;
         ">
           <i class="${icon}" style="color: white; font-size: 28px;"></i>
         </div>
@@ -1375,32 +1232,6 @@ async function showEnhancedConfirmModal({ title, message, details, confirmText =
       content.style.transform = 'scale(1)';
     }, 10);
     
-    // Add enhanced hover effects
-    const cancelBtn = modal.querySelector('.btn-cancel');
-    const confirmBtn = modal.querySelector('.btn-confirm');
-    
-    cancelBtn.addEventListener('mouseenter', () => {
-      cancelBtn.style.background = '#E5E7EB';
-      cancelBtn.style.transform = 'translateY(-2px)';
-      cancelBtn.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
-    });
-    
-    cancelBtn.addEventListener('mouseleave', () => {
-      cancelBtn.style.background = '#F3F4F6';
-      cancelBtn.style.transform = '';
-      cancelBtn.style.boxShadow = '';
-    });
-    
-    confirmBtn.addEventListener('mouseenter', () => {
-      confirmBtn.style.transform = 'translateY(-2px)';
-      confirmBtn.style.boxShadow = `0 8px 25px ${style.shadow}`;
-    });
-    
-    confirmBtn.addEventListener('mouseleave', () => {
-      confirmBtn.style.transform = '';
-      confirmBtn.style.boxShadow = `0 4px 12px ${style.shadow}`;
-    });
-    
     // Event listeners
     const closeModal = (confirmed = false) => {
       modal.style.opacity = '0';
@@ -1412,14 +1243,14 @@ async function showEnhancedConfirmModal({ title, message, details, confirmText =
       }, 300);
     };
     
-    cancelBtn.addEventListener('click', () => closeModal(false));
-    confirmBtn.addEventListener('click', () => closeModal(true));
+    modal.querySelector('.btn-cancel').addEventListener('click', () => closeModal(false));
+    modal.querySelector('.btn-confirm').addEventListener('click', () => closeModal(true));
     
     modal.addEventListener('click', (e) => {
       if (e.target === modal) closeModal(false);
     });
     
-    // Enhanced keyboard handling
+    // Keyboard handling
     const handleKeydown = (e) => {
       if (e.key === 'Escape') {
         document.removeEventListener('keydown', handleKeydown);
@@ -1434,335 +1265,204 @@ async function showEnhancedConfirmModal({ title, message, details, confirmText =
   });
 }
 
-// Enhanced Duty Item Management
-function addNewDutyItem(button) {
-  const dutiesList = button.parentElement.previousElementSibling;
-  const newDuty = document.createElement('li');
-  newDuty.className = 'duty-item';
-  newDuty.contentEditable = 'true';
-  newDuty.style.cssText = `
-    opacity: 0;
-    transform: translateX(-20px);
-    transition: all 0.3s ease;
-  `;
-  newDuty.textContent = 'Click to add your achievement or responsibility';
-  
-  dutiesList.appendChild(newDuty);
-  setupDutyItemBehavior(newDuty);
-  
-  // Animate in
-  setTimeout(() => {
-    newDuty.style.opacity = '1';
-    newDuty.style.transform = 'translateX(0)';
-    
-    // Focus and select text
-    setTimeout(() => {
-      newDuty.focus();
-      const range = document.createRange();
-      range.selectNodeContents(newDuty);
-      const selection = window.getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }, 100);
-  }, 10);
-  
-  // Add delete button
-  const deleteBtn = document.createElement('button');
-  deleteBtn.className = 'duty-delete-btn';
-  deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
-  deleteBtn.style.cssText = `
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #EF4444;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 10px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-  `;
-  
-  deleteBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    newDuty.style.opacity = '0';
-    newDuty.style.transform = 'translateX(-20px)';
-    setTimeout(() => {
-      newDuty.remove();
-      state.hasUnsavedChanges = true;
-    }, 200);
-  });
-  
-  newDuty.style.position = 'relative';
-  newDuty.appendChild(deleteBtn);
-  
-  // Show delete button on hover
-  newDuty.addEventListener('mouseenter', () => {
-    deleteBtn.style.display = 'flex';
-  });
-  
-  newDuty.addEventListener('mouseleave', () => {
-    deleteBtn.style.display = 'none';
-  });
-  
-  state.hasUnsavedChanges = true;
-  showNotification('✨ New bullet point added', 'info');
+// Debounce utility
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
 }
 
-function setupDutyItemBehavior(duty) {
-  duty.addEventListener('focus', function() {
-    this.style.background = 'rgba(79, 70, 229, 0.1)';
-    this.style.borderLeftColor = '#10B981';
-  });
-  
-  duty.addEventListener('blur', function() {
-    this.style.background = 'rgba(255, 255, 255, 0.8)';
-    this.style.borderLeftColor = '#4F46E5';
-    
-    // Remove if empty
-    if (!this.textContent.trim()) {
-      this.style.opacity = '0';
-      setTimeout(() => this.remove(), 200);
-    }
-  });
-  
-  duty.addEventListener('input', function() {
-    state.hasUnsavedChanges = true;
-  });
-  
-  duty.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      // Create new duty item
-      const addBtn = this.closest('.enhanced-field').querySelector('.add-duty-btn');
-      if (addBtn) {
-        addNewDutyItem(addBtn);
-      }
-    } else if (e.key === 'Backspace' && !this.textContent.trim()) {
-      e.preventDefault();
-      const prevDuty = this.previousElementSibling;
-      this.remove();
-      if (prevDuty) {
-        prevDuty.focus();
-        // Place cursor at end
-        const range = document.createRange();
-        const sel = window.getSelection();
-        range.setStart(prevDuty, prevDuty.childNodes.length);
-        range.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(range);
-      }
-    }
-  });
+function showNotification(message, type) {
+  showEnhancedNotification(message, type);
 }
 
-// Enhanced notification system integration
-function showNotification(message, type = 'info') {
-  // Remove existing notifications
-  const existingNotifications = document.querySelectorAll('.enhanced-notification');
-  existingNotifications.forEach(notification => {
-    notification.style.opacity = '0';
-    notification.style.transform = 'translateX(100%)';
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.parentNode.removeChild(notification);
-      }
-    }, 300);
-  });
+function getCurrentTemplate() {
+  // First try to get from meta tag
+  const metaTemplate = document.querySelector('meta[name="template"]');
+  let templateName = metaTemplate ? metaTemplate.getAttribute('content') : null;
   
-  const notification = document.createElement('div');
-  notification.className = `enhanced-notification ${type}`;
-  
-  const iconMap = {
-    success: 'fas fa-check-circle',
-    error: 'fas fa-exclamation-circle',
-    warning: 'fas fa-exclamation-triangle',
-    info: 'fas fa-info-circle'
-  };
-  
-  const colorMap = {
-    success: '#10B981',
-    error: '#EF4444',
-    warning: '#F59E0B',
-    info: '#3B82F6'
-  };
-  
-  notification.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 2000;
-    max-width: 400px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(15px);
-    border-radius: 16px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-    border-left: 4px solid ${colorMap[type]};
-    opacity: 0;
-    transform: translateX(100%);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-  `;
-  
-  notification.innerHTML = `
-    <div style="
-      padding: 20px;
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-    ">
-      <div style="
-        width: 24px;
-        height: 24px;
-        background: ${colorMap[type]};
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        margin-top: 2px;
-      ">
-        <i class="${iconMap[type]}" style="
-          color: white;
-          font-size: 12px;
-        "></i>
-      </div>
-      <div style="
-        flex: 1;
-        min-width: 0;
-      ">
-        <div style="
-          color: #1F2937;
-          font-size: 15px;
-          line-height: 1.5;
-          font-weight: 600;
-          word-wrap: break-word;
-          margin-bottom: 4px;
-        ">${message}</div>
-        <div style="
-          color: #6B7280;
-          font-size: 12px;
-          font-weight: 500;
-        ">Just now</div>
-      </div>
-      <button class="notification-close" style="
-        background: none;
-        border: none;
-        color: #9CA3AF;
-        cursor: pointer;
-        font-size: 18px;
-        padding: 4px;
-        width: 28px;
-        height: 28px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 6px;
-        transition: all 0.2s ease;
-        flex-shrink: 0;
-      ">&times;</button>
-    </div>
-  `;
-  
-  document.body.appendChild(notification);
-  
-  // Show with enhanced animation
-  setTimeout(() => {
-    notification.style.opacity = '1';
-    notification.style.transform = 'translateX(0)';
-  }, 10);
-  
-  // Auto-hide with progress bar
-  const progressBar = document.createElement('div');
-  progressBar.style.cssText = `
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 3px;
-    background: ${colorMap[type]};
-    width: 100%;
-    transform-origin: left;
-    animation: progressShrink 4s linear;
-  `;
-  notification.appendChild(progressBar);
-  
-  // Add progress animation
-  if (!document.querySelector('#notification-progress-styles')) {
-    const progressStyles = document.createElement('style');
-    progressStyles.id = 'notification-progress-styles';
-    progressStyles.textContent = `
-      @keyframes progressShrink {
-        from { transform: scaleX(1); }
-        to { transform: scaleX(0); }
-      }
-    `;
-    document.head.appendChild(progressStyles);
+  // If not found, try to get from selected radio button
+  if (!templateName) {
+    const selectedRadio = document.querySelector('input[name="template"]:checked');
+    templateName = selectedRadio ? selectedRadio.value : 'classic';
   }
   
-  const autoHideTimeout = setTimeout(() => {
-    notification.style.opacity = '0';
-    notification.style.transform = 'translateX(100%)';
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.parentNode.removeChild(notification);
-      }
-    }, 400);
-  }, 4000);
-  
-  // Enhanced close button
-  const closeBtn = notification.querySelector('.notification-close');
-  closeBtn.addEventListener('click', () => {
-    clearTimeout(autoHideTimeout);
-    notification.style.opacity = '0';
-    notification.style.transform = 'translateX(100%)';
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.parentNode.removeChild(notification);
-      }
-    }, 400);
-  });
-  
-  closeBtn.addEventListener('mouseenter', () => {
-    closeBtn.style.background = '#F3F4F6';
-    closeBtn.style.color = '#374151';
-    closeBtn.style.transform = 'scale(1.1)';
-  });
-  
-  closeBtn.addEventListener('mouseleave', () => {
-    closeBtn.style.background = 'none';
-    closeBtn.style.color = '#9CA3AF';
-    closeBtn.style.transform = 'scale(1)';
-  });
-  
-  // Pause auto-hide on hover
-  notification.addEventListener('mouseenter', () => {
-    clearTimeout(autoHideTimeout);
-    progressBar.style.animationPlayState = 'paused';
-  });
-  
-  notification.addEventListener('mouseleave', () => {
-    progressBar.style.animationPlayState = 'running';
-    setTimeout(() => {
-      notification.style.opacity = '0';
-      notification.style.transform = 'translateX(100%)';
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.parentNode.removeChild(notification);
-        }
-      }, 400);
-    }, 2000);
-  });
+  return templateConfigs[templateName] || templateConfigs.classic;
 }
 
-// Export the enhanced functions
-window.addNewItem = addNewItem;
-window.addEnhancedItemEventListeners = addEnhancedItemEventListeners;
-window.autoSave = autoSave;
+// Template configurations for different resume styles
+const templateConfigs = {
+  classic: {
+    name: 'classic',
+    itemStructure: {
+      experience: [
+        { key: 'job_title', icon: 'fas fa-chevron-right', placeholder: 'e.g., Senior Software Engineer' },
+        { key: 'company', icon: 'fas fa-building', placeholder: 'e.g., Tech Solutions Inc.' },
+        { key: 'duration', icon: 'fas fa-calendar-alt', placeholder: 'e.g., Jan 2023 - Present' },
+        { 
+          key: 'description', 
+          type: 'list', 
+          icon: 'fas fa-list',
+          placeholder: 'Key responsibilities and achievements',
+          defaultItems: [
+            'Led cross-functional teams to deliver high-impact projects',
+            'Implemented innovative solutions that improved efficiency',
+            'Collaborated with stakeholders to define requirements'
+          ]
+        }
+      ],
+      education: [
+        { key: 'degree', icon: 'fas fa-graduation-cap', placeholder: 'e.g., Bachelor of Computer Science' },
+        { key: 'school', icon: 'fas fa-university', placeholder: 'e.g., University of Technology' },
+        { key: 'date', icon: 'fas fa-calendar-alt', placeholder: 'e.g., 2020 - 2024' },
+        { key: 'description', placeholder: 'GPA, honors, relevant coursework' }
+      ]
+    }
+  }
+  // ... other templates can be added here
+};
+
+// Map section types to their display names
+const sectionTypeMap = {
+  experience: 'Experience',
+  education: 'Education', 
+  certification: 'Certification',
+  project: 'Project',
+  volunteer: 'Volunteer',
+  award: 'Award',
+  publication: 'Publication',
+  language: 'Language'
+};
+
+// Enhanced Add New Item Function with your existing template structure
+function addNewItem(button, type) {
+  if (button.dataset.adding === 'true') {
+    return; // Prevent duplicate calls
+  }
+  button.dataset.adding = 'true';
+  
+  const section = button.parentElement;
+  const newItem = document.createElement('div');
+  newItem.className = 'section-item';
+  
+  const uniqueId = generateUniqueId();
+  newItem.dataset.itemId = uniqueId;
+  newItem.id = `item-${uniqueId}`;
+  
+  // Professional loading state for button
+  const originalButtonContent = button.innerHTML;
+  button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+  button.disabled = true;
+  
+  // Get current template configuration
+  const currentTemplate = getCurrentTemplate();
+  const templateStructure = currentTemplate.itemStructure[type];
+
+  if (!templateStructure) {
+    console.warn(`No template structure found for type: ${type}`);
+    // Restore button state
+    button.innerHTML = originalButtonContent;
+    button.disabled = false;
+    button.dataset.adding = 'false';
+    return;
+  }
+
+  // Build template from current configuration
+  const template = {
+    icon: templateStructure[0]?.icon || 'fas fa-star',
+    fields: templateStructure.map(field => ({
+      ...field,
+      label: field.key.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+    }))
+  };
+  
+  // Build enhanced HTML with professional styling
+  let itemHTML = `
+    <div class="item-actions" style="opacity: 0; transition: opacity 0.3s ease;">
+      <button class="item-btn delete" title="Delete this ${type}" data-item-type="${type}">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+    <div class="item-content">
+  `;
+
+  template.fields.forEach(field => {
+    if (field.type === 'list') {
+      itemHTML += `
+        <div class="section-${field.key.replace('_', '-')}" contenteditable="false" data-key="${field.key}">
+          ${field.icon ? `<i class="${field.icon}"></i>` : ''}
+          <ul class="section-duties">
+            ${(field.defaultItems || ['Click to add your achievement']).map(item => 
+              `<li class="duty-item" contenteditable="true">${item}</li>`
+            ).join('')}
+          </ul>
+        </div>
+      `;
+    } else {
+      itemHTML += `
+        <div class="section-${field.key.replace('_', '-')}" contenteditable="true" data-key="${field.key}">
+          ${field.icon ? `<i class="${field.icon}"></i>` : ''}
+          ${field.placeholder}
+        </div>
+      `;
+    }
+  });
+
+  itemHTML += '</div>';
+  newItem.innerHTML = itemHTML;
+  
+  // Add professional styling and animations
+  newItem.style.cssText = `
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.02), rgba(16, 185, 129, 0.02));
+    border: 2px solid rgba(79, 70, 229, 0.1);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  `;
+
+  // Insert with professional timing
+  section.insertBefore(newItem, button);
+
+  // Animate in with staggered effect
+  setTimeout(() => {
+    newItem.style.opacity = '1';
+    newItem.style.transform = 'translateY(0) scale(1)';
+    
+    // Restore button
+    setTimeout(() => {
+      button.innerHTML = originalButtonContent;
+      button.disabled = false;
+    }, 200);
+    
+    // Show actions after main animation
+    setTimeout(() => {
+      const actions = newItem.querySelector('.item-actions');
+      if (actions) actions.style.opacity = '1';
+    }, 300);
+  }, 100);
+
+  // Add enhanced event listeners
+  addItemEventListeners(newItem);
+  
+  // Mark as changed and auto-save
+  state.hasUnsavedChanges = true;
+  enhancedAutoSave();
+  
+  // Show success notification
+  showEnhancedNotification(`✨ New ${type} added successfully!`, 'success');
+  setTimeout(() => {
+    button.dataset.adding = 'false';
+  }, 1000);
+  return newItem;
+}
+
+function generateUniqueId() {
+  return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}

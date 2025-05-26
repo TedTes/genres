@@ -8,7 +8,7 @@
 
 {% include 'partials/navbar.html' %}
 <div class="resume-builder" data-resume-id="{{ resume.id }}">
-    <!-- Left Sidebar Controls -->
+    <!-- Enhanced Left Sidebar Controls -->
     <div class="floating-controls-left">
         <div class="tooltip-container">
             <button id="ai-assistant-btn" class="toolbar-btn toolbar-btn-primary float-control-btn">
@@ -26,8 +26,8 @@
         
         <div class="tooltip-container">
             <button class="float-control-btn ats-score-btn" data-action="ats-scan">
-                <i class="fas fa-robot"></i>
-                <div class="btn-tooltip">Check ATS Score</div>
+                <i class="fas fa-chart-line"></i>
+                <div class="btn-tooltip">ATS Score</div>
             </button>
         </div>
              
@@ -39,7 +39,7 @@
         </div>
     </div>
 
-    <!-- Save Status and Button -->
+    <!-- Enhanced Save Status and Button -->
     <div class="save-button-container">
         <div class="save-status" id="save-status">
             <span class="status-icon"><i class="fas fa-check"></i></span>
@@ -51,10 +51,10 @@
         </button>
     </div>
 
-    <!-- Templates Panel -->
+    <!-- Enhanced Templates Panel -->
     <div class="slide-panel" id="templates-panel">
         <div class="panel-header">
-            <h2>Choose Template</h2>
+            <h2>✨ Choose Template</h2>
             <button class="panel-close" data-panel="templates-panel">
                 <i class="fas fa-times"></i>
             </button>
@@ -72,13 +72,17 @@
                             <div class="template-preview">
                                 <img src="{{ url_for('static', filename=template.thumbnail) }}" alt="{{ template.id }} Thumbnail" class="template-thumbnail">
                                 <div class="template-overlay">
-                                    <button type="button" class="preview-btn">Preview</button>
-                                    <button type="submit" class="select-btn">Select</button>
+                                    <button type="button" class="preview-btn">
+                                        <i class="fas fa-eye"></i> Preview
+                                    </button>
+                                    <button type="submit" class="select-btn">
+                                        <i class="fas fa-check"></i> Select
+                                    </button>
                                 </div>
                             </div>
                             <div class="template-info">
-                                <span class="template-name">{{ template.id }}</span>
-                                <span class="template-description">{{ template.get('layout', {}).get('description', 'No description available') }}</span>
+                                <span class="template-name">{{ template.id | title }}</span>
+                                <span class="template-description">{{ template.get('layout', {}).get('description', 'Professional template perfect for your career') }}</span>
                             </div>
                         </label>
                     </div>
@@ -88,11 +92,14 @@
         </div>
     </div>
     
-    <!-- AI Assistant Modal -->
+    <!-- Enhanced AI Assistant Modal -->
     <div class="ai-modal" id="ai-assistant-modal">
         <div class="ai-modal-content">
             <div class="ai-modal-header">
-                <h3 class="ai-modal-title">AI Assistant</h3>
+                <h3 class="ai-modal-title">
+                    <i class="fas fa-robot"></i>
+                    AI Resume Assistant
+                </h3>
                 <button class="ai-modal-close">&times;</button>
             </div>
             <div class="ai-modal-body">
@@ -103,21 +110,28 @@
                             <div class="ai-feature-icon"><i class="fas fa-star"></i></div>
                             <div class="ai-feature-text">
                                 <h5>Enhance Experience</h5>
-                                <p>Improve your work experience bullet points</p>
+                                <p>Improve your work experience bullet points with AI-powered suggestions</p>
                             </div>
                         </div>
                         <div class="ai-feature-card" data-action="suggest-skills">
                             <div class="ai-feature-icon"><i class="fas fa-lightbulb"></i></div>
                             <div class="ai-feature-text">
                                 <h5>Suggest Skills</h5>
-                                <p>Recommend relevant skills based on your background</p>
+                                <p>Get personalized skill recommendations based on your industry</p>
                             </div>
                         </div>
                         <div class="ai-feature-card" data-action="ats-scan">
                             <div class="ai-feature-icon"><i class="fas fa-robot"></i></div>
                             <div class="ai-feature-text">
                                 <h5>ATS Optimization</h5>
-                                <p>Check and improve ATS compatibility</p>
+                                <p>Analyze and optimize your resume for Applicant Tracking Systems</p>
+                            </div>
+                        </div>
+                        <div class="ai-feature-card" data-action="grammar-check">
+                            <div class="ai-feature-icon"><i class="fas fa-spell-check"></i></div>
+                            <div class="ai-feature-text">
+                                <h5>Grammar & Style</h5>
+                                <p>Perfect your resume's language, grammar, and professional tone</p>
                             </div>
                         </div>
                     </div>
@@ -126,8 +140,13 @@
         </div>
     </div>
 
-    <!-- Main Preview Area -->
+    <!-- Enhanced Main Preview Area with Loading -->
     <div class="resume-preview-container">
+        <div class="iframe-loading-overlay" id="iframe-loading">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading your resume...</div>
+            <div class="loading-subtext">Please wait while we prepare your preview</div>
+        </div>
         
         <iframe src="{{ url_for('resume.resume_render', resume_id=resume.id) }}" 
                 class="preview-iframe" 
