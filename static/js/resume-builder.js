@@ -39,6 +39,17 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.saveButton.addEventListener('click', saveResume);
   }
 
+  const selectedRadio = document.querySelector('input[name="template"]:checked');
+  if (selectedRadio) {
+    const templateId = selectedRadio.value;
+    let metaTemplate = document.querySelector('meta[name="template"]');
+    if (!metaTemplate) {
+      metaTemplate = document.createElement('meta');
+      metaTemplate.setAttribute('name', 'template');
+      document.head.appendChild(metaTemplate);
+    }
+    metaTemplate.setAttribute('content', templateId);
+  }
   // AI modal handlers
   if (elements.aiButton && elements.aiModal && elements.aiModalClose) {
     elements.aiButton.addEventListener('click', () => {
@@ -206,6 +217,56 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// Template selection handler
+document.addEventListener('click', (e) => {
+  // Handle template selection via radio buttons
+  if (e.target.matches('input[name="template"]')) {
+    const templateId = e.target.value;
+    const templateName = e.target.closest('.template-option').querySelector('.template-name')?.textContent?.toLowerCase();
+    
+    if (templateId && templateConfigs[templateId]) {
+      // Update meta tag for the current session
+      let metaTemplate = document.querySelector('meta[name="template"]');
+      if (!metaTemplate) {
+        metaTemplate = document.createElement('meta');
+        metaTemplate.setAttribute('name', 'template');
+        document.head.appendChild(metaTemplate);
+      }
+      metaTemplate.setAttribute('content', templateId);
+      
+      // Show notification
+      showNotification(`Template changed to ${templateName || templateId}`, 'info');
+    }
+  }
+  
+  // Handle template label clicks (to trigger radio button)
+  if (e.target.closest('.template-label')) {
+    const label = e.target.closest('.template-label');
+    const templateId = label.dataset.templateId;
+    const radio = document.querySelector(`#template-${templateId}`);
+    
+    if (radio && !radio.checked) {
+      radio.checked = true;
+      radio.dispatchEvent(new Event('click'));
+    }
+  }
+  
+  // Handle select button clicks
+  if (e.target.classList.contains('select-btn')) {
+    e.preventDefault();
+    const templateOption = e.target.closest('.template-option');
+    const radio = templateOption.querySelector('input[name="template"]');
+    
+    if (radio) {
+      radio.checked = true;
+      // Trigger the form submission
+      const form = document.getElementById('template-form');
+      if (form) {
+        form.submit();
+      }
+    }
+  }
+});
 // Iframe-specific event setup
 function setupIframeListeners(iframeDoc) {
   iframeDoc.querySelectorAll('.section-tag').forEach(addTagEventListeners);
@@ -494,10 +555,69 @@ function showNotification(message, type) {
     });
 }
 
+function getCurrentTemplate() {
+  // First try to get from meta tag
+  const metaTemplate = document.querySelector('meta[name="template"]');
+  let templateName = metaTemplate ? metaTemplate.getAttribute('content') : null;
+  
+  // If not found, try to get from selected radio button
+  if (!templateName) {
+    const selectedRadio = document.querySelector('input[name="template"]:checked');
+    templateName = selectedRadio ? selectedRadio.value : 'classic';
+  }
+  
+  return templateConfigs[templateName] || templateConfigs.classic;
+}
 
+// Template configurations for different resume styles
+const templateConfigs = {
+  classic: {
+    name: 'classic',
+    itemStructure: {
+      experience: [
+        { key: 'job_title', icon: 'fas fa-chevron-right', placeholder: 'e.g., Senior Software Engineer' },
+        { key: 'company', icon: 'fas fa-building', placeholder: 'e.g., Tech Solutions Inc.' },
+        { key: 'duration', icon: 'fas fa-calendar-alt', placeholder: 'e.g., Jan 2023 - Present' },
+        { 
+          key: 'description', 
+          type: 'list', 
+          icon: 'fas fa-list',
+          placeholder: 'Key responsibilities and achievements',
+          defaultItems: [
+            'Led cross-functional teams to deliver high-impact projects',
+            'Implemented innovative solutions that improved efficiency',
+            'Collaborated with stakeholders to define requirements'
+          ]
+        }
+      ],
+      education: [
+        { key: 'degree', icon: 'fas fa-graduation-cap', placeholder: 'e.g., Bachelor of Computer Science' },
+        { key: 'school', icon: 'fas fa-university', placeholder: 'e.g., University of Technology' },
+        { key: 'date', icon: 'fas fa-calendar-alt', placeholder: 'e.g., 2020 - 2024' },
+        { key: 'description', placeholder: 'GPA, honors, relevant coursework' }
+      ]
+    }
+  }
+  // ... other templates
+};
 
+// Map section types to their display names
+const sectionTypeMap = {
+  experience: 'Experience',
+  education: 'Education', 
+  certification: 'Certification',
+  project: 'Project',
+  volunteer: 'Volunteer',
+  award: 'Award',
+  publication: 'Publication',
+  language: 'Language'
+};
 // Enhanced Add New Item Function with Animations and Professional UX
 function addNewItem(button, type) {
+  if (button.dataset.adding === 'true') {
+    return; // Prevent duplicate calls
+  }
+  button.dataset.adding = 'true';
   const section = button.parentElement;
   const newItem = document.createElement('div');
   newItem.className = 'section-item new-item-animation';
@@ -511,101 +631,23 @@ function addNewItem(button, type) {
   button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
   button.disabled = true;
   
-  // Enhanced item templates with professional structure
-  const templates = {
-    experience: {
-      icon: 'fas fa-briefcase',
-      fields: [
-        { key: 'job_title', label: 'Job Title', icon: 'fas fa-chevron-right', placeholder: 'e.g., Senior Software Engineer' },
-        { key: 'company', label: 'Company Name', icon: 'fas fa-building', placeholder: 'e.g., Tech Solutions Inc.' },
-        { key: 'duration', label: 'Duration', icon: 'fas fa-calendar-alt', placeholder: 'e.g., Jan 2023 - Present' },
-        { key: 'description', label: 'Description', type: 'list', placeholder: 'Key responsibilities and achievements', 
-          defaultItems: [
-            'Led cross-functional teams to deliver high-impact projects',
-            'Implemented innovative solutions that improved efficiency by X%',
-            'Collaborated with stakeholders to define requirements and deliverables',
-            'Mentored junior team members and facilitated knowledge sharing'
-          ]
-        }
-      ]
-    },
-    education: {
-      icon: 'fas fa-graduation-cap',
-      fields: [
-        { key: 'degree', label: 'Degree', icon: 'fas fa-graduation-cap', placeholder: 'e.g., Bachelor of Science in Computer Science' },
-        { key: 'school', label: 'Institution', icon: 'fas fa-university', placeholder: 'e.g., University of Technology' },
-        { key: 'date', label: 'Year', icon: 'fas fa-calendar-alt', placeholder: 'e.g., 2020 - 2024' },
-        { key: 'description', label: 'Details', placeholder: 'GPA, honors, relevant coursework, activities' }
-      ]
-    },
-    certification: {
-      icon: 'fas fa-award',
-      fields: [
-        { key: 'degree', label: 'Certification', icon: 'fas fa-award', placeholder: 'e.g., AWS Certified Solutions Architect' },
-        { key: 'school', label: 'Issuer', icon: 'fas fa-building', placeholder: 'e.g., Amazon Web Services' },
-        { key: 'date', label: 'Date Obtained', icon: 'fas fa-calendar-alt', placeholder: 'e.g., March 2024' },
-        { key: 'description', label: 'Details', placeholder: 'Credential ID, validation URL, or additional notes' }
-      ]
-    },
-    project: {
-      icon: 'fas fa-folder-open',
-      fields: [
-        { key: 'degree', label: 'Project Name', icon: 'fas fa-folder-open', placeholder: 'e.g., E-commerce Platform Redesign' },
-        { key: 'school', label: 'Link/URL', icon: 'fas fa-link', placeholder: 'e.g., github.com/username/project (optional)' },
-        { key: 'date', label: 'Completion Date', icon: 'fas fa-calendar-alt', placeholder: 'e.g., June 2024' },
-        { key: 'description', label: 'Description', type: 'list', placeholder: 'Project details and technologies used',
-          defaultItems: [
-            'Developed full-stack application using modern technologies',
-            'Implemented responsive design and optimized user experience',
-            'Integrated third-party APIs and payment processing',
-            'Achieved measurable improvements in performance metrics'
-          ]
-        }
-      ]
-    },
-    volunteer: {
-      icon: 'fas fa-hands-helping',
-      fields: [
-        { key: 'degree', label: 'Role', icon: 'fas fa-hands-helping', placeholder: 'e.g., Community Outreach Coordinator' },
-        { key: 'school', label: 'Organization', icon: 'fas fa-building', placeholder: 'e.g., Local Food Bank' },
-        { key: 'date', label: 'Duration', icon: 'fas fa-calendar-alt', placeholder: 'e.g., 2023 - Present' },
-        { key: 'description', label: 'Impact', type: 'list', placeholder: 'Your contributions and achievements',
-          defaultItems: [
-            'Organized community events serving 200+ families monthly',
-            'Recruited and trained 15+ volunteers for various programs',
-            'Developed partnerships with local businesses and organizations'
-          ]
-        }
-      ]
-    },
-    award: {
-      icon: 'fas fa-trophy',
-      fields: [
-        { key: 'degree', label: 'Award Name', icon: 'fas fa-trophy', placeholder: 'e.g., Employee of the Year' },
-        { key: 'school', label: 'Awarding Body', icon: 'fas fa-building', placeholder: 'e.g., Tech Solutions Inc.' },
-        { key: 'date', label: 'Date Received', icon: 'fas fa-calendar-alt', placeholder: 'e.g., December 2023' },
-        { key: 'description', label: 'Significance', placeholder: 'Recognition criteria and your achievements' }
-      ]
-    },
-    publication: {
-      icon: 'fas fa-book',
-      fields: [
-        { key: 'degree', label: 'Title', icon: 'fas fa-book', placeholder: 'e.g., Machine Learning in Healthcare' },
-        { key: 'school', label: 'Publisher/Journal', icon: 'fas fa-newspaper', placeholder: 'e.g., IEEE Transactions' },
-        { key: 'date', label: 'Publication Date', icon: 'fas fa-calendar-alt', placeholder: 'e.g., August 2024' },
-        { key: 'description', label: 'Abstract/Summary', placeholder: 'Brief description of your contribution and findings' }
-      ]
-    },
-    language: {
-      icon: 'fas fa-language',
-      fields: [
-        { key: 'degree', label: 'Language', icon: 'fas fa-language', placeholder: 'e.g., Spanish' },
-        { key: 'school', label: 'Proficiency', icon: 'fas fa-star', placeholder: 'e.g., Native, Fluent, Conversational, Basic' }
-      ]
-    }
-  };
+// Get current template configuration
+const currentTemplate = getCurrentTemplate();
+const templateStructure = currentTemplate.itemStructure[type];
 
-  const template = templates[type] || templates.experience;
+if (!templateStructure) {
+  console.warn(`No template structure found for type: ${type}`);
+  return;
+}
+
+// Build template from current configuration
+const template = {
+  icon: templateStructure[0]?.icon || 'fas fa-star',
+  fields: templateStructure.map(field => ({
+    ...field,
+    label: field.key.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+  }))
+};
   
   // Build enhanced HTML with professional styling
   let itemHTML = `
@@ -623,37 +665,32 @@ function addNewItem(button, type) {
   template.fields.forEach(field => {
     if (field.type === 'list') {
       itemHTML += `
-        <div class="section-${field.key.replace('_', '-')} enhanced-field" contenteditable="true" data-key="${field.key}" data-field-type="list">
-          <div class="field-header">
-            <i class="${field.icon}"></i>
-            <span class="field-label">${field.label}</span>
-          </div>
-          <ul class="section-duties enhanced-duties">
-            ${field.defaultItems.map(item => `<li class="duty-item">${item}</li>`).join('')}
+        <div class="section-${field.key.replace('_', '-')}" contenteditable="false" data-key="${field.key}">
+          ${field.icon ? `<i class="${field.icon}"></i>` : ''}
+          <ul class="section-duties">
+            ${(field.defaultItems || ['Click to add your achievement']).map(item => 
+              `<li class="duty-item" contenteditable="true">${item}</li>`
+            ).join('')}
           </ul>
-          <div class="field-actions">
-            <button class="add-duty-btn" type="button">
-              <i class="fas fa-plus"></i> Add bullet point
-            </button>
-          </div>
+          <button class="add-duty-btn" type="button">
+            <i class="fas fa-plus"></i> Add bullet point
+          </button>
         </div>
       `;
     } else {
       itemHTML += `
-        <div class="section-${field.key.replace('_', '-')} enhanced-field" contenteditable="true" data-key="${field.key}" data-placeholder="${field.placeholder}">
-          <div class="field-header">
-            <i class="${field.icon}"></i>
-            <span class="field-label">${field.label}</span>
-          </div>
-          <div class="field-content" data-placeholder="${field.placeholder}">
-            <span class="placeholder-text">${field.placeholder}</span>
-          </div>
+        <div class="section-${field.key.replace('_', '-')}" contenteditable="true" data-key="${field.key}">
+          ${field.icon ? `<i class="${field.icon}"></i>` : ''}
+          ${field.placeholder}
         </div>
       `;
     }
   });
 
   itemHTML += '</div>';
+  // Add template-specific classes
+  newItem.classList.add(`${currentTemplate.name.toLowerCase()}-template-item`);
+  newItem.dataset.templateType = currentTemplate.name.toLowerCase();
   newItem.innerHTML = itemHTML;
   
   // Add professional styling and animations
@@ -681,7 +718,34 @@ function addNewItem(button, type) {
         transition: all 0.2s ease;
         position: relative;
       }
-      
+      .classic-template-item .section-job-title i,
+.classic-template-item .section-degree i {
+  color: #333;
+  margin-right: 8px;
+}
+
+.classic-template-item .section-company i,
+.classic-template-item .section-school i {
+  color: #666;
+  margin-right: 8px;
+}
+
+.classic-template-item .section-duration i,
+.classic-template-item .section-date i {
+  color: #888;
+  margin-right: 8px;
+}
+
+.classic-template-item .section-duties {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.classic-template-item .section-duties li {
+  list-style-type: disc;
+  margin: 4px 0;
+  line-height: 1.4;
+}
       .enhanced-field:hover {
         background: rgba(79, 70, 229, 0.05);
       }
@@ -833,6 +897,10 @@ function addNewItem(button, type) {
           transform: translateX(0) scale(1);
         }
       }
+        @keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
     `;
     document.head.appendChild(enhancementStyles);
   }
@@ -876,7 +944,9 @@ function addNewItem(button, type) {
   
   // Show success notification
   showNotification(`✨ New ${type} added successfully!`, 'success');
-  
+  setTimeout(() => {
+    button.dataset.adding = 'false';
+  }, 1000);
   return newItem;
 }
 
