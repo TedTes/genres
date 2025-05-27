@@ -2,120 +2,336 @@
 
 {% block title %} {{ resume.contact.name|default('Resume') }} {% endblock %}
 
-
 {% block content %}
 
 {% block extra_css %}
 <style>
   {{css_content | safe }}
+  
+  /* Empty state styles */
+  .section-container.empty {
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    margin: 20px 0;
+    background: #f9f9f9;
+    transition: all 0.3s ease;
+  }
+  
+  .section-container.empty:hover {
+    border-color: #007bff;
+    background: #f0f8ff;
+  }
+  
+  .add-section-btn {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
+  }
+  
+  .add-section-btn:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+  }
+  
+  .add-section-btn i {
+    margin-right: 8px;
+  }
+  
+  /* Hide empty state styles when container has content */
+  .section-container:not(.empty) {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Enhanced section item styles */
+  .section-item {
+    position: relative;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .section-item:hover {
+    background: rgba(0, 123, 255, 0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Enhanced add item buttons */
+  .add-item-btn {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+  }
+  
+  .add-item-btn:hover {
+    background: linear-gradient(135deg, #20c997, #17a2b8);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+  }
+  
+  .add-item-btn i {
+    margin-right: 6px;
+  }
 </style>
 {% endblock %}
-    <!-- Header -->
-    <div class="resume-header content-editable resume-content" data-resume-id="{{resume_id}}">
-      <h1 class="name" contenteditable="true">{{ resume.bio.name|default('John Doe') }}</h1>
-      <h2 class="title" contenteditable="true">{{ resume.bio.title|default('Professional Title') }}</h2>
+
+<body data-template="classic">
+    <!-- Header - Always Present -->
+    <div class="resume-header content-editable resume-content" data-resume-id="{{resume_id}}" data-section="header">
+      <h1 class="name" data-field="name" contenteditable="true">{{ resume.bio.name|default('Jane Doe') }}</h1>
+      <h2 class="title" data-field="title" contenteditable="true">{{ resume.bio.title|default('Product Manager') }}</h2>
       
       {% if resume.contact %}
       <div class="contact-grid">
         {% if resume.contact.email %}
         <div class="contact-item content-editable">
           <i class="contact-icon fas fa-envelope"></i>
-          <span class="contact-content" contenteditable="true">{{ resume.contact.email }}</span>
+          <span class="contact-content" data-field="email" contenteditable="true">{{ resume.contact.email }}</span>
         </div>
         {% endif %}
         
         {% if resume.contact.phone %}
         <div class="contact-item content-editable">
           <i class="contact-icon fas fa-phone"></i>
-          <span class="contact-content" contenteditable="true">{{ resume.contact.phone }}</span>
+          <span class="contact-content" data-field="phone" contenteditable="true">{{ resume.contact.phone }}</span>
         </div>
         {% endif %}
         
         {% if resume.contact.location %}
         <div class="contact-item content-editable">
           <i class="contact-icon fas fa-map-marker-alt"></i>
-          <span class="contact-content" contenteditable="true">{{ resume.contact.location }}</span>
+          <span class="contact-content" data-field="location" contenteditable="true">{{ resume.contact.location }}</span>
         </div>
         {% endif %}
         
         {% if resume.contact.linkedin %}
         <div class="contact-item content-editable">
           <i class="contact-icon fab fa-linkedin"></i>
-          <span class="contact-content" contenteditable="true">{{ resume.contact.linkedin }}</span>
+          <span class="contact-content" data-field="linkedin" contenteditable="true">{{ resume.contact.linkedin }}</span>
         </div>
         {% endif %}
         
         {% if resume.contact.website %}
         <div class="contact-item content-editable">
           <i class="contact-icon fas fa-globe"></i>
-          <span class="contact-content" contenteditable="true">{{ resume.contact.website }}</span>
+          <span class="contact-content" data-field="website" contenteditable="true">{{ resume.contact.website }}</span>
         </div>
         {% endif %}
       </div>
       {% endif %}
     </div>
 
-    <!-- Custom Sections -->
-    {% for section in resume.sections %}
-    <section class="resume-section {{ section.type }}-section" data-section-type="{{ section.type }}">
-      <h2 class="section-title" contenteditable="true">
-        {% set map = {'summary':'user','experience':'briefcase', 'education':'graduation-cap','skills':'cogs','star':'star'} %}
-        {% if section.type in map  %}
-          <i class="fas fa-{{ map[section.type]}}"></i>
-        {% else %}
-          <i class="fas fa-{{ map['star']}}"></i>
-        {% endif %}
-        {{ section.title }}
-      </h2>
+    <!-- Dynamic Sections with Empty States -->
+    {% set section_types = ['summary', 'experience', 'education', 'skills', 'certification', 'project'] %}
+    {% set section_icons = {
+      'summary': 'user',
+      'experience': 'briefcase', 
+      'education': 'graduation-cap',
+      'skills': 'cogs',
+      'certification': 'certificate',
+      'project': 'code',
+      'volunteer': 'hands-helping',
+      'award': 'trophy',
+      'publication': 'book',
+      'language': 'language'
+    } %}
+    
+    {% for section_type in section_types %}
+      {% set section = resume.sections | selectattr('type', 'equalto', section_type) | first %}
       
-      {% if section.display == 'text' %}
-        <div class="section-content" contenteditable="true">
-          {{ section.content | safe }}
-        </div>
-      
-      {% elif section.display == 'tags' %}
-        <div class="section-container">
-          {% for item in section["items"] %}
-            <span class="section-tag">
-              <i class="fas fa-check"></i>
-              {{ item }}
-              <i class="fas fa-times tag-delete"></i>
-            </span>
-          {% endfor %}
-          <button class="add-tag-btn" id="add-{{section.type}}-btn">
-            <i class="fas fa-plus"></i> Add {{section.type}}
+      {% if section and (section.items or section.content) %}
+        <section class="resume-section {{ section.type }}-section" data-section-type="{{ section.type }}">
+          <h2 class="section-title" contenteditable="true">
+            <i class="fas fa-{{ section_icons.get(section.type, 'star') }}"></i>
+            {{ section.title }}
+          </h2>
+          
+          {% if section.display == 'text' %}
+            <div class="section-content" data-field="content" contenteditable="true">
+              {{ section.content | safe }}
+            </div>
+          
+          {% elif section.display == 'tags' %}
+            <div class="section-container" data-section-type="{{ section.type }}">
+              {% for item in section["items"] %}
+                <span class="section-tag">
+                  <i class="fas fa-check"></i>
+                  {{ item }}
+                  <i class="fas fa-times tag-delete"></i>
+                </span>
+              {% endfor %}
+              <button class="add-tag-btn" data-section="{{ section.type }}" data-type="{{ section.type }}">
+                <i class="fas fa-plus"></i> Add {{ section.type | title }}
+              </button>
+            </div>
+          
+          {% else %}
+            <!-- List Items -->
+            {% for item in section["items"] %}
+              <div class="section-item" data-item-id="{{ item.id }}" data-section="{{ section.type }}">
+                <div class="item-actions">
+                  <button class="item-btn delete" title="Delete {{ section.type }}">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+                
+                {% if section.type == 'experience' %}
+                  <div class="section-job-title" contenteditable="true" data-field="job_title">{{ item.job_title|default('Job Title') }}</div>
+                  <div class="section-company" contenteditable="true" data-field="company">{{ item.company|default('Company Name') }}</div>
+                  <div class="section-duration" contenteditable="true" data-field="duration">{{ item.duration|default('Date Range') }}</div>
+                  {% if item.description %}
+                  <div class="section-description" contenteditable="true" data-field="description">
+                    {% if item.description.split('\n')|length > 1 %}
+                      <ul class="duties-list">
+                        {% for duty in item.description.split('\n') %}
+                          {% if duty.strip() %}
+                            <li>{{ duty.strip() }}</li>
+                          {% endif %}
+                        {% endfor %}
+                      </ul>
+                    {% else %}
+                      {{ item.description }}
+                    {% endif %}
+                  </div>
+                  {% endif %}
+                  
+                {% elif section.type == 'education' %}
+                  <div class="section-degree" contenteditable="true" data-field="degree">{{ item.degree|default('Degree') }}</div>
+                  <div class="section-school" contenteditable="true" data-field="school">{{ item.school|default('School Name') }}</div>
+                  <div class="section-date" contenteditable="true" data-field="date">{{ item.date|default('Year') }}</div>
+                  
+                {% else %}
+                  <!-- Generic item rendering for other section types -->
+                  {% for key, value in item.items() %}
+                    {% if key != "id" %}
+                      <div class="section-{{ key | replace('_', '-') }}" 
+                           contenteditable="true" 
+                           data-field="{{ key }}"
+                           data-key="{{ key }}">
+                        {% if key == 'name' or key == 'job_title' or key == 'degree' %}
+                          <i class="fas fa-chevron-right"></i>
+                        {% elif key == 'company' or key == 'school' or key == 'issuer' %}
+                          <i class="fas fa-building"></i>
+                        {% elif key == 'date' or key == 'duration' %}
+                          <i class="fas fa-calendar-alt"></i>
+                        {% elif key == 'description' %}
+                          <i class="fas fa-list"></i>
+                        {% endif %}
+                        {{ value }}
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              </div>
+            {% endfor %}
+            
+            <!-- Add Item Button -->
+            {% if section.type not in ['skills'] %}
+            <button class="add-item-btn" data-section="{{ section.type }}" data-type="{{ section.type }}">
+              <i class="fas fa-plus"></i> Add {{ section.type | title }}
+            </button>
+            {% endif %}
+          {% endif %}
+        </section>
+        
+      {% else %}
+        <!-- Empty State Container -->
+        <div id="{{ section_type }}-container" class="section-container empty" data-section-type="{{ section_type }}">
+          <button class="add-section-btn" data-section="{{ section_type }}">
+            <i class="fas fa-{{ section_icons.get(section_type, 'star') }}"></i>
+            Add {{ section_type | title }}
           </button>
         </div>
-      
-      {% else %}
-        {% for item in section["items"] %}
-          <div class="section-item" data-item-id="{{ item.id }}">
-            <div class="item-actions">
-              <button class="item-btn delete" title="Delete"><i class="fas fa-trash"></i></button>
-            </div>
-            
-            {% for key, value in item.items() %}
-              {% if  key != "id" %}
-                  <div class="section-{{ key | replace('_', '-') }}" contenteditable="true" data-key="{{ key }}">
-                    {% if key == 'name' or key == 'job_title' or key == 'degree' %}
-                      <i class="fas fa-chevron-right"></i>
-                    {% elif key == 'company' or key == 'school' or key == 'issuer' %}
-                      <i class="fas fa-building"></i>
-                    {% elif key == 'date' or key == 'duration' %}
-                      <i class="fas fa-calendar-alt"></i>
-                    {% endif %}
-                    {{ value }}
-                  </div>
-               {%endif%}
-            {% endfor %}
-          </div>
-        {% endfor %}
-        {% if section.type != "Skills" and section.type != "Summary" %}
-        <button class="add-item-btn" id="add-{{section.type}}-btn">
-          <i class="fas fa-plus"></i> Add {{section.type}}
-        </button>
-        {% endif %}
       {% endif %}
-    </section>
     {% endfor %}
+
+    <!-- Handle Custom Sections (not in predefined types) -->
+    {% for section in resume.sections %}
+      {% if section.type not in section_types %}
+        <section class="resume-section {{ section.type }}-section" data-section-type="{{ section.type }}">
+          <h2 class="section-title" contenteditable="true">
+            <i class="fas fa-{{ section_icons.get(section.type, 'star') }}"></i>
+            {{ section.title }}
+          </h2>
+          
+          {% if section.display == 'text' %}
+            <div class="section-content" data-field="content" contenteditable="true">
+              {{ section.content | safe }}
+            </div>
+          
+          {% elif section.display == 'tags' %}
+            <div class="section-container" data-section-type="{{ section.type }}">
+              {% for item in section["items"] %}
+                <span class="section-tag">
+                  <i class="fas fa-check"></i>
+                  {{ item }}
+                  <i class="fas fa-times tag-delete"></i>
+                </span>
+              {% endfor %}
+              <button class="add-tag-btn" data-section="{{ section.type }}" data-type="{{ section.type }}">
+                <i class="fas fa-plus"></i> Add {{ section.type | title }}
+              </button>
+            </div>
+          
+          {% else %}
+            {% for item in section["items"] %}
+              <div class="section-item" data-item-id="{{ item.id }}" data-section="{{ section.type }}">
+                <div class="item-actions">
+                  <button class="item-btn delete" title="Delete {{ section.type }}">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+                
+                {% for key, value in item.items() %}
+                  {% if key != "id" %}
+                    <div class="section-{{ key | replace('_', '-') }}" 
+                         contenteditable="true" 
+                         data-field="{{ key }}"
+                         data-key="{{ key }}">
+                      {% if key == 'name' or key == 'job_title' or key == 'degree' %}
+                        <i class="fas fa-chevron-right"></i>
+                      {% elif key == 'company' or key == 'school' or key == 'issuer' %}
+                        <i class="fas fa-building"></i>
+                      {% elif key == 'date' or key == 'duration' %}
+                        <i class="fas fa-calendar-alt"></i>
+                      {% elif key == 'description' %}
+                        <i class="fas fa-list"></i>
+                      {% endif %}
+                      {{ value }}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% endfor %}
+            
+            <button class="add-item-btn" data-section="{{ section.type }}" data-type="{{ section.type }}">
+              <i class="fas fa-plus"></i> Add {{ section.type | title }}
+            </button>
+          {% endif %}
+        </section>
+      {% endif %}
+    {% endfor %}
+    
+</body>
 {% endblock %}

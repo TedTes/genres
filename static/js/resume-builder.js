@@ -1,4 +1,3 @@
-// Enhanced Global state and utilities
 const state = {
   autoSaveTimeout: null,
   hasUnsavedChanges: false,
@@ -20,6 +19,92 @@ const selectors = {
   addButtons: '.add-item-btn, .add-tag-btn',
   sectionTags: '.section-tag',
   sectionItems: '.section-item',
+};
+
+const templateConfigs = {
+  classic: {
+    experience: `
+      <div class="section-item" data-section="experience">
+        <div class="item-actions">
+          <button class="item-btn delete" title="Delete experience">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+        <div class="section-job-title" contenteditable="true" data-field="job_title">Job Title</div>
+        <div class="section-company" contenteditable="true" data-field="company">Company Name</div>
+        <div class="section-duration" contenteditable="true" data-field="duration">Mar 2021 — Present</div>
+        <div class="section-description" contenteditable="true" data-field="description">
+          <ul class="duties-list">
+            <li>Led product development for SaaS platform with 50,000+ users</li>
+            <li>Oversaw 30% growth in annual recurring revenue</li>
+            <li>Click to add more responsibilities</li>
+          </ul>
+        </div>
+      </div>
+    `,
+    education: `
+      <div class="section-item" data-section="education">
+        <div class="item-actions">
+          <button class="item-btn delete" title="Delete education">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+        <div class="section-degree" contenteditable="true" data-field="degree">Master of Science in Computer Science</div>
+        <div class="section-school" contenteditable="true" data-field="school">University Name</div>
+        <div class="section-date" contenteditable="true" data-field="date">2018 — 2020</div>
+      </div>
+    `,
+    certification: `
+      <div class="section-item" data-section="certification">
+        <div class="item-actions">
+          <button class="item-btn delete" title="Delete certification">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+        <div class="section-name" contenteditable="true" data-field="name">Certification Name</div>
+        <div class="section-issuer" contenteditable="true" data-field="issuer">Issuing Organization</div>
+        <div class="section-date" contenteditable="true" data-field="date">2023</div>
+      </div>
+    `,
+    project: `
+      <div class="section-item" data-section="project">
+        <div class="item-actions">
+          <button class="item-btn delete" title="Delete project">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+        <div class="section-name" contenteditable="true" data-field="name">Project Name</div>
+        <div class="section-date" contenteditable="true" data-field="date">2023</div>
+        <div class="section-description" contenteditable="true" data-field="description">
+          Project description and key achievements
+        </div>
+      </div>
+    `
+  },
+  
+  cards: {
+    experience: `
+      <div class="card exp-card section-item" data-section="experience">
+        <div class="card-header">
+          <div class="section-job-title" contenteditable="true" data-field="job_title">Job Title</div>
+          <div class="section-duration" contenteditable="true" data-field="duration">2020 - 2023</div>
+        </div>
+        <div class="section-company" contenteditable="true" data-field="company">Company Name</div>
+        <div class="section-description" contenteditable="true" data-field="description">
+          <ul class="duties-list">
+            <li>Click to add responsibility</li>
+          </ul>
+        </div>
+      </div>
+    `,
+    education: `
+      <div class="card edu-card section-item" data-section="education">
+        <div class="section-degree" contenteditable="true" data-field="degree">Degree</div>
+        <div class="section-school" contenteditable="true" data-field="school">School Name</div>
+        <div class="section-date" contenteditable="true" data-field="year">2020</div>
+      </div>
+    `
+  }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -134,6 +219,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  document.addEventListener('click', (e) => {
+    // Handle empty state "Add Section" buttons
+    if (e.target.closest('.add-section-btn')) {
+      const button = e.target.closest('.add-section-btn');
+      const sectionType = button.dataset.section;
+      console.log('Adding section:', sectionType);
+      addNewSection(button, sectionType);
+    }
+    
+    // Handle "Add Item" buttons with data-section attribute
+    if (e.target.closest('.add-item-btn[data-section]')) {
+      const button = e.target.closest('.add-item-btn');
+      const sectionType = button.dataset.section;
+      console.log('Adding item:', sectionType);
+      addNewItem(button, sectionType);
+    }
+  });
+
   // Existing tag and item event listeners
   document.querySelectorAll(selectors.sectionTags).forEach(addTagEventListeners);
   document.querySelectorAll(selectors.sectionItems).forEach(addItemEventListeners);
@@ -194,7 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', handleKeyboardShortcuts);
 });
 
-// Enhanced template selection handler with loading feedback
 document.addEventListener('click', (e) => {
   // Handle template selection via radio buttons with loading
   if (e.target.matches('input[name="template"]')) {
@@ -230,8 +332,6 @@ document.addEventListener('click', (e) => {
     handleAIFeature(action);
   }
 });
-
-// Enhanced Professional Functions
 
 function initializeEnhancements() {
   // Add professional styles if not exists
@@ -526,7 +626,33 @@ function toggleTemplatePanelWithAnimation() {
   const templatesPanel = document.querySelector('#templates-panel');
   templatesPanel.classList.toggle('active');
 }
+function addNewSection(button, sectionType) {
+  console.log('Adding new section:', sectionType);
 
+  addNewItem(button, sectionType);
+}
+function deleteItem(item) {
+  showEnhancedConfirmModal({
+    title: 'Delete Item',
+    message: 'Are you sure you want to delete this item?',
+    details: 'This action cannot be undone.',
+    confirmText: 'Delete',
+    confirmStyle: 'danger',
+    icon: 'fas fa-exclamation-triangle'
+  }).then(confirmed => {
+    if (confirmed) {
+      item.style.transition = 'all 0.3s ease';
+      item.style.opacity = '0';
+      item.style.transform = 'scale(0.8)';
+      setTimeout(() => {
+        item.remove();
+        state.hasUnsavedChanges = true;
+        enhancedAutoSave();
+        showEnhancedNotification('Item deleted successfully', 'success');
+      }, 300);
+    }
+  });
+}
 function showIframeLoading(message = 'Loading...', subtext = 'Please wait while we process your request') {
   const loadingOverlay = document.querySelector('.iframe-loading-overlay');
   if (loadingOverlay) {
@@ -648,7 +774,6 @@ async function handlePDFPreview() {
 
   showEnhancedNotification('📄 Preparing PDF preview...', 'info');
 
-  // Create enhanced modal
   const modal = document.createElement('div');
   modal.className = 'enhanced-pdf-modal';
   modal.style.cssText = `
@@ -743,7 +868,6 @@ async function handlePDFPreview() {
 }
 
 function showEnhancedNotification(message, type = 'info') {
-  // Remove existing notifications
   const existing = document.querySelectorAll('.enhanced-notification');
   existing.forEach(n => {
     n.style.opacity = '0';
@@ -831,21 +955,34 @@ function showEnhancedNotification(message, type = 'info') {
   });
 }
 
-// Keep all existing functions but enhance them
 function setupIframeListeners(iframeDoc) {
   iframeDoc.querySelectorAll('.section-tag').forEach(addTagEventListeners);
+  iframeDoc.querySelectorAll('.section-item').forEach(addItemEventListeners);
+  
+  iframeDoc.addEventListener('click', (e) => {
+    if (e.target.closest('.add-section-btn')) {
+      const button = e.target.closest('.add-section-btn');
+      const sectionType = button.dataset.section;
+      window.parent.addNewSection(button, sectionType);
+    }
+    
+    if (e.target.closest('.add-item-btn[data-section]')) {
+      const button = e.target.closest('.add-item-btn');
+      const sectionType = button.dataset.section;
+      window.parent.addNewItem(button, sectionType);
+    }
+  });
+  
   iframeDoc.addEventListener('input', () => {
     state.hasUnsavedChanges = true;
     clearTimeout(state.autoSaveTimeout);
     state.autoSaveTimeout = setTimeout(enhancedAutoSave, 3000);
   });
 }
-
 function showSaveStatus(message, isError = false) {
   showEnhancedNotification(message, isError ? 'error' : 'success');
 }
 
-// Keep all your existing functions with enhancements
 async function saveResume() {
   if (!state.hasUnsavedChanges) return;
   const saveButton = window.parent.document.querySelector('#save-resume-btn');
@@ -1113,7 +1250,7 @@ function addItemEventListeners(item) {
   }
 }
 
-// Enhanced confirmation modal
+
 async function showEnhancedConfirmModal({ title, message, details, confirmText = 'Confirm', confirmStyle = 'primary', icon = 'fas fa-question-circle' }) {
   return new Promise((resolve) => {
     const modal = document.createElement('div');
@@ -1278,7 +1415,7 @@ function showNotification(message, type) {
   showEnhancedNotification(message, type);
 }
 
-function getCurrentTemplate() {
+function getCurrentTemplateName() {
   // First try to get from meta tag
   const metaTemplate = document.querySelector('meta[name="template"]');
   let templateName = metaTemplate ? metaTemplate.getAttribute('content') : null;
@@ -1289,40 +1426,8 @@ function getCurrentTemplate() {
     templateName = selectedRadio ? selectedRadio.value : 'classic';
   }
   
-  return templateConfigs[templateName] || templateConfigs.classic;
+  return templateName;
 }
-
-// Template configurations for different resume styles
-const templateConfigs = {
-  classic: {
-    name: 'classic',
-    itemStructure: {
-      experience: [
-        { key: 'job_title', icon: 'fas fa-chevron-right', placeholder: 'e.g., Senior Software Engineer' },
-        { key: 'company', icon: 'fas fa-building', placeholder: 'e.g., Tech Solutions Inc.' },
-        { key: 'duration', icon: 'fas fa-calendar-alt', placeholder: 'e.g., Jan 2023 - Present' },
-        { 
-          key: 'description', 
-          type: 'list', 
-          icon: 'fas fa-list',
-          placeholder: 'Key responsibilities and achievements',
-          defaultItems: [
-            'Led cross-functional teams to deliver high-impact projects',
-            'Implemented innovative solutions that improved efficiency',
-            'Collaborated with stakeholders to define requirements'
-          ]
-        }
-      ],
-      education: [
-        { key: 'degree', icon: 'fas fa-graduation-cap', placeholder: 'e.g., Bachelor of Computer Science' },
-        { key: 'school', icon: 'fas fa-university', placeholder: 'e.g., University of Technology' },
-        { key: 'date', icon: 'fas fa-calendar-alt', placeholder: 'e.g., 2020 - 2024' },
-        { key: 'description', placeholder: 'GPA, honors, relevant coursework' }
-      ]
-    }
-  }
-  // ... other templates can be added here
-};
 
 // Map section types to their display names
 const sectionTypeMap = {
@@ -1336,133 +1441,298 @@ const sectionTypeMap = {
   language: 'Language'
 };
 
-// Enhanced Add New Item Function with your existing template structure
+
+// Update the addNewItem function to use correct container finding:
 function addNewItem(button, type) {
   if (button.dataset.adding === 'true') {
-    return; // Prevent duplicate calls
+    return;
   }
   button.dataset.adding = 'true';
   
-  const section = button.parentElement;
-  const newItem = document.createElement('div');
-  newItem.className = 'section-item';
-  
-  const uniqueId = generateUniqueId();
-  newItem.dataset.itemId = uniqueId;
-  newItem.id = `item-${uniqueId}`;
-  
-  // Professional loading state for button
   const originalButtonContent = button.innerHTML;
   button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
   button.disabled = true;
   
-  // Get current template configuration
-  const currentTemplate = getCurrentTemplate();
-  const templateStructure = currentTemplate.itemStructure[type];
+  try {
+    const currentTemplateName = getCurrentTemplateName();
+    const templateConfig = templateConfigs[currentTemplateName];
 
-  if (!templateStructure) {
-    console.warn(`No template structure found for type: ${type}`);
-    // Restore button state
-    button.innerHTML = originalButtonContent;
-    button.disabled = false;
-    button.dataset.adding = 'false';
-    return;
-  }
-
-  // Build template from current configuration
-  const template = {
-    icon: templateStructure[0]?.icon || 'fas fa-star',
-    fields: templateStructure.map(field => ({
-      ...field,
-      label: field.key.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
-    }))
-  };
-  
-  // Build enhanced HTML with professional styling
-  let itemHTML = `
-    <div class="item-actions" style="opacity: 0; transition: opacity 0.3s ease;">
-      <button class="item-btn delete" title="Delete this ${type}" data-item-type="${type}">
-        <i class="fas fa-trash"></i>
-      </button>
-    </div>
-    <div class="item-content">
-  `;
-
-  template.fields.forEach(field => {
-    if (field.type === 'list') {
-      itemHTML += `
-        <div class="section-${field.key.replace('_', '-')}" contenteditable="false" data-key="${field.key}">
-          ${field.icon ? `<i class="${field.icon}"></i>` : ''}
-          <ul class="section-duties">
-            ${(field.defaultItems || ['Click to add your achievement']).map(item => 
-              `<li class="duty-item" contenteditable="true">${item}</li>`
-            ).join('')}
-          </ul>
-        </div>
-      `;
-    } else {
-      itemHTML += `
-        <div class="section-${field.key.replace('_', '-')}" contenteditable="true" data-key="${field.key}">
-          ${field.icon ? `<i class="${field.icon}"></i>` : ''}
-          ${field.placeholder}
-        </div>
-      `;
+    if (!templateConfig || !templateConfig[type]) {
+      throw new Error(`No template configuration found for ${currentTemplateName}.${type}`);
     }
-  });
-
-  itemHTML += '</div>';
-  newItem.innerHTML = itemHTML;
-  
-  // Add professional styling and animations
-  newItem.style.cssText = `
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.02), rgba(16, 185, 129, 0.02));
-    border: 2px solid rgba(79, 70, 229, 0.1);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
-  `;
-
-  // Insert with professional timing
-  section.insertBefore(newItem, button);
-
-  // Animate in with staggered effect
-  setTimeout(() => {
-    newItem.style.opacity = '1';
-    newItem.style.transform = 'translateY(0) scale(1)';
     
-    // Restore button
+    // Determine target document
+    const targetDoc = window !== window.parent ? document : getIframeDocument() || document;
+    
+    // Create new item
+    const newItem = createItemElement(type, templateConfig[type]);
+    
+    // Find or create section container
+    let container = findSectionContainer(targetDoc, type);
+    
+    if (!container) {
+      // Create new section if none exists
+      container = createNewSection(targetDoc, type);
+    }
+    
+    // Insert item
+    insertItemWithAnimation(container, newItem, button);
+    
+    // Setup editing
+    makeItemEditable(newItem);
+    
+    state.hasUnsavedChanges = true;
+    enhancedAutoSave();
+    
+    showEnhancedNotification(`✨ New ${type} added successfully!`, 'success');
+    
+  } catch (error) {
+    console.error('Error adding new item:', error);
+    showEnhancedNotification(`❌ Failed to add ${type}: ${error.message}`, 'error');
+  } finally {
     setTimeout(() => {
       button.innerHTML = originalButtonContent;
       button.disabled = false;
-    }, 200);
-    
-    // Show actions after main animation
-    setTimeout(() => {
-      const actions = newItem.querySelector('.item-actions');
-      if (actions) actions.style.opacity = '1';
-    }, 300);
-  }, 100);
+      button.dataset.adding = 'false';
+    }, 500);
+  }
+}
 
-  // Add enhanced event listeners
-  addItemEventListeners(newItem);
+
+function createItemElement(type, templateHTML) {
+  const uniqueId = generateUniqueId();
+  const wrapper = document.createElement('div');
   
-  // Mark as changed and auto-save
-  state.hasUnsavedChanges = true;
-  enhancedAutoSave();
+  // Use template-specific HTML structure
+  wrapper.innerHTML = templateHTML;
+  const newItem = wrapper.firstElementChild;
   
-  // Show success notification
-  showEnhancedNotification(`✨ New ${type} added successfully!`, 'success');
-  setTimeout(() => {
-    button.dataset.adding = 'false';
-  }, 1000);
+  // Add universal attributes for editing
+  newItem.dataset.itemId = uniqueId;
+  newItem.dataset.sectionType = type;
+  newItem.id = `item-${uniqueId}`;
+  
+  // Add delete button (template-agnostic)
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'item-delete-btn';
+  deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+  deleteBtn.style.cssText = `
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #EF4444;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  `;
+  
+  newItem.style.position = 'relative';
+  newItem.appendChild(deleteBtn);
+  
+  // Show delete button on hover
+  newItem.addEventListener('mouseenter', () => deleteBtn.style.opacity = '1');
+  newItem.addEventListener('mouseleave', () => deleteBtn.style.opacity = '0');
+  
   return newItem;
+}
+
+function findSectionContainer(doc, sectionType) {
+  // First try to find existing section
+  let container = doc.querySelector(`.${sectionType}-section`);
+  
+  if (container) {
+    return container;
+  }
+  
+  // If no section exists, try to find empty state container
+  container = doc.querySelector(`#${sectionType}-container`);
+  
+  if (container && container.classList.contains('empty')) {
+    // Convert empty state to actual section
+    const section = doc.createElement('section');
+    section.className = `resume-section ${sectionType}-section`;
+    section.setAttribute('data-section-type', sectionType);
+    
+    // Add section title
+    const title = doc.createElement('h2');
+    title.className = 'section-title';
+    title.contentEditable = true;
+    title.innerHTML = `<i class="fas fa-${getSectionIcon(sectionType)}"></i>${getSectionDisplayName(sectionType)}`;
+    section.appendChild(title);
+    
+    // Replace empty container with section
+    container.parentNode.replaceChild(section, container);
+    return section;
+  }
+  
+  return null;
+}
+
+function removeEmptyState(container) {
+  if (container.classList.contains('empty')) {
+    container.classList.remove('empty');
+    
+    // Remove empty state content (add buttons, placeholder text)
+    const emptyContent = container.querySelector('.add-section-btn, .empty-placeholder');
+    if (emptyContent) {
+      emptyContent.remove();
+    }
+  }
+}
+
+function insertItemWithAnimation(container, newItem, button) {
+  // Add entrance animation
+  newItem.style.cssText += `
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  `;
+  
+  // Insert before the add button, or at the end
+  if (button && container.contains(button)) {
+    container.insertBefore(newItem, button);
+  } else {
+    container.appendChild(newItem);
+  }
+  
+  // Trigger animation
+  setTimeout(() => {
+    newItem.style.opacity = '1';
+    newItem.style.transform = 'translateY(0) scale(1)';
+  }, 50);
+}
+
+function makeItemEditable(item) {
+ // Make all data-field elements editable
+ item.querySelectorAll('[data-field]').forEach(field => {
+  if (!field.hasAttribute('contenteditable')) {
+    field.contentEditable = true;
+  }
+  
+  // Special handling for description fields with lists
+  if (field.dataset.field === 'description') {
+    field.addEventListener('input', handleDescriptionInput);
+  }
+  
+  // Add placeholder behavior
+  if (field.textContent.trim() === '' || field.textContent.includes('Click to add')) {
+    field.classList.add('placeholder');
+  }
+});
+
+// Add delete functionality
+const deleteBtn = item.querySelector('.item-btn.delete');
+if (deleteBtn) {
+  deleteBtn.addEventListener('click', () => deleteItem(item));
+}
+
+// Setup item event listeners
+addItemEventListeners(item);
+}
+
+function getIframeDocument() {
+  const iframe = document.getElementById('preview-iframe');
+  return iframe?.contentDocument || iframe?.contentWindow?.document;
 }
 
 function generateUniqueId() {
   return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
+
+
+
+// Helper function to get section icons
+function getSectionIcon(sectionType) {
+  const icons = {
+    'summary': 'user',
+    'experience': 'briefcase',
+    'education': 'graduation-cap',
+    'skills': 'cogs',
+    'certification': 'certificate',
+    'project': 'code',
+    'volunteer': 'hands-helping',
+    'award': 'trophy',
+    'publication': 'book',
+    'language': 'language'
+  };
+  return icons[sectionType] || 'star';
+}
+
+// Helper function to get section display names
+function getSectionDisplayName(sectionType) {
+  const names = {
+    'summary': 'Professional Summary',
+    'experience': 'Professional Experience',
+    'education': 'Education',
+    'skills': 'Skills',
+    'certification': 'Certifications',
+    'project': 'Projects',
+    'volunteer': 'Volunteer Experience',
+    'award': 'Awards',
+    'publication': 'Publications',
+    'language': 'Languages'
+  };
+  return names[sectionType] || sectionType.charAt(0).toUpperCase() + sectionType.slice(1);
+}
+
+// function to handle description input with list formatting
+function handleDescriptionInput(e) {
+  const field = e.target;
+  const text = field.textContent;
+  
+  // If user types bullet points manually, convert to proper list
+  if (text.includes('•') || text.includes('-') || text.includes('*')) {
+    const lines = text.split('\n').filter(line => line.trim());
+    if (lines.length > 1) {
+      const ul = document.createElement('ul');
+      ul.className = 'duties-list';
+      
+      lines.forEach(line => {
+        const cleanLine = line.replace(/^[•\-*]\s*/, '').trim();
+        if (cleanLine) {
+          const li = document.createElement('li');
+          li.textContent = cleanLine;
+          li.contentEditable = true;
+          ul.appendChild(li);
+        }
+      });
+      
+      field.innerHTML = '';
+      field.appendChild(ul);
+    }
+  }
+}
+
+
+// function to create a section if it doesn't exist
+function createNewSection(doc, sectionType) {
+  const section = doc.createElement('section');
+  section.className = `resume-section ${sectionType}-section`;
+  section.setAttribute('data-section-type', sectionType);
+  
+  const title = doc.createElement('h2');
+  title.className = 'section-title';
+  title.contentEditable = true;
+  title.innerHTML = `<i class="fas fa-${getSectionIcon(sectionType)}"></i>${getSectionDisplayName(sectionType)}`;
+  
+  section.appendChild(title);
+  
+  // Find a good place to insert the section
+  const lastSection = doc.querySelector('.resume-section:last-of-type');
+  if (lastSection) {
+    lastSection.parentNode.insertBefore(section, lastSection.nextSibling);
+  } else {
+    const header = doc.querySelector('.resume-header');
+    if (header) {
+      header.parentNode.insertBefore(section, header.nextSibling);
+    } else {
+      doc.body.appendChild(section);
+    }
+  }
+  
+  return section;
 }
