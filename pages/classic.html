@@ -189,61 +189,144 @@
           {% else %}
             <!-- List Items -->
             {% for item in section["items"] %}
-              <div class="section-item" data-item-id="{{ item.id }}" data-section="{{ section.type }}">
-                <div class="item-actions">
-                  <button class="item-btn delete" title="Delete {{ section.type }}">
-                    <i class="fas fa-trash"></i>
-                  </button>
+            <div class="section-item" data-item-id="{{ item.id }}" data-section="{{ section.type }}">
+              <div class="item-actions">
+                <button class="item-btn delete" title="Delete {{ section.type }}">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+              
+              {% if section.type == 'experience' %}
+                <div class="section-job-title" contenteditable="true" data-field="job_title" placeholder="Job Title">
+                  {{- item.job_title|default('') -}}
+                </div>
+                <div class="section-company" contenteditable="true" data-field="company" placeholder="Company Name">
+                  {{- item.company|default('') -}}
+                </div>
+                <div class="section-duration" contenteditable="true" data-field="duration" placeholder="Date Range">
+                  {{- item.duration|default('') -}}
+                </div>
+                {% if item.description %}
+                <div class="section-description" data-field="description">
+                  <ul class="duties-list">
+                    {% set description_lines = item.description.split('\n') if item.description else [] %}
+                    {% for line in description_lines %}
+                      {% if line.strip() %}
+                        <li contenteditable="true">{{ line.strip() }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                  <div class="add-bullet-prompt" onclick="addNewBulletPoint(this)">
+                    <i class="fas fa-plus"></i>
+                    <span>Click to add responsibility</span>
+                  </div>
+                </div>
+                {% else %}
+                <div class="section-description" data-field="description">
+                  <ul class="duties-list"></ul>
+                  <div class="add-bullet-prompt" onclick="addNewBulletPoint(this)">
+                    <i class="fas fa-plus"></i>
+                    <span>Click to add responsibility</span>
+                  </div>
+                </div>
+                {% endif %}
+                
+              {% elif section.type == 'education' %}
+                <div class="section-degree" contenteditable="true" data-field="degree" placeholder="Degree">
+                  {{- item.degree|default('') -}}
+                </div>
+                <div class="section-school" contenteditable="true" data-field="school" placeholder="School Name">
+                  {{- item.school|default('') -}}
+                </div>
+                <div class="section-date" contenteditable="true" data-field="date" placeholder="Year">
+                  {{- item.date|default('') -}}
                 </div>
                 
-                {% if section.type == 'experience' %}
-                  <div class="section-job-title" contenteditable="true" data-field="job_title">{{ item.job_title|default('Job Title') }}</div>
-                  <div class="section-company" contenteditable="true" data-field="company">{{ item.company|default('Company Name') }}</div>
-                  <div class="section-duration" contenteditable="true" data-field="duration">{{ item.duration|default('Date Range') }}</div>
-                  {% if item.description %}
-                  <div class="section-description" contenteditable="true" data-field="description">
-                    {% if item.description.split('\n')|length > 1 %}
-                      <ul class="duties-list">
-                        {% for duty in item.description.split('\n') %}
-                          {% if duty.strip() %}
-                            <li>{{ duty.strip() }}</li>
-                          {% endif %}
-                        {% endfor %}
-                      </ul>
-                    {% else %}
-                      {{ item.description }}
-                    {% endif %}
+              {% elif section.type == 'certification' %}
+                <div class="section-name" contenteditable="true" data-field="name" placeholder="Certification Name">
+                  {{- item.name|default('') -}}
+                </div>
+                <div class="section-issuer" contenteditable="true" data-field="issuer" placeholder="Issuing Organization">
+                  {{- item.issuer|default('') -}}
+                </div>
+                <div class="section-date" contenteditable="true" data-field="date" placeholder="Year">
+                  {{- item.date|default('') -}}
+                </div>
+                
+              {% elif section.type == 'project' %}
+                <div class="section-name" contenteditable="true" data-field="name" placeholder="Project Name">
+                  {{- item.name|default('') -}}
+                </div>
+                <div class="section-date" contenteditable="true" data-field="date" placeholder="Year">
+                  {{- item.date|default('') -}}
+                </div>
+                {% if item.description %}
+                <div class="section-description" data-field="description">
+                  <ul class="duties-list">
+                    {% set description_lines = item.description.split('\n') if item.description else [] %}
+                    {% for line in description_lines %}
+                      {% if line.strip() %}
+                        <li contenteditable="true">{{ line.strip() }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                  <div class="add-bullet-prompt" onclick="addNewBulletPoint(this)">
+                    <i class="fas fa-plus"></i>
+                    <span>Click to add project detail</span>
                   </div>
-                  {% endif %}
-                  
-                {% elif section.type == 'education' %}
-                  <div class="section-degree" contenteditable="true" data-field="degree">{{ item.degree|default('Degree') }}</div>
-                  <div class="section-school" contenteditable="true" data-field="school">{{ item.school|default('School Name') }}</div>
-                  <div class="section-date" contenteditable="true" data-field="date">{{ item.date|default('Year') }}</div>
-                  
+                </div>
                 {% else %}
-                  <!-- Generic item rendering for other section types -->
-                  {% for key, value in item.items() %}
-                    {% if key != "id" %}
+                <div class="section-description" data-field="description">
+                  <ul class="duties-list"></ul>
+                  <div class="add-bullet-prompt" onclick="addNewBulletPoint(this)">
+                    <i class="fas fa-plus"></i>
+                    <span>Click to add project detail</span>
+                  </div>
+                </div>
+                {% endif %}
+                
+              {% else %}
+                <!-- Generic item rendering for other section types -->
+                {% for key, value in item.items() %}
+                  {% if key != "id" %}
+                    {% if key == 'description' %}
+                      <!-- Handle description fields with potential bullet points -->
+                      <div class="section-{{ key | replace('_', '-') }}" 
+                           data-field="{{ key }}"
+                           data-key="{{ key }}">
+                        {% if value and '\n' in value %}
+                          <!-- Multi-line description - treat as bullet points -->
+                          <ul class="duties-list">
+                            {% set description_lines = value.split('\n') if value else [] %}
+                            {% for line in description_lines %}
+                              {% if line.strip() %}
+                                <li contenteditable="true">{{ line.strip() }}</li>
+                              {% endif %}
+                            {% endfor %}
+                          </ul>
+                          <div class="add-bullet-prompt" onclick="addNewBulletPoint(this)">
+                            <i class="fas fa-plus"></i>
+                            <span>Click to add detail</span>
+                          </div>
+                        {% else %}
+                          <!-- Single line description -->
+                          <div contenteditable="true" placeholder="Add description">{{ value|default('') }}</div>
+                        {% endif %}
+                      </div>
+                    {% else %}
+                      <!-- Regular field -->
                       <div class="section-{{ key | replace('_', '-') }}" 
                            contenteditable="true" 
                            data-field="{{ key }}"
-                           data-key="{{ key }}">
-                        {% if key == 'name' or key == 'job_title' or key == 'degree' %}
-                          <i class="fas fa-chevron-right"></i>
-                        {% elif key == 'company' or key == 'school' or key == 'issuer' %}
-                          <i class="fas fa-building"></i>
-                        {% elif key == 'date' or key == 'duration' %}
-                          <i class="fas fa-calendar-alt"></i>
-                        {% elif key == 'description' %}
-                          <i class="fas fa-list"></i>
-                        {% endif %}
-                        {{ value }}
+                           data-key="{{ key }}"
+                           placeholder="{{ key | replace('_', ' ') | title }}">
+                        {{- value|default('') -}}
                       </div>
                     {% endif %}
-                  {% endfor %}
-                {% endif %}
-              </div>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            </div>
             {% endfor %}
             
             <!-- Add Item Button -->

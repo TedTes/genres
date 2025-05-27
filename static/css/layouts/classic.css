@@ -1111,3 +1111,181 @@ body {
   width: 100%;
   margin-top: 10px;
 }
+
+
+/* Dashed box prompt styles */
+.add-bullet-prompt {
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 8px;
+  background: #f9fafb;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+  font-size: 14px;
+  user-select: none;
+}
+
+.add-bullet-prompt:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.add-bullet-prompt i {
+  font-size: 12px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: currentColor;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.add-bullet-prompt:hover i {
+  background: #1d4ed8;
+}
+
+.add-bullet-prompt span {
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* Bullet point list styles */
+.duties-list {
+  margin: 8px 0 0 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.duties-list li {
+  margin-bottom: 6px;
+  line-height: 1.5;
+  position: relative;
+  outline: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 2px 4px;
+  transition: all 0.2s ease;
+}
+
+.duties-list li:hover {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.duties-list li:focus {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.duties-list li::marker {
+  color: var(--primary, #3b82f6);
+}
+
+/* Delete button for individual bullet points */
+.bullet-delete {
+  position: absolute;
+  top: 2px;
+  right: -20px;
+  width: 16px;
+  height: 16px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 10px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.duties-list li:hover .bullet-delete {
+  display: flex;
+  opacity: 1;
+}
+
+.bullet-delete:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+/* Placeholder styling for empty contenteditable fields */
+[contenteditable="true"]:empty::before {
+  content: attr(placeholder);
+  color: #9ca3af;
+  font-style: italic;
+  pointer-events: none;
+}
+
+[contenteditable="true"]:focus:empty::before {
+  content: "";
+}
+
+/* Hide dashed boxes in print/PDF */
+@media print {
+  .add-bullet-prompt {
+    display: none !important;
+  }
+  
+  .bullet-delete {
+    display: none !important;
+  }
+  
+  .duties-list li {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+}
+
+/* Enhanced focus states for better UX */
+.section-description:focus-within .add-bullet-prompt {
+  border-color: #93c5fd;
+  background: #dbeafe;
+}
+
+/* Animation for new bullet points */
+@keyframes bulletSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.duties-list li.new-bullet {
+  animation: bulletSlideIn 0.3s ease-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .add-bullet-prompt {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .bullet-delete {
+    right: -16px;
+    width: 14px;
+    height: 14px;
+    font-size: 9px;
+  }
+}
