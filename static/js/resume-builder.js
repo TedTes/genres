@@ -30,15 +30,15 @@ const templateConfigs = {
             <i class="fas fa-trash"></i>
           </button>
         </div>
-        <div class="section-job-title" contenteditable="true" data-field="job_title">Job Title</div>
-        <div class="section-company" contenteditable="true" data-field="company">Company Name</div>
-        <div class="section-duration" contenteditable="true" data-field="duration">Mar 2021 — Present</div>
-        <div class="section-description" contenteditable="true" data-field="description">
-          <ul class="duties-list">
-            <li>Led product development for SaaS platform with 50,000+ users</li>
-            <li>Oversaw 30% growth in annual recurring revenue</li>
-            <li>Click to add more responsibilities</li>
-          </ul>
+        <div class="section-job-title" contenteditable="true" data-field="job_title" placeholder="Job Title"></div>
+        <div class="section-company" contenteditable="true" data-field="company" placeholder="Company Name"></div>
+        <div class="section-duration" contenteditable="true" data-field="duration" placeholder="Date Range"></div>
+        <div class="section-description" data-field="description">
+          <ul class="duties-list"></ul>
+          <div class="add-bullet-prompt" onclick="addNewBulletPoint(this)">
+            <i class="fas fa-plus"></i>
+            <span>Click to add responsibility</span>
+          </div>
         </div>
       </div>
     `,
@@ -49,9 +49,9 @@ const templateConfigs = {
             <i class="fas fa-trash"></i>
           </button>
         </div>
-        <div class="section-degree" contenteditable="true" data-field="degree">Master of Science in Computer Science</div>
-        <div class="section-school" contenteditable="true" data-field="school">University Name</div>
-        <div class="section-date" contenteditable="true" data-field="date">2018 — 2020</div>
+        <div class="section-degree" contenteditable="true" data-field="degree" placeholder="Degree"></div>
+        <div class="section-school" contenteditable="true" data-field="school" placeholder="School Name"></div>
+        <div class="section-date" contenteditable="true" data-field="date" placeholder="Year"></div>
       </div>
     `,
     certification: `
@@ -61,9 +61,9 @@ const templateConfigs = {
             <i class="fas fa-trash"></i>
           </button>
         </div>
-        <div class="section-name" contenteditable="true" data-field="name">Certification Name</div>
-        <div class="section-issuer" contenteditable="true" data-field="issuer">Issuing Organization</div>
-        <div class="section-date" contenteditable="true" data-field="date">2023</div>
+        <div class="section-name" contenteditable="true" data-field="name" placeholder="Certification Name"></div>
+        <div class="section-issuer" contenteditable="true" data-field="issuer" placeholder="Issuing Organization"></div>
+        <div class="section-date" contenteditable="true" data-field="date" placeholder="Year"></div>
       </div>
     `,
     project: `
@@ -73,10 +73,14 @@ const templateConfigs = {
             <i class="fas fa-trash"></i>
           </button>
         </div>
-        <div class="section-name" contenteditable="true" data-field="name">Project Name</div>
-        <div class="section-date" contenteditable="true" data-field="date">2023</div>
-        <div class="section-description" contenteditable="true" data-field="description">
-          Project description and key achievements
+        <div class="section-name" contenteditable="true" data-field="name" placeholder="Project Name"></div>
+        <div class="section-date" contenteditable="true" data-field="date" placeholder="Year"></div>
+        <div class="section-description" data-field="description">
+          <ul class="duties-list"></ul>
+          <div class="add-bullet-prompt" onclick="addNewBulletPoint(this)">
+            <i class="fas fa-plus"></i>
+            <span>Click to add project detail</span>
+          </div>
         </div>
       </div>
     `
@@ -86,22 +90,24 @@ const templateConfigs = {
     experience: `
       <div class="card exp-card section-item" data-section="experience">
         <div class="card-header">
-          <div class="section-job-title" contenteditable="true" data-field="job_title">Job Title</div>
-          <div class="section-duration" contenteditable="true" data-field="duration">2020 - 2023</div>
+          <div class="section-job-title" contenteditable="true" data-field="job_title" placeholder="Job Title"></div>
+          <div class="section-duration" contenteditable="true" data-field="duration" placeholder="Date Range"></div>
         </div>
-        <div class="section-company" contenteditable="true" data-field="company">Company Name</div>
-        <div class="section-description" contenteditable="true" data-field="description">
-          <ul class="duties-list">
-            <li>Click to add responsibility</li>
-          </ul>
+        <div class="section-company" contenteditable="true" data-field="company" placeholder="Company Name"></div>
+        <div class="section-description" data-field="description">
+          <ul class="duties-list"></ul>
+          <div class="add-bullet-prompt" onclick="addNewBulletPoint(this)">
+            <i class="fas fa-plus"></i>
+            <span>Click to add responsibility</span>
+          </div>
         </div>
       </div>
     `,
     education: `
       <div class="card edu-card section-item" data-section="education">
-        <div class="section-degree" contenteditable="true" data-field="degree">Degree</div>
-        <div class="section-school" contenteditable="true" data-field="school">School Name</div>
-        <div class="section-date" contenteditable="true" data-field="year">2020</div>
+        <div class="section-degree" contenteditable="true" data-field="degree" placeholder="Degree"></div>
+        <div class="section-school" contenteditable="true" data-field="school" placeholder="School Name"></div>
+        <div class="section-date" contenteditable="true" data-field="year" placeholder="Year"></div>
       </div>
     `
   }
@@ -267,13 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Export enhanced functions globally
-  window.addItemEventListeners = addItemEventListeners;
-  window.addTagEventListeners = addTagEventListeners;
-  window.addNewTag = addNewTag;
-  window.addNewItem = addNewItem;
-  window.autoSave = enhancedAutoSave;
-
   // Enhanced iframe loading with loading overlay
   if (elements.iframe) {
     showIframeLoading('Loading resume preview...');
@@ -295,7 +294,270 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Add keyboard shortcuts
   document.addEventListener('keydown', handleKeyboardShortcuts);
+
+    // Initialize bullet points for existing content
+    setTimeout(() => {
+      initializeExistingBullets();
+      
+      // Also initialize iframe content if it exists
+      const iframe = document.querySelector('#preview-iframe');
+      if (iframe) {
+        iframe.addEventListener('load', () => {
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+          if (iframeDoc) {
+            initializeIframeBullets(iframeDoc);
+          }
+        });
+      }
+    }, 500);
 });
+
+// Main function to add new bullet points
+function addNewBulletPoint(promptElement) {
+  const descriptionContainer = promptElement.parentElement;
+  const dutiesList = descriptionContainer.querySelector('.duties-list');
+  
+  // Create new list item
+  const newBullet = document.createElement('li');
+  newBullet.contentEditable = true;
+  newBullet.className = 'new-bullet';
+  
+  // Add delete button to the bullet
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'bullet-delete';
+  deleteBtn.innerHTML = '×';
+  deleteBtn.title = 'Delete this point';
+  deleteBtn.onclick = (e) => {
+    e.stopPropagation();
+    deleteBulletPoint(newBullet);
+  };
+  
+  newBullet.appendChild(deleteBtn);
+  
+  // Add event listeners for bullet editing
+  setupBulletEventListeners(newBullet);
+  
+  // Add to list
+  dutiesList.appendChild(newBullet);
+  
+  // Focus the new bullet for immediate editing
+  newBullet.focus();
+  
+  // Remove animation class after animation completes
+  setTimeout(() => {
+    newBullet.classList.remove('new-bullet');
+  }, 300);
+  
+  // Mark as changed for auto-save
+  state.hasUnsavedChanges = true;
+  clearTimeout(state.autoSaveTimeout);
+  state.autoSaveTimeout = setTimeout(enhancedAutoSave, 1500);
+  
+  return newBullet;
+}
+// Function to delete individual bullet points
+function deleteBulletPoint(bulletElement) {
+  // Add fade-out animation
+  bulletElement.style.transition = 'all 0.3s ease';
+  bulletElement.style.opacity = '0';
+  bulletElement.style.transform = 'translateX(-20px)';
+  
+  setTimeout(() => {
+    bulletElement.remove();
+    
+    // Mark as changed for auto-save
+    state.hasUnsavedChanges = true;
+    clearTimeout(state.autoSaveTimeout);
+    state.autoSaveTimeout = setTimeout(enhancedAutoSave, 1500);
+    
+    showEnhancedNotification('Bullet point removed', 'success');
+  }, 300);
+}
+
+// Setup event listeners for bullet points
+function setupBulletEventListeners(bulletElement) {
+  // Handle Enter key to add new bullet
+  bulletElement.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      
+      // If current bullet is empty, don't add new one
+      if (bulletElement.textContent.trim() === '') {
+        return;
+      }
+      
+      // Find the prompt element and add new bullet
+      const descriptionContainer = bulletElement.closest('.section-description');
+      const promptElement = descriptionContainer.querySelector('.add-bullet-prompt');
+      const newBullet = addNewBulletPoint(promptElement);
+      
+      // Focus the new bullet
+      setTimeout(() => {
+        newBullet.focus();
+      }, 50);
+    }
+    
+    // Handle Backspace on empty bullet to delete it
+    if (e.key === 'Backspace' && bulletElement.textContent.trim() === '') {
+      e.preventDefault();
+      
+      const dutiesList = bulletElement.parentElement;
+      const bullets = Array.from(dutiesList.children);
+      const currentIndex = bullets.indexOf(bulletElement);
+      
+      // Focus previous bullet if exists
+      if (currentIndex > 0) {
+        const prevBullet = bullets[currentIndex - 1];
+        prevBullet.focus();
+        // Move cursor to end of previous bullet
+        const range = document.createRange();
+        const selection = window.getSelection();
+        range.selectNodeContents(prevBullet);
+        range.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+      
+      deleteBulletPoint(bulletElement);
+    }
+  });
+  
+  // Handle input changes for auto-save
+  bulletElement.addEventListener('input', () => {
+    state.hasUnsavedChanges = true;
+    clearTimeout(state.autoSaveTimeout);
+    state.autoSaveTimeout = setTimeout(enhancedAutoSave, 1500);
+  });
+  
+  // Handle focus events
+  bulletElement.addEventListener('focus', () => {
+    bulletElement.style.outline = 'none';
+  });
+  
+  // Handle blur to clean up empty bullets
+  bulletElement.addEventListener('blur', () => {
+    // Remove bullet if it's empty and not the only one
+    const dutiesList = bulletElement.parentElement;
+    const bullets = dutiesList.querySelectorAll('li');
+    
+    if (bulletElement.textContent.trim() === '' && bullets.length > 1) {
+      setTimeout(() => {
+        if (document.activeElement !== bulletElement) {
+          deleteBulletPoint(bulletElement);
+        }
+      }, 100);
+    }
+  });
+}
+
+// Function to populate existing bullets when loading data
+function populateBulletPoints(descriptionElement, bulletData) {
+  const dutiesList = descriptionElement.querySelector('.duties-list');
+  const promptElement = descriptionElement.querySelector('.add-bullet-prompt');
+  
+  if (!dutiesList) {
+    console.warn('No duties list found in description element');
+    return;
+  }
+  
+  // Clear existing bullets
+  dutiesList.innerHTML = '';
+  
+  let bulletsToAdd = [];
+  
+  if (Array.isArray(bulletData)) {
+    // Data is already an array
+    bulletsToAdd = bulletData.filter(item => item && item.trim());
+  } else if (typeof bulletData === 'string' && bulletData.trim()) {
+    // Data is a string - split by newlines
+    bulletsToAdd = bulletData.split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+  }
+  
+  // Add bullets to the list
+  bulletsToAdd.forEach(bulletText => {
+    addBulletFromData(dutiesList, bulletText);
+  });
+  
+  // Ensure prompt element exists and is functional
+  if (!promptElement) {
+    const newPrompt = document.createElement('div');
+    newPrompt.className = 'add-bullet-prompt';
+    newPrompt.onclick = () => addNewBulletPoint(newPrompt);
+    newPrompt.innerHTML = '<i class="fas fa-plus"></i><span>Click to add detail</span>';
+    descriptionElement.appendChild(newPrompt);
+  }
+}
+// Function to collect bullet point data for saving
+function collectBulletData(descriptionElement) {
+  const bullets = descriptionElement.querySelectorAll('.duties-list li');
+  const bulletTexts = [];
+  
+  bullets.forEach(bullet => {
+    let text = bullet.textContent || '';
+    
+    // Remove delete button text (×) and clean up
+    text = text.replace(/×$/, '').trim();
+    
+    // Only include non-empty bullets
+    if (text && text.length > 0) {
+      bulletTexts.push(text);
+    }
+  });
+  
+  return bulletTexts.length > 0 ? bulletTexts.join('\n') : '';
+}
+// Helper function to add bullet from existing data
+function addBulletFromData(dutiesList, bulletText) {
+  if (!bulletText || !bulletText.trim()) return;
+  
+  const bullet = document.createElement('li');
+  bullet.contentEditable = true;
+  bullet.textContent = bulletText.trim();
+  
+  // Add delete button
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'bullet-delete';
+  deleteBtn.innerHTML = '×';
+  deleteBtn.title = 'Delete this point';
+  deleteBtn.onclick = (e) => {
+    e.stopPropagation();
+    deleteBulletPoint(bullet);
+  };
+  
+  bullet.appendChild(deleteBtn);
+  setupBulletEventListeners(bullet);
+  dutiesList.appendChild(bullet);
+  
+  return bullet;
+}
+// Initialize existing bullet points when page loads
+function initializeExistingBullets() {
+  // Find all existing section descriptions with bullet lists
+  document.querySelectorAll('.section-description').forEach(descriptionElement => {
+    const dutiesList = descriptionElement.querySelector('.duties-list');
+    if (dutiesList) {
+      // Setup event listeners for existing bullets
+      dutiesList.querySelectorAll('li').forEach(bullet => {
+        setupBulletEventListeners(bullet);
+        
+        // Add delete button if it doesn't exist
+        if (!bullet.querySelector('.bullet-delete')) {
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'bullet-delete';
+          deleteBtn.innerHTML = '×';
+          deleteBtn.title = 'Delete this point';
+          deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            deleteBulletPoint(bullet);
+          };
+          bullet.appendChild(deleteBtn);
+        }
+      });
+    }
+  });
+}
 
 document.addEventListener('click', (e) => {
   // Handle template selection via radio buttons with loading
@@ -722,7 +984,7 @@ async function enhancedSaveResume() {
   saveButton.querySelector('span').textContent = 'Saving...';
   
   try {
-    await saveResume();
+    await saveResumeData();
     saveButton.classList.remove('saving');
     saveButton.querySelector('span').textContent = 'Save Changes';
     showEnhancedNotification('✅ Resume saved successfully!', 'success');
@@ -737,7 +999,7 @@ async function enhancedAutoSave() {
   if (state.isGeneratingContent) return;
   
   try {
-    await saveResume();
+    await saveResumeData();
   } catch (error) {
     console.error('Auto-save failed:', error);
     showEnhancedNotification('Auto-save failed. Please save manually.', 'warning');
@@ -959,6 +1221,10 @@ function setupIframeListeners(iframeDoc) {
   iframeDoc.querySelectorAll('.section-tag').forEach(addTagEventListeners);
   iframeDoc.querySelectorAll('.section-item').forEach(addItemEventListeners);
   
+  // Initialize bullet points in iframe
+  initializeIframeBullets(iframeDoc);
+  
+  // Add event listeners for iframe buttons
   iframeDoc.addEventListener('click', (e) => {
     if (e.target.closest('.add-section-btn')) {
       const button = e.target.closest('.add-section-btn');
@@ -979,59 +1245,128 @@ function setupIframeListeners(iframeDoc) {
     state.autoSaveTimeout = setTimeout(enhancedAutoSave, 3000);
   });
 }
+
 function showSaveStatus(message, isError = false) {
   showEnhancedNotification(message, isError ? 'error' : 'success');
 }
 
-async function saveResume() {
-  if (!state.hasUnsavedChanges) return;
-  const saveButton = window.parent.document.querySelector('#save-resume-btn');
+async function saveResumeData() {
+  const saveButton = document.querySelector('#save-resume-btn');
   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-  const resumeId = window.parent.document.querySelector('.resume-builder')?.dataset.resumeId;
-  const iframe = window.parent.document.querySelector('#preview-iframe');
+  const resumeId = document.querySelector('.resume-builder')?.dataset.resumeId;
+  const iframe = document.querySelector('#preview-iframe');
 
-  if (!saveButton || !resumeId || !iframe) return;
-  saveButton.classList.add('saving');
+  if (!resumeId) {
+    showEnhancedNotification('Error: Resume ID not found', 'error');
+    return false;
+  }
+
+  if (!iframe || !iframe.contentDocument) {
+    showEnhancedNotification('Error: Cannot access resume content', 'error');
+    return false;
+  }
 
   try {
     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
     const resumeContent = collectResumeData(iframeDoc);
+    
+    // Validate data before sending
+    if (!resumeContent || !resumeContent.sections) {
+      throw new Error('Invalid resume data collected');
+    }
 
-    await fetch(`/api/v1/resume/${resumeId}/save-data`, {
+    const response = await fetch(`/api/v1/resume/${resumeId}/save-data`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
-      body: JSON.stringify({ resume_data: resumeContent }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        saveButton.classList.remove('saving');
-        showSaveStatus(data.success ? 'Changes saved successfully!' : 'Error saving changes. Please try again.', !data.success);
-        if (data.success) state.hasUnsavedChanges = false;
-      })
-      .catch(error => {
-        console.error('Error saving resume:', error);
-        saveButton.classList.remove('saving');
-        showSaveStatus('Error saving changes. Please try again.', true);
-      });
+      headers: { 
+        'Content-Type': 'application/json', 
+        'X-CSRFToken': csrfToken 
+      },
+      body: JSON.stringify({ 
+        resume_data: resumeContent,
+        timestamp: new Date().toISOString()
+      }),
+    });
+
+    const data = await response.json();
+    
+    if (response.ok && data.success) {
+      state.hasUnsavedChanges = false;
+      showEnhancedNotification('✅ Resume saved successfully!', 'success');
+      return true;
+    } else {
+      throw new Error(data.message || 'Server returned error');
+    }
+    
   } catch (error) {
-    console.error('Error collecting resume data:', error);
-    saveButton.classList.remove('saving');
-    showSaveStatus('Error accessing resume content. Please try again.', true);
+    console.error('Error saving resume:', error);
+    showEnhancedNotification(`❌ Save failed: ${error.message}`, 'error');
+    return false;
   }
 }
 
+// Function to load and populate resume data
+function loadResumeData(resumeData) {
+  if (!resumeData) {
+    console.warn('No resume data provided');
+    return;
+  }
+  
+  // Populate bio data
+  if (resumeData.bio) {
+    const nameElement = document.querySelector('.name');
+    const titleElement = document.querySelector('.title');
+    
+    if (nameElement && resumeData.bio.name) {
+      nameElement.textContent = resumeData.bio.name;
+    }
+    if (titleElement && resumeData.bio.title) {
+      titleElement.textContent = resumeData.bio.title;
+    }
+  }
+  
+  // Populate contact data
+  if (resumeData.contact) {
+    Object.keys(resumeData.contact).forEach(contactType => {
+      const contactElement = document.querySelector(`[data-field="${contactType}"]`);
+      if (contactElement) {
+        contactElement.textContent = resumeData.contact[contactType];
+      }
+    });
+  }
+  
+  // Populate sections
+  if (resumeData.sections && Array.isArray(resumeData.sections)) {
+    resumeData.sections.forEach(sectionData => {
+      const existingSection = document.querySelector(`.${sectionData.type}-section`);
+      
+      if (existingSection) {
+        populateExistingSection(existingSection, sectionData);
+      } else {
+        createAndPopulateSection(sectionData);
+      }
+    });
+  }
+  
+}
 function collectResumeData(iframeDoc) {
   const resumeData = { contact: {}, sections: [], bio: { name: '', title: '' } };
 
-  resumeData.bio.name = iframeDoc.querySelector('.name')?.textContent || '';
-  resumeData.bio.title = iframeDoc.querySelector('.title')?.textContent || '';
+  // Collect bio data
+  resumeData.bio.name = iframeDoc.querySelector('.name')?.textContent.trim() || '';
+  resumeData.bio.title = iframeDoc.querySelector('.title')?.textContent.trim() || '';
 
+  // Collect contact info
   iframeDoc.querySelectorAll('.contact-item').forEach(item => {
     const iconClass = item.querySelector('.contact-icon')?.className;
-    const content = item.querySelector('.contact-content')?.textContent;
+    const content = item.querySelector('.contact-content')?.textContent.trim();
     if (iconClass && content) {
       const match = iconClass.match(/fa-(\w+)/);
-      if (match) resumeData.contact[match[1] === 'envelope' ? 'email' : match[1]] = content;
+      if (match) {
+        const key = match[1] === 'envelope' ? 'email' : 
+                   match[1] === 'map-marker-alt' ? 'location' : 
+                   match[1] === 'linkedin-in' ? 'linkedin' : match[1];
+        resumeData.contact[key] = content;
+      }
     }
   });
 
@@ -1042,15 +1377,13 @@ function collectResumeData(iframeDoc) {
   ];
 
   iframeDoc.querySelectorAll('.resume-section').forEach(section => {
-    let sectionType = 'custom'; // Default type
+    let sectionType = 'custom';
     
+    // Determine section type
     if (section.dataset.sectionType) {
       sectionType = section.dataset.sectionType;
     } else {
-      // Fall back to class name detection
       const classList = section.className.split(' ');
-      
-      // Check each class against known section types
       for (const className of classList) {
         const match = className.match(/^(\w+)-section$/);
         if (match && match[1] && knownSectionTypes.includes(match[1])) {
@@ -1058,60 +1391,73 @@ function collectResumeData(iframeDoc) {
           break;
         }
       }
-      
-      // If didn't find a known type, try to extract any type from class
-      if (sectionType === 'custom') {
-        for (const className of classList) {
-          const match = className.match(/^(\w+)-section$/);
-          if (match && match[1] && match[1] !== 'resume') {
-            sectionType = match[1];
-            break;
-          }
-        }
-      }
     }
 
-    const sectionTitle = section.querySelector('.section-title')?.textContent.trim();
-    const sectionData = { type: sectionType, title: sectionTitle, display: 'list', content: '', items: [] };
+    const sectionTitle = section.querySelector('.section-title')?.textContent.trim().replace(/[^\w\s]/g, '').trim();
+    const sectionData = { 
+      type: sectionType, 
+      title: sectionTitle, 
+      display: 'list', 
+      content: '', 
+      items: [] 
+    };
 
+    // Handle different section types
     if (section.querySelector('.section-content')) {
       sectionData.display = 'text';
-      sectionData.content = section.querySelector('.section-content')?.textContent || '';
+      sectionData.content = section.querySelector('.section-content')?.textContent.trim() || '';
     } else if (section.querySelector('.section-container')) {
       sectionData.display = 'tags';
-      sectionData.items = Array.from(section.querySelectorAll('.section-tag')).map(tag =>
-        tag.textContent.trim().replace(/\s*✓\s*/, '').replace(/\s*×\s*/, '').trim()
-      );
+      sectionData.items = Array.from(section.querySelectorAll('.section-tag')).map(tag => {
+        // Clean up tag text (remove icons and extra spaces)
+        let tagText = tag.textContent || '';
+        tagText = tagText.replace(/\s*✓\s*/, '').replace(/\s*×\s*/, '').trim();
+        return tagText;
+      }).filter(text => text.length > 0);
     } else {
+      // List items
       sectionData.display = 'list';
       sectionData.items = Array.from(section.querySelectorAll('.section-item')).map(item => {
         const itemData = {};
         
-        itemData.id = item.dataset.itemId || `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        // Ensure item has an ID
+        itemData.id = item.dataset.itemId || generateUniqueId();
         item.dataset.itemId = itemData.id;
 
-        item.querySelectorAll('[class^="section-"], [class*=" section-"]').forEach(el => {
-          const classes = el.className.split(' ');
-          classes.forEach(className => {
-            if (className.startsWith('section-')) {
-              let key = className.replace('section-', '').replace(/-/g, '_');
-              if (sectionType === 'certification' && key === 'degree') key = 'name';
-              if (sectionType === 'certification' && key === 'school') key = 'issuer';
-              if (sectionType === 'experience' && key === 'date') key = 'duration';
-              itemData[key] = (key === 'description' || key === 'duties')
-                ? (el.querySelector('.section-duties')
-                  ? Array.from(el.querySelectorAll('li')).map(li => li.textContent.trim()).join('\n')
-                  : el.textContent.trim())
-                : el.textContent.trim();
-            }
-          });
+        // Collect field data
+        item.querySelectorAll('[data-field]').forEach(field => {
+          const fieldName = field.dataset.field;
+          let fieldValue = '';
+          
+          if (fieldName === 'description' && field.querySelector('.duties-list')) {
+            // Handle bullet point descriptions
+            fieldValue = collectBulletData(field);
+          } else {
+            // Handle regular text fields
+            fieldValue = field.textContent.trim();
+          }
+          
+          // Map field names for different section types
+          let mappedFieldName = fieldName;
+          if (sectionType === 'certification') {
+            if (fieldName === 'degree') mappedFieldName = 'name';
+            if (fieldName === 'school') mappedFieldName = 'issuer';
+          }
+          if (sectionType === 'experience' && fieldName === 'date') {
+            mappedFieldName = 'duration';
+          }
+          
+          itemData[mappedFieldName] = fieldValue;
         });
-     
+
         return itemData;
       });
     }
 
-    resumeData.sections.push(sectionData);
+    // Only add section if it has content
+    if (sectionData.content || sectionData.items.length > 0) {
+      resumeData.sections.push(sectionData);
+    }
   });
 
   return resumeData;
@@ -1411,10 +1757,6 @@ function debounce(func, wait) {
   };
 }
 
-function showNotification(message, type) {
-  showEnhancedNotification(message, type);
-}
-
 function getCurrentTemplateName() {
   // First try to get from meta tag
   const metaTemplate = document.querySelector('meta[name="template"]');
@@ -1428,18 +1770,6 @@ function getCurrentTemplateName() {
   
   return templateName;
 }
-
-// Map section types to their display names
-const sectionTypeMap = {
-  experience: 'Experience',
-  education: 'Education', 
-  certification: 'Certification',
-  project: 'Project',
-  volunteer: 'Volunteer',
-  award: 'Award',
-  publication: 'Publication',
-  language: 'Language'
-};
 
 
 // Update the addNewItem function to use correct container finding:
@@ -1503,39 +1833,18 @@ function createItemElement(type, templateHTML) {
   const uniqueId = generateUniqueId();
   const wrapper = document.createElement('div');
   
-  // Use template-specific HTML structure
   wrapper.innerHTML = templateHTML;
   const newItem = wrapper.firstElementChild;
   
-  // Add universal attributes for editing
   newItem.dataset.itemId = uniqueId;
   newItem.dataset.sectionType = type;
   newItem.id = `item-${uniqueId}`;
   
-  // Add delete button (template-agnostic)
-  const deleteBtn = document.createElement('button');
-  deleteBtn.className = 'item-delete-btn';
-  deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-  deleteBtn.style.cssText = `
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #EF4444;
-    border-radius: 4px;
-    padding: 4px 8px;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  `;
-  
-  newItem.style.position = 'relative';
-  newItem.appendChild(deleteBtn);
-  
-  // Show delete button on hover
-  newItem.addEventListener('mouseenter', () => deleteBtn.style.opacity = '1');
-  newItem.addEventListener('mouseleave', () => deleteBtn.style.opacity = '0');
+  // Setup bullet points if this item has description field
+  const descriptionField = newItem.querySelector('.section-description');
+  if (descriptionField) {
+    handleDescriptionField(descriptionField);
+  }
   
   return newItem;
 }
@@ -1607,31 +1916,31 @@ function insertItemWithAnimation(container, newItem, button) {
 }
 
 function makeItemEditable(item) {
- // Make all data-field elements editable
- item.querySelectorAll('[data-field]').forEach(field => {
-  if (!field.hasAttribute('contenteditable')) {
-    field.contentEditable = true;
+  // Make all data-field elements editable
+  item.querySelectorAll('[data-field]').forEach(field => {
+    if (!field.hasAttribute('contenteditable') && !field.classList.contains('section-description')) {
+      field.contentEditable = true;
+    }
+    
+    // Special handling for description fields with bullet lists
+    if (field.dataset.field === 'description') {
+      handleDescriptionField(field);
+    }
+    
+    // Add placeholder behavior for simple fields
+    if (field.hasAttribute('placeholder')) {
+      handlePlaceholderField(field);
+    }
+  });
+  
+  // Add delete functionality for the entire item
+  const deleteBtn = item.querySelector('.item-btn.delete');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', () => deleteItem(item));
   }
   
-  // Special handling for description fields with lists
-  if (field.dataset.field === 'description') {
-    field.addEventListener('input', handleDescriptionInput);
-  }
-  
-  // Add placeholder behavior
-  if (field.textContent.trim() === '' || field.textContent.includes('Click to add')) {
-    field.classList.add('placeholder');
-  }
-});
-
-// Add delete functionality
-const deleteBtn = item.querySelector('.item-btn.delete');
-if (deleteBtn) {
-  deleteBtn.addEventListener('click', () => deleteItem(item));
-}
-
-// Setup item event listeners
-addItemEventListeners(item);
+  // Setup item event listeners
+  addItemEventListeners(item);
 }
 
 function getIframeDocument() {
@@ -1642,8 +1951,6 @@ function getIframeDocument() {
 function generateUniqueId() {
   return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
-
-
 
 // Helper function to get section icons
 function getSectionIcon(sectionType) {
@@ -1736,3 +2043,153 @@ function createNewSection(doc, sectionType) {
   
   return section;
 }
+
+// function to initialize bullets in iframe
+function initializeIframeBullets(iframeDoc) {
+  // Make addNewBulletPoint available in iframe context
+  iframeDoc.defaultView.addNewBulletPoint = addNewBulletPoint;
+  
+  // Initialize existing bullets in iframe
+  iframeDoc.querySelectorAll('.section-description').forEach(descriptionElement => {
+    const dutiesList = descriptionElement.querySelector('.duties-list');
+    if (dutiesList) {
+      dutiesList.querySelectorAll('li').forEach(bullet => {
+        setupBulletEventListeners(bullet);
+        
+        // Add delete button if missing
+        if (!bullet.querySelector('.bullet-delete')) {
+          const deleteBtn = iframeDoc.createElement('button');
+          deleteBtn.className = 'bullet-delete';
+          deleteBtn.innerHTML = '×';
+          deleteBtn.title = 'Delete this point';
+          deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            deleteBulletPoint(bullet);
+          };
+          bullet.appendChild(deleteBtn);
+        }
+      });
+    }
+  });
+}
+
+function handleDescriptionField(descriptionField) {
+  const dutiesList = descriptionField.querySelector('.duties-list');
+  const promptElement = descriptionField.querySelector('.add-bullet-prompt');
+  
+  if (dutiesList) {
+    // Initialize existing bullets
+    dutiesList.querySelectorAll('li').forEach(bullet => {
+      setupBulletEventListeners(bullet);
+      
+      // Add delete button if missing
+      if (!bullet.querySelector('.bullet-delete')) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'bullet-delete';
+        deleteBtn.innerHTML = '×';
+        deleteBtn.title = 'Delete this point';
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation();
+          deleteBulletPoint(bullet);
+        };
+        bullet.appendChild(deleteBtn);
+      }
+    });
+  }
+  
+  // Ensure prompt element has correct onclick
+  if (promptElement && !promptElement.onclick) {
+    promptElement.onclick = () => addNewBulletPoint(promptElement);
+  }
+}
+
+function handlePlaceholderField(field) {
+  // Focus event - clear placeholder styling
+  field.addEventListener('focus', () => {
+    field.classList.remove('placeholder');
+  });
+  
+  // Blur event - add placeholder styling if empty
+  field.addEventListener('blur', () => {
+    if (field.textContent.trim() === '') {
+      field.classList.add('placeholder');
+    }
+  });
+  
+  // Input event - remove placeholder styling when typing
+  field.addEventListener('input', () => {
+    if (field.textContent.trim() !== '') {
+      field.classList.remove('placeholder');
+    }
+  });
+  
+  // Initial state
+  if (field.textContent.trim() === '') {
+    field.classList.add('placeholder');
+  }
+}
+
+// Helper function to populate existing section
+function populateExistingSection(sectionElement, sectionData) {
+  // Clear existing items
+  const existingItems = sectionElement.querySelectorAll('.section-item');
+  existingItems.forEach(item => item.remove());
+  
+  // Add new items based on data
+  if (sectionData.items && Array.isArray(sectionData.items)) {
+    const templateConfig = templateConfigs[getCurrentTemplateName()];
+    const addButton = sectionElement.querySelector('.add-item-btn');
+    
+    sectionData.items.forEach(itemData => {
+      if (templateConfig && templateConfig[sectionData.type]) {
+        const itemElement = createItemElement(sectionData.type, templateConfig[sectionData.type]);
+        populateItemFromData(itemElement, itemData);
+        
+        // Insert before add button if it exists
+        if (addButton) {
+          sectionElement.insertBefore(itemElement, addButton);
+        } else {
+          sectionElement.appendChild(itemElement);
+        }
+      }
+    });
+  }
+}
+
+function createAndPopulateSection(sectionData) {
+  const newSection = createSectionFromData(sectionData);
+  
+  // Find appropriate place to insert
+  const lastSection = document.querySelector('.resume-section:last-of-type');
+  if (lastSection) {
+    lastSection.parentNode.insertBefore(newSection, lastSection.nextSibling);
+  } else {
+    const header = document.querySelector('.resume-header');
+    if (header) {
+      header.parentNode.insertBefore(newSection, header.nextSibling);
+    }
+  }
+}
+
+// Export enhanced functions globally
+window.handleDescriptionField = handleDescriptionField;
+window.handlePlaceholderField = handlePlaceholderField;
+window.initializeIframeBullets = initializeIframeBullets;
+window.addNewBulletPoint = addNewBulletPoint;
+window.deleteBulletPoint = deleteBulletPoint;
+window.initializeExistingBullets = initializeExistingBullets;
+
+window.collectResumeData = collectResumeData;
+window.collectBulletData = collectBulletData;
+window.populateBulletPoints = populateBulletPoints;
+window.addBulletFromData = addBulletFromData;
+window.saveResumeData = saveResumeData;
+window.loadResumeData = loadResumeData;
+window.populateExistingSection = populateExistingSection;
+window.createAndPopulateSection = createAndPopulateSection;
+
+
+window.addItemEventListeners = addItemEventListeners;
+window.addTagEventListeners = addTagEventListeners;
+window.addNewTag = addNewTag;
+window.addNewItem = addNewItem;
