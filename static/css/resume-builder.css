@@ -192,7 +192,7 @@
   /* Enhanced Templates Panel */
   .slide-panel {
     position: fixed;
-    left: -420px;
+    right: -420px;
     top: 0;
     width: 400px;
     height: 100vh;
@@ -206,7 +206,7 @@
   }
   
   .slide-panel.active {
-    left: 0;
+    right: 0;
   }
   
   .panel-header {

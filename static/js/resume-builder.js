@@ -175,8 +175,19 @@ document.addEventListener('DOMContentLoaded', () => {
       aiModalClose: document.querySelector(selectors.aiModalClose),
       tooltipContainers: document.querySelectorAll(selectors.tooltipContainers),
     };
-
+    const closePanel = () => {
+      if (elements.templatesPanel?.classList.contains('active')) {
+        elements.templatesPanel.classList.remove('active');
+      }
+    };
       if (elements.iframe) {
+        window.addEventListener('blur', () => {
+          setTimeout(() => {
+            if (document.activeElement === elements.iframe && elements.templatesPanel?.classList.contains('active')) {
+              closePanel();
+            }
+          }, 100);
+        });
         elements.iframe.addEventListener('load', () => {
           let templateId = state.currentTemplate || getCurrentTemplateName();
          templateId = templateId.split("_")[1];
@@ -270,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.slide-panel') && !e.target.closest('.float-control-btn') && 
           elements.templatesPanel?.classList.contains('active')) {
-        elements.templatesPanel.classList.remove('active');
+            closePanel();
       }
     });
   
@@ -1405,11 +1416,6 @@ async function saveResumeData(options = {}) {
     isAutoSave = false 
   } = options;
   
-  // Log for debugging
-  if (isAutoSave) {
-    console.log("Auto-saving...");
-  }
-  
   // Check if content generation is in progress
   if (state.isGeneratingContent) return false;
 
@@ -1840,8 +1846,6 @@ function collectResumeData(iframeDoc) {
       resumeData.sections.push(sectionData);
     }
   });
-  console.log("collected data " )
-  console.log(resumeData);
   return resumeData;
 }
 
@@ -2058,6 +2062,7 @@ function hideAutoSaveIndicator() {
 
 function updateSaveButtonState(state) {
   console.log("claled")
+  console.log(state);
   const saveButton = document.querySelector('#save-resume-btn');
   const buttonText = saveButton.querySelector('span');
   const buttonIcon = saveButton.querySelector('i');
