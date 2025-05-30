@@ -83,7 +83,13 @@ const templateConfigs = {
           </div>
         </div>
       </div>
-    `
+    `,
+    skills: `
+    <div class="section-container" data-section-type="skills">
+      <button class="add-tag-btn" data-section="skills" data-type="skills">
+        <i class="fas fa-plus"></i> Add Skill
+      </button>
+    </div>`
   },
   
   cards: {
@@ -113,206 +119,363 @@ const templateConfigs = {
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-  const root = document.documentElement;
-  const elements = {
-    saveButton: document.querySelector(selectors.saveButton),
-    iframe: document.querySelector(selectors.iframe),
-    templateButton: document.querySelector(selectors.templateButton),
-    templatesPanel: document.querySelector(selectors.templatesPanel),
-    closePanelButtons: document.querySelectorAll(selectors.closePanelButtons),
-    aiButton: document.querySelector(selectors.aiButton),
-    aiModal: document.querySelector(selectors.aiModal),
-    aiModalClose: document.querySelector(selectors.aiModalClose),
-    tooltipContainers: document.querySelectorAll(selectors.tooltipContainers),
-  };
-
-  // Initialize professional enhancements
-  initializeEnhancements();
-
-  // Save button handler with enhanced feedback
-  if (elements.saveButton) {
-    elements.saveButton.addEventListener('click', enhancedSaveResume);
+const templateLoaders = {
+  classic: {
+    loader: classicTemplateLoader,
+    initialize: classicInitialize
   }
+};
 
-  // Enhanced template meta tag handling
-  const selectedRadio = document.querySelector('input[name="template"]:checked');
-  if (selectedRadio) {
-    const templateId = selectedRadio.value;
-    state.currentTemplate = templateId;
-    updateTemplateMetaTag(templateId);
-  }
-
-  // Enhanced AI modal handlers with animations
-  if (elements.aiButton && elements.aiModal && elements.aiModalClose) {
-    elements.aiButton.addEventListener('click', () => {
-      if (elements.templatesPanel?.classList.contains('active')) {
-        elements.templatesPanel.classList.remove('active');
-      }
-      openAIModalWithAnimation();
-    });
-
-    elements.aiModalClose.addEventListener('click', () => {
-      closeAIModalWithAnimation();
-    });
-
-    elements.aiModal.addEventListener('click', (e) => {
-      if (e.target === elements.aiModal) {
-        closeAIModalWithAnimation();
-      }
-    });
-  }
-
-  // Enhanced template panel toggle with loading
-  if (elements.templateButton && elements.templatesPanel) {
-    elements.templateButton.addEventListener('click', () => {
-      if (elements.aiModal?.classList.contains('active')) {
-        closeAIModalWithAnimation();
-      }
-      toggleTemplatePanelWithAnimation();
-    });
-  }
-
-  // Enhanced tooltip handlers
-  elements.tooltipContainers.forEach(container => {
-    const tooltip = container.querySelector('.btn-tooltip');
-    if (tooltip) {
-      container.addEventListener('mouseenter', () => {
-        tooltip.style.opacity = '1';
-        tooltip.style.visibility = 'visible';
-        tooltip.style.transform = 'translateY(-50%) translateX(8px)';
-      });
-      container.addEventListener('mouseleave', () => {
-        tooltip.style.opacity = '0';
-        tooltip.style.visibility = 'hidden';
-        tooltip.style.transform = 'translateY(-50%) translateX(0)';
-      });
-    }
-  });
-
-  // Enhanced close panels
-  elements.closePanelButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const panelId = button.getAttribute('data-panel');
-      const panel = document.getElementById(panelId);
-      if (panel) {
-        panel.classList.remove('active');
-        // Add exit animation
-        panel.style.transform = 'translateX(-100%)';
-        setTimeout(() => {
-          panel.style.transform = '';
-        }, 300);
-      }
-    });
-  });
-
-  // Enhanced outside click handling
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.slide-panel') && !e.target.closest('.float-control-btn') && 
-        elements.templatesPanel?.classList.contains('active')) {
-      elements.templatesPanel.classList.remove('active');
-    }
-  });
-
-  // Enhanced add button handlers
-  document.querySelectorAll(selectors.addButtons).forEach(btn => {
-    if (btn.id.startsWith('add-')) {
-      const type = btn.id.replace('add-', '').replace('-btn', '');
-      btn.addEventListener('click', () => {
-        if (type === 'skills') addNewTag(btn);
-        else if (type !== 'summary') addNewItem(btn, type);
-      });
-    }
-  });
-
-  document.addEventListener('click', (e) => {
-    // Handle empty state "Add Section" buttons
-    if (e.target.closest('.add-section-btn')) {
-      const button = e.target.closest('.add-section-btn');
-      const sectionType = button.dataset.section;
-      console.log('Adding section:', sectionType);
-      addNewSection(button, sectionType);
-    }
+document.addEventListener('click', (e) => {
+  // Handle template selection via radio buttons with loading
+  if (e.target.matches('input[name="template"]')) {
+    const templateId = e.target.value;
+    const templateName = e.target.closest('.template-option').querySelector('.template-name')?.textContent;
     
-    // Handle "Add Item" buttons with data-section attribute
-    if (e.target.closest('.add-item-btn[data-section]')) {
-      const button = e.target.closest('.add-item-btn');
-      const sectionType = button.dataset.section;
-      console.log('Adding item:', sectionType);
-      addNewItem(button, sectionType);
+    if (templateId && templateConfigs[templateId]) {
+      handleTemplateSelection(templateId, templateName);
     }
-  });
-
-  // Existing tag and item event listeners
-  document.querySelectorAll(selectors.sectionTags).forEach(addTagEventListeners);
-  document.querySelectorAll(selectors.sectionItems).forEach(addItemEventListeners);
-
-  // Enhanced file drop handlers
-  document.addEventListener('dragover', (e) => e.preventDefault());
-  document.addEventListener('drop', (e) => {
+  }
+  
+  // Enhanced template label clicks
+  if (e.target.closest('.template-label')) {
+    const label = e.target.closest('.template-label');
+    const templateId = label.dataset.templateId;
+    const radio = document.querySelector(`#template-${templateId}`);
+    
+    if (radio && !radio.checked) {
+      radio.checked = true;
+      radio.dispatchEvent(new Event('click'));
+    }
+  }
+  
+  // Enhanced select button clicks with loading
+  if (e.target.classList.contains('select-btn')) {
     e.preventDefault();
-    showEnhancedNotification('📁 File uploads will be supported in a future version.', 'info');
-  });
-
-  // Enhanced input change handler with professional debouncing
-  document.addEventListener('input', debounce((e) => {
-    if (e.target.getAttribute('contenteditable') === 'true') {
-      state.hasUnsavedChanges = true;
-      clearTimeout(state.autoSaveTimeout);
-      state.autoSaveTimeout = setTimeout(enhancedAutoSave, 1500);
-      showAutoSaveIndicator();
-    }
-  }, 100));
-
-  // Enhanced unload warning
-  window.addEventListener('beforeunload', (e) => {
-    if (state.hasUnsavedChanges) {
-      e.preventDefault();
-      e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
-      return e.returnValue;
-    }
-  });
-
-  // Enhanced iframe loading with loading overlay
-  if (elements.iframe) {
-    showIframeLoading('Loading resume preview...');
-    elements.iframe.addEventListener('load', () => {
-      const iframeDoc = elements.iframe.contentDocument || elements.iframe.contentWindow.document;
-      setupIframeListeners(iframeDoc);
-      hideIframeLoading();
-    });
+    handleTemplateSelectButton(e.target);
   }
 
-  // Initial auto-save with delay
-  setTimeout(enhancedAutoSave, 3000);
-
-  // Enhanced PDF preview handler
-  const previewPdfButton = document.querySelector('#preview-pdf-btn');
-  if (previewPdfButton) {
-    previewPdfButton.addEventListener('click', handlePDFPreview);
+  // Handle AI feature cards
+  if (e.target.closest('.ai-feature-card')) {
+    const action = e.target.closest('.ai-feature-card').dataset.action;
+    handleAIFeature(action);
   }
+});
+document.addEventListener('DOMContentLoaded', () => {
+  if(window == window.top) {
+    const root = document.documentElement;
+    const elements = {
+      saveButton: document.querySelector(selectors.saveButton),
+      iframe: document.querySelector(selectors.iframe),
+      templateButton: document.querySelector(selectors.templateButton),
+      templatesPanel: document.querySelector(selectors.templatesPanel),
+      closePanelButtons: document.querySelectorAll(selectors.closePanelButtons),
+      aiButton: document.querySelector(selectors.aiButton),
+      aiModal: document.querySelector(selectors.aiModal),
+      aiModalClose: document.querySelector(selectors.aiModalClose),
+      tooltipContainers: document.querySelectorAll(selectors.tooltipContainers),
+    };
 
-  // Add keyboard shortcuts
-  document.addEventListener('keydown', handleKeyboardShortcuts);
-
-    // Initialize bullet points for existing content
-    setTimeout(() => {
-      initializeExistingBullets();
-      
-      // Also initialize iframe content if it exists
-      const iframe = document.querySelector('#preview-iframe');
-      if (iframe) {
-        iframe.addEventListener('load', () => {
-          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-          if (iframeDoc) {
-            initializeIframeBullets(iframeDoc);
+      if (elements.iframe) {
+        elements.iframe.addEventListener('load', () => {
+          let templateId = state.currentTemplate || getCurrentTemplateName();
+         templateId = templateId.split("_")[1];
+          if (templateLoaders[templateId]) {
+            templateLoaders[templateId].loader(elements.iframe.contentDocument);
+            templateLoaders[templateId].initialize(elements.iframe.contentDocument);
           }
+          setupIframeListeners(elements.iframe.contentDocument);
         });
       }
-    }, 500);
+    // Save button handler with enhanced feedback
+    if (elements.saveButton) {
+      elements.saveButton.addEventListener('click',()=>saveResumeData({ showNotifications: true, isAutoSave: false }));
+    }
+  
+    // Enhanced template meta tag handling
+    const selectedRadio = document.querySelector('input[name="template"]:checked');
+    if (selectedRadio) {
+      const templateId = selectedRadio.value;
+      state.currentTemplate = templateId;
+      updateTemplateMetaTag(templateId);
+    }
+  
+    // Enhanced AI modal handlers with animations
+    if (elements.aiButton && elements.aiModal && elements.aiModalClose) {
+      elements.aiButton.addEventListener('click', () => {
+        if (elements.templatesPanel?.classList.contains('active')) {
+          elements.templatesPanel.classList.remove('active');
+        }
+        openAIModalWithAnimation();
+      });
+  
+      elements.aiModalClose.addEventListener('click', () => {
+        closeAIModalWithAnimation();
+      });
+  
+      elements.aiModal.addEventListener('click', (e) => {
+        if (e.target === elements.aiModal) {
+          closeAIModalWithAnimation();
+        }
+      });
+    }
+  
+    // Enhanced template panel toggle with loading
+    if (elements.templateButton && elements.templatesPanel) {
+      elements.templateButton.addEventListener('click', () => {
+        if (elements.aiModal?.classList.contains('active')) {
+          closeAIModalWithAnimation();
+        }
+        toggleTemplatePanelWithAnimation();
+      });
+    }
+  
+    // Enhanced tooltip handlers
+    elements.tooltipContainers.forEach(container => {
+      const tooltip = container.querySelector('.btn-tooltip');
+      if (tooltip) {
+        container.addEventListener('mouseenter', () => {
+          tooltip.style.opacity = '1';
+          tooltip.style.visibility = 'visible';
+          tooltip.style.transform = 'translateY(-50%) translateX(8px)';
+        });
+        container.addEventListener('mouseleave', () => {
+          tooltip.style.opacity = '0';
+          tooltip.style.visibility = 'hidden';
+          tooltip.style.transform = 'translateY(-50%) translateX(0)';
+        });
+      }
+    });
+  
+    // Enhanced close panels
+    elements.closePanelButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const panelId = button.getAttribute('data-panel');
+        const panel = document.getElementById(panelId);
+        if (panel) {
+          panel.classList.remove('active');
+          // Add exit animation
+          panel.style.transform = 'translateX(-100%)';
+          setTimeout(() => {
+            panel.style.transform = '';
+          }, 300);
+        }
+      });
+    });
+  
+    // Enhanced outside click handling
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.slide-panel') && !e.target.closest('.float-control-btn') && 
+          elements.templatesPanel?.classList.contains('active')) {
+        elements.templatesPanel.classList.remove('active');
+      }
+    });
+  
+    document.addEventListener('click', (e) => {
+      // Handle empty state "Add Section" buttons
+      if (e.target.closest('.add-section-btn')) {
+        const button = e.target.closest('.add-section-btn');
+        const sectionType = button.dataset.section;
+        console.log('Adding section:', sectionType);
+        addNewSection(button, sectionType);
+      }
+      
+      // Handle "Add Item" buttons with data-section attribute
+      if (e.target.closest('.add-item-btn[data-section]')) {
+        const button = e.target.closest('.add-item-btn');
+        const sectionType = button.dataset.section;
+        console.log('Adding item:', sectionType);
+        addNewItem(button, sectionType);
+      }
+    });
+  
+    // Existing tag and item event listeners
+    document.querySelectorAll(selectors.sectionTags).forEach(addTagEventListeners);
+    document.querySelectorAll(selectors.sectionItems).forEach(addItemEventListeners);
+  
+    // Enhanced file drop handlers
+    document.addEventListener('dragover', (e) => e.preventDefault());
+    document.addEventListener('drop', (e) => {
+      e.preventDefault();
+      showEnhancedNotification('📁 File uploads will be supported in a future version.', 'info');
+    });
+  
+    // Enhanced input change handler with professional debouncing
+    document.addEventListener('input', debounce((e) => {
+      if (e.target.getAttribute('contenteditable') === 'true') {
+        state.hasUnsavedChanges = true;
+        clearTimeout(state.autoSaveTimeout);
+        state.autoSaveTimeout = setTimeout(saveResumeData, 1500, { showNotifications: false, isAutoSave: true });
+        showAutoSaveIndicator();
+      }
+    }, 100));
+  
+    // Enhanced unload warning
+    window.addEventListener('beforeunload', (e) => {
+      if (state.hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        return e.returnValue;
+      }
+    });
+
+  
+  
+    // Initial auto-save with delay
+    setTimeout(saveResumeData, 3000,{ showNotifications: false, isAutoSave: true });
+  
+    // Enhanced PDF preview handler
+    const previewPdfButton = document.querySelector('#preview-pdf-btn');
+    if (previewPdfButton) {
+      previewPdfButton.addEventListener('click', handlePDFPreview);
+    }
+  
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', handleKeyboardShortcuts);
+  
+      // Initialize bullet points for existing content
+      setTimeout(() => {
+        initializeExistingBullets();
+        
+     
+      }, 500);
+  }
+ 
 });
 
-// Main function to add new bullet points
+function setupIframeListeners(iframeDoc) {
+  iframeDoc.querySelectorAll('.section-tag').forEach(addTagEventListeners);
+  iframeDoc.querySelectorAll('.section-item').forEach(addItemEventListeners);
+  
+  // Initialize bullet points in iframe
+  initializeIframeBullets(iframeDoc);
+  
+  if(!iframeDoc.hasInputListener) {
+    iframeDoc.addEventListener('click', (e) => {
+      if (e.target.closest('.add-section-btn')) {
+        const button = e.target.closest('.add-section-btn');
+        const sectionType = button.dataset.section;
+        window.parent.addNewSection(button, sectionType);
+      }
+      
+      if (e.target.closest('.add-item-btn[data-section]')) {
+        const button = e.target.closest('.add-item-btn');
+        const sectionType = button.dataset.section;
+        window.parent.addNewItem(button, sectionType);
+      }
+    });
+    iframeDoc.addEventListener('input', () => {
+      state.hasUnsavedChanges = true;
+      clearTimeout(state.autoSaveTimeout);
+      // state.autoSaveTimeout = setTimeout(saveResumeData, 3000,{ showNotifications: false, isAutoSave: true });
+    });
+  }
+}
+function classicInitialize(iframeDoc) {
+  console.log("Iframe: Initializing classic template event listeners");
+
+  iframeDoc.querySelectorAll('[contenteditable="true"]').forEach(field => {
+    field.addEventListener('focus', () => {
+      field.style.outline = '2px solid #007bff';
+      field.style.backgroundColor = '#f8f9fa';
+      field.style.padding = '2px';
+    });
+    field.addEventListener('blur', () => {
+      field.style.outline = 'none';
+      field.style.backgroundColor = 'transparent';
+      field.style.padding = '0';
+    });
+  });
+
+  iframeDoc.querySelectorAll('.section-job-title, .section-company, .section-duration, .section-degree, .section-school, .section-date, .section-name, .section-issuer').forEach(field => {
+    field.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        field.blur();
+      }
+    });
+  });
+
+  iframeDoc.querySelectorAll('.item-btn.delete').forEach(button => {
+    button.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const item = button.closest('.section-item');
+      const sectionType = item.dataset.section;
+      const confirmed = await window.parent.showEnhancedConfirmModal({
+        title: `Delete ${sectionType.charAt(0).toUpperCase() + sectionType.slice(1)}`,
+        message: `Are you sure you want to delete this ${sectionType} item?`,
+        details: 'This action cannot be undone.',
+        confirmText: 'Delete',
+        confirmStyle: 'danger',
+        icon: 'fas fa-exclamation-triangle'
+      });
+      if (confirmed) {
+        window.parent.deleteItem(item);
+      }
+    });
+  });
+
+  iframeDoc.querySelectorAll('.section-item').forEach(item => {
+    item.addEventListener('mouseenter', () => {
+      item.style.backgroundColor = '#f1f3f5';
+      item.style.transition = 'background-color 0.2s ease';
+    });
+    item.addEventListener('mouseleave', () => {
+      item.style.backgroundColor = 'transparent';
+    });
+    item.setAttribute('tabindex', '0');
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const firstEditable = item.querySelector('[contenteditable="true"]');
+        if (firstEditable) {
+          firstEditable.focus();
+        }
+      }
+    });
+  });
+
+  iframeDoc.addEventListener('click', (e) => {
+    if (e.target.closest('.add-tag-btn')) {
+      const button = e.target.closest('.add-tag-btn');
+      const sectionType = button.getAttribute('data-section');
+      if (sectionType === 'skills' || sectionType === 'technical-skills' || sectionType === 'soft-skills') {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("lklkalskdfajlsjdkf")
+        window.parent.addNewSkillTag(button);
+      }
+    }
+
+    if (e.target.classList.contains('tag-delete')) {
+      const tag = e.target.closest('.section-tag');
+      if (tag && tag.closest('[data-section-type="skills"]')) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.parent.deleteSkillTag(e.target);
+      }
+    }
+
+    if (e.target.closest('.section-tag') && !e.target.classList.contains('tag-delete')) {
+      const tag = e.target.closest('.section-tag');
+      if (tag && tag.closest('[data-section-type="skills"]')) {
+        window.parent.editSkillTag(tag);
+      }
+    }
+  });
+}
+function classicTemplateLoader(iframeDoc) {
+  console.log("Iframe: Loading classic template");
+  initializeIframeBullets(iframeDoc);
+  iframeDoc.querySelectorAll('.section-item').forEach(item => {
+    item.classList.add('classic-item');
+  });
+}
+function cardTemplateLoader() {
+
+}
+
+
 function addNewBulletPoint(promptElement) {
   const descriptionContainer = promptElement.parentElement;
   const dutiesList = descriptionContainer.querySelector('.duties-list');
@@ -327,6 +490,7 @@ function addNewBulletPoint(promptElement) {
   deleteBtn.className = 'bullet-delete';
   deleteBtn.innerHTML = '×';
   deleteBtn.title = 'Delete this point';
+  deleteBtn.contentEditable = false;
   deleteBtn.onclick = (e) => {
     e.stopPropagation();
     deleteBulletPoint(newBullet);
@@ -351,9 +515,38 @@ function addNewBulletPoint(promptElement) {
   // Mark as changed for auto-save
   state.hasUnsavedChanges = true;
   clearTimeout(state.autoSaveTimeout);
-  state.autoSaveTimeout = setTimeout(enhancedAutoSave, 1500);
+ state.autoSaveTimeout = setTimeout(saveResumeData, 1500,{ showNotifications: false, isAutoSave: true });
   
   return newBullet;
+}
+// Main function to add new bullet points
+function addBulletFromData(dutiesList, bulletText) {
+  if (!bulletText || !bulletText.trim()) return;
+  
+  const bullet = document.createElement('li');
+  bullet.contentEditable = true;
+  bullet.textContent = bulletText.trim();
+  
+  // Add delete button
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'bullet-delete';
+  deleteBtn.innerHTML = '×';
+  deleteBtn.title = 'Delete this point';
+  deleteBtn.contentEditable = false; 
+  deleteBtn.onclick = (e) => {
+    e.stopPropagation();
+    deleteBulletPoint(bullet);
+  };
+  
+  bullet.appendChild(deleteBtn);
+
+  const textNode = document.createTextNode(bulletText.trim());
+  bullet.insertBefore(textNode, deleteBtn);
+  
+  setupBulletEventListeners(bullet);
+  dutiesList.appendChild(bullet);
+  
+  return bullet;
 }
 // Function to delete individual bullet points
 function deleteBulletPoint(bulletElement) {
@@ -368,12 +561,11 @@ function deleteBulletPoint(bulletElement) {
     // Mark as changed for auto-save
     state.hasUnsavedChanges = true;
     clearTimeout(state.autoSaveTimeout);
-    state.autoSaveTimeout = setTimeout(enhancedAutoSave, 1500);
+    state.autoSaveTimeout = setTimeout(saveResumeData, 1500,{ showNotifications: false, isAutoSave: true });
     
     showEnhancedNotification('Bullet point removed', 'success');
   }, 300);
 }
-
 // Setup event listeners for bullet points
 function setupBulletEventListeners(bulletElement) {
   // Handle Enter key to add new bullet
@@ -426,28 +618,14 @@ function setupBulletEventListeners(bulletElement) {
   bulletElement.addEventListener('input', () => {
     state.hasUnsavedChanges = true;
     clearTimeout(state.autoSaveTimeout);
-    state.autoSaveTimeout = setTimeout(enhancedAutoSave, 1500);
+    state.autoSaveTimeout = setTimeout(saveResumeData, 1500,{ showNotifications: false, isAutoSave: true });
   });
   
   // Handle focus events
   bulletElement.addEventListener('focus', () => {
     bulletElement.style.outline = 'none';
   });
-  
-  // Handle blur to clean up empty bullets
-  bulletElement.addEventListener('blur', () => {
-    // Remove bullet if it's empty and not the only one
-    const dutiesList = bulletElement.parentElement;
-    const bullets = dutiesList.querySelectorAll('li');
-    
-    if (bulletElement.textContent.trim() === '' && bullets.length > 1) {
-      setTimeout(() => {
-        if (document.activeElement !== bulletElement) {
-          deleteBulletPoint(bulletElement);
-        }
-      }, 100);
-    }
-  });
+
 }
 
 // Function to populate existing bullets when loading data
@@ -508,30 +686,6 @@ function collectBulletData(descriptionElement) {
   
   return bulletTexts.length > 0 ? bulletTexts.join('\n') : '';
 }
-// Helper function to add bullet from existing data
-function addBulletFromData(dutiesList, bulletText) {
-  if (!bulletText || !bulletText.trim()) return;
-  
-  const bullet = document.createElement('li');
-  bullet.contentEditable = true;
-  bullet.textContent = bulletText.trim();
-  
-  // Add delete button
-  const deleteBtn = document.createElement('button');
-  deleteBtn.className = 'bullet-delete';
-  deleteBtn.innerHTML = '×';
-  deleteBtn.title = 'Delete this point';
-  deleteBtn.onclick = (e) => {
-    e.stopPropagation();
-    deleteBulletPoint(bullet);
-  };
-  
-  bullet.appendChild(deleteBtn);
-  setupBulletEventListeners(bullet);
-  dutiesList.appendChild(bullet);
-  
-  return bullet;
-}
 // Initialize existing bullet points when page loads
 function initializeExistingBullets() {
   // Find all existing section descriptions with bullet lists
@@ -558,258 +712,637 @@ function initializeExistingBullets() {
     }
   });
 }
+function addNewSection(button, sectionType) {
+  console.log('Adding new section:', sectionType);
 
-document.addEventListener('click', (e) => {
-  // Handle template selection via radio buttons with loading
-  if (e.target.matches('input[name="template"]')) {
-    const templateId = e.target.value;
-    const templateName = e.target.closest('.template-option').querySelector('.template-name')?.textContent;
-    
-    if (templateId && templateConfigs[templateId]) {
-      handleTemplateSelection(templateId, templateName);
+  addNewItem(button, sectionType);
+}
+function deleteItem(item) {
+  showEnhancedConfirmModal({
+    title: 'Delete Item',
+    message: 'Are you sure you want to delete this item?',
+    details: 'This action cannot be undone.',
+    confirmText: 'Delete',
+    confirmStyle: 'danger',
+    icon: 'fas fa-exclamation-triangle'
+  }).then(confirmed => {
+    if (confirmed) {
+      item.style.transition = 'all 0.3s ease';
+      item.style.opacity = '0';
+      item.style.transform = 'scale(0.8)';
+      setTimeout(() => {
+        item.remove();
+        state.hasUnsavedChanges = true;
+        saveResumeData({ showNotifications: false, isAutoSave: true })
+        showEnhancedNotification('Item deleted successfully', 'success');
+      }, 300);
     }
+  });
+}
+function addTagEventListeners(tag) {
+  const deleteBtn = tag.querySelector('.tag-delete');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Check if this is a skills tag for special handling
+      if (tag.closest('[data-section-type="skills"]')) {
+        deleteSkillTag(deleteBtn);
+      } else {
+        // Original delete logic for other tags
+        tag.style.transition = 'all 0.3s ease';
+        tag.style.opacity = '0';
+        tag.style.transform = 'scale(0.8)';
+        
+        setTimeout(() => {
+          tag.remove();
+          state.hasUnsavedChanges = true;
+          saveResumeData({ showNotifications: false, isAutoSave: true });
+          showEnhancedNotification('Tag removed successfully', 'success');
+        }, 300);
+      }
+    });
   }
-  
-  // Enhanced template label clicks
-  if (e.target.closest('.template-label')) {
-    const label = e.target.closest('.template-label');
-    const templateId = label.dataset.templateId;
-    const radio = document.querySelector(`#template-${templateId}`);
+}
+
+async function addNewTag(button) {
+  const tagName = prompt('Enter item name:');
+  if (tagName) {
+    const tagsContainer = button.parentElement;
+    const newTag = Object.assign(document.createElement('span'), {
+      className: 'section-tag',
+      innerHTML: `<i class="fas fa-check"></i>${tagName}<i class="fas fa-times tag-delete"></i>`,
+    });
     
-    if (radio && !radio.checked) {
-      radio.checked = true;
-      radio.dispatchEvent(new Event('click'));
-    }
-  }
-  
-  // Enhanced select button clicks with loading
-  if (e.target.classList.contains('select-btn')) {
-    e.preventDefault();
-    handleTemplateSelectButton(e.target);
-  }
-
-  // Handle AI feature cards
-  if (e.target.closest('.ai-feature-card')) {
-    const action = e.target.closest('.ai-feature-card').dataset.action;
-    handleAIFeature(action);
-  }
-});
-
-function initializeEnhancements() {
-  // Add professional styles if not exists
-  if (!document.querySelector('#professional-enhancements-styles')) {
-    const enhancementStyles = document.createElement('style');
-    enhancementStyles.id = 'professional-enhancements-styles';
-    enhancementStyles.textContent = `
-      /* Enhanced floating controls */
-      .floating-controls-left .float-control-btn {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-      }
-      
-      .floating-controls-left .float-control-btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-        transition: left 0.5s;
-      }
-      
-      .floating-controls-left .float-control-btn:hover::before {
-        left: 100%;
-      }
-      
-      .floating-controls-left .float-control-btn:hover {
-        transform: translateY(-4px) scale(1.05);
-        box-shadow: 0 12px 40px rgba(79, 70, 229, 0.3);
-      }
-
-      /* Enhanced tooltips */
-      .btn-tooltip {
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
-      }
-
-      /* Enhanced template panel */
-      .slide-panel {
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .template-label {
-        transition: all 0.3s ease;
-      }
-
-      .template-label:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-      }
-
-      .template-overlay {
-        transition: all 0.3s ease;
-      }
-
-      .template-label:hover .template-overlay {
-        opacity: 1;
-      }
-
-      .template-label:hover .template-thumbnail {
-        transform: scale(1.1);
-      }
-
-      /* Enhanced AI modal */
-      .ai-modal {
-        transition: all 0.3s ease;
-      }
-
-      .ai-modal-content {
-        transition: transform 0.3s ease;
-      }
-
-      .ai-feature-card {
-        transition: all 0.3s ease;
-      }
-
-      .ai-feature-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 40px rgba(79, 70, 229, 0.15);
-      }
-
-      /* Enhanced save button */
-      .save-button {
-        transition: all 0.3s ease;
-      }
-
-      .save-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
-      }
-
-      .save-button.saving {
-        background: linear-gradient(135deg, #6B7280, #4B5563);
-        cursor: not-allowed;
-      }
-
-      .save-button.saving i {
-        animation: spin 1s linear infinite;
-      }
-
-      /* Loading overlay for iframe */
-      .iframe-loading-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        z-index: 500;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-        border-radius: 20px;
-      }
-
-      .iframe-loading-overlay.active {
-        opacity: 1;
-        visibility: visible;
-      }
-
-      .loading-spinner {
-        width: 60px;
-        height: 60px;
-        border: 4px solid rgba(79, 70, 229, 0.2);
-        border-top: 4px solid #4F46E5;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-bottom: 20px;
-      }
-
-      .loading-text {
-        color: #4F46E5;
-        font-size: 16px;
-        font-weight: 600;
-        text-align: center;
-      }
-
-      .loading-subtext {
-        color: #6B7280;
-        font-size: 14px;
-        margin-top: 8px;
-        text-align: center;
-      }
-
-      /* Auto-save indicator */
-      .auto-save-indicator {
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        background: rgba(79, 70, 229, 0.9);
-        color: white;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 500;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
-        opacity: 0;
-        transform: translateY(20px);
-        transition: all 0.3s ease;
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .auto-save-indicator.show {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      .auto-save-indicator.success {
-        background: rgba(16, 185, 129, 0.9);
-      }
-
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-
-      @keyframes bounce-in {
-        0% { transform: scale(0.3); opacity: 0; }
-        50% { transform: scale(1.05); }
-        70% { transform: scale(0.9); }
-        100% { transform: scale(1); opacity: 1; }
-      }
-
-      .bounce-in {
-        animation: bounce-in 0.6s ease-out;
-      }
+    // Add entrance animation
+    newTag.style.cssText = `
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.3s ease;
     `;
-    document.head.appendChild(enhancementStyles);
+    
+    tagsContainer.insertBefore(newTag, button);
+    addTagEventListeners(newTag);
+    
+    // Animate in
+    setTimeout(() => {
+      newTag.style.opacity = '1';
+      newTag.style.transform = 'scale(1)';
+    }, 10);
+    
+    state.hasUnsavedChanges = true;
+    saveResumeData({ showNotifications: false, isAutoSave: true });
   }
+}
 
-  // Create iframe loading overlay if it doesn't exist
-  if (!document.querySelector('.iframe-loading-overlay')) {
-    const previewContainer = document.querySelector('.resume-preview-container');
-    if (previewContainer) {
-      const loadingOverlay = document.createElement('div');
-      loadingOverlay.className = 'iframe-loading-overlay';
-      loadingOverlay.innerHTML = `
-        <div class="loading-spinner"></div>
-        <div class="loading-text">Loading your resume...</div>
-        <div class="loading-subtext">Please wait while we prepare your preview</div>
-      `;
-      previewContainer.appendChild(loadingOverlay);
+function addItemEventListeners(item) {
+  console.log('Enhanced item listener initialized');
+
+  const deleteBtn = item.querySelector('.item-btn.delete');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const itemId = item.dataset.itemId || item.id?.replace('item-', '');
+
+      // Enhanced confirmation
+      const confirmed = await showEnhancedConfirmModal({
+        title: 'Delete Item',
+        message: 'Are you sure you want to delete this item?',
+        details: 'This action cannot be undone.',
+        confirmText: 'Delete',
+        confirmStyle: 'danger',
+        icon: 'fas fa-exclamation-triangle'
+      });
+
+      if (!confirmed) return;
+
+      const sectionType = item.closest('.resume-section')?.dataset.sectionType;
+      if (!sectionType) {
+        console.error('Section type not found');
+        showEnhancedNotification('Error: Section type not found', 'error');
+        return;
+      }
+
+      const resumeContainer = document.querySelector('.resume-builder') || (window.parent?.document?.querySelector('.resume-builder'));
+      const resumeId = resumeContainer?.dataset.resumeId;
+      if (!resumeId) {
+        console.error('Resume ID not found');
+        showEnhancedNotification('Error: Resume ID not found', 'error');
+        return;
+      }
+
+      if (!itemId) {
+        console.error('Item ID not found');
+        showEnhancedNotification('Error: Item ID not found', 'error');
+        return;
+      }
+
+      // Add professional delete animation
+      item.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+      item.style.opacity = '0.5';
+      item.style.transform = 'scale(0.95) translateX(-10px)';
+      item.style.filter = 'blur(1px)';
+
+      try {
+        const response = await fetch(`/api/v1/resume/${resumeId}/section/${sectionType}/item/${itemId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          },
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          setTimeout(() => {
+            item.remove();
+            showEnhancedNotification('Item deleted successfully', 'success');
+          }, 300);
+        } else {
+          // Reset animation on error
+          item.style.opacity = '1';
+          item.style.transform = 'scale(1) translateX(0)';
+          item.style.filter = 'none';
+          showEnhancedNotification(`Failed to delete item: ${data.message || 'Unknown error'}`, 'error');
+        }
+      } catch (error) {
+        console.error('Delete error:', error);
+        showEnhancedNotification('Error deleting item', 'error');
+        // Reset animation on error
+        item.style.opacity = '1';
+        item.style.transform = 'scale(1) translateX(0)';
+        item.style.filter = 'none';
+      }
+    });
+  }
+}
+function addNewItem(button, type) {
+  if (button.dataset.adding === 'true') {
+    return;
+  }
+  button.dataset.adding = 'true';
+  
+  const originalButtonContent = button.innerHTML;
+  button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+  button.disabled = true;
+  
+  try {
+    const currentTemplateName = getCurrentTemplateName();
+    const templateConfig = templateConfigs[currentTemplateName];
+
+    if (!templateConfig || !templateConfig[type]) {
+      throw new Error(`No template configuration found for ${currentTemplateName}.${type}`);
+    }
+    
+    // Determine target document
+    const targetDoc = window !== window.parent ? document : getIframeDocument() || document;
+    
+    // Create new item
+    const newItem = createItemElement(type, templateConfig[type]);
+    
+    // Find or create section container
+    let container = findSectionContainer(targetDoc, type);
+    
+    if (!container) {
+      // Create new section if none exists
+      container = createNewSection(targetDoc, type);
+    }
+    
+    // Insert item
+    insertItemWithAnimation(container, newItem, button);
+    
+    // Setup editing
+    makeItemEditable(newItem);
+    
+    state.hasUnsavedChanges = true;
+    saveResumeData({ showNotifications: false, isAutoSave: true });
+    
+  } catch (error) {
+    console.error('Error adding new item:', error);
+    showEnhancedNotification(`❌ Failed to add ${type}: ${error.message}`, 'error');
+  } finally {
+    setTimeout(() => {
+      button.innerHTML = originalButtonContent;
+      button.disabled = false;
+      button.dataset.adding = 'false';
+    }, 500);
+  }
+}
+
+
+function createItemElement(type, templateHTML) {
+  const uniqueId = generateUniqueId();
+  const wrapper = document.createElement('div');
+  
+  wrapper.innerHTML = templateHTML;
+  const newItem = wrapper.firstElementChild;
+  
+  newItem.dataset.itemId = uniqueId;
+  newItem.dataset.sectionType = type;
+  newItem.id = `item-${uniqueId}`;
+  
+  // Setup bullet points if this item has description field
+  const descriptionField = newItem.querySelector('.section-description');
+  if (descriptionField) {
+    handleDescriptionField(descriptionField);
+  }
+  
+  return newItem;
+}
+
+function findSectionContainer(doc, sectionType) {
+  // First try to find existing section
+  let container = doc.querySelector(`.${sectionType}-section`);
+  
+  if (container) {
+    return container;
+  }
+  
+  // If no section exists, try to find empty state container
+  container = doc.querySelector(`#${sectionType}-container`);
+  
+  if (container && container.classList.contains('empty')) {
+    // Convert empty state to actual section
+    const section = doc.createElement('section');
+    section.className = `resume-section ${sectionType}-section`;
+    section.setAttribute('data-section-type', sectionType);
+    
+    // Add section title
+    const title = doc.createElement('h2');
+    title.className = 'section-title';
+    title.contentEditable = true;
+    title.innerHTML = `<i class="fas fa-${getSectionIcon(sectionType)}"></i>${getSectionDisplayName(sectionType)}`;
+    section.appendChild(title);
+    
+    // Replace empty container with section
+    container.parentNode.replaceChild(section, container);
+    return section;
+  }
+  
+  return null;
+}
+
+function removeEmptyState(container) {
+  if (container.classList.contains('empty')) {
+    container.classList.remove('empty');
+    
+    // Remove empty state content (add buttons, placeholder text)
+    const emptyContent = container.querySelector('.add-section-btn, .empty-placeholder');
+    if (emptyContent) {
+      emptyContent.remove();
     }
   }
+}
+
+function insertItemWithAnimation(container, newItem, button) {
+  // Add entrance animation
+  newItem.style.cssText += `
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  `;
+  
+  // Insert before the add button, or at the end
+  if (button && container.contains(button)) {
+    container.insertBefore(newItem, button);
+  } else {
+    container.appendChild(newItem);
+  }
+  
+  // Trigger animation
+  setTimeout(() => {
+    newItem.style.opacity = '1';
+    newItem.style.transform = 'translateY(0) scale(1)';
+  }, 50);
+}
+
+function makeItemEditable(item) {
+  // Make all data-field elements editable
+  item.querySelectorAll('[data-field]').forEach(field => {
+    if (!field.hasAttribute('contenteditable') && !field.classList.contains('section-description')) {
+      field.contentEditable = true;
+    }
+    
+    // Special handling for description fields with bullet lists
+    if (field.dataset.field === 'description') {
+      handleDescriptionField(field);
+    }
+    
+    // Add placeholder behavior for simple fields
+    if (field.hasAttribute('placeholder')) {
+      handlePlaceholderField(field);
+    }
+  });
+  
+  // Add delete functionality for the entire item
+  const deleteBtn = item.querySelector('.item-btn.delete');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', () => deleteItem(item));
+  }
+  
+  // Setup item event listeners
+  addItemEventListeners(item);
+}
+
+// function to create a section if it doesn't exist
+function createNewSection(doc, sectionType) {
+  const section = doc.createElement('section');
+  section.className = `resume-section ${sectionType}-section`;
+  section.setAttribute('data-section-type', sectionType);
+  
+  const title = doc.createElement('h2');
+  title.className = 'section-title';
+  title.contentEditable = true;
+  title.innerHTML = `<i class="fas fa-${getSectionIcon(sectionType)}"></i>${getSectionDisplayName(sectionType)}`;
+  
+  section.appendChild(title);
+  
+  // Find a good place to insert the section
+  const lastSection = doc.querySelector('.resume-section:last-of-type');
+  if (lastSection) {
+    lastSection.parentNode.insertBefore(section, lastSection.nextSibling);
+  } else {
+    const header = doc.querySelector('.resume-header');
+    if (header) {
+      header.parentNode.insertBefore(section, header.nextSibling);
+    } else {
+      doc.body.appendChild(section);
+    }
+  }
+  
+  return section;
+}
+// function to handle description input with list formatting
+function handleDescriptionInput(e) {
+  const field = e.target;
+  const text = field.textContent;
+  
+  // If user types bullet points manually, convert to proper list
+  if (text.includes('•') || text.includes('-') || text.includes('*')) {
+    const lines = text.split('\n').filter(line => line.trim());
+    if (lines.length > 1) {
+      const ul = document.createElement('ul');
+      ul.className = 'duties-list';
+      
+      lines.forEach(line => {
+        const cleanLine = line.replace(/^[•\-*]\s*/, '').trim();
+        if (cleanLine) {
+          const li = document.createElement('li');
+          li.textContent = cleanLine;
+          li.contentEditable = true;
+          ul.appendChild(li);
+        }
+      });
+      
+      field.innerHTML = '';
+      field.appendChild(ul);
+    }
+  }
+}
+
+// function to initialize bullets in iframe
+function initializeIframeBullets(iframeDoc) {
+  // Make addNewBulletPoint available in iframe context
+  iframeDoc.defaultView.addNewBulletPoint = addNewBulletPoint;
+  
+  // Initialize existing bullets in iframe
+  iframeDoc.querySelectorAll('.section-description').forEach(descriptionElement => {
+    const dutiesList = descriptionElement.querySelector('.duties-list');
+    if (dutiesList) {
+      dutiesList.querySelectorAll('li').forEach(bullet => {
+        setupBulletEventListeners(bullet);
+        
+        // Add delete button if missing
+        if (!bullet.querySelector('.bullet-delete')) {
+          const deleteBtn = iframeDoc.createElement('button');
+          deleteBtn.className = 'bullet-delete';
+          deleteBtn.innerHTML = '×';
+          deleteBtn.title = 'Delete this point';
+          deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            deleteBulletPoint(bullet);
+          };
+          bullet.appendChild(deleteBtn);
+        }
+      });
+    }
+  });
+}
+
+function handleDescriptionField(descriptionField) {
+  const dutiesList = descriptionField.querySelector('.duties-list');
+  const promptElement = descriptionField.querySelector('.add-bullet-prompt');
+  
+  if (dutiesList) {
+    // Initialize existing bullets
+    dutiesList.querySelectorAll('li').forEach(bullet => {
+      setupBulletEventListeners(bullet);
+      
+      // Add delete button if missing
+      if (!bullet.querySelector('.bullet-delete')) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'bullet-delete';
+        deleteBtn.innerHTML = '×';
+        deleteBtn.title = 'Delete this point';
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation();
+          deleteBulletPoint(bullet);
+        };
+        bullet.appendChild(deleteBtn);
+      }
+    });
+  }
+  
+  // Ensure prompt element has correct onclick
+  if (promptElement && !promptElement.onclick) {
+    promptElement.onclick = () => addNewBulletPoint(promptElement);
+  }
+}
+
+function handlePlaceholderField(field) {
+  // Focus event - clear placeholder styling
+  field.addEventListener('focus', () => {
+    field.classList.remove('placeholder');
+  });
+  
+  // Blur event - add placeholder styling if empty
+  field.addEventListener('blur', () => {
+    if (field.textContent.trim() === '') {
+      field.classList.add('placeholder');
+    }
+  });
+  
+  // Input event - remove placeholder styling when typing
+  field.addEventListener('input', () => {
+    if (field.textContent.trim() !== '') {
+      field.classList.remove('placeholder');
+    }
+  });
+  
+  // Initial state
+  if (field.textContent.trim() === '') {
+    field.classList.add('placeholder');
+  }
+}
+
+// Helper function to populate existing section
+function populateExistingSection(sectionElement, sectionData) {
+  // Clear existing items
+  const existingItems = sectionElement.querySelectorAll('.section-item');
+  existingItems.forEach(item => item.remove());
+  
+  // Add new items based on data
+  if (sectionData.items && Array.isArray(sectionData.items)) {
+    const templateConfig = templateConfigs[getCurrentTemplateName()];
+    const addButton = sectionElement.querySelector('.add-item-btn');
+    
+    sectionData.items.forEach(itemData => {
+      if (templateConfig && templateConfig[sectionData.type]) {
+        const itemElement = createItemElement(sectionData.type, templateConfig[sectionData.type]);
+        populateItemFromData(itemElement, itemData);
+        
+        // Insert before add button if it exists
+        if (addButton) {
+          sectionElement.insertBefore(itemElement, addButton);
+        } else {
+          sectionElement.appendChild(itemElement);
+        }
+      }
+    });
+  }
+}
+
+function createAndPopulateSection(sectionData) {
+  const newSection = createSectionFromData(sectionData);
+  
+  // Find appropriate place to insert
+  const lastSection = document.querySelector('.resume-section:last-of-type');
+  if (lastSection) {
+    lastSection.parentNode.insertBefore(newSection, lastSection.nextSibling);
+  } else {
+    const header = document.querySelector('.resume-header');
+    if (header) {
+      header.parentNode.insertBefore(newSection, header.nextSibling);
+    }
+  }
+}
+async function addNewSkillTag(button) {
+  const skillName = prompt('Enter skill name:');
+  if (!skillName || !skillName.trim()) return;
+  
+  const trimmedSkill = skillName.trim();
+  const tagsContainer = button.parentElement;
+  
+  // Check for duplicates
+  const existingTags = Array.from(tagsContainer.querySelectorAll('.section-tag'));
+  const isDuplicate = existingTags.some(tag => {
+    const tagText = tag.textContent.replace(/\s*✓\s*/, '').replace(/\s*×\s*/, '').trim();
+    return tagText.toLowerCase() === trimmedSkill.toLowerCase();
+  });
+  
+  if (isDuplicate) {
+    showEnhancedNotification('This skill already exists!', 'warning');
+    return;
+  }
+  
+  const newTag = document.createElement('span');
+  newTag.className = 'section-tag';
+  newTag.innerHTML = `
+    <i class="fas fa-check"></i>
+    ${trimmedSkill}
+    <i class="fas fa-times tag-delete"></i>
+  `;
+  
+  // Add entrance animation
+  newTag.style.cssText = `
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+  `;
+  
+  tagsContainer.insertBefore(newTag, button);
+  addTagEventListeners(newTag);
+  
+  // Animate in
+  setTimeout(() => {
+    newTag.style.opacity = '1';
+    newTag.style.transform = 'scale(1)';
+  }, 10);
+  
+  state.hasUnsavedChanges = true;
+  await saveResumeData({ showNotifications: false, isAutoSave: true })
+  showEnhancedNotification(`✅ Added skill: ${trimmedSkill}`, 'success');
+}
+async function editSkillTag(tag) {
+  const currentSkill = tag.textContent.replace(/\s*✓\s*/, '').replace(/\s*×\s*/, '').trim();
+  const newSkill = prompt('Edit skill name:', currentSkill);
+  if (!newSkill || !newSkill.trim() || newSkill.trim() === currentSkill) return;
+
+  const trimmedSkill = newSkill.trim();
+  const tagsContainer = tag.parentElement;
+
+  // Check for duplicates
+  const existingTags = Array.from(tagsContainer.querySelectorAll('.section-tag'));
+  const isDuplicate = existingTags.some(otherTag => {
+    if (otherTag === tag) return false;
+    const tagText = otherTag.textContent.replace(/\s*✓\s*/, '').replace(/\s*×\s*/, '').trim();
+    return tagText.toLowerCase() === trimmedSkill.toLowerCase();
+  });
+
+  if (isDuplicate) {
+    showEnhancedNotification('This skill already exists!', 'warning');
+    return;
+  }
+
+  // Update tag content
+  tag.innerHTML = `
+    <i class="fas fa-check"></i>
+    ${trimmedSkill}
+    <i class="fas fa-times tag-delete"></i>
+  `;
+
+  // Re-attach event listeners
+  window.addTagEventListeners(tag);
+
+  // Trigger auto-save
+  state.hasUnsavedChanges = true;
+  await saveResumeData({ showNotifications: false, isAutoSave: true });
+  showEnhancedNotification(`✅ Updated skill to: ${trimmedSkill}`, 'success');
+}
+async function deleteSkillTag(deleteBtn) {
+  const tag = deleteBtn.closest('.section-tag');
+  if (!tag) return;
+  
+  const skillName = tag.textContent.replace(/\s*✓\s*/, '').replace(/\s*×\s*/, '').trim();
+  
+  // Add enhanced delete animation
+  tag.style.transition = 'all 0.3s ease';
+  tag.style.opacity = '0';
+  tag.style.transform = 'scale(0.8)';
+  
+  setTimeout(async () => {
+    tag.remove();
+    state.hasUnsavedChanges = true;
+    await saveResumeData({ showNotifications: false, isAutoSave: true })
+    showEnhancedNotification(`Removed skill: ${skillName}`, 'success');
+  }, 300);
+}
+
+function getCurrentTemplateName() {
+
+  // First try to get from meta tag
+  const metaTemplate = document.querySelector('meta[name="template"]');
+  let templateName = metaTemplate ? metaTemplate.getAttribute('content').split("_")[1] : null;
+
+  // If not found, try to get from selected radio button
+  if (!templateName) {
+    const selectedRadio = document.querySelector('input[name="template"]:checked');
+    templateName = selectedRadio ? selectedRadio.value.split('_')[1] : 'classic';
+  }
+
+  return templateName;
 }
 
 function handleTemplateSelection(templateId, templateName) {
@@ -888,33 +1421,8 @@ function toggleTemplatePanelWithAnimation() {
   const templatesPanel = document.querySelector('#templates-panel');
   templatesPanel.classList.toggle('active');
 }
-function addNewSection(button, sectionType) {
-  console.log('Adding new section:', sectionType);
 
-  addNewItem(button, sectionType);
-}
-function deleteItem(item) {
-  showEnhancedConfirmModal({
-    title: 'Delete Item',
-    message: 'Are you sure you want to delete this item?',
-    details: 'This action cannot be undone.',
-    confirmText: 'Delete',
-    confirmStyle: 'danger',
-    icon: 'fas fa-exclamation-triangle'
-  }).then(confirmed => {
-    if (confirmed) {
-      item.style.transition = 'all 0.3s ease';
-      item.style.opacity = '0';
-      item.style.transform = 'scale(0.8)';
-      setTimeout(() => {
-        item.remove();
-        state.hasUnsavedChanges = true;
-        enhancedAutoSave();
-        showEnhancedNotification('Item deleted successfully', 'success');
-      }, 300);
-    }
-  });
-}
+
 function showIframeLoading(message = 'Loading...', subtext = 'Please wait while we process your request') {
   const loadingOverlay = document.querySelector('.iframe-loading-overlay');
   if (loadingOverlay) {
@@ -946,71 +1454,160 @@ function showAutoSaveIndicator() {
   if (!indicator) {
     indicator = document.createElement('div');
     indicator.className = 'auto-save-indicator';
-    indicator.innerHTML = `
-      <div style="width: 12px; height: 12px; border: 2px solid rgba(255, 255, 255, 0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-      <span>Auto-saving...</span>
-    `;
     document.body.appendChild(indicator);
   }
   
+  // Clear any existing timeout
+  if (window.autoSaveIndicatorTimeout) {
+    clearTimeout(window.autoSaveIndicatorTimeout);
+  }
+  
   indicator.classList.remove('success');
+  indicator.innerHTML = `
+    <div style="width: 12px; height: 12px; border: 2px solid rgba(255, 255, 255, 0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+    <span>Resume data saving...</span>
+  `;
   indicator.classList.add('show');
   
-  setTimeout(() => {
-    if (indicator.classList.contains('show')) {
-      indicator.innerHTML = `
-        <i class="fas fa-check"></i>
-        <span>Auto-saved</span>
-      `;
-      indicator.classList.add('success');
-      
-      setTimeout(() => {
-        indicator.classList.remove('show');
-      }, 1500);
+  // fallback timeout to hide the indicator if showAutoSaveSuccess isn't called
+  window.autoSaveIndicatorTimeout = setTimeout(() => {
+    indicator.classList.remove('show', 'success');
+  }, 5000); 
+}
+
+async function saveResumeData(options = {}) {
+  const { 
+    showNotifications = true, 
+    isAutoSave = false 
+  } = options;
+  
+  // Log for debugging
+  if (isAutoSave) {
+    console.log("Auto-saving...");
+  }
+  
+  // Check if content generation is in progress
+  if (state.isGeneratingContent) return false;
+
+  try {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    // const resumeId = document.querySelector('.resume-header')?.dataset.resumeId;
+ 
+    const iframe = document.querySelector("#preview-iframe");
+    const resumeId = iframe.getAttribute("resume_id");
+
+    // Enhanced error handling with indicator management
+    if (!resumeId) {
+      if (showNotifications) {
+        showEnhancedNotification('Error: Resume ID not found', 'error');
+      }
+      if (isAutoSave) {
+        hideAutoSaveIndicator();
+      }
+      return false;
     }
-  }, 1000);
-}
+    
+    if (!iframe || !iframe.contentDocument) {
+      if (showNotifications) {
+        showEnhancedNotification('Error: Cannot access resume content', 'error');
+      }
+      if (isAutoSave) {
+        hideAutoSaveIndicator();
+      }
+      return false;
+    }
 
-async function enhancedSaveResume() {
-  const saveButton = document.querySelector('#save-resume-btn');
-  if (!saveButton) return;
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    const resumeContent = collectResumeData(iframeDoc);
+    
+    // Enhanced data validation with indicator management
+    if (!resumeContent || !resumeContent.sections) {
+      if (isAutoSave) {
+        hideAutoSaveIndicator();
+      }
+      throw new Error('Invalid resume data collected');
+    }
 
-  if (!state.hasUnsavedChanges) {
-    showEnhancedNotification('✅ Resume is already up to date!', 'success');
-    return;
-  }
+    const response = await fetch(`/api/v1/resume/${resumeId}/save-data`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json', 
+        'X-CSRFToken': csrfToken 
+      },
+      body: JSON.stringify({ 
+        resume_data: resumeContent,
+        timestamp: new Date().toISOString()
+      }),
+    });
 
-  saveButton.classList.add('saving');
-  saveButton.querySelector('span').textContent = 'Saving...';
-  
-  try {
-    await saveResumeData();
-    saveButton.classList.remove('saving');
-    saveButton.querySelector('span').textContent = 'Save Changes';
-    showEnhancedNotification('✅ Resume saved successfully!', 'success');
+    const data = await response.json();
+    
+    if (response.ok && data.success) {
+      state.hasUnsavedChanges = false;
+      
+      // Different success handling for auto-save vs manual save
+      if (isAutoSave) {
+        showAutoSaveSuccess();
+      } else if (showNotifications) {
+        showEnhancedNotification('✅ Resume data saved successfully!', 'success');
+      }
+      
+      return true;
+    } else {
+      // Hide indicator on error for auto-save
+      if (isAutoSave) {
+        hideAutoSaveIndicator();
+      }
+      throw new Error(data.message || 'Server returned error');
+    }
+    
   } catch (error) {
-    saveButton.classList.remove('saving');
-    saveButton.querySelector('span').textContent = 'Save Changes';
-    showEnhancedNotification('❌ Failed to save resume. Please try again.', 'error');
+    console.error(isAutoSave ? 'Auto-save failed:' : 'Error saving resume:', error);
+    
+    // Hide indicator on error for auto-save
+    if (isAutoSave) {
+      hideAutoSaveIndicator();
+    }
+    
+    // Show notification for manual save or if requested
+    if (showNotifications && !isAutoSave) {
+      showEnhancedNotification(`❌ Save failed: ${error.message}`, 'error');
+    }
+    
+    return false;
   }
 }
 
-async function enhancedAutoSave() {
-  if (state.isGeneratingContent) return;
+function showAutoSaveSuccess() {
+  let indicator = document.querySelector('.auto-save-indicator');
+  if (!indicator) {
+    indicator = document.createElement('div');
+    indicator.className = 'auto-save-indicator';
+    document.body.appendChild(indicator);
+  }
   
-  try {
-    await saveResumeData();
-  } catch (error) {
-    console.error('Auto-save failed:', error);
-    showEnhancedNotification('Auto-save failed. Please save manually.', 'warning');
+  // Clear any existing timeout
+  if (window.autoSaveIndicatorTimeout) {
+    clearTimeout(window.autoSaveIndicatorTimeout);
   }
+  
+  indicator.innerHTML = `
+    <i class="fas fa-check"></i>
+    <span>Resume data saved</span>
+  `;
+  indicator.classList.remove('show', 'success');
+  indicator.classList.add('success', 'show');
+  
+  // Hide after 2 seconds
+  window.autoSaveIndicatorTimeout = setTimeout(() => {
+    indicator.classList.remove('show', 'success');
+  }, 2000);
 }
-
 function handleKeyboardShortcuts(e) {
   // Ctrl/Cmd + S to save
   if ((e.ctrlKey || e.metaKey) && e.key === 's') {
     e.preventDefault();
-    enhancedSaveResume();
+    saveResumeData({ showNotifications: false, isAutoSave: true });
   }
   
   // Escape to close modals/panels
@@ -1134,7 +1731,7 @@ function showEnhancedNotification(message, type = 'info') {
   existing.forEach(n => {
     n.style.opacity = '0';
     n.style.transform = 'translateX(100%)';
-    setTimeout(() => n.remove(), 300);
+    n.remove();
   });
   
   const notification = document.createElement('div');
@@ -1154,22 +1751,7 @@ function showEnhancedNotification(message, type = 'info') {
     info: '#3B82F6'
   };
   
-  notification.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 2000;
-    max-width: 400px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(15px);
-    border-radius: 16px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-    border-left: 4px solid ${colors[type]};
-    opacity: 0;
-    transform: translateX(100%);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-  `;
+  
   
   notification.innerHTML = `
     <div style="padding: 20px; display: flex; align-items: flex-start; gap: 16px;">
@@ -1179,8 +1761,8 @@ function showEnhancedNotification(message, type = 'info') {
       ">
         <i class="${icons[type]}" style="color: white; font-size: 12px;"></i>
       </div>
-      <div style="flex: 1; min-width: 0;">
-        <div style="color: #1F2937; font-size: 15px; line-height: 1.5; font-weight: 600; word-wrap: break-word; margin-bottom: 4px;">
+      <div style="flex: 1; min-width: 0; overflow: hidden;">
+        <div style="color: #1F2937; font-size: 15px; line-height: 1.5; font-weight: 600; word-wrap: break-word; margin-bottom: 4px; overflow-wrap: break-word;">
           ${message}
         </div>
         <div style="color: #6B7280; font-size: 12px; font-weight: 500;">Just now</div>
@@ -1217,92 +1799,7 @@ function showEnhancedNotification(message, type = 'info') {
   });
 }
 
-function setupIframeListeners(iframeDoc) {
-  iframeDoc.querySelectorAll('.section-tag').forEach(addTagEventListeners);
-  iframeDoc.querySelectorAll('.section-item').forEach(addItemEventListeners);
-  
-  // Initialize bullet points in iframe
-  initializeIframeBullets(iframeDoc);
-  
-  // Add event listeners for iframe buttons
-  iframeDoc.addEventListener('click', (e) => {
-    if (e.target.closest('.add-section-btn')) {
-      const button = e.target.closest('.add-section-btn');
-      const sectionType = button.dataset.section;
-      window.parent.addNewSection(button, sectionType);
-    }
-    
-    if (e.target.closest('.add-item-btn[data-section]')) {
-      const button = e.target.closest('.add-item-btn');
-      const sectionType = button.dataset.section;
-      window.parent.addNewItem(button, sectionType);
-    }
-  });
-  
-  iframeDoc.addEventListener('input', () => {
-    state.hasUnsavedChanges = true;
-    clearTimeout(state.autoSaveTimeout);
-    state.autoSaveTimeout = setTimeout(enhancedAutoSave, 3000);
-  });
-}
 
-function showSaveStatus(message, isError = false) {
-  showEnhancedNotification(message, isError ? 'error' : 'success');
-}
-
-async function saveResumeData() {
-  const saveButton = document.querySelector('#save-resume-btn');
-  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-  const resumeId = document.querySelector('.resume-builder')?.dataset.resumeId;
-  const iframe = document.querySelector('#preview-iframe');
-
-  if (!resumeId) {
-    showEnhancedNotification('Error: Resume ID not found', 'error');
-    return false;
-  }
-
-  if (!iframe || !iframe.contentDocument) {
-    showEnhancedNotification('Error: Cannot access resume content', 'error');
-    return false;
-  }
-
-  try {
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    const resumeContent = collectResumeData(iframeDoc);
-    
-    // Validate data before sending
-    if (!resumeContent || !resumeContent.sections) {
-      throw new Error('Invalid resume data collected');
-    }
-
-    const response = await fetch(`/api/v1/resume/${resumeId}/save-data`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json', 
-        'X-CSRFToken': csrfToken 
-      },
-      body: JSON.stringify({ 
-        resume_data: resumeContent,
-        timestamp: new Date().toISOString()
-      }),
-    });
-
-    const data = await response.json();
-    
-    if (response.ok && data.success) {
-      state.hasUnsavedChanges = false;
-      showEnhancedNotification('✅ Resume saved successfully!', 'success');
-      return true;
-    } else {
-      throw new Error(data.message || 'Server returned error');
-    }
-    
-  } catch (error) {
-    console.error('Error saving resume:', error);
-    showEnhancedNotification(`❌ Save failed: ${error.message}`, 'error');
-    return false;
-  }
-}
 
 // Function to load and populate resume data
 function loadResumeData(resumeData) {
@@ -1459,141 +1956,9 @@ function collectResumeData(iframeDoc) {
       resumeData.sections.push(sectionData);
     }
   });
-
+  console.log("collected data " )
+  console.log(resumeData);
   return resumeData;
-}
-
-function addTagEventListeners(tag) {
-  const deleteBtn = tag.querySelector('.tag-delete');
-  if (deleteBtn) {
-    deleteBtn.addEventListener('click', async () => {
-      // Add enhanced delete animation
-      tag.style.transition = 'all 0.3s ease';
-      tag.style.opacity = '0';
-      tag.style.transform = 'scale(0.8)';
-      
-      setTimeout(() => {
-        tag.remove();
-        state.hasUnsavedChanges = true;
-        enhancedAutoSave();
-        showEnhancedNotification('Tag removed successfully', 'success');
-      }, 300);
-    });
-  }
-}
-
-async function addNewTag(button) {
-  const tagName = prompt('Enter item name:');
-  if (tagName) {
-    const tagsContainer = button.parentElement;
-    const newTag = Object.assign(document.createElement('span'), {
-      className: 'section-tag',
-      innerHTML: `<i class="fas fa-check"></i>${tagName}<i class="fas fa-times tag-delete"></i>`,
-    });
-    
-    // Add entrance animation
-    newTag.style.cssText = `
-      opacity: 0;
-      transform: scale(0.8);
-      transition: all 0.3s ease;
-    `;
-    
-    tagsContainer.insertBefore(newTag, button);
-    addTagEventListeners(newTag);
-    
-    // Animate in
-    setTimeout(() => {
-      newTag.style.opacity = '1';
-      newTag.style.transform = 'scale(1)';
-    }, 10);
-    
-    state.hasUnsavedChanges = true;
-    await enhancedAutoSave();
-    showEnhancedNotification(`✨ "${tagName}" added successfully!`, 'success');
-  }
-}
-
-function addItemEventListeners(item) {
-  console.log('Enhanced item listener initialized');
-
-  const deleteBtn = item.querySelector('.item-btn.delete');
-  if (deleteBtn) {
-    deleteBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const itemId = item.dataset.itemId || item.id?.replace('item-', '');
-
-      // Enhanced confirmation
-      const confirmed = await showEnhancedConfirmModal({
-        title: 'Delete Item',
-        message: 'Are you sure you want to delete this item?',
-        details: 'This action cannot be undone.',
-        confirmText: 'Delete',
-        confirmStyle: 'danger',
-        icon: 'fas fa-exclamation-triangle'
-      });
-
-      if (!confirmed) return;
-
-      const sectionType = item.closest('.resume-section')?.dataset.sectionType;
-      if (!sectionType) {
-        console.error('Section type not found');
-        showEnhancedNotification('Error: Section type not found', 'error');
-        return;
-      }
-
-      const resumeContainer = document.querySelector('.resume-builder') || (window.parent?.document?.querySelector('.resume-builder'));
-      const resumeId = resumeContainer?.dataset.resumeId;
-      if (!resumeId) {
-        console.error('Resume ID not found');
-        showEnhancedNotification('Error: Resume ID not found', 'error');
-        return;
-      }
-
-      if (!itemId) {
-        console.error('Item ID not found');
-        showEnhancedNotification('Error: Item ID not found', 'error');
-        return;
-      }
-
-      // Add professional delete animation
-      item.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-      item.style.opacity = '0.5';
-      item.style.transform = 'scale(0.95) translateX(-10px)';
-      item.style.filter = 'blur(1px)';
-
-      try {
-        const response = await fetch(`/api/v1/resume/${resumeId}/section/${sectionType}/item/${itemId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-          },
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          setTimeout(() => {
-            item.remove();
-            showEnhancedNotification('Item deleted successfully', 'success');
-          }, 300);
-        } else {
-          // Reset animation on error
-          item.style.opacity = '1';
-          item.style.transform = 'scale(1) translateX(0)';
-          item.style.filter = 'none';
-          showEnhancedNotification(`Failed to delete item: ${data.message || 'Unknown error'}`, 'error');
-        }
-      } catch (error) {
-        console.error('Delete error:', error);
-        showEnhancedNotification('Error deleting item', 'error');
-        // Reset animation on error
-        item.style.opacity = '1';
-        item.style.transform = 'scale(1) translateX(0)';
-        item.style.filter = 'none';
-      }
-    });
-  }
 }
 
 
@@ -1757,192 +2122,6 @@ function debounce(func, wait) {
   };
 }
 
-function getCurrentTemplateName() {
-  // First try to get from meta tag
-  const metaTemplate = document.querySelector('meta[name="template"]');
-  let templateName = metaTemplate ? metaTemplate.getAttribute('content') : null;
-  
-  // If not found, try to get from selected radio button
-  if (!templateName) {
-    const selectedRadio = document.querySelector('input[name="template"]:checked');
-    templateName = selectedRadio ? selectedRadio.value : 'classic';
-  }
-  
-  return templateName;
-}
-
-
-// Update the addNewItem function to use correct container finding:
-function addNewItem(button, type) {
-  if (button.dataset.adding === 'true') {
-    return;
-  }
-  button.dataset.adding = 'true';
-  
-  const originalButtonContent = button.innerHTML;
-  button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
-  button.disabled = true;
-  
-  try {
-    const currentTemplateName = getCurrentTemplateName();
-    const templateConfig = templateConfigs[currentTemplateName];
-
-    if (!templateConfig || !templateConfig[type]) {
-      throw new Error(`No template configuration found for ${currentTemplateName}.${type}`);
-    }
-    
-    // Determine target document
-    const targetDoc = window !== window.parent ? document : getIframeDocument() || document;
-    
-    // Create new item
-    const newItem = createItemElement(type, templateConfig[type]);
-    
-    // Find or create section container
-    let container = findSectionContainer(targetDoc, type);
-    
-    if (!container) {
-      // Create new section if none exists
-      container = createNewSection(targetDoc, type);
-    }
-    
-    // Insert item
-    insertItemWithAnimation(container, newItem, button);
-    
-    // Setup editing
-    makeItemEditable(newItem);
-    
-    state.hasUnsavedChanges = true;
-    enhancedAutoSave();
-    
-    showEnhancedNotification(`✨ New ${type} added successfully!`, 'success');
-    
-  } catch (error) {
-    console.error('Error adding new item:', error);
-    showEnhancedNotification(`❌ Failed to add ${type}: ${error.message}`, 'error');
-  } finally {
-    setTimeout(() => {
-      button.innerHTML = originalButtonContent;
-      button.disabled = false;
-      button.dataset.adding = 'false';
-    }, 500);
-  }
-}
-
-
-function createItemElement(type, templateHTML) {
-  const uniqueId = generateUniqueId();
-  const wrapper = document.createElement('div');
-  
-  wrapper.innerHTML = templateHTML;
-  const newItem = wrapper.firstElementChild;
-  
-  newItem.dataset.itemId = uniqueId;
-  newItem.dataset.sectionType = type;
-  newItem.id = `item-${uniqueId}`;
-  
-  // Setup bullet points if this item has description field
-  const descriptionField = newItem.querySelector('.section-description');
-  if (descriptionField) {
-    handleDescriptionField(descriptionField);
-  }
-  
-  return newItem;
-}
-
-function findSectionContainer(doc, sectionType) {
-  // First try to find existing section
-  let container = doc.querySelector(`.${sectionType}-section`);
-  
-  if (container) {
-    return container;
-  }
-  
-  // If no section exists, try to find empty state container
-  container = doc.querySelector(`#${sectionType}-container`);
-  
-  if (container && container.classList.contains('empty')) {
-    // Convert empty state to actual section
-    const section = doc.createElement('section');
-    section.className = `resume-section ${sectionType}-section`;
-    section.setAttribute('data-section-type', sectionType);
-    
-    // Add section title
-    const title = doc.createElement('h2');
-    title.className = 'section-title';
-    title.contentEditable = true;
-    title.innerHTML = `<i class="fas fa-${getSectionIcon(sectionType)}"></i>${getSectionDisplayName(sectionType)}`;
-    section.appendChild(title);
-    
-    // Replace empty container with section
-    container.parentNode.replaceChild(section, container);
-    return section;
-  }
-  
-  return null;
-}
-
-function removeEmptyState(container) {
-  if (container.classList.contains('empty')) {
-    container.classList.remove('empty');
-    
-    // Remove empty state content (add buttons, placeholder text)
-    const emptyContent = container.querySelector('.add-section-btn, .empty-placeholder');
-    if (emptyContent) {
-      emptyContent.remove();
-    }
-  }
-}
-
-function insertItemWithAnimation(container, newItem, button) {
-  // Add entrance animation
-  newItem.style.cssText += `
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  `;
-  
-  // Insert before the add button, or at the end
-  if (button && container.contains(button)) {
-    container.insertBefore(newItem, button);
-  } else {
-    container.appendChild(newItem);
-  }
-  
-  // Trigger animation
-  setTimeout(() => {
-    newItem.style.opacity = '1';
-    newItem.style.transform = 'translateY(0) scale(1)';
-  }, 50);
-}
-
-function makeItemEditable(item) {
-  // Make all data-field elements editable
-  item.querySelectorAll('[data-field]').forEach(field => {
-    if (!field.hasAttribute('contenteditable') && !field.classList.contains('section-description')) {
-      field.contentEditable = true;
-    }
-    
-    // Special handling for description fields with bullet lists
-    if (field.dataset.field === 'description') {
-      handleDescriptionField(field);
-    }
-    
-    // Add placeholder behavior for simple fields
-    if (field.hasAttribute('placeholder')) {
-      handlePlaceholderField(field);
-    }
-  });
-  
-  // Add delete functionality for the entire item
-  const deleteBtn = item.querySelector('.item-btn.delete');
-  if (deleteBtn) {
-    deleteBtn.addEventListener('click', () => deleteItem(item));
-  }
-  
-  // Setup item event listeners
-  addItemEventListeners(item);
-}
-
 function getIframeDocument() {
   const iframe = document.getElementById('preview-iframe');
   return iframe?.contentDocument || iframe?.contentWindow?.document;
@@ -1986,188 +2165,10 @@ function getSectionDisplayName(sectionType) {
   return names[sectionType] || sectionType.charAt(0).toUpperCase() + sectionType.slice(1);
 }
 
-// function to handle description input with list formatting
-function handleDescriptionInput(e) {
-  const field = e.target;
-  const text = field.textContent;
-  
-  // If user types bullet points manually, convert to proper list
-  if (text.includes('•') || text.includes('-') || text.includes('*')) {
-    const lines = text.split('\n').filter(line => line.trim());
-    if (lines.length > 1) {
-      const ul = document.createElement('ul');
-      ul.className = 'duties-list';
-      
-      lines.forEach(line => {
-        const cleanLine = line.replace(/^[•\-*]\s*/, '').trim();
-        if (cleanLine) {
-          const li = document.createElement('li');
-          li.textContent = cleanLine;
-          li.contentEditable = true;
-          ul.appendChild(li);
-        }
-      });
-      
-      field.innerHTML = '';
-      field.appendChild(ul);
-    }
-  }
-}
-
-
-// function to create a section if it doesn't exist
-function createNewSection(doc, sectionType) {
-  const section = doc.createElement('section');
-  section.className = `resume-section ${sectionType}-section`;
-  section.setAttribute('data-section-type', sectionType);
-  
-  const title = doc.createElement('h2');
-  title.className = 'section-title';
-  title.contentEditable = true;
-  title.innerHTML = `<i class="fas fa-${getSectionIcon(sectionType)}"></i>${getSectionDisplayName(sectionType)}`;
-  
-  section.appendChild(title);
-  
-  // Find a good place to insert the section
-  const lastSection = doc.querySelector('.resume-section:last-of-type');
-  if (lastSection) {
-    lastSection.parentNode.insertBefore(section, lastSection.nextSibling);
-  } else {
-    const header = doc.querySelector('.resume-header');
-    if (header) {
-      header.parentNode.insertBefore(section, header.nextSibling);
-    } else {
-      doc.body.appendChild(section);
-    }
-  }
-  
-  return section;
-}
-
-// function to initialize bullets in iframe
-function initializeIframeBullets(iframeDoc) {
-  // Make addNewBulletPoint available in iframe context
-  iframeDoc.defaultView.addNewBulletPoint = addNewBulletPoint;
-  
-  // Initialize existing bullets in iframe
-  iframeDoc.querySelectorAll('.section-description').forEach(descriptionElement => {
-    const dutiesList = descriptionElement.querySelector('.duties-list');
-    if (dutiesList) {
-      dutiesList.querySelectorAll('li').forEach(bullet => {
-        setupBulletEventListeners(bullet);
-        
-        // Add delete button if missing
-        if (!bullet.querySelector('.bullet-delete')) {
-          const deleteBtn = iframeDoc.createElement('button');
-          deleteBtn.className = 'bullet-delete';
-          deleteBtn.innerHTML = '×';
-          deleteBtn.title = 'Delete this point';
-          deleteBtn.onclick = (e) => {
-            e.stopPropagation();
-            deleteBulletPoint(bullet);
-          };
-          bullet.appendChild(deleteBtn);
-        }
-      });
-    }
-  });
-}
-
-function handleDescriptionField(descriptionField) {
-  const dutiesList = descriptionField.querySelector('.duties-list');
-  const promptElement = descriptionField.querySelector('.add-bullet-prompt');
-  
-  if (dutiesList) {
-    // Initialize existing bullets
-    dutiesList.querySelectorAll('li').forEach(bullet => {
-      setupBulletEventListeners(bullet);
-      
-      // Add delete button if missing
-      if (!bullet.querySelector('.bullet-delete')) {
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'bullet-delete';
-        deleteBtn.innerHTML = '×';
-        deleteBtn.title = 'Delete this point';
-        deleteBtn.onclick = (e) => {
-          e.stopPropagation();
-          deleteBulletPoint(bullet);
-        };
-        bullet.appendChild(deleteBtn);
-      }
-    });
-  }
-  
-  // Ensure prompt element has correct onclick
-  if (promptElement && !promptElement.onclick) {
-    promptElement.onclick = () => addNewBulletPoint(promptElement);
-  }
-}
-
-function handlePlaceholderField(field) {
-  // Focus event - clear placeholder styling
-  field.addEventListener('focus', () => {
-    field.classList.remove('placeholder');
-  });
-  
-  // Blur event - add placeholder styling if empty
-  field.addEventListener('blur', () => {
-    if (field.textContent.trim() === '') {
-      field.classList.add('placeholder');
-    }
-  });
-  
-  // Input event - remove placeholder styling when typing
-  field.addEventListener('input', () => {
-    if (field.textContent.trim() !== '') {
-      field.classList.remove('placeholder');
-    }
-  });
-  
-  // Initial state
-  if (field.textContent.trim() === '') {
-    field.classList.add('placeholder');
-  }
-}
-
-// Helper function to populate existing section
-function populateExistingSection(sectionElement, sectionData) {
-  // Clear existing items
-  const existingItems = sectionElement.querySelectorAll('.section-item');
-  existingItems.forEach(item => item.remove());
-  
-  // Add new items based on data
-  if (sectionData.items && Array.isArray(sectionData.items)) {
-    const templateConfig = templateConfigs[getCurrentTemplateName()];
-    const addButton = sectionElement.querySelector('.add-item-btn');
-    
-    sectionData.items.forEach(itemData => {
-      if (templateConfig && templateConfig[sectionData.type]) {
-        const itemElement = createItemElement(sectionData.type, templateConfig[sectionData.type]);
-        populateItemFromData(itemElement, itemData);
-        
-        // Insert before add button if it exists
-        if (addButton) {
-          sectionElement.insertBefore(itemElement, addButton);
-        } else {
-          sectionElement.appendChild(itemElement);
-        }
-      }
-    });
-  }
-}
-
-function createAndPopulateSection(sectionData) {
-  const newSection = createSectionFromData(sectionData);
-  
-  // Find appropriate place to insert
-  const lastSection = document.querySelector('.resume-section:last-of-type');
-  if (lastSection) {
-    lastSection.parentNode.insertBefore(newSection, lastSection.nextSibling);
-  } else {
-    const header = document.querySelector('.resume-header');
-    if (header) {
-      header.parentNode.insertBefore(newSection, header.nextSibling);
-    }
+function hideAutoSaveIndicator() {
+  let indicator = document.querySelector('.auto-save-indicator');
+  if (indicator) {
+    indicator.classList.remove('show', 'success');
   }
 }
 
@@ -2193,3 +2194,7 @@ window.addItemEventListeners = addItemEventListeners;
 window.addTagEventListeners = addTagEventListeners;
 window.addNewTag = addNewTag;
 window.addNewItem = addNewItem;
+
+window.addNewSkillTag = addNewSkillTag;
+window.deleteSkillTag = deleteSkillTag;
+window.editSkillTag = editSkillTag;
