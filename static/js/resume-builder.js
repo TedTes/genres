@@ -396,25 +396,6 @@ function classicInitialize(iframeDoc) {
     });
   });
 
-  iframeDoc.querySelectorAll('.item-btn.delete').forEach(button => {
-    button.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const item = button.closest('.section-item');
-      const sectionType = item.dataset.section;
-      const confirmed = await window.parent.showEnhancedConfirmModal({
-        title: `Delete ${sectionType.charAt(0).toUpperCase() + sectionType.slice(1)}`,
-        message: `Are you sure you want to delete this ${sectionType} item?`,
-        details: 'This action cannot be undone.',
-        confirmText: 'Delete',
-        confirmStyle: 'danger',
-        icon: 'fas fa-exclamation-triangle'
-      });
-      if (confirmed) {
-        window.parent.deleteItem(item);
-      }
-    });
-  });
-
   iframeDoc.querySelectorAll('.section-item').forEach(item => {
     item.addEventListener('mouseenter', () => {
       item.style.backgroundColor = '#f1f3f5';
@@ -717,28 +698,7 @@ function addNewSection(button, sectionType) {
 
   addNewItem(button, sectionType);
 }
-function deleteItem(item) {
-  showEnhancedConfirmModal({
-    title: 'Delete Item',
-    message: 'Are you sure you want to delete this item?',
-    details: 'This action cannot be undone.',
-    confirmText: 'Delete',
-    confirmStyle: 'danger',
-    icon: 'fas fa-exclamation-triangle'
-  }).then(confirmed => {
-    if (confirmed) {
-      item.style.transition = 'all 0.3s ease';
-      item.style.opacity = '0';
-      item.style.transform = 'scale(0.8)';
-      setTimeout(() => {
-        item.remove();
-        state.hasUnsavedChanges = true;
-        saveResumeData({ showNotifications: false, isAutoSave: true })
-        showEnhancedNotification('Item deleted successfully', 'success');
-      }, 300);
-    }
-  });
-}
+
 function addTagEventListeners(tag) {
   const deleteBtn = tag.querySelector('.tag-delete');
   if (deleteBtn) {
@@ -1035,13 +995,6 @@ function makeItemEditable(item) {
       handlePlaceholderField(field);
     }
   });
-  
-  // Add delete functionality for the entire item
-  const deleteBtn = item.querySelector('.item-btn.delete');
-  if (deleteBtn) {
-    deleteBtn.addEventListener('click', () => deleteItem(item));
-  }
-  
   // Setup item event listeners
   addItemEventListeners(item);
 }
