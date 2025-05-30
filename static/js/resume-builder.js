@@ -189,7 +189,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     // Save button handler with enhanced feedback
     if (elements.saveButton) {
-      elements.saveButton.addEventListener('click',()=>saveResumeData({ showNotifications: true, isAutoSave: false }));
+      elements.saveButton.addEventListener('click', () => {
+        updateSaveButtonState('saving');
+        saveResumeData({ showNotifications: true, isAutoSave: false });
+      });
     }
   
     // Enhanced template meta tag handling
@@ -300,15 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showEnhancedNotification('📁 File uploads will be supported in a future version.', 'info');
     });
   
-    // Enhanced input change handler with professional debouncing
-    document.addEventListener('input', debounce((e) => {
-      if (e.target.getAttribute('contenteditable') === 'true') {
-        state.hasUnsavedChanges = true;
-        clearTimeout(state.autoSaveTimeout);
-        state.autoSaveTimeout = setTimeout(saveResumeData, 1500, { showNotifications: false, isAutoSave: true });
-        showAutoSaveIndicator();
-      }
-    }, 100));
+ 
   
     // Enhanced unload warning
     window.addEventListener('beforeunload', (e) => {
@@ -364,12 +359,15 @@ function setupIframeListeners(iframeDoc) {
         window.parent.addNewItem(button, sectionType);
       }
     });
-    iframeDoc.addEventListener('input', () => {
-      state.hasUnsavedChanges = true;
-      clearTimeout(state.autoSaveTimeout);
-      // state.autoSaveTimeout = setTimeout(saveResumeData, 3000,{ showNotifications: false, isAutoSave: true });
-    });
   }
+  iframeDoc.addEventListener('input', debounce((e) => {
+    if (e.target.getAttribute('contenteditable') === 'true') {
+      state.hasUnsavedChanges = true;
+      updateSaveButtonState('unsaved');
+      clearTimeout(state.autoSaveTimeout);
+      state.autoSaveTimeout = setTimeout(saveResumeData, 1500, { showNotifications: false, isAutoSave: true });
+    }
+  }, 100));
 }
 function classicInitialize(iframeDoc) {
   console.log("Iframe: Initializing classic template event listeners");
@@ -423,7 +421,6 @@ function classicInitialize(iframeDoc) {
       if (sectionType === 'skills' || sectionType === 'technical-skills' || sectionType === 'soft-skills') {
         e.preventDefault();
         e.stopPropagation();
-        console.log("lklkalskdfajlsjdkf")
         window.parent.addNewSkillTag(button);
       }
     }
@@ -1402,32 +1399,6 @@ function updateTemplateMetaTag(templateId) {
   metaTemplate.setAttribute('content', templateId);
 }
 
-function showAutoSaveIndicator() {
-  let indicator = document.querySelector('.auto-save-indicator');
-  if (!indicator) {
-    indicator = document.createElement('div');
-    indicator.className = 'auto-save-indicator';
-    document.body.appendChild(indicator);
-  }
-  
-  // Clear any existing timeout
-  if (window.autoSaveIndicatorTimeout) {
-    clearTimeout(window.autoSaveIndicatorTimeout);
-  }
-  
-  indicator.classList.remove('success');
-  indicator.innerHTML = `
-    <div style="width: 12px; height: 12px; border: 2px solid rgba(255, 255, 255, 0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-    <span>Resume data saving...</span>
-  `;
-  indicator.classList.add('show');
-  
-  // fallback timeout to hide the indicator if showAutoSaveSuccess isn't called
-  window.autoSaveIndicatorTimeout = setTimeout(() => {
-    indicator.classList.remove('show', 'success');
-  }, 5000); 
-}
-
 async function saveResumeData(options = {}) {
   const { 
     showNotifications = true, 
@@ -1498,29 +1469,16 @@ async function saveResumeData(options = {}) {
     if (response.ok && data.success) {
       state.hasUnsavedChanges = false;
       
-      // Different success handling for auto-save vs manual save
-      if (isAutoSave) {
-        showAutoSaveSuccess();
-      } else if (showNotifications) {
-        showEnhancedNotification('✅ Resume data saved successfully!', 'success');
-      }
-      
+      updateSaveButtonState('saved');
+    
       return true;
     } else {
-      // Hide indicator on error for auto-save
-      if (isAutoSave) {
-        hideAutoSaveIndicator();
-      }
+
       throw new Error(data.message || 'Server returned error');
     }
     
   } catch (error) {
     console.error(isAutoSave ? 'Auto-save failed:' : 'Error saving resume:', error);
-    
-    // Hide indicator on error for auto-save
-    if (isAutoSave) {
-      hideAutoSaveIndicator();
-    }
     
     // Show notification for manual save or if requested
     if (showNotifications && !isAutoSave) {
@@ -1531,31 +1489,7 @@ async function saveResumeData(options = {}) {
   }
 }
 
-function showAutoSaveSuccess() {
-  let indicator = document.querySelector('.auto-save-indicator');
-  if (!indicator) {
-    indicator = document.createElement('div');
-    indicator.className = 'auto-save-indicator';
-    document.body.appendChild(indicator);
-  }
-  
-  // Clear any existing timeout
-  if (window.autoSaveIndicatorTimeout) {
-    clearTimeout(window.autoSaveIndicatorTimeout);
-  }
-  
-  indicator.innerHTML = `
-    <i class="fas fa-check"></i>
-    <span>Resume data saved</span>
-  `;
-  indicator.classList.remove('show', 'success');
-  indicator.classList.add('success', 'show');
-  
-  // Hide after 2 seconds
-  window.autoSaveIndicatorTimeout = setTimeout(() => {
-    indicator.classList.remove('show', 'success');
-  }, 2000);
-}
+
 function handleKeyboardShortcuts(e) {
   // Ctrl/Cmd + S to save
   if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -1751,9 +1685,6 @@ function showEnhancedNotification(message, type = 'info') {
     setTimeout(() => notification.remove(), 400);
   });
 }
-
-
-
 // Function to load and populate resume data
 function loadResumeData(resumeData) {
   if (!resumeData) {
@@ -2125,6 +2056,46 @@ function hideAutoSaveIndicator() {
   }
 }
 
+function updateSaveButtonState(state) {
+  console.log("claled")
+  const saveButton = document.querySelector('#save-resume-btn');
+  const buttonText = saveButton.querySelector('span');
+  const buttonIcon = saveButton.querySelector('i');
+  
+  if (!saveButton) return;
+  
+  // Remove all state classes
+  saveButton.classList.remove('saving', 'saved');
+  
+  switch(state) {
+    case 'saving':
+      saveButton.classList.add('saving');
+      saveButton.disabled = true;
+      buttonText.textContent = 'Saving';
+      buttonIcon.className = 'fas fa-spinner';
+      break;
+      
+    case 'saved':
+      saveButton.classList.add('saved');
+      saveButton.disabled = false;
+      buttonText.textContent = 'Saved';
+      buttonIcon.className = 'fas fa-check';
+      
+      // Reset to normal after 2 seconds
+      setTimeout(() => {
+        saveButton.classList.remove('saved');
+        buttonText.textContent = 'Save';
+        buttonIcon.className = 'fas fa-save';
+      }, 2000);
+      break;
+      
+    case 'unsaved':
+      saveButton.disabled = false;
+      buttonText.textContent = 'Save';
+      buttonIcon.className = 'fas fa-save';
+      break;
+  }
+}
 // Export enhanced functions globally
 window.handleDescriptionField = handleDescriptionField;
 window.handlePlaceholderField = handlePlaceholderField;

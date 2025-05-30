@@ -115,14 +115,15 @@
   /* Enhanced Save Button Container */
   .save-button-container {
     position: fixed;
-    top: 20px;
+    bottom: 20px;
     right: 20px;
     z-index: 1000;
     display: flex;
     align-items: center;
     gap: 12px;
-  }
-  
+
+   }
+
   .save-status {
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
@@ -163,13 +164,22 @@
     transition: all 0.3s ease;
     box-shadow: var(--shadow-success);
     backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
   }
   
   .save-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
   }
-  
+  .save-button.saved {
+    background: linear-gradient(135deg, #10B981, #059669);
+  }
+  .save-button.saved {
+    animation: pulse-success 0.6s ease;
+  }
+  .save-button i {
+    transition: all 0.3s ease;
+  }
   .save-button.saving {
     background: linear-gradient(135deg, #6B7280, #4B5563);
     cursor: not-allowed;
@@ -577,7 +587,10 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
-  
+  @keyframes pulse-success {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
   @keyframes bounce-in {
     0% { transform: scale(0.3); opacity: 0; }
     50% { transform: scale(1.05); }
@@ -609,16 +622,6 @@
     .slide-panel {
       width: 100%;
       left: -100%;
-    }
-  
-    .save-button-container {
-      top: 10px;
-      right: 10px;
-    }
-  
-    .save-button {
-      padding: 10px 16px;
-      font-size: 14px;
     }
   
     .resume-preview-container {
@@ -659,15 +662,6 @@
     .btn-tooltip {
       display: none;
     }
-  
-    .save-button span {
-      display: none;
-    }
-  
-    .save-button {
-      width: 48px;
-      height: 48px;
-      padding: 0;
-      justify-content: center;
-    }
+
   }
+
