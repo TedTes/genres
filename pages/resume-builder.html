@@ -151,6 +151,7 @@
         <iframe src="{{ url_for('resume.resume_render', resume_id=resume.id) }}" 
                 class="preview-iframe" 
                 id="preview-iframe" 
+                resume_id = {{resume.id}}
                 frameborder="0"
                 title="Resume Preview"></iframe>
     </div>

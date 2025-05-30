@@ -357,7 +357,7 @@
                 confirmDelete.addEventListener('click', function() {
                     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
                     if (resumeToDelete) {
-                        fetch(`/resume/${resumeToDelete}/delete`, {
+                        fetch(`/api/v1/resume/${resumeToDelete}/delete`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
