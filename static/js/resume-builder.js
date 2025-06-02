@@ -23,6 +23,11 @@ const selectors = {
 
 const templateConfigs = {
   classic: {
+    summary: `
+      <div class="section-item" data-section="summary">
+        <div class="section-summary" contenteditable="true" data-field="summary" placeholder="Write a compelling professional summary that highlights your key qualifications, experience, and career objectives..."></div>
+      </div>
+    `,
     experience: `
       <div class="section-item" data-section="experience">
         <div class="item-actions">
@@ -93,6 +98,14 @@ const templateConfigs = {
   },
   
   cards: {
+    summary: `
+      <div class="card summary-card section-item" data-section="summary">
+        <div class="card-header">
+          <h3 class="card-title">Professional Summary</h3>
+        </div>
+        <div class="section-summary" contenteditable="true" data-field="summary" placeholder="Write a compelling professional summary that showcases your expertise and career goals..."></div>
+      </div>
+    `,
     experience: `
       <div class="card exp-card section-item" data-section="experience">
         <div class="card-header">
@@ -397,7 +410,7 @@ function classicInitialize(iframeDoc) {
   });
 
   iframeDoc.querySelectorAll('.section-job-title, .section-company, .section-duration, .section-degree, .section-school, .section-date, .section-name, .section-issuer').forEach(field => {
-    field.addEventListener('keypress', (e) => {
+    field.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
         field.blur();
@@ -579,27 +592,35 @@ function setupBulletEventListeners(bulletElement) {
     }
     
     // Handle Backspace on empty bullet to delete it
-    if (e.key === 'Backspace' && bulletElement.textContent.trim() === '') {
-      e.preventDefault();
+    if (e.key === 'Backspace') {
+      // Get text content excluding the delete button
+      const deleteBtn = bulletElement.querySelector('.bullet-delete');
+      const textContent = deleteBtn ? 
+        bulletElement.textContent.replace(deleteBtn.textContent, '').trim() : 
+        bulletElement.textContent.trim();
       
-      const dutiesList = bulletElement.parentElement;
-      const bullets = Array.from(dutiesList.children);
-      const currentIndex = bullets.indexOf(bulletElement);
-      
-      // Focus previous bullet if exists
-      if (currentIndex > 0) {
-        const prevBullet = bullets[currentIndex - 1];
-        prevBullet.focus();
-        // Move cursor to end of previous bullet
-        const range = document.createRange();
-        const selection = window.getSelection();
-        range.selectNodeContents(prevBullet);
-        range.collapse(false);
-        selection.removeAllRanges();
-        selection.addRange(range);
+      if (textContent === '') {
+        e.preventDefault();
+        
+        const dutiesList = bulletElement.parentElement;
+        const bullets = Array.from(dutiesList.children);
+        const currentIndex = bullets.indexOf(bulletElement);
+        
+        // Focus previous bullet if exists
+        if (currentIndex > 0) {
+          const prevBullet = bullets[currentIndex - 1];
+          prevBullet.focus();
+          // Move cursor to end of previous bullet
+          const range = document.createRange();
+          const selection = window.getSelection();
+          range.selectNodeContents(prevBullet);
+          range.collapse(false);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+        
+        deleteBulletPoint(bulletElement);
       }
-      
-      deleteBulletPoint(bulletElement);
     }
   });
   
@@ -607,14 +628,13 @@ function setupBulletEventListeners(bulletElement) {
   bulletElement.addEventListener('input', () => {
     state.hasUnsavedChanges = true;
     clearTimeout(state.autoSaveTimeout);
-    state.autoSaveTimeout = setTimeout(saveResumeData, 1500,{ showNotifications: false, isAutoSave: true });
+    state.autoSaveTimeout = setTimeout(saveResumeData, 1500, { showNotifications: false, isAutoSave: true });
   });
   
   // Handle focus events
   bulletElement.addEventListener('focus', () => {
     bulletElement.style.outline = 'none';
   });
-
 }
 
 // Function to populate existing bullets when loading data
@@ -2061,8 +2081,6 @@ function hideAutoSaveIndicator() {
 }
 
 function updateSaveButtonState(state) {
-  console.log("claled")
-  console.log(state);
   const saveButton = document.querySelector('#save-resume-btn');
   const buttonText = saveButton.querySelector('span');
   const buttonIcon = saveButton.querySelector('i');
