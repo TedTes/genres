@@ -428,7 +428,7 @@ function classicInitialize(iframeDoc) {
     });
     item.setAttribute('tabindex', '0');
     item.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target === item) {
         e.preventDefault();
         const firstEditable = item.querySelector('[contenteditable="true"]');
         if (firstEditable) {
@@ -486,7 +486,7 @@ function addNewBulletPoint(promptElement) {
   const newBullet = document.createElement('li');
   newBullet.contentEditable = true;
   newBullet.className = 'new-bullet';
-  
+  newBullet.innerHTML = '&nbsp;';
   // Add delete button to the bullet
   const deleteBtn = document.createElement('button');
   deleteBtn.className = 'bullet-delete';
@@ -495,6 +495,7 @@ function addNewBulletPoint(promptElement) {
   deleteBtn.contentEditable = false;
   deleteBtn.onclick = (e) => {
     e.stopPropagation();
+    e.preventDefault();
     deleteBulletPoint(newBullet);
   };
   
@@ -537,6 +538,7 @@ function addBulletFromData(dutiesList, bulletText) {
   deleteBtn.contentEditable = false; 
   deleteBtn.onclick = (e) => {
     e.stopPropagation();
+    e.preventDefault();
     deleteBulletPoint(bullet);
   };
   
@@ -1431,6 +1433,8 @@ function updateTemplateMetaTag(templateId) {
 }
 
 async function saveResumeData(options = {}) {
+  console.log("saving resume data");
+  console.log(options);
   const { 
     showNotifications = true, 
     isAutoSave = false 

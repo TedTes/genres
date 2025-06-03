@@ -519,7 +519,6 @@ body {
   line-height: var(--line-height);
   margin-top: 10px;
   background-color: white;
-  padding: 10px 12px;
   border-radius: 6px;
   box-shadow: var(--shadow-sm);
 }
@@ -736,14 +735,6 @@ body {
   margin-right: 8px; 
 }
 
-
-.section-item {
-  position: relative;
-  margin-bottom: 20px;
-  padding: 15px 0;
-  transition: all 0.3s ease;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
 
 .section-item:last-child {
   border-bottom: none;
@@ -1162,6 +1153,7 @@ body {
 
 /* Bullet point list styles */
 .duties-list {
+  position:relative;
   margin: 8px 0 0 0;
   padding-left: 20px;
   list-style-type: disc;
@@ -1176,6 +1168,7 @@ body {
   border-radius: 4px;
   padding: 2px 4px;
   transition: all 0.2s ease;
+  padding-right: 24px;
 }
 
 .duties-list li:hover {
@@ -1197,7 +1190,8 @@ body {
 .bullet-delete {
   position: absolute;
   top: 2px;
-  right: -20px;
+  right: 4px;
+  z-index: 10;
   width: 16px;
   height: 16px;
   background: #ef4444;
@@ -1211,11 +1205,19 @@ body {
   justify-content: center;
   opacity: 0;
   transition: all 0.2s ease;
+  pointer-events:none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
-
+.duties-list li {
+  position: relative; 
+}
 .duties-list li:hover .bullet-delete {
   display: flex;
   opacity: 1;
+  pointer-events: auto;
 }
 
 .bullet-delete:hover {
