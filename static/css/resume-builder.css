@@ -17,7 +17,6 @@
     overflow-x: hidden;
   }
   
-  /* Enhanced Floating Controls */
   .floating-controls-left {
     position: fixed;
     left: 20px;
@@ -45,7 +44,7 @@
     color: #4F46E5;
     font-size: 18px;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     text-decoration: none;
   }
   
@@ -90,10 +89,11 @@
     white-space: nowrap;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
     pointer-events: none;
     backdrop-filter: blur(10px);
-    z-index: 1001;
+    z-index: 1002;
+    display: block !important;
   }
   
   .btn-tooltip::before {
@@ -105,11 +105,14 @@
     border: 6px solid transparent;
     border-right-color: rgba(0, 0, 0, 0.9);
   }
-  
+  .tooltip-container {
+    position: relative; 
+    display: inline-block; 
+  }
   .tooltip-container:hover .btn-tooltip {
     opacity: 1;
     visibility: visible;
-    transform: translateY(-50%) translateX(8px);
+    transform: translateY(-50%) translateX(8px) !important;
   }
   
   /* Enhanced Save Button Container */
@@ -658,10 +661,11 @@
       height: 44px;
       font-size: 14px;
     }
-  
     .btn-tooltip {
-      display: none;
+      left: 50px; 
+      font-size: 10px;
+      padding: 6px 10px;
     }
 
-  }
 
+  }

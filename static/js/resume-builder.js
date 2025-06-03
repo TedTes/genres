@@ -256,23 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleTemplatePanelWithAnimation();
       });
     }
-  
-    // Enhanced tooltip handlers
-    elements.tooltipContainers.forEach(container => {
-      const tooltip = container.querySelector('.btn-tooltip');
-      if (tooltip) {
-        container.addEventListener('mouseenter', () => {
-          tooltip.style.opacity = '1';
-          tooltip.style.visibility = 'visible';
-          tooltip.style.transform = 'translateY(-50%) translateX(8px)';
-        });
-        container.addEventListener('mouseleave', () => {
-          tooltip.style.opacity = '0';
-          tooltip.style.visibility = 'hidden';
-          tooltip.style.transform = 'translateY(-50%) translateX(0)';
-        });
-      }
-    });
+
   
     // Enhanced close panels
     elements.closePanelButtons.forEach(button => {
