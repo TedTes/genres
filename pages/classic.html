@@ -1,3 +1,6 @@
+{% extends "resume-builder.html" %}
+
+{% block title %} {{ resume.contact.name|default('Resume') }} {% endblock %}
 
 {% block content %}
 
@@ -5,7 +8,8 @@
 <style>
   {{css_content | safe }}
   
-  /* Empty state styles */
+  {% if not is_preview %}
+  /* Empty state styles - only show in edit mode */
   .section-container.empty {
     border: 2px dashed #ddd;
     border-radius: 8px;
@@ -44,23 +48,7 @@
     margin-right: 8px;
   }
   
-  /* Hide empty state styles when container has content */
-  .section-container:not(.empty) {
-    border: none;
-    background: none;
-    padding: 0;
-    margin: 0;
-  }
-  
   /* Enhanced section item styles */
-  .section-item {
-    position: relative;
-    margin-bottom: 20px;
-    padding: 15px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-  }
-  
   .section-item:hover {
     background: rgba(0, 123, 255, 0.05);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -90,49 +78,65 @@
   .add-item-btn i {
     margin-right: 6px;
   }
+  {% endif %}
+  
+  /* Hide empty state styles when container has content */
+  .section-container:not(.empty) {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* section item styles */
+  .section-item {
+    position: relative;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
 </style>
 {% endblock %}
 
-
     <!-- Header - Always Present -->
     <div class="resume-header content-editable resume-content" data-resume-id="{{id}}" data-section="header">
-      <h1 class="name" data-field="name" contenteditable="true">{{ resume.bio.name|default('Jane Doe') }}</h1>
-      <h2 class="title" data-field="title" contenteditable="true">{{ resume.bio.title|default('Product Manager') }}</h2>
+      <h1 class="name" data-field="name" {% if not is_preview %}contenteditable="true"{% endif %}>{{ resume.bio.name|default('Jane Doe') }}</h1>
+      <h2 class="title" data-field="title" {% if not is_preview %}contenteditable="true"{% endif %}>{{ resume.bio.title|default('Product Manager') }}</h2>
       
       {% if resume.contact %}
       <div class="contact-grid">
         {% if resume.contact.email %}
         <div class="contact-item content-editable">
           <i class="contact-icon fas fa-envelope"></i>
-          <span class="contact-content" data-field="email" contenteditable="true">{{ resume.contact.email }}</span>
+          <span class="contact-content" data-field="email" {% if not is_preview %}contenteditable="true"{% endif %}>{{ resume.contact.email }}</span>
         </div>
         {% endif %}
         
         {% if resume.contact.phone %}
         <div class="contact-item content-editable">
           <i class="contact-icon fas fa-phone"></i>
-          <span class="contact-content" data-field="phone" contenteditable="true">{{ resume.contact.phone }}</span>
+          <span class="contact-content" data-field="phone" {% if not is_preview %}contenteditable="true"{% endif %}>{{ resume.contact.phone }}</span>
         </div>
         {% endif %}
         
         {% if resume.contact.location %}
         <div class="contact-item content-editable">
           <i class="contact-icon fas fa-map-marker-alt"></i>
-          <span class="contact-content" data-field="location" contenteditable="true">{{ resume.contact.location }}</span>
+          <span class="contact-content" data-field="location" {% if not is_preview %}contenteditable="true"{% endif %}>{{ resume.contact.location }}</span>
         </div>
         {% endif %}
         
         {% if resume.contact.linkedin %}
         <div class="contact-item content-editable">
           <i class="contact-icon fab fa-linkedin"></i>
-          <span class="contact-content" data-field="linkedin" contenteditable="true">{{ resume.contact.linkedin }}</span>
+          <span class="contact-content" data-field="linkedin" {% if not is_preview %}contenteditable="true"{% endif %}>{{ resume.contact.linkedin }}</span>
         </div>
         {% endif %}
         
         {% if resume.contact.website %}
         <div class="contact-item content-editable">
           <i class="contact-icon fas fa-globe"></i>
-          <span class="contact-content" data-field="website" contenteditable="true">{{ resume.contact.website }}</span>
+          <span class="contact-content" data-field="website" {% if not is_preview %}contenteditable="true"{% endif %}>{{ resume.contact.website }}</span>
         </div>
         {% endif %}
       </div>
@@ -159,13 +163,13 @@
       
       {% if section and (section.items or section.content) %}
         <section class="resume-section {{ section.type }}-section" data-section-type="{{ section.type }}">
-          <h2 class="section-title" contenteditable="true">
+          <h2 class="section-title" {% if not is_preview %}contenteditable="true"{% endif %}>
             <i class="fas fa-{{ section_icons.get(section.type, 'star') }}"></i>
             {{ section.title }}
           </h2>
           
           {% if section.display == 'text' %}
-            <div class="section-content" data-field="content" contenteditable="true">
+            <div class="section-content" data-field="content" {% if not is_preview %}contenteditable="true"{% endif %}>
               {{ section.content | safe }}
             </div>
           
@@ -175,32 +179,38 @@
                 <span class="section-tag">
                   <i class="fas fa-check"></i>
                   {{ item }}
+                  {% if not is_preview %}
                   <i class="fas fa-times tag-delete"></i>
+                  {% endif %}
                 </span>
               {% endfor %}
+              {% if not is_preview %}
               <button class="add-tag-btn" data-section="{{ section.type }}" data-type="{{ section.type }}">
                 <i class="fas fa-plus"></i> Add {{ section.type | title }}
               </button>
+              {% endif %}
             </div>
           
           {% else %}
             <!-- List Items -->
             {% for item in section["items"] %}
             <div class="section-item" data-item-id="{{ item.id }}" data-section="{{ section.type }}">
+              {% if not is_preview %}
               <div class="item-actions">
                 <button class="item-btn delete" title="Delete {{ section.type }}">
                   <i class="fas fa-trash"></i>
                 </button>
               </div>
+              {% endif %}
               
               {% if section.type == 'experience' %}
-                <div class="section-job-title" contenteditable="true" data-field="job_title" placeholder="Job Title">
+                <div class="section-job-title" {% if not is_preview %}contenteditable="true"{% endif %} data-field="job_title" placeholder="Job Title">
                   {{- item.job_title|default('') -}}
                 </div>
-                <div class="section-company" contenteditable="true" data-field="company" placeholder="Company Name">
+                <div class="section-company" {% if not is_preview %}contenteditable="true"{% endif %} data-field="company" placeholder="Company Name">
                   {{- item.company|default('') -}}
                 </div>
-                <div class="section-duration" contenteditable="true" data-field="duration" placeholder="Date Range">
+                <div class="section-duration" {% if not is_preview %}contenteditable="true"{% endif %} data-field="duration" placeholder="Date Range">
                   {{- item.duration|default('') -}}
                 </div>
                 {% if item.description %}
@@ -209,52 +219,56 @@
                     {% set description_lines = item.description.split('\n') if item.description else [] %}
                     {% for line in description_lines %}
                       {% if line.strip() %}
-                        <li contenteditable="true">{{ line.strip() }}</li>
+                        <li {% if not is_preview %}contenteditable="true"{% endif %}>{{ line.strip() }}</li>
                       {% endif %}
                     {% endfor %}
                   </ul>
+                  {% if not is_preview %}
                   <div class="add-bullet-prompt" onclick="addNewBulletPoint(this)">
                     <i class="fas fa-plus"></i>
                     <span>Click to add responsibility</span>
                   </div>
+                  {% endif %}
                 </div>
                 {% else %}
                 <div class="section-description" data-field="description">
                   <ul class="duties-list"></ul>
+                  {% if not is_preview %}
                   <div class="add-bullet-prompt" onclick="addNewBulletPoint(this)">
                     <i class="fas fa-plus"></i>
                     <span>Click to add responsibility</span>
                   </div>
+                  {% endif %}
                 </div>
                 {% endif %}
                 
               {% elif section.type == 'education' %}
-                <div class="section-degree" contenteditable="true" data-field="degree" placeholder="Degree">
+                <div class="section-degree" {% if not is_preview %}contenteditable="true"{% endif %} data-field="degree" placeholder="Degree">
                   {{- item.degree|default('') -}}
                 </div>
-                <div class="section-school" contenteditable="true" data-field="school" placeholder="School Name">
+                <div class="section-school" {% if not is_preview %}contenteditable="true"{% endif %} data-field="school" placeholder="School Name">
                   {{- item.school|default('') -}}
                 </div>
-                <div class="section-date" contenteditable="true" data-field="date" placeholder="Year">
+                <div class="section-date" {% if not is_preview %}contenteditable="true"{% endif %} data-field="date" placeholder="Year">
                   {{- item.date|default('') -}}
                 </div>
                 
               {% elif section.type == 'certification' %}
-                <div class="section-name" contenteditable="true" data-field="name" placeholder="Certification Name">
+                <div class="section-name" {% if not is_preview %}contenteditable="true"{% endif %} data-field="name" placeholder="Certification Name">
                   {{- item.name|default('') -}}
                 </div>
-                <div class="section-issuer" contenteditable="true" data-field="issuer" placeholder="Issuing Organization">
+                <div class="section-issuer" {% if not is_preview %}contenteditable="true"{% endif %} data-field="issuer" placeholder="Issuing Organization">
                   {{- item.issuer|default('') -}}
                 </div>
-                <div class="section-date" contenteditable="true" data-field="date" placeholder="Year">
+                <div class="section-date" {% if not is_preview %}contenteditable="true"{% endif %} data-field="date" placeholder="Year">
                   {{- item.date|default('') -}}
                 </div>
                 
               {% elif section.type == 'project' %}
-                <div class="section-name" contenteditable="true" data-field="name" placeholder="Project Name">
+                <div class="section-name" {% if not is_preview %}contenteditable="true"{% endif %} data-field="name" placeholder="Project Name">
                   {{- item.name|default('') -}}
                 </div>
-                <div class="section-date" contenteditable="true" data-field="date" placeholder="Year">
+                <div class="section-date" {% if not is_preview %}contenteditable="true"{% endif %} data-field="date" placeholder="Year">
                   {{- item.date|default('') -}}
                 </div>
                 {% if item.description %}
@@ -263,22 +277,26 @@
                     {% set description_lines = item.description.split('\n') if item.description else [] %}
                     {% for line in description_lines %}
                       {% if line.strip() %}
-                        <li contenteditable="true">{{ line.strip() }}</li>
+                        <li {% if not is_preview %}contenteditable="true"{% endif %}>{{ line.strip() }}</li>
                       {% endif %}
                     {% endfor %}
                   </ul>
+                  {% if not is_preview %}
                   <div class="add-bullet-prompt" onclick="addNewBulletPoint(this)">
                     <i class="fas fa-plus"></i>
                     <span>Click to add project detail</span>
                   </div>
+                  {% endif %}
                 </div>
                 {% else %}
                 <div class="section-description" data-field="description">
                   <ul class="duties-list"></ul>
+                  {% if not is_preview %}
                   <div class="add-bullet-prompt" onclick="addNewBulletPoint(this)">
                     <i class="fas fa-plus"></i>
                     <span>Click to add project detail</span>
                   </div>
+                  {% endif %}
                 </div>
                 {% endif %}
                 
@@ -297,23 +315,25 @@
                             {% set description_lines = value.split('\n') if value else [] %}
                             {% for line in description_lines %}
                               {% if line.strip() %}
-                                <li contenteditable="true">{{ line.strip() }}</li>
+                                <li {% if not is_preview %}contenteditable="true"{% endif %}>{{ line.strip() }}</li>
                               {% endif %}
                             {% endfor %}
                           </ul>
+                          {% if not is_preview %}
                           <div class="add-bullet-prompt" onclick="addNewBulletPoint(this)">
                             <i class="fas fa-plus"></i>
                             <span>Click to add detail</span>
                           </div>
+                          {% endif %}
                         {% else %}
                           <!-- Single line description -->
-                          <div contenteditable="true" placeholder="Add description">{{ value|default('') }}</div>
+                          <div {% if not is_preview %}contenteditable="true"{% endif %} placeholder="Add description">{{ value|default('') }}</div>
                         {% endif %}
                       </div>
                     {% else %}
                       <!-- Regular field -->
                       <div class="section-{{ key | replace('_', '-') }}" 
-                           contenteditable="true" 
+                           {% if not is_preview %}contenteditable="true"{% endif %}
                            data-field="{{ key }}"
                            data-key="{{ key }}"
                            placeholder="{{ key | replace('_', ' ') | title }}">
@@ -327,7 +347,7 @@
             {% endfor %}
             
             <!-- Add Item Button -->
-            {% if section.type not in ['skills'] %}
+            {% if section.type not in ['skills'] and not is_preview %}
             <button class="add-item-btn" data-section="{{ section.type }}" data-type="{{ section.type }}">
               <i class="fas fa-plus"></i> Add {{ section.type | title }}
             </button>
@@ -335,14 +355,14 @@
           {% endif %}
         </section>
         
-      {% else %}
-        <!-- Empty State Container -->
-        <div id="{{ section_type }}-container" class="section-container empty" data-section-type="{{ section_type }}">
+      {% elif not is_preview %}
+        <!-- Empty State Container - only show in edit mode -->
+        <section id="{{ section_type }}-container" class="section-container empty" data-section-type="{{ section_type }}">
           <button class="add-section-btn" data-section="{{ section_type }}">
             <i class="fas fa-{{ section_icons.get(section_type, 'star') }}"></i>
             Add {{ section_type | title }}
           </button>
-        </div>
+        </section>
       {% endif %}
     {% endfor %}
 
@@ -350,13 +370,13 @@
     {% for section in resume.sections %}
       {% if section.type not in section_types %}
         <section class="resume-section {{ section.type }}-section" data-section-type="{{ section.type }}">
-          <h2 class="section-title" contenteditable="true">
+          <h2 class="section-title" {% if not is_preview %}contenteditable="true"{% endif %}>
             <i class="fas fa-{{ section_icons.get(section.type, 'star') }}"></i>
             {{ section.title }}
           </h2>
           
           {% if section.display == 'text' %}
-            <div class="section-content" data-field="content" contenteditable="true">
+            <div class="section-content" data-field="content" {% if not is_preview %}contenteditable="true"{% endif %}>
               {{ section.content | safe }}
             </div>
           
@@ -366,27 +386,33 @@
                 <span class="section-tag">
                   <i class="fas fa-check"></i>
                   {{ item }}
+                  {% if not is_preview %}
                   <i class="fas fa-times tag-delete"></i>
+                  {% endif %}
                 </span>
               {% endfor %}
+              {% if not is_preview %}
               <button class="add-tag-btn" data-section="{{ section.type }}" data-type="{{ section.type }}">
                 <i class="fas fa-plus"></i> Add {{ section.type | title }}
               </button>
+              {% endif %}
             </div>
           
           {% else %}
             {% for item in section["items"] %}
               <div class="section-item" data-item-id="{{ item.id }}" data-section="{{ section.type }}">
+                {% if not is_preview %}
                 <div class="item-actions">
                   <button class="item-btn delete" title="Delete {{ section.type }}">
                     <i class="fas fa-trash"></i>
                   </button>
                 </div>
+                {% endif %}
                 
                 {% for key, value in item.items() %}
                   {% if key != "id" %}
                     <div class="section-{{ key | replace('_', '-') }}" 
-                         contenteditable="true" 
+                         {% if not is_preview %}contenteditable="true"{% endif %}
                          data-field="{{ key }}"
                          data-key="{{ key }}">
                       {% if key == 'name' or key == 'job_title' or key == 'degree' %}
@@ -405,9 +431,11 @@
               </div>
             {% endfor %}
             
+            {% if not is_preview %}
             <button class="add-item-btn" data-section="{{ section.type }}" data-type="{{ section.type }}">
               <i class="fas fa-plus"></i> Add {{ section.type | title }}
             </button>
+            {% endif %}
           {% endif %}
         </section>
       {% endif %}
@@ -415,6 +443,7 @@
 
 {% endblock %}
 {% block extra_js %}
-
+{% if not is_preview %}
 <script src="{{ url_for('static', filename='js/resume-builder.js') }}"></script>
+{% endif %}
 {% endblock %}
