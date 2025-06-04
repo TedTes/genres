@@ -100,47 +100,37 @@
 
     <!-- Header - Always Present -->
     <div class="resume-header content-editable resume-content" data-resume-id="{{id}}" data-section="header">
-      <h1 class="name" data-field="name" {% if not is_preview %}contenteditable="true"{% endif %}>{{ resume.bio.name|default('Jane Doe') }}</h1>
-      <h2 class="title" data-field="title" {% if not is_preview %}contenteditable="true"{% endif %}>{{ resume.bio.title|default('Product Manager') }}</h2>
+      <!-- Name Field -->
+      <div class="header-field name" data-field="name" {% if not is_preview %}contenteditable="true"{% endif %} data-placeholder="Name">
+        {{- resume.bio.name|default('') -}}
+      </div>
       
-      {% if resume.contact %}
-      <div class="contact-grid">
-        {% if resume.contact.email %}
-        <div class="contact-item content-editable">
-          <i class="contact-icon fas fa-envelope"></i>
-          <span class="contact-content" data-field="email" {% if not is_preview %}contenteditable="true"{% endif %}>{{ resume.contact.email }}</span>
-        </div>
-        {% endif %}
+      <!-- Title Field -->
+      <div class="header-field title" data-field="title" {% if not is_preview %}contenteditable="true"{% endif %} data-placeholder="Title">
+        {{- resume.bio.title|default('') -}}
+      </div>
+      <!-- Contact Details Row -->
+      <div class="header-field contact-field" data-field="email" {% if not is_preview %}contenteditable="true"{% endif %} data-placeholder="Email">
+        {{- resume.contact.email|default('') -}}</div>
         
-        {% if resume.contact.phone %}
-        <div class="contact-item content-editable">
-          <i class="contact-icon fas fa-phone"></i>
-          <span class="contact-content" data-field="phone" {% if not is_preview %}contenteditable="true"{% endif %}>{{ resume.contact.phone }}</span>
-        </div>
-        {% endif %}
+      <div class="header-field contact-field" data-field="phone" {% if not is_preview %}contenteditable="true"{% endif %} data-placeholder="Phone">
+        {{- resume.contact.phone|default('') -}}</div>
         
-        {% if resume.contact.location %}
-        <div class="contact-item content-editable">
-          <i class="contact-icon fas fa-map-marker-alt"></i>
-          <span class="contact-content" data-field="location" {% if not is_preview %}contenteditable="true"{% endif %}>{{ resume.contact.location }}</span>
-        </div>
-        {% endif %}
+      <div class="header-field contact-field" data-field="location" {% if not is_preview %}contenteditable="true"{% endif %} data-placeholder="Location">
+        {{- resume.contact.location|default('') -}}</div>
         
-        {% if resume.contact.linkedin %}
-        <div class="contact-item content-editable">
-          <i class="contact-icon fab fa-linkedin"></i>
-          <span class="contact-content" data-field="linkedin" {% if not is_preview %}contenteditable="true"{% endif %}>{{ resume.contact.linkedin }}</span>
-        </div>
-        {% endif %}
+      <div class="header-field contact-field" data-field="linkedin" {% if not is_preview %}contenteditable="true"{% endif %} data-placeholder="LinkedIn">
+        {{- resume.contact.linkedin|default('') -}}</div>
         
-        {% if resume.contact.website %}
-        <div class="contact-item content-editable">
-          <i class="contact-icon fas fa-globe"></i>
-          <span class="contact-content" data-field="website" {% if not is_preview %}contenteditable="true"{% endif %}>{{ resume.contact.website }}</span>
-        </div>
+      <div class="header-field contact-field" data-field="website" {% if not is_preview %}contenteditable="true"{% endif %} data-placeholder="Website">
+        {{- resume.contact.website|default('') -}}</div>
+        
+        {% if not is_preview %}
+        <button class="add-contact-btn" onclick="addCustomContactField()">
+          <i class="fas fa-plus"></i>
+        </button>
         {% endif %}
       </div>
-      {% endif %}
     </div>
 
     <!-- Dynamic Sections with Empty States -->
