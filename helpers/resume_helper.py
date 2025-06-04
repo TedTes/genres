@@ -3,6 +3,8 @@ from .themes_helper import generate_theme_css,get_theme
 from .layouts_helper import get_layout
 from jinja2 import  FileSystemLoader
 from flask import Flask,request,render_template,jsonify,current_app
+from io import BytesIO
+from weasyprint import HTML, CSS
 import os
 
 def generate_pdf(html_string):
@@ -232,3 +234,11 @@ def generate_resume(app,resume,is_preview=False):
         print(e)
         app.logger.error(f"Error generating resume: {str(e)}")
         raise
+
+
+def generate_pdf(data,base_url):
+    pdf_bytes = BytesIO()
+    html = HTML(string=data,base_url=base_url)
+    html.write_pdf(pdf_bytes)
+    pdf_bytes.seek(0)
+    return pdf_bytes

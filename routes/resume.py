@@ -1,14 +1,12 @@
 from flask import Blueprint, current_app,request,Response, abort,jsonify,render_template,flash,request,redirect,url_for,send_file,session,make_response,g
 from flask_login import login_user,  current_user, login_required
-from weasyprint import HTML, CSS
 from template_registry import TemplateRegistry
 import os
-from io import BytesIO
 import json
 from models import Job, Resume,Application
 from sqlalchemy.orm import attributes
 from datetime import datetime
-from helpers import enhance_resume_content,analyze_job_description,extract_skills_from_text,generate_resume
+from helpers import enhance_resume_content,analyze_job_description,extract_skills_from_text,generate_resume, generate_pdf
 from forms import ContactForm,SummaryForm,ExperienceForm,EducationForm,SkillsForm
 from db import db
 
@@ -84,13 +82,7 @@ def download_resume(resume_id):
         template = template_registry.get_template(template_id)
 
         html_string  = generate_resume(g.app,resume)
-
-        # Create a BytesIO object to store the PDF
-        pdf_file = BytesIO()
-        
-        html = HTML(string=html_string, base_url=request.url_root)
-        html.write_pdf(pdf_file)
-        pdf_file.seek(0)
+        pdf_bytes = generate_pdf(html_string,request.url_root)
 
         # Create a filename
         name = resume.resume_data.get('contact', {}).get('name', 'resume')
@@ -98,7 +90,7 @@ def download_resume(resume_id):
 
         # Send the PDF as a response
         return send_file(
-            pdf_file,
+            pdf_bytes,
             as_attachment=True,
             download_name=filename,
             mimetype='application/pdf'
@@ -110,12 +102,19 @@ def download_resume(resume_id):
 @resume_bp.route('/<int:resume_id>/preview')
 @login_required
 def preview_resume(resume_id):
-    resume = Resume.query.get_or_404(resume_id)
-    if resume.user_id != current_user.id:
-        abort(403)
-    
-    html_string = generate_resume(g.app, resume, is_preview=True)
-    return html_string, 200, {'Content-Type': 'text/html'}
+    try:
+        resume = Resume.query.get_or_404(resume_id)
+        if resume.user_id != current_user.id:
+            abort(403)
+        html_string = generate_resume(g.app, resume, is_preview=True)
+
+        pdf_bytes = generate_pdf(html_string, request.url_root)
+        # Create a BytesIO object to store the PDF
+        return Response(pdf_bytes, mimetype='application/pdf')
+    except Exception as e:
+        print(f"Error previewing PDF: {e}")
+        flash(f"Error previewing PDF: {str(e)}", 'danger')
+        return f"Error previewing PDF", 500
 @resume_bp.route('/<int:resume_id>/update-template', methods=['POST'])
 @login_required
 def update_resume_template(resume_id):
