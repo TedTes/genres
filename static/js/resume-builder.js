@@ -19,6 +19,8 @@ const selectors = {
   addButtons: '.add-item-btn, .add-tag-btn',
   sectionTags: '.section-tag',
   sectionItems: '.section-item',
+  previewContainer: ".resume-preview-container",
+  previewButton: '.float-control-btn[data-action="toggle-preview"]'
 };
 
 const templateConfigs = {
@@ -187,6 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
       aiModal: document.querySelector(selectors.aiModal),
       aiModalClose: document.querySelector(selectors.aiModalClose),
       tooltipContainers: document.querySelectorAll(selectors.tooltipContainers),
+      previewButton : document.querySelector(selectors.previewButton),
+      previewContainer : document.querySelector(selectors.previewContainer)
     };
     const closePanel = () => {
       if (elements.templatesPanel?.classList.contains('active')) {
@@ -218,7 +222,16 @@ document.addEventListener('DOMContentLoaded', () => {
         saveResumeData({ showNotifications: true, isAutoSave: false });
       });
     }
-  
+
+    if(elements.previewButton) {
+      elements.previewButton.addEventListener('click', () => { 
+       
+        if (elements.iframe && elements.previewContainer) {
+          togglePreviewMode(elements.previewButton,elements.iframe, elements.previewContainer);
+        }
+      });
+    }
+
     // Enhanced template meta tag handling
     const selectedRadio = document.querySelector('input[name="template"]:checked');
     if (selectedRadio) {
@@ -345,7 +358,33 @@ document.addEventListener('DOMContentLoaded', () => {
   }
  
 });
-
+  
+function togglePreviewMode(button, iframe, container) {
+  const isFullscreen = container?.classList?.contains('fullscreen-preview');
+  
+  if (isFullscreen) {
+      // Exit preview - restore original editing iframe
+      container.classList.remove('fullscreen-preview');
+      button.querySelector('.btn-tooltip').textContent = 'Preview Resume';
+      button.querySelector('i').className = 'fas fa-eye';
+      
+      // Restore original iframe src (with editing)
+      const resumeId = iframe.getAttribute('resume_id');
+      iframe.src = `/api/v1/resume/${resumeId}/render`; // Original editing version
+      
+      showEnhancedNotification('✅ Exited preview mode', 'success');
+  } else {
+      // Enter preview - load clean preview content
+      container.classList.add('fullscreen-preview');
+      button.querySelector('.btn-tooltip').textContent = 'Exit Preview';
+      button.querySelector('i').className = 'fas fa-eye-slash';
+      
+      // Switch iframe to preview endpoint
+      const resumeId = iframe.getAttribute('resume_id');
+      iframe.src = `/api/v1/resume/${resumeId}/preview`;
+      showEnhancedNotification('👁️ Entered preview mode', 'success');
+  }
+}
 function setupIframeListeners(iframeDoc) {
   iframeDoc.querySelectorAll('.section-tag').forEach(addTagEventListeners);
   iframeDoc.querySelectorAll('.section-item').forEach(addItemEventListeners);
