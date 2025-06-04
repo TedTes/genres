@@ -107,7 +107,15 @@ def download_resume(resume_id):
         print(f"Error generating PDF: {e}")
         flash(f"Error generating PDF: {str(e)}", 'danger')
         return redirect(url_for('resume.resume_builder', resume_id=resume_id))
-
+@resume_bp.route('/<int:resume_id>/preview')
+@login_required
+def preview_resume(resume_id):
+    resume = Resume.query.get_or_404(resume_id)
+    if resume.user_id != current_user.id:
+        abort(403)
+    
+    html_string = generate_resume(g.app, resume, is_preview=True)
+    return html_string, 200, {'Content-Type': 'text/html'}
 @resume_bp.route('/<int:resume_id>/update-template', methods=['POST'])
 @login_required
 def update_resume_template(resume_id):

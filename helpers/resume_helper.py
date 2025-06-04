@@ -193,7 +193,7 @@ def calculate_skill_match(user_skills, job_skills):
     return overall_match, skill_matches
 
 
-def generate_resume(app,resume):
+def generate_resume(app,resume,is_preview=False):
     try:
   
         layout = get_layout(resume.layout_id)
@@ -223,7 +223,8 @@ def generate_resume(app,resume):
         html_content = template.render(
             theme=theme,
             css_content=full_css,
-            resume=resume.resume_data
+            resume=resume.resume_data,
+            is_preview=is_preview
         )
         return html_content
     except Exception as e:
