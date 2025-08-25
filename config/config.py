@@ -51,3 +51,34 @@ class Config:
     SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
     #flask secret key
     SECRET_KEY = secrets.token_hex(16)
+
+
+
+    MODEL_PROVIDER = os.environ.get('MODEL_PROVIDER', 'hf')  # default to huggingface
+    LLM_MODEL = os.environ.get('LLM_MODEL', 'mistralai/Mistral-7B-Instruct-v0.3')
+    EMBED_MODEL = os.environ.get('EMBED_MODEL', 'BAAI/bge-large-en-v1.5')
+    
+    #LLM API Keys
+    HF_TOKEN = os.environ.get('HF_TOKEN')
+    OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+    
+    #Redis Configuration
+    REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+    #Resume Optimizer Settings
+    RESUME_OPTIMIZER_ENABLED = os.environ.get('RESUME_OPTIMIZER_ENABLED', 'true').lower() == 'true'
+    MAX_RESUME_SIZE_MB = int(os.environ.get('MAX_RESUME_SIZE_MB', '5'))
+    RATE_LIMIT_PER_HOUR = int(os.environ.get('RATE_LIMIT_PER_HOUR', '10'))
+    
+    @classmethod
+    def validate_llm_config(cls):
+        """Validate LLM configuration based on selected provider"""
+        if cls.MODEL_PROVIDER == 'openai':
+            if not cls.OPENAI_API_KEY:
+                raise ValueError("OPENAI_API_KEY is required when MODEL_PROVIDER=openai")
+        elif cls.MODEL_PROVIDER == 'hf':
+            if not cls.HF_TOKEN:
+                print("Warning: HF_TOKEN not set. Some HuggingFace models may not work.")
+        else:
+            raise ValueError(f"Unsupported MODEL_PROVIDER: {cls.MODEL_PROVIDER}")
+        
+        return True

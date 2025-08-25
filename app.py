@@ -70,6 +70,13 @@ def server_error(e):
     return render_template('error.html', error_code=500), 500
 
 
+
+try:
+    Config.validate_llm_config()
+    print(f"✓ LLM Provider: {Config.MODEL_PROVIDER}")
+    print(f"✓ LLM Model: {Config.LLM_MODEL}")
+except ValueError as e:
+    print(f"⚠️  LLM Config Warning: {e}")
 if __name__ == '__main__':
     app.run(debug=True)
 
