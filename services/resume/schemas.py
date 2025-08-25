@@ -9,25 +9,50 @@ from datetime import datetime
 
 
 class ResumeInput(BaseModel):
-    """Input for resume optimization - either text or DOCX file."""
+    """Input for resume optimization - text, DOCX, or PDF file."""
     
     text: Optional[str] = Field(None, description="Raw resume text")
     docx_url: Optional[str] = Field(None, description="URL or path to DOCX file")
+    pdf_url: Optional[str] = Field(None, description="URL or path to PDF file")
     
     @validator('*', pre=True)
     def validate_input(cls, v, values):
-        """Ensure either text or docx_url is provided."""
-        if not values.get('text') and not values.get('docx_url'):
-            raise ValueError("Either 'text' or 'docx_url' must be provided")
+        """Ensure exactly one input method is provided."""
+        inputs = [values.get('text'), values.get('docx_url'), values.get('pdf_url')]
+        provided = [inp for inp in inputs if inp is not None]
+        
+        if len(provided) == 0:
+            raise ValueError("One of 'text', 'docx_url', or 'pdf_url' must be provided")
+        elif len(provided) > 1:
+            raise ValueError("Only one input method should be provided")
+        
         return v
+    
+    @property
+    def input_type(self) -> str:
+        """Get the type of input provided."""
+        if self.text:
+            return "text"
+        elif self.docx_url:
+            return "docx"
+        elif self.pdf_url:
+            return "pdf"
+        return "unknown"
     
     class Config:
         schema_extra = {
-            "example": {
-                "text": "John Smith\nSoftware Engineer\n\nExperience:\n- Built web applications..."
-            }
+            "examples": [
+                {
+                    "text": "John Smith\nSoftware Engineer\n\nExperience:\n- Built web applications..."
+                },
+                {
+                    "docx_url": "/uploads/resume.docx"
+                },
+                {
+                    "pdf_url": "/uploads/resume.pdf"
+                }
+            ]
         }
-
 
 class JDInput(BaseModel):
     """Job description input for matching."""
@@ -185,9 +210,16 @@ class OptimizationResult(BaseModel):
     weak_keywords: List[str] = Field(..., description="Weak keywords")
     optimized_resume: OptimizedResume = Field(..., description="Optimized resume content")
     explanations: Rationale = Field(..., description="Change explanations")
-    artifacts: Dict[str, Optional[str]] = Field({}, description="Generated file URLs")
+    
+    # Updated artifacts to include PDF
+    artifacts: Dict[str, Optional[str]] = Field(
+        default_factory=lambda: {"docx_url": None, "pdf_url": None}, 
+        description="Generated file URLs"
+    )
+    
     model_info: Dict[str, str] = Field(..., description="Model and provider information")
     processing_time_ms: Optional[float] = Field(None, description="Processing time")
+    input_type: Optional[str] = Field(None, description="Original input format (text/docx/pdf)")
     
     class Config:
         schema_extra = {
@@ -197,9 +229,13 @@ class OptimizationResult(BaseModel):
                 "weak_keywords": ["Python"],
                 "optimized_resume": {"summary": "...", "experience": []},
                 "explanations": {"rationale": []},
-                "artifacts": {"docx_url": "https://...", "pdf_url": None},
+                "artifacts": {
+                    "docx_url": "https://s3.../optimized_resume.docx",
+                    "pdf_url": "https://s3.../optimized_resume.pdf"
+                },
                 "model_info": {"provider": "hf", "llm": "mistral-7b", "embed": "bge-large"},
-                "processing_time_ms": 2500.0
+                "processing_time_ms": 2500.0,
+                "input_type": "pdf"
             }
         }
 
@@ -231,3 +267,43 @@ def validate_json_response(json_str: str, schema_class: BaseModel) -> BaseModel:
         
     except (json.JSONDecodeError, ValidationError) as e:
         raise ValueError(f"Invalid JSON response: {str(e)}\nResponse: {json_str[:200]}...")
+
+
+def validate_file_format(file_url: str) -> str:
+    """
+    Validate file format based on URL/path extension.
+    
+    Args:
+        file_url: File URL or path
+        
+    Returns:
+        File format ('pdf', 'docx', or raises ValueError)
+    """
+    import os
+    
+    if not file_url:
+        raise ValueError("File URL cannot be empty")
+    
+    # Get file extension
+    _, ext = os.path.splitext(file_url.lower())
+    
+    if ext == '.pdf':
+        return 'pdf'
+    elif ext in ['.docx', '.doc']:
+        return 'docx'
+    else:
+        raise ValueError(f"Unsupported file format: {ext}. Only PDF and DOCX are supported.")
+
+
+class SupportedFormats:
+    """Constants for supported file formats."""
+    PDF = "pdf"
+    DOCX = "docx"
+    TEXT = "text"
+    
+    ALL = [PDF, DOCX, TEXT]
+    
+    @classmethod
+    def is_supported(cls, format_type: str) -> bool:
+        """Check if format is supported."""
+        return format_type.lower() in cls.ALL
