@@ -264,3 +264,256 @@ def analyze_semantic_gaps_sync(
 ) -> Dict[str, any]:
     """Synchronous wrapper for analyze_semantic_gaps."""
     return asyncio.run(analyze_semantic_gaps(resume_chunks, jd_text, similarity_threshold))
+
+
+class GapAnalyzer:
+    """Comprehensive gap analysis combining keywords and semantic similarity."""
+    
+    def __init__(self):
+        self.embedder = ResumeEmbedder()
+    
+    async def analyze_resume_gaps(
+        self,
+        resume_chunks: List[DocumentChunk],
+        jd_text: str,
+        jd_title: Optional[str] = None
+    ) -> Dict[str, any]:
+        """
+        Comprehensive gap analysis between resume and job description.
+        
+        Args:
+            resume_chunks: Parsed resume chunks
+            jd_text: Job description text
+            jd_title: Optional job title for context
+            
+        Returns:
+            Complete gap analysis with recommendations
+        """
+        
+        print(f"🔍 Analyzing gaps for {len(resume_chunks)} resume chunks...")
+        
+        # 1. Keyword-based analysis
+        keyword_gaps = await self._analyze_keyword_gaps(resume_chunks, jd_text)
+        
+        # 2. Semantic similarity analysis  
+        semantic_gaps = await analyze_semantic_gaps(resume_chunks, jd_text)
+        
+        # 3. Section-specific analysis
+        section_gaps = self._analyze_section_gaps(resume_chunks, jd_text)
+        
+        # 4. Generate recommendations
+        recommendations = self._generate_recommendations(keyword_gaps, semantic_gaps, section_gaps)
+        
+        # 5. Calculate overall score
+        overall_score = self._calculate_overall_score(keyword_gaps, semantic_gaps)
+        
+        result = {
+            'overall_match_score': overall_score,
+            'keyword_analysis': keyword_gaps,
+            'semantic_analysis': semantic_gaps,
+            'section_analysis': section_gaps,
+            'recommendations': recommendations,
+            'missing_keywords': keyword_gaps.get('missing_keywords', []),
+            'weak_keywords': keyword_gaps.get('weak_keywords', []),
+            'strong_sections': [s for s, score in semantic_gaps.get('section_similarities', {}).items() if score >= 0.6],
+            'weak_sections': [s for s, score in semantic_gaps.get('section_similarities', {}).items() if score < 0.4]
+        }
+        
+        print(f"✅ Gap analysis complete. Overall score: {overall_score:.2f}")
+        return result
+    
+    async def _analyze_keyword_gaps(
+        self, 
+        resume_chunks: List[DocumentChunk], 
+        jd_text: str
+    ) -> Dict[str, any]:
+        """Analyze keyword-based gaps between resume and JD."""
+        
+        from ..resume.keywords import extract_jd_requirements, calculate_skill_coverage
+        
+        # Extract resume keywords from all chunks
+        resume_text = '\n'.join([chunk.text for chunk in resume_chunks])
+        resume_keywords = extract_keywords_from_text(resume_text)
+        resume_kw_list = [kw.keyword for kw in resume_keywords]
+        
+        # Extract JD requirements
+        jd_keywords, importance_map = extract_jd_requirements(jd_text)
+        
+        # Calculate coverage
+        coverage = calculate_skill_coverage(resume_kw_list, jd_keywords, importance_map)
+        
+        # Identify weak keywords (present but low similarity)
+        weak_keywords = []
+        for chunk in resume_chunks:
+            chunk_keywords = extract_keywords_from_text(chunk.text)
+            chunk_kw_set = {kw.keyword.lower() for kw in chunk_keywords}
+            
+            for kw in chunk_kw_set:
+                if kw in [k.lower() for k in jd_keywords]:
+                    # Check if this keyword appears weakly in this chunk
+                    kw_match = next((k for k in chunk_keywords if k.keyword.lower() == kw), None)
+                    if kw_match and kw_match.frequency < 2:
+                        weak_keywords.append(kw_match.keyword)
+        
+        return {
+            'coverage_score': coverage['coverage_score'],
+            'matched_keywords': coverage['matched_keywords'],
+            'missing_keywords': coverage['missing_keywords'],
+            'weak_keywords': list(set(weak_keywords)),
+            'critical_missing': coverage['critical_missing'],
+            'keyword_frequency': {kw.keyword: kw.frequency for kw in resume_keywords},
+            'importance_map': importance_map
+        }
+    
+    def _analyze_section_gaps(
+        self, 
+        resume_chunks: List[DocumentChunk], 
+        jd_text: str
+    ) -> Dict[str, any]:
+        """Analyze gaps at the section level."""
+        
+        # Group chunks by section
+        sections = {}
+        for chunk in resume_chunks:
+            if chunk.section not in sections:
+                sections[chunk.section] = []
+            sections[chunk.section].append(chunk)
+        
+        section_analysis = {}
+        
+        # Expected sections for a complete resume
+        expected_sections = ['summary', 'experience', 'skills', 'education']
+        missing_sections = []
+        
+        for expected in expected_sections:
+            if expected not in sections:
+                missing_sections.append(expected)
+            else:
+                chunk_count = len(sections[expected])
+                total_text = '\n'.join([c.text for c in sections[expected]])
+                word_count = len(total_text.split())
+                
+                section_analysis[expected] = {
+                    'present': True,
+                    'chunk_count': chunk_count,
+                    'word_count': word_count,
+                    'completeness': min(1.0, word_count / 50)  # Rough completeness metric
+                }
+        
+        return {
+            'section_completeness': section_analysis,
+            'missing_sections': missing_sections,
+            'total_sections': len(sections),
+            'section_distribution': {k: len(v) for k, v in sections.items()}
+        }
+    
+    def _generate_recommendations(
+        self,
+        keyword_gaps: Dict[str, any],
+        semantic_gaps: Dict[str, any], 
+        section_gaps: Dict[str, any]
+    ) -> List[Dict[str, str]]:
+        """Generate actionable recommendations based on gap analysis."""
+        
+        recommendations = []
+        
+        # Keyword recommendations
+        critical_missing = keyword_gaps.get('critical_missing', [])
+        if critical_missing:
+            recommendations.append({
+                'type': 'critical',
+                'action': f"Add critical missing skills: {', '.join(critical_missing[:3])}",
+                'reason': 'These skills are marked as required in the job description',
+                'priority': 'high'
+            })
+        
+        missing_keywords = keyword_gaps.get('missing_keywords', [])
+        if len(missing_keywords) > len(critical_missing):
+            other_missing = [kw for kw in missing_keywords if kw not in critical_missing]
+            recommendations.append({
+                'type': 'enhancement',
+                'action': f"Consider adding: {', '.join(other_missing[:5])}",
+                'reason': 'These skills appear in the job description but not in your resume',
+                'priority': 'medium'
+            })
+        
+        # Semantic recommendations
+        weak_matches = semantic_gaps.get('weak_matches', [])
+        if weak_matches:
+            recommendations.append({
+                'type': 'strengthening',
+                'action': f"Strengthen {len(weak_matches)} experience sections with more specific details",
+                'reason': 'These sections relate to the job but could be more detailed',
+                'priority': 'medium'
+            })
+        
+        # Section recommendations
+        missing_sections = section_gaps.get('missing_sections', [])
+        if missing_sections:
+            recommendations.append({
+                'type': 'structure',
+                'action': f"Add missing sections: {', '.join(missing_sections)}",
+                'reason': 'Complete resumes typically include these sections',
+                'priority': 'low'
+            })
+        
+        # Low overall similarity
+        if semantic_gaps.get('semantic_similarity', 0) < 0.4:
+            recommendations.append({
+                'type': 'major_revision',
+                'action': 'Consider significant resume revision for this role',
+                'reason': 'Low semantic similarity suggests major skill/experience gaps',
+                'priority': 'high'
+            })
+        
+        return recommendations
+    
+    def _calculate_overall_score(
+        self,
+        keyword_gaps: Dict[str, any],
+        semantic_gaps: Dict[str, any]
+    ) -> float:
+        """Calculate weighted overall match score."""
+        
+        # Weights for different factors
+        keyword_weight = 0.6  # Keyword matching is very important for ATS
+        semantic_weight = 0.4  # Semantic similarity for human reviewers
+        
+        keyword_score = keyword_gaps.get('coverage_score', 0.0)
+        semantic_score = semantic_gaps.get('semantic_similarity', 0.0)
+        
+        overall = (keyword_score * keyword_weight) + (semantic_score * semantic_weight)
+        
+        return round(overall, 3)
+
+
+# Convenience function for the complete analysis
+async def perform_gap_analysis(
+    resume_chunks: List[DocumentChunk],
+    jd_text: str,
+    jd_title: Optional[str] = None
+) -> Dict[str, any]:
+    """
+    Perform complete gap analysis between resume and job description.
+    
+    Args:
+        resume_chunks: Parsed resume chunks
+        jd_text: Job description text  
+        jd_title: Optional job title
+        
+    Returns:
+        Complete gap analysis results
+    """
+    
+    analyzer = GapAnalyzer()
+    return await analyzer.analyze_resume_gaps(resume_chunks, jd_text, jd_title)
+
+
+# Sync wrapper
+def perform_gap_analysis_sync(
+    resume_chunks: List[DocumentChunk],
+    jd_text: str,
+    jd_title: Optional[str] = None
+) -> Dict[str, any]:
+    """Synchronous wrapper for perform_gap_analysis."""
+    return asyncio.run(perform_gap_analysis(resume_chunks, jd_text, jd_title))
