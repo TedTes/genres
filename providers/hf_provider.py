@@ -8,7 +8,7 @@ import json
 from typing import List, Dict, Any
 from flask import current_app
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-
+from .logger import track_llm_request
 from .base import Embedder, ChatModel, LLMProvider
 
 
@@ -19,7 +19,8 @@ class HuggingFaceEmbedder(Embedder):
         self.model_name = model_name
         self.api_token = api_token
         self.base_url = "https://api-inference.huggingface.co"
-        
+        self.provider_name = "huggingface"
+    @track_llm_request("embedding")   
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=4, max=10),
@@ -79,7 +80,9 @@ class HuggingFaceChatModel(ChatModel):
         self.model_name = model_name
         self.api_token = api_token
         self.base_url = "https://api-inference.huggingface.co"
-        
+        self.provider_name = "huggingface"
+
+    @track_llm_request("chat")
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=4, max=10),
