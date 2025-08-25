@@ -53,6 +53,9 @@ class ResumeInput(BaseModel):
                 }
             ]
         }
+    def dict(self, **kwargs):
+        """Convert to dictionary for JSON serialization."""
+        return super().dict(**kwargs)
 
 class JDInput(BaseModel):
     """Job description input for matching."""
@@ -69,6 +72,9 @@ class JDInput(BaseModel):
                 "company": "TechCorp"
             }
         }
+    def dict(self, **kwargs):
+        """Convert to dictionary for JSON serialization."""
+        return super().dict(**kwargs)
 
 
 class OptimizationOptions(BaseModel):
@@ -90,6 +96,9 @@ class OptimizationOptions(BaseModel):
                 "ats_optimize": True
             }
         }
+    def dict(self, **kwargs):
+        """Convert to dictionary for JSON serialization."""
+        return super().dict(**kwargs)
 
 
 class ExperienceItem(BaseModel):
@@ -112,6 +121,9 @@ class ExperienceItem(BaseModel):
                 ]
             }
         }
+    def dict(self, **kwargs):
+        """Convert to dictionary for JSON serialization."""
+        return super().dict(**kwargs)
 
 
 class OptimizedResume(BaseModel):
@@ -140,6 +152,9 @@ class OptimizedResume(BaseModel):
                 "skills_to_add": ["Docker", "Kubernetes", "AWS"]
             }
         }
+    def dict(self, **kwargs):
+        """Convert to dictionary for JSON serialization."""
+        return super().dict(**kwargs)
 
 
 class GapReport(BaseModel):
@@ -163,6 +178,9 @@ class GapReport(BaseModel):
                 }
             }
         }
+    def dict(self, **kwargs):
+        """Convert to dictionary for JSON serialization."""
+        return super().dict(**kwargs)
 
 
 class ChangeRationale(BaseModel):
@@ -178,6 +196,9 @@ class ChangeRationale(BaseModel):
                 "reason": "Job description emphasizes DevOps practices and automation"
             }
         }
+    def dict(self, **kwargs):
+        """Convert to dictionary for JSON serialization."""
+        return super().dict(**kwargs)
 
 
 class Rationale(BaseModel):
@@ -200,6 +221,9 @@ class Rationale(BaseModel):
                 ]
             }
         }
+    def dict(self, **kwargs):
+        """Convert to dictionary for JSON serialization."""
+        return super().dict(**kwargs)
 
 
 class OptimizationResult(BaseModel):
@@ -238,6 +262,9 @@ class OptimizationResult(BaseModel):
                 "input_type": "pdf"
             }
         }
+   def dict(self, **kwargs):
+        """Convert to dictionary for JSON serialization."""
+        return super().dict(**kwargs)
 
 
 def validate_json_response(json_str: str, schema_class: BaseModel) -> BaseModel:
