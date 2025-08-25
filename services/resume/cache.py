@@ -553,3 +553,288 @@ def get_cache() -> ResumeCache:
     if _cache_instance is None:
         _cache_instance = ResumeCache()
     return _cache_instance
+
+
+
+class CacheAnalytics:
+    """Analytics and logging for cache performance."""
+    
+    def __init__(self):
+        self.cache = get_cache()
+        self.session_stats = {
+            'hits': 0,
+            'misses': 0,
+            'sets': 0,
+            'errors': 0,
+            'total_requests': 0,
+            'cache_savings_ms': 0.0,
+            'session_start': time.time()
+        }
+    
+    async def log_cache_operation(
+        self,
+        operation: str,  # 'hit', 'miss', 'set', 'error'
+        key: str,
+        data_type: str = None,  # 'optimization', 'embedding', 'gap_analysis'
+        processing_time_saved: float = 0.0,
+        error_details: str = None
+    ):
+        """
+        Log cache operation with detailed analytics.
+        
+        Args:
+            operation: Type of cache operation
+            key: Cache key used
+            data_type: Type of data being cached
+            processing_time_saved: Time saved by cache hit (ms)
+            error_details: Error information if operation failed
+        """
+        
+        # Update session stats
+        self.session_stats['total_requests'] += 1
+        
+        if operation == 'hit':
+            self.session_stats['hits'] += 1
+            self.session_stats['cache_savings_ms'] += processing_time_saved
+        elif operation == 'miss':
+            self.session_stats['misses'] += 1
+        elif operation == 'set':
+            self.session_stats['sets'] += 1
+        elif operation == 'error':
+            self.session_stats['errors'] += 1
+        
+        # Calculate current hit rate
+        hit_rate = (self.session_stats['hits'] / self.session_stats['total_requests'] * 100) if self.session_stats['total_requests'] > 0 else 0
+        
+        # Create log entry
+        log_data = {
+            'timestamp': datetime.now().isoformat(),
+            'operation': operation,
+            'data_type': data_type,
+            'key_prefix': key[:16] + '...' if len(key) > 16 else key,
+            'session_hit_rate': round(hit_rate, 1),
+            'cumulative_savings_ms': round(self.session_stats['cache_savings_ms'], 2),
+            'error_details': error_details
+        }
+        
+        # Log based on operation type
+        if operation == 'hit':
+            print(f"🎯 Cache HIT ({hit_rate:.1}% session rate): {data_type or 'unknown'} | Saved {processing_time_saved:.0f}ms")
+        elif operation == 'miss':
+            print(f"❌ Cache MISS ({hit_rate:.1}% session rate): {data_type or 'unknown'} | Key: {log_data['key_prefix']}")
+        elif operation == 'set':
+            print(f"💾 Cache SET: {data_type or 'unknown'} | Key: {log_data['key_prefix']}")
+        elif operation == 'error':
+            print(f"🔴 Cache ERROR: {error_details} | Key: {log_data['key_prefix']}")
+        
+        # Optional: Store detailed logs for analytics (could send to external service)
+        await self._store_analytics_log(log_data)
+    
+    async def _store_analytics_log(self, log_data: Dict[str, Any]):
+        """Store detailed analytics log (extend this for external analytics)."""
+        
+        # For MVP, just store in Redis with short TTL for recent analytics
+        try:
+            analytics_key = f"analytics:{int(time.time())}"
+            await self.cache.cache.set(analytics_key, log_data, ttl=60*60)  # 1 hour
+        except:
+            pass  # Don't fail main operation if analytics storage fails
+    
+    def get_session_stats(self) -> Dict[str, Any]:
+        """Get current session cache statistics."""
+        
+        total_requests = self.session_stats['total_requests']
+        hit_rate = (self.session_stats['hits'] / total_requests * 100) if total_requests > 0 else 0
+        
+        session_duration = time.time() - self.session_stats['session_start']
+        
+        return {
+            'session_duration_minutes': round(session_duration / 60, 2),
+            'total_requests': total_requests,
+            'cache_hits': self.session_stats['hits'],
+            'cache_misses': self.session_stats['misses'],
+            'hit_rate_percentage': round(hit_rate, 2),
+            'total_time_saved_ms': round(self.session_stats['cache_savings_ms'], 2),
+            'average_savings_per_hit': round(
+                self.session_stats['cache_savings_ms'] / self.session_stats['hits'], 2
+            ) if self.session_stats['hits'] > 0 else 0,
+            'cache_errors': self.session_stats['errors'],
+            'sets_performed': self.session_stats['sets']
+        }
+    
+    async def generate_cache_report(self) -> Dict[str, Any]:
+        """Generate comprehensive cache performance report."""
+        
+        session_stats = self.get_session_stats()
+        cache_stats = await self.cache.get_cache_stats()
+        
+        # Performance assessment
+        hit_rate = session_stats['hit_rate_percentage']
+        if hit_rate >= 70:
+            performance_grade = 'Excellent'
+            performance_color = 'green'
+        elif hit_rate >= 50:
+            performance_grade = 'Good'
+            performance_color = 'blue'
+        elif hit_rate >= 30:
+            performance_grade = 'Fair'
+            performance_color = 'yellow'
+        else:
+            performance_grade = 'Poor'
+            performance_color = 'red'
+        
+        return {
+            'session_performance': session_stats,
+            'cache_infrastructure': cache_stats,
+            'performance_assessment': {
+                'grade': performance_grade,
+                'color': performance_color,
+                'recommendation': CacheAnalytics._get_performance_recommendation(hit_rate)
+            },
+            'generated_at': datetime.now().isoformat()
+        }
+    
+    @staticmethod
+    def _get_performance_recommendation(hit_rate: float) -> str:
+        """Get recommendation based on cache hit rate."""
+        
+        if hit_rate >= 70:
+            return "Cache performing excellently. Consider extending TTL for stable data."
+        elif hit_rate >= 50:
+            return "Good cache performance. Monitor for optimization opportunities."
+        elif hit_rate >= 30:
+            return "Fair cache performance. Review cache key strategy and TTL settings."
+        else:
+            return "Poor cache performance. Check Redis connectivity and review caching strategy."
+
+
+# Enhanced ResumeCache with analytics
+class EnhancedResumeCache(ResumeCache):
+    """ResumeCache enhanced with analytics and logging."""
+    
+    def __init__(self):
+        super().__init__()
+        self.analytics = CacheAnalytics()
+    
+    async def get_cached_result(self, *args, **kwargs) -> Optional[Dict[str, Any]]:
+        """Enhanced get with analytics logging."""
+        
+        start_time = time.time()
+        result = await super().get_cached_result(*args, **kwargs)
+        
+        if result:
+            # Cache hit
+            processing_time_saved = 2000.0  # Estimate average processing time saved
+            await self.analytics.log_cache_operation(
+                'hit', 
+                CacheKeyGenerator.request_key(
+                    kwargs.get('resume_text', ''),
+                    kwargs.get('jd_text', ''),
+                    kwargs.get('options'),
+                    kwargs.get('model_info')
+                ),
+                'optimization',
+                processing_time_saved
+            )
+        else:
+            # Cache miss
+            await self.analytics.log_cache_operation(
+                'miss',
+                CacheKeyGenerator.request_key(
+                    kwargs.get('resume_text', ''),
+                    kwargs.get('jd_text', ''),
+                    kwargs.get('options'),
+                    kwargs.get('model_info')
+                ),
+                'optimization'
+            )
+        
+        return result
+    
+    async def cache_result(self, *args, **kwargs) -> bool:
+        """Enhanced cache set with analytics logging."""
+        
+        result = await super().cache_result(*args, **kwargs)
+        
+        cache_key = CacheKeyGenerator.request_key(
+            kwargs.get('resume_text', ''),
+            kwargs.get('jd_text', ''),
+            kwargs.get('options'),
+            kwargs.get('model_info')
+        )
+        
+        if result:
+            await self.analytics.log_cache_operation('set', cache_key, 'optimization')
+        else:
+            await self.analytics.log_cache_operation('error', cache_key, 'optimization', error_details="Cache set failed")
+        
+        return result
+    
+    async def get_performance_report(self) -> Dict[str, Any]:
+        """Get comprehensive cache performance report."""
+        return await self.analytics.generate_cache_report()
+
+
+# Update global cache instance to use enhanced version
+def get_enhanced_cache() -> EnhancedResumeCache:
+    """Get global enhanced cache instance."""
+    global _cache_instance
+    if _cache_instance is None or not isinstance(_cache_instance, EnhancedResumeCache):
+        _cache_instance = EnhancedResumeCache()
+    return _cache_instance
+
+
+# Decorator for automatic caching
+def cache_result(
+    data_type: str = 'generic',
+    ttl: Optional[int] = None,
+    key_generator = None
+):
+    """
+    Decorator for automatic caching of function results.
+    
+    Args:
+        data_type: Type of data being cached
+        ttl: Cache TTL in seconds
+        key_generator: Function to generate cache key from args
+    """
+    
+    def decorator(func):
+        async def wrapper(*args, **kwargs):
+            cache = get_enhanced_cache()
+            
+            # Generate cache key
+            if key_generator:
+                cache_key = key_generator(*args, **kwargs)
+            else:
+                # Default key generation
+                func_name = func.__name__
+                args_hash = hashlib.md5(str(args).encode()).hexdigest()[:8]
+                kwargs_hash = hashlib.md5(str(sorted(kwargs.items())).encode()).hexdigest()[:8]
+                cache_key = f"{func_name}:{args_hash}:{kwargs_hash}"
+            
+            # Try cache first
+            cached = await cache.cache.get(cache_key)
+            if cached:
+                await cache.analytics.log_cache_operation('hit', cache_key, data_type, 1000.0)
+                return cached
+            
+            # Execute function
+            start_time = time.time()
+            result = await func(*args, **kwargs)
+            processing_time = (time.time() - start_time) * 1000
+            
+            # Cache result
+            cache_success = await cache.cache.set(cache_key, result, ttl)
+            
+            if cache_success:
+                await cache.analytics.log_cache_operation('set', cache_key, data_type)
+            else:
+                await cache.analytics.log_cache_operation('error', cache_key, data_type, error_details="Cache set failed")
+            
+            await cache.analytics.log_cache_operation('miss', cache_key, data_type)
+            
+            return result
+        
+        return wrapper
+    return decorator
