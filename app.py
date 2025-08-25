@@ -17,6 +17,10 @@ from flask_wtf.csrf import CSRFProtect, CSRFError
 
 from helpers.resume_helper import generate_resume
 from config.config import Config
+
+import services
+import providers
+
 os.environ['DYLD_LIBRARY_PATH'] = '/opt/homebrew/lib:' + os.environ.get('DYLD_LIBRARY_PATH', '')
 
 

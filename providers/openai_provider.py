@@ -1,0 +1,2 @@
+"""OpenAI provider implementation."""
+pass
