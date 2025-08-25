@@ -9,25 +9,50 @@ from datetime import datetime
 
 
 class ResumeInput(BaseModel):
-    """Input for resume optimization - either text or DOCX file."""
+    """Input for resume optimization - text, DOCX, or PDF file."""
     
     text: Optional[str] = Field(None, description="Raw resume text")
     docx_url: Optional[str] = Field(None, description="URL or path to DOCX file")
+    pdf_url: Optional[str] = Field(None, description="URL or path to PDF file")
     
     @validator('*', pre=True)
     def validate_input(cls, v, values):
-        """Ensure either text or docx_url is provided."""
-        if not values.get('text') and not values.get('docx_url'):
-            raise ValueError("Either 'text' or 'docx_url' must be provided")
+        """Ensure exactly one input method is provided."""
+        inputs = [values.get('text'), values.get('docx_url'), values.get('pdf_url')]
+        provided = [inp for inp in inputs if inp is not None]
+        
+        if len(provided) == 0:
+            raise ValueError("One of 'text', 'docx_url', or 'pdf_url' must be provided")
+        elif len(provided) > 1:
+            raise ValueError("Only one input method should be provided")
+        
         return v
+    
+    @property
+    def input_type(self) -> str:
+        """Get the type of input provided."""
+        if self.text:
+            return "text"
+        elif self.docx_url:
+            return "docx"
+        elif self.pdf_url:
+            return "pdf"
+        return "unknown"
     
     class Config:
         schema_extra = {
-            "example": {
-                "text": "John Smith\nSoftware Engineer\n\nExperience:\n- Built web applications..."
-            }
+            "examples": [
+                {
+                    "text": "John Smith\nSoftware Engineer\n\nExperience:\n- Built web applications..."
+                },
+                {
+                    "docx_url": "/uploads/resume.docx"
+                },
+                {
+                    "pdf_url": "/uploads/resume.pdf"
+                }
+            ]
         }
-
 
 class JDInput(BaseModel):
     """Job description input for matching."""
@@ -185,9 +210,16 @@ class OptimizationResult(BaseModel):
     weak_keywords: List[str] = Field(..., description="Weak keywords")
     optimized_resume: OptimizedResume = Field(..., description="Optimized resume content")
     explanations: Rationale = Field(..., description="Change explanations")
-    artifacts: Dict[str, Optional[str]] = Field({}, description="Generated file URLs")
+    
+    # Updated artifacts to include PDF
+    artifacts: Dict[str, Optional[str]] = Field(
+        default_factory=lambda: {"docx_url": None, "pdf_url": None}, 
+        description="Generated file URLs"
+    )
+    
     model_info: Dict[str, str] = Field(..., description="Model and provider information")
     processing_time_ms: Optional[float] = Field(None, description="Processing time")
+    input_type: Optional[str] = Field(None, description="Original input format (text/docx/pdf)")
     
     class Config:
         schema_extra = {
@@ -197,9 +229,13 @@ class OptimizationResult(BaseModel):
                 "weak_keywords": ["Python"],
                 "optimized_resume": {"summary": "...", "experience": []},
                 "explanations": {"rationale": []},
-                "artifacts": {"docx_url": "https://...", "pdf_url": None},
+                "artifacts": {
+                    "docx_url": "https://s3.../optimized_resume.docx",
+                    "pdf_url": "https://s3.../optimized_resume.pdf"
+                },
                 "model_info": {"provider": "hf", "llm": "mistral-7b", "embed": "bge-large"},
-                "processing_time_ms": 2500.0
+                "processing_time_ms": 2500.0,
+                "input_type": "pdf"
             }
         }
 
@@ -231,3 +267,213 @@ def validate_json_response(json_str: str, schema_class: BaseModel) -> BaseModel:
         
     except (json.JSONDecodeError, ValidationError) as e:
         raise ValueError(f"Invalid JSON response: {str(e)}\nResponse: {json_str[:200]}...")
+
+
+def validate_file_format(file_url: str) -> str:
+    """
+    Validate file format based on URL/path extension.
+    
+    Args:
+        file_url: File URL or path
+        
+    Returns:
+        File format ('pdf', 'docx', or raises ValueError)
+    """
+    import os
+    
+    if not file_url:
+        raise ValueError("File URL cannot be empty")
+    
+    # Get file extension
+    _, ext = os.path.splitext(file_url.lower())
+    
+    if ext == '.pdf':
+        return 'pdf'
+    elif ext in ['.docx', '.doc']:
+        return 'docx'
+    else:
+        raise ValueError(f"Unsupported file format: {ext}. Only PDF and DOCX are supported.")
+
+
+class SupportedFormats:
+    """Constants for supported file formats."""
+    PDF = "pdf"
+    DOCX = "docx"
+    TEXT = "text"
+    
+    ALL = [PDF, DOCX, TEXT]
+    
+    @classmethod
+    def is_supported(cls, format_type: str) -> bool:
+        """Check if format is supported."""
+        return format_type.lower() in cls.ALL
+
+
+
+async def validate_json_with_retry(
+    json_str: str, 
+    schema_class: BaseModel, 
+    chat_model=None,
+    max_retries: int = 1
+) -> BaseModel:
+    """
+    Validate JSON response from LLM with automatic retry and repair.
+    
+    Args:
+        json_str: JSON string from LLM
+        schema_class: Pydantic model class to validate against
+        chat_model: ChatModel instance for JSON repair (optional)
+        max_retries: Number of repair attempts
+        
+    Returns:
+        Validated Pydantic model instance
+        
+    Raises:
+        ValueError: If JSON is invalid after all retries
+    """
+    import json
+    from pydantic import ValidationError
+    
+    # Attempt 1: Try original response
+    try:
+        json_data = json.loads(json_str)
+        return schema_class(**json_data)
+    except (json.JSONDecodeError, ValidationError) as e:
+        print(f"⚠️  JSON validation failed: {str(e)}")
+        original_error = str(e)
+    
+    # If no chat model provided, can't retry
+    if not chat_model or max_retries <= 0:
+        raise ValueError(f"Invalid JSON response: {original_error}\nResponse: {json_str[:200]}...")
+    
+    # Attempt 2: Ask LLM to fix the JSON
+    for attempt in range(max_retries):
+        try:
+            print(f"🔄 Attempting JSON repair (attempt {attempt + 1}/{max_retries})")
+            
+            repair_messages = [
+                {
+                    "role": "system",
+                    "content": "You are a JSON repair assistant. Fix malformed JSON to match the required schema. Return ONLY valid JSON, no explanations."
+                },
+                {
+                    "role": "user", 
+                    "content": f"""Fix this malformed JSON to match the schema:
+
+                    MALFORMED JSON:
+                    {json_str}
+
+                    ERROR:
+                    {original_error}
+
+                    REQUIRED SCHEMA EXAMPLE:
+                    {json.dumps(schema_class.Config.schema_extra.get('example', {}), indent=2)}
+
+                    Return ONLY the corrected JSON:"""
+                }
+            ]
+            
+            repaired_json = await chat_model.chat(
+                repair_messages, 
+                temperature=0.1,  # Low temperature for precise JSON
+                max_tokens=2048
+            )
+            
+            # Clean the response (remove any non-JSON text)
+            repaired_json = extract_json_from_response(repaired_json)
+            
+            # Try to validate the repaired JSON
+            json_data = json.loads(repaired_json)
+            validated = schema_class(**json_data)
+            
+            print("✅ JSON repair successful")
+            return validated
+            
+        except (json.JSONDecodeError, ValidationError) as e:
+            print(f"❌ JSON repair attempt {attempt + 1} failed: {str(e)}")
+            if attempt == max_retries - 1:
+                # Final attempt failed
+                raise ValueError(
+                    f"JSON validation failed after {max_retries + 1} attempts.\n"
+                    f"Original error: {original_error}\n"
+                    f"Final response: {repaired_json[:200] if 'repaired_json' in locals() else json_str[:200]}..."
+                )
+        except Exception as e:
+            print(f"❌ Unexpected error during JSON repair: {str(e)}")
+            raise ValueError(f"JSON repair failed: {str(e)}")
+
+
+def extract_json_from_response(response: str) -> str:
+    """
+    Extract JSON from LLM response that might contain extra text.
+    
+    Args:
+        response: Raw LLM response
+        
+    Returns:
+        Cleaned JSON string
+    """
+    import re
+    
+    # Remove common prefixes/suffixes
+    response = response.strip()
+    
+    # Look for JSON block markers
+    json_patterns = [
+        r'```json\s*(\{.*?\})\s*```',  # ```json { ... } ```
+        r'```\s*(\{.*?\})\s*```',      # ``` { ... } ```
+        r'(\{.*\})',                   # Just find { ... }
+    ]
+    
+    for pattern in json_patterns:
+        match = re.search(pattern, response, re.DOTALL)
+        if match:
+            return match.group(1).strip()
+    
+    # If no pattern matches, return original
+    return response
+
+
+def create_json_prompt(system_message: str, user_content: str, schema_class: BaseModel) -> List[Dict[str, str]]:
+    """
+    Create a standardized prompt for JSON generation.
+    
+    Args:
+        system_message: System instruction
+        user_content: User request
+        schema_class: Expected response schema
+        
+    Returns:
+        Formatted messages for LLM
+    """
+    
+    schema_example = schema_class.Config.schema_extra.get('example', {})
+    
+    enhanced_system = f"""{system_message}
+
+CRITICAL: You must respond with ONLY valid JSON that matches this exact schema structure:
+
+{json.dumps(schema_example, indent=2)}
+
+Rules:
+- Return ONLY JSON, no explanations or markdown
+- All required fields must be present
+- Use exact field names and types as shown
+- No additional fields beyond the schema"""
+
+    return [
+        {"role": "system", "content": enhanced_system},
+        {"role": "user", "content": user_content}
+    ]
+
+
+# Sync wrapper for non-async code
+def validate_json_with_retry_sync(
+    json_str: str, 
+    schema_class: BaseModel, 
+    chat_model=None,
+    max_retries: int = 1
+) -> BaseModel:
+    """Synchronous wrapper for validate_json_with_retry."""
+    import asyncio
+    return asyncio.run(validate_json_with_retry(json_str, schema_class, chat_model, max_retries))
