@@ -109,3 +109,14 @@ wrapt==1.17.2
 WTForms==3.2.1
 yarl==1.18.3
 zopfli==0.2.3.post1
+
+
+# AI/ML Dependencies for Resume Optimizer
+openai>=1.0.0
+httpx>=0.25.0
+tenacity>=8.0.0
+mammoth>=1.6.0
+python-docx>=1.1.0
+redis>=5.0.0
+orjson>=3.9.0
+pydantic>=2.0.0
