@@ -3,7 +3,7 @@ from flask_login import login_user,  current_user, login_required
 from template_registry import TemplateRegistry
 import os
 import json
-from models import Job, Resume,Application
+from models import Job, Resume,Application,User
 from sqlalchemy.orm import attributes
 from datetime import datetime
 from helpers import enhance_resume_content,analyze_job_description,extract_skills_from_text,generate_resume, generate_pdf
@@ -463,3 +463,102 @@ def delete_resume_item(resume_id, section_type, item_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+
+
+
+@resume_bp.route('/resumes')
+@login_required
+def resumes():
+    """Display all user resumes - main resume management page"""
+    try:
+        # Get user's resumes
+        resumes = Resume.query.filter_by(user_id=current_user.id).order_by(Resume.updated_at.desc()).all()
+        
+        # Process resumes for display
+        for resume in resumes:
+            if resume.job:
+                resume.display_title = f"Resume for {resume.job.title}"
+                resume.display_company = resume.job.company
+            else:
+                resume.display_title = resume.title or "General Resume"
+                resume.display_company = "Multiple Companies"
+                
+            # Calculate completeness score
+            resume.completeness_score = calculate_resume_completeness(resume.resume_data) if resume.resume_data else 0
+        
+        return render_template('resumes.html', resumes=resumes)
+        
+    except Exception as e:
+        print(f"Error loading resumes: {e}")
+        flash('Error loading resumes. Please try again.', 'error')
+        return redirect(url_for('root.dashboard'))
+
+
+@resume_bp.route('/optimize')
+@login_required
+def optimize():
+    """Resume optimization landing page"""
+    try:
+        # Get user's resumes for selection
+        resumes = Resume.query.filter_by(user_id=current_user.id).all()
+        
+        return render_template('optimize.html', resumes=resumes)
+        
+    except Exception as e:
+        print(f"Error loading optimize page: {e}")
+        flash('Error loading optimization page. Please try again.', 'error')
+        return redirect(url_for('root.dashboard'))
+
+
+@resume_bp.route('/templates')
+@login_required 
+def templates():
+    """Resume templates gallery"""
+    try:
+        # Mock template data - replace with actual template loading
+        templates = [
+            {
+                'id': 'professional_classic',
+                'name': 'Professional Classic',
+                'description': 'Clean and traditional layout perfect for corporate roles',
+                'thumbnail': '/static/images/templates/professional_classic.png',
+                'category': 'professional'
+            },
+            {
+                'id': 'modern_creative',
+                'name': 'Modern Creative',
+                'description': 'Contemporary design for creative industries',
+                'thumbnail': '/static/images/templates/modern_creative.png',
+                'category': 'creative'
+            },
+            {
+                'id': 'tech_minimalist', 
+                'name': 'Tech Minimalist',
+                'description': 'Minimalist design perfect for tech professionals',
+                'thumbnail': '/static/images/templates/tech_minimalist.png',
+                'category': 'tech'
+            }
+        ]
+        
+        return render_template('templates.html', templates=templates)
+        
+    except Exception as e:
+        print(f"Error loading templates: {e}")
+        flash('Error loading templates. Please try again.', 'error')
+        return redirect(url_for('root.dashboard'))
+
+
+# Add to routes/__init__.py or create new error handling route file
+
+
+
+# Also add these temporary template files that need to be created:
+
+"""
+Create these template files in pages/ directory:
+
+1. pages/resumes.html - Main resume management page
+2. pages/optimize.html - Resume optimization interface  
+3. pages/templates.html - Template gallery
+"""

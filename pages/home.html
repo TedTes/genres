@@ -36,12 +36,9 @@
                         <a href="{{ url_for('root.dashboard') }}" class="btn btn-primary btn-large">
                             <i class="fas fa-rocket"></i> Optimize Resume
                         </a>
-                        <a href="" class="btn btn-outline btn-large">
+                        <a href="{{ url_for('resume.resumes') }}" class="btn btn-outline btn-large">
                             <i class="fas fa-file-alt"></i> My Resumes
                         </a>
-                        <!-- <a href="{{ url_for('resume.resumes') }}" class="btn btn-outline btn-large">
-                            <i class="fas fa-file-alt"></i> My Resumes
-                        </a> -->
                     {% else %}
                         <a href="{{ url_for('auth.signup') }}" class="btn btn-primary btn-large">
                             <i class="fas fa-rocket"></i> Start Optimizing
