@@ -1,17 +1,17 @@
 # ResumeMatch
 
-ResumeMatch is an AI-powered resume builder that helps job seekers create professional, ATS-optimized resumes tailored to specific job listings with intelligent skills matching.
+ResumeMatch is an AI-powered resume optimization platform that helps job seekers create professional, ATS-optimized resumes tailored to specific job descriptions with intelligent skills matching and enhancement.
 
 ## Features
 
-- **AI-powered resume creation**: Generate professional resumes with optimal formatting and content
-- **Job-specific tailoring**: Customize your resume to match specific job listings
-- **ATS optimization**: Create resumes that pass through Applicant Tracking Systems
-- **Skills matching**: Automatically identify and highlight relevant skills for job positions
-- **Multiple templates**: Choose from various professional resume templates
-- **Job search**: Browse job listings and create tailored resumes for each position
-- **Application tracking**: Track your job applications and their statuses
-- **PDF download**: Export your resume as a PDF ready for submission
+- **AI-powered resume optimization**: Generate professional resumes with optimal formatting, content enhancement, and keyword optimization
+- **Job-specific tailoring**: Customize your resume to match specific job descriptions and requirements
+- **ATS optimization**: Create resumes that pass through Applicant Tracking Systems with improved keyword matching
+- **Skills gap analysis**: Automatically identify missing skills and optimize your resume content
+- **Multiple templates**: Choose from various professional resume templates with modern designs
+- **Resume enhancement**: Improve existing resumes with AI-powered content suggestions and optimization
+- **Performance tracking**: Monitor your resume optimization success and improvement metrics
+- **PDF & DOCX export**: Export your optimized resume in multiple formats ready for submission
 
 ## Tech Stack
 
@@ -21,7 +21,7 @@ ResumeMatch is an AI-powered resume builder that helps job seekers create profes
 - **Authentication**: Flask-Login
 - **Form Handling**: WTForms
 - **PDF Generation**: WeasyPrint
-- **Job Scraping**: PlayWright, BeautifulSoup
+- **AI Integration**: OpenAI API for resume optimization
 - **NLP**: spaCy for skills extraction and matching
 - **Payment Processing**: Stripe integration (with PayPal support)
 - **Storage**: Supabase for file storage
@@ -36,30 +36,25 @@ ResumeMatch/
 ├── models.py               # SQLAlchemy models
 ├── routes/                 # Route handlers
 │   ├── admin.py            # Admin dashboard routes
-│   ├── application.py      # Job application tracking routes
+│   ├── application.py      # Application tracking routes
 │   ├── auth.py             # Authentication routes
-│   ├── job.py              # Job listing and search routes
+│   ├── resume.py           # Resume creation/editing/optimization routes
 │   ├── payment.py          # Payment processing routes
-│   ├── resume.py           # Resume creation/editing routes
 │   └── root.py             # Home and dashboard routes
 ├── helpers/                # Helper functions
-│   ├── job_helper.py       # Job data processing helpers
-│   ├── resume_helper.py    # Resume generation helpers
+│   ├── resume_helper.py    # Resume generation and optimization helpers
 │   ├── layouts_helper.py   # Resume layout definitions
 │   └── themes_helper.py    # Resume theme definitions
 ├── services/               # Business logic services
-│   ├── job_service.py      # Job-related business logic
-│   ├── subscription_service.py # Subscription management
-│   └── scraper/            # Job scraping functionality
-│       ├── web_scraper.py  # Web scraping using PlayWright
-│       ├── parser.py       # HTML parsing with BeautifulSoup
-│       └── data_aggregator.py # Combines scraped data
+│   ├── resume/             # Resume optimization services
+│   │   ├── optimizer.py    # AI-powered resume optimization
+│   │   ├── analyzer.py     # Skills gap analysis
+│   │   └── rewrite.py      # Content enhancement
+│   └── subscription_service.py # Subscription management
 ├── pages/                  # HTML templates
 │   ├── base.html           # Base template with common structure
 │   ├── home.html           # Landing page
 │   ├── dashboard.html      # User dashboard
-│   ├── jobs.html           # Job search page
-│   ├── job_detail.html     # Individual job listing
 │   └── resume_*.html       # Various resume creation forms
 ├── static/                 # Static assets (CSS, JS, images)
 └── payments/               # Payment gateway implementations
@@ -103,6 +98,7 @@ ResumeMatch/
    STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
    SUPABASE_URL=your_supabase_url
    SUPABASE_KEY=your_supabase_key
+   OPENAI_API_KEY=your_openai_api_key
    ```
 
 5. Initialize the database:
@@ -121,34 +117,4 @@ ResumeMatch/
 
 2. Visit `http://localhost:5000` in your browser
 
-## Subscription Plans
 
-ResumeMatch offers the following subscription options:
-
-- **Free Plan**: Basic features with limited templates
-- **3-Month Plan**: $30 (Premium features for 3 months)
-- **6-Month Plan**: $48 (Premium features for 6 months)
-- **Annual Plan**: $80 (Premium features for 12 months)
-
-## Resume Templates
-
-The application includes multiple professional resume templates:
-
-- Classic
-- Modern
-- Sidebar
-- Minimalist
-- Professional
-- Timeline
-- Cards
-- Grid
-- Portfolio
-- Compact
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Commit your changes: `git commit -m 'Add some feature'`
-4. Push to the branch: `git push origin feature-name`
-5. Open a pull request
