@@ -9,7 +9,7 @@ import asyncio
 
 from .schemas import Rationale, ChangeRationale, validate_json_with_retry
 from providers import get_models
-
+from .pipeline import OptimizedResume
 
 class ResumeDiffGenerator:
     """Generates detailed diffs between original and optimized resumes."""
@@ -204,10 +204,10 @@ class ExplanationGenerator:
     
     async def generate_explanations(
         self,
-        original_resume: Dict[str, any],
+        original_resume: Dict[str, Any],
         optimized_resume: OptimizedResume,
         missing_keywords: List[str],
-        gap_analysis: Dict[str, any]
+        gap_analysis: Dict[str, Any]
     ) -> Rationale:
         """
         Generate comprehensive explanations for all resume changes.
@@ -272,9 +272,9 @@ class ExplanationGenerator:
     
     def _create_detailed_diff(
         self, 
-        original: Dict[str, any], 
+        original: Dict[str, Any], 
         optimized: OptimizedResume
-    ) -> Dict[str, any]:
+    ) -> Dict[str, Any]:
         """Create comprehensive diff analysis."""
         
         # Extract original bullets for comparison

@@ -297,11 +297,11 @@ class TransparentScoring:
     @classmethod
     def calculate_match_score(
         cls,
-        keyword_analysis: Dict[str, any],
-        semantic_analysis: Dict[str, any],
-        gap_analysis: Dict[str, any],
+        keyword_analysis: Dict[str, Any],
+        semantic_analysis: Dict[str, Any],
+        gap_analysis: Dict[str, Any],
         resume_sections: Dict[str, str]
-    ) -> Dict[str, any]:
+    ) -> Dict[str, Any]:
         """
         Calculate comprehensive match score with detailed breakdown.
         
@@ -537,11 +537,11 @@ class TransparentScoring:
 
 # Convenience function
 def score_resume_match(
-    keyword_analysis: Dict[str, any],
-    semantic_analysis: Dict[str, any],
-    gap_analysis: Dict[str, any],
+    keyword_analysis: Dict[str, Any],
+    semantic_analysis: Dict[str, Any],
+    gap_analysis: Dict[str, Any],
     resume_sections: Dict[str, str]
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """
     Score resume match with transparent breakdown.
     
