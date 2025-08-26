@@ -548,17 +548,3 @@ def templates():
         flash('Error loading templates. Please try again.', 'error')
         return redirect(url_for('root.dashboard'))
 
-
-# Add to routes/__init__.py or create new error handling route file
-
-
-
-# Also add these temporary template files that need to be created:
-
-"""
-Create these template files in pages/ directory:
-
-1. pages/resumes.html - Main resume management page
-2. pages/optimize.html - Resume optimization interface  
-3. pages/templates.html - Template gallery
-"""
