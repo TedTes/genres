@@ -4,12 +4,12 @@ Handles text vectorization and semantic matching between resumes and job descrip
 """
 
 import numpy as np
-from typing import List, Dict, Tuple, Optional
+from typing import Any,List, Dict, Tuple, Optional
 from dataclasses import dataclass
 import asyncio
 
-from ..resume.schemas import DocumentChunk
-from ..resume.keywords import KeywordMatch, extract_keywords_from_text
+from .ingest import DocumentChunk
+from .keywords import KeywordMatch, extract_keywords_from_text
 from providers import get_models
 
 
@@ -201,7 +201,7 @@ async def analyze_semantic_gaps(
     resume_chunks: List[DocumentChunk],
     jd_text: str,
     similarity_threshold: float = 0.3
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """
     Analyze semantic gaps between resume and job description.
     
@@ -261,7 +261,7 @@ def analyze_semantic_gaps_sync(
     resume_chunks: List[DocumentChunk],
     jd_text: str,
     similarity_threshold: float = 0.3
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """Synchronous wrapper for analyze_semantic_gaps."""
     return asyncio.run(analyze_semantic_gaps(resume_chunks, jd_text, similarity_threshold))
 
@@ -277,7 +277,7 @@ class GapAnalyzer:
         resume_chunks: List[DocumentChunk],
         jd_text: str,
         jd_title: Optional[str] = None
-    ) -> Dict[str, any]:
+    ) -> Dict[str, Any]:
         """
         Comprehensive gap analysis between resume and job description.
         
@@ -326,7 +326,7 @@ class GapAnalyzer:
         self, 
         resume_chunks: List[DocumentChunk], 
         jd_text: str
-    ) -> Dict[str, any]:
+    ) -> Dict[str, Any]:
         """Analyze keyword-based gaps between resume and JD."""
         
         from ..resume.keywords import extract_jd_requirements, calculate_skill_coverage
@@ -369,7 +369,7 @@ class GapAnalyzer:
         self, 
         resume_chunks: List[DocumentChunk], 
         jd_text: str
-    ) -> Dict[str, any]:
+    ) -> Dict[str, Any]:
         """Analyze gaps at the section level."""
         
         # Group chunks by section
@@ -409,9 +409,9 @@ class GapAnalyzer:
     
     def _generate_recommendations(
         self,
-        keyword_gaps: Dict[str, any],
-        semantic_gaps: Dict[str, any], 
-        section_gaps: Dict[str, any]
+        keyword_gaps: Dict[str, Any],
+        semantic_gaps: Dict[str, Any], 
+        section_gaps: Dict[str, Any]
     ) -> List[Dict[str, str]]:
         """Generate actionable recommendations based on gap analysis."""
         
@@ -470,8 +470,8 @@ class GapAnalyzer:
     
     def _calculate_overall_score(
         self,
-        keyword_gaps: Dict[str, any],
-        semantic_gaps: Dict[str, any]
+        keyword_gaps: Dict[str, Any],
+        semantic_gaps: Dict[str, Any]
     ) -> float:
         """Calculate weighted overall match score."""
         
@@ -492,7 +492,7 @@ async def perform_gap_analysis(
     resume_chunks: List[DocumentChunk],
     jd_text: str,
     jd_title: Optional[str] = None
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """
     Perform complete gap analysis between resume and job description.
     
@@ -514,6 +514,6 @@ def perform_gap_analysis_sync(
     resume_chunks: List[DocumentChunk],
     jd_text: str,
     jd_title: Optional[str] = None
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """Synchronous wrapper for perform_gap_analysis."""
     return asyncio.run(perform_gap_analysis(resume_chunks, jd_text, jd_title))

@@ -262,7 +262,7 @@ class OptimizationResult(BaseModel):
                 "input_type": "pdf"
             }
         }
-   def dict(self, **kwargs):
+    def dict(self, **kwargs):
         """Convert to dictionary for JSON serialization."""
         return super().dict(**kwargs)
 

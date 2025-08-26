@@ -5,7 +5,7 @@ Handles DOCX, PDF, and text input for resume processing.
 
 import os
 import tempfile
-from typing import Dict, List, Optional, Tuple
+from typing import Any,Dict, List, Optional, Tuple
 import httpx
 import mammoth
 from pydantic import BaseModel
@@ -26,7 +26,7 @@ class DocumentChunk(BaseModel):
     section: str  # 'summary', 'experience', 'education', 'skills'
     chunk_index: int
     token_count: Optional[int] = None
-    metadata: Dict[str, any] = {}
+    metadata: Dict[str, Any] = {}
 
 
 class ParsedResume(BaseModel):
@@ -34,7 +34,7 @@ class ParsedResume(BaseModel):
     
     raw_text: str
     sections: Dict[str, str] = {}
-    experience_items: List[Dict[str, any]] = []
+    experience_items: List[Dict[str, Any]] = []
     education_items: List[Dict[str, str]] = []
     skills: List[str] = []
     contact_info: Dict[str, str] = {}
@@ -247,7 +247,7 @@ def parse_resume_sections(text: str) -> ParsedResume:
     return parsed
 
 
-def parse_experience_items(experience_text: str) -> List[Dict[str, any]]:
+def parse_experience_items(experience_text: str) -> List[Dict[str, Any]]:
     """
     Parse experience section into individual job items.
     

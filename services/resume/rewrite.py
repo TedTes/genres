@@ -36,7 +36,7 @@ ATS OPTIMIZATION PRIORITIES:
     @staticmethod
     def create_optimization_prompt(
         resume_sections: Dict[str, str],
-        experience_items: List[Dict[str, any]],
+        experience_items: List[Dict[str, Any]],
         jd_text: str,
         missing_keywords: List[str],
         weak_keywords: List[str],
@@ -181,7 +181,7 @@ class ResumeRewriter:
     async def optimize_resume(
         self,
         resume_sections: Dict[str, str],
-        experience_items: List[Dict[str, any]],
+        experience_items: List[Dict[str, Any]],
         jd_text: str,
         missing_keywords: List[str],
         weak_keywords: List[str],
@@ -252,7 +252,7 @@ class ResumeRewriter:
     def _post_process_resume(
         self,
         optimized: OptimizedResume,
-        original_experience: List[Dict[str, any]]
+        original_experience: List[Dict[str, Any]]
     ) -> OptimizedResume:
         """
         Post-process optimized resume to ensure constraints.

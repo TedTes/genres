@@ -4,7 +4,7 @@ Curated allowlist of technical skills and keyword extraction logic.
 """
 
 import re
-from typing import List, Set, Dict, Tuple
+from typing import Any, List, Set, Dict, Tuple
 from dataclasses import dataclass
 
 
@@ -226,7 +226,7 @@ def calculate_skill_coverage(
     resume_keywords: List[str], 
     jd_keywords: List[str],
     importance_map: Dict[str, str] = None
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """
     Calculate how well resume covers job description requirements.
     
