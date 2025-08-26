@@ -1,0 +1,940 @@
+{% extends "base.html" %}
+{% block title %}Optimize Resume - ResumeMatch{% endblock %}
+
+{% block content %}
+<section class="dashboard-header">
+    <div class="container">
+        <div class="dashboard-welcome">
+            <h1><i class="fas fa-robot text-primary"></i> AI Resume Optimization</h1>
+            <p>Transform your resume with intelligent AI-powered optimization</p>
+        </div>
+    </div>
+</section>
+
+<section class="optimize-content">
+    <div class="container">
+        <!-- Optimization Steps -->
+        <div class="optimization-steps">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-title">Select Resume</div>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-title">Job Description</div>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-title">AI Optimization</div>
+            </div>
+            <div class="step" data-step="4">
+                <div class="step-number">4</div>
+                <div class="step-title">Results</div>
+            </div>
+        </div>
+
+        <!-- Step 1: Resume Selection -->
+        <div class="optimization-step" id="step-1">
+            <div class="step-content">
+                <h2>Choose Resume to Optimize</h2>
+                <p>Select an existing resume or upload a new one for AI optimization.</p>
+                
+                <div class="resume-selection-options">
+                    <!-- Existing Resumes -->
+                    {% if resumes %}
+                    <div class="existing-resumes">
+                        <h3><i class="fas fa-file-alt"></i> Your Existing Resumes</h3>
+                        <div class="resume-selection-grid">
+                            {% for resume in resumes %}
+                            <div class="resume-option" data-resume-id="{{ resume.id }}">
+                                <div class="resume-preview-mini">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="resume-details">
+                                    <h4>{{ resume.display_title }}</h4>
+                                    <p>{{ resume.display_company }}</p>
+                                    <small>Updated {{ resume.updated_at.strftime('%b %d, %Y') }}</small>
+                                </div>
+                                <button class="btn btn-outline select-resume-btn" 
+                                        onclick="selectResume({{ resume.id }}, '{{ resume.display_title }}')">
+                                    Select
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Upload New Resume -->
+                    <div class="upload-section">
+                        <h3><i class="fas fa-upload"></i> Upload New Resume</h3>
+                        <div class="upload-zone" id="resume-upload-zone">
+                            <div class="upload-content">
+                                <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                                <h4>Drag & drop your resume here</h4>
+                                <p>or <button class="btn btn-link" onclick="document.getElementById('resume-file').click()">browse files</button></p>
+                                <small>Supports PDF, DOCX, and TXT files (max 5MB)</small>
+                            </div>
+                            <input type="file" id="resume-file" accept=".pdf,.docx,.txt" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn btn-primary" id="next-step-1" onclick="nextStep(1)" disabled>
+                        Continue to Job Description <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Job Description -->
+        <div class="optimization-step" id="step-2" style="display: none;">
+            <div class="step-content">
+                <h2>Add Job Description</h2>
+                <p>Paste the job description you're targeting for optimal resume customization.</p>
+
+                <div class="job-input-section">
+                    <div class="input-tabs">
+                        <button class="tab-btn active" data-tab="paste">Paste Job Description</button>
+                        <button class="tab-btn" data-tab="template">Use Template</button>
+                        <button class="tab-btn" data-tab="url">From URL</button>
+                    </div>
+
+                    <div class="tab-content active" id="paste-tab">
+                        <div class="form-group">
+                            <label for="job-title">Job Title</label>
+                            <input type="text" id="job-title" placeholder="e.g., Senior Software Engineer">
+                        </div>
+                        <div class="form-group">
+                            <label for="company-name">Company Name (Optional)</label>
+                            <input type="text" id="company-name" placeholder="e.g., Google">
+                        </div>
+                        <div class="form-group">
+                            <label for="job-description">Job Description</label>
+                            <textarea id="job-description" rows="12" 
+                                    placeholder="Paste the full job description here..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="template-tab">
+                        <div class="template-selection">
+                            <div class="template-grid">
+                                <div class="template-option" data-template="software-engineer">
+                                    <h4>Software Engineer</h4>
+                                    <p>Standard software development role</p>
+                                </div>
+                                <div class="template-option" data-template="data-scientist">
+                                    <h4>Data Scientist</h4>
+                                    <p>Machine learning and analytics</p>
+                                </div>
+                                <div class="template-option" data-template="product-manager">
+                                    <h4>Product Manager</h4>
+                                    <p>Product development and strategy</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="url-tab">
+                        <div class="form-group">
+                            <label for="job-url">Job Posting URL</label>
+                            <input type="url" id="job-url" placeholder="https://...">
+                            <button class="btn btn-outline" onclick="extractFromUrl()">Extract Content</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn btn-outline" onclick="prevStep(2)">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button class="btn btn-primary" id="next-step-2" onclick="nextStep(2)" disabled>
+                        Start AI Optimization <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: AI Processing -->
+        <div class="optimization-step" id="step-3" style="display: none;">
+            <div class="step-content text-center">
+                <h2>AI is Optimizing Your Resume</h2>
+                <p>Please wait while our AI analyzes and enhances your resume...</p>
+
+                <div class="processing-animation">
+                    <div class="processing-spinner">
+                        <i class="fas fa-robot fa-3x"></i>
+                    </div>
+                </div>
+
+                <div class="processing-steps">
+                    <div class="processing-step active">
+                        <i class="fas fa-file-text"></i>
+                        <span>Parsing resume content</span>
+                    </div>
+                    <div class="processing-step">
+                        <i class="fas fa-search"></i>
+                        <span>Analyzing job requirements</span>
+                    </div>
+                    <div class="processing-step">
+                        <i class="fas fa-brain"></i>
+                        <span>AI optimization in progress</span>
+                    </div>
+                    <div class="processing-step">
+                        <i class="fas fa-check"></i>
+                        <span>Finalizing improvements</span>
+                    </div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="optimization-progress"></div>
+                </div>
+                <p class="progress-text">Estimated time: 30-60 seconds</p>
+            </div>
+        </div>
+
+        <!-- Step 4: Results -->
+        <div class="optimization-step" id="step-4" style="display: none;">
+            <div class="step-content">
+                <h2>🎉 Optimization Complete!</h2>
+                <p>Your resume has been successfully optimized with AI enhancements.</p>
+
+                <div class="results-summary">
+                    <div class="score-improvement">
+                        <div class="score-card">
+                            <div class="score-label">ATS Match Score</div>
+                            <div class="score-comparison">
+                                <div class="before-score">Before: <span id="before-score">--</span>%</div>
+                                <div class="arrow"><i class="fas fa-arrow-right"></i></div>
+                                <div class="after-score">After: <span id="after-score">--</span>%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="improvements-list">
+                        <h3>Key Improvements Made:</h3>
+                        <ul id="improvements-summary">
+                            <!-- Will be populated by JavaScript -->
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="btn btn-primary" onclick="downloadOptimized()">
+                        <i class="fas fa-download"></i> Download PDF
+                    </button>
+                    <button class="btn btn-outline" onclick="viewOptimized()">
+                        <i class="fas fa-eye"></i> Preview Resume
+                    </button>
+                    <button class="btn btn-outline" onclick="saveToAccount()">
+                        <i class="fas fa-save"></i> Save to Account
+                    </button>
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn btn-outline" onclick="startOver()">
+                        <i class="fas fa-redo"></i> Optimize Another Resume
+                    </button>
+                    <a href="{{ url_for('root.dashboard') }}" class="btn btn-primary">
+                        <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.optimize-content {
+    padding: 2rem 0;
+    min-height: calc(100vh - 300px);
+}
+
+.optimization-steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.optimization-steps::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 25%;
+    right: 25%;
+    height: 2px;
+    background: var(--border);
+    z-index: 1;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    margin: 0 1rem;
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--light-gray);
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.step.active .step-number {
+    background: var(--primary);
+    color: white;
+}
+
+.step.completed .step-number {
+    background: var(--success);
+    color: white;
+}
+
+.step-title {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.optimization-step {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.resume-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.resume-option {
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.resume-option:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow);
+}
+
+.resume-option.selected {
+    border-color: var(--primary);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.resume-preview-mini {
+    width: 60px;
+    height: 80px;
+    background: var(--light);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.resume-details {
+    flex: 1;
+}
+
+.resume-details h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--dark);
+}
+
+.resume-details p {
+    margin: 0 0 0.25rem 0;
+    color: var(--text-light);
+}
+
+.upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 3rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    margin: 1.5rem 0;
+}
+
+.upload-zone:hover {
+    border-color: var(--primary);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.upload-zone.dragover {
+    border-color: var(--primary);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.upload-content i {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.upload-content h4 {
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+}
+
+.input-tabs {
+    display: flex;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 2rem;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    color: var(--text-light);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.template-option {
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.template-option:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow);
+}
+
+.template-option.selected {
+    border-color: var(--primary);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.processing-animation {
+    margin: 2rem 0;
+}
+
+.processing-spinner {
+    animation: spin 2s linear infinite;
+    color: var(--primary);
+    margin-bottom: 2rem;
+}
+
+.processing-steps {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.processing-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-light);
+    min-width: 120px;
+}
+
+.processing-step.active {
+    color: var(--primary);
+}
+
+.processing-step.completed {
+    color: var(--success);
+}
+
+.processing-step i {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--light-gray);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.results-summary {
+    background: var(--light);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin: 2rem 0;
+}
+
+.score-improvement {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.score-card {
+    display: inline-block;
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.score-comparison {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.before-score {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.after-score {
+    color: var(--success);
+    font-weight: 600;
+    font-size: 1.125rem;
+}
+
+.arrow {
+    color: var(--primary);
+    font-size: 1.25rem;
+}
+
+.improvements-list h3 {
+    margin-bottom: 1rem;
+    color: var(--dark);
+}
+
+.improvements-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.improvements-list li {
+    padding: 0.5rem 0;
+    color: var(--text);
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.improvements-list li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--success);
+    font-weight: 600;
+}
+
+.results-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+}
+
+.step-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+    .optimization-steps {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .optimization-steps::before {
+        display: none;
+    }
+    
+    .resume-selection-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .score-comparison {
+        flex-direction: column;
+    }
+    
+    .results-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .step-actions {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentStep = 1;
+let selectedResumeId = null;
+let uploadedFile = null;
+let optimizationData = {};
+
+// Step navigation
+function nextStep(step) {
+    if (validateStep(step)) {
+        document.getElementById(`step-${step}`).style.display = 'none';
+        document.getElementById(`step-${step + 1}`).style.display = 'block';
+        
+        // Update step indicators
+        document.querySelector(`.step[data-step="${step}"]`).classList.add('completed');
+        document.querySelector(`.step[data-step="${step + 1}"]`).classList.add('active');
+        
+        currentStep = step + 1;
+        
+        if (step + 1 === 3) {
+            startOptimization();
+        }
+    }
+}
+
+function prevStep(step) {
+    document.getElementById(`step-${step}`).style.display = 'none';
+    document.getElementById(`step-${step - 1}`).style.display = 'block';
+    
+    // Update step indicators
+    document.querySelector(`.step[data-step="${step}"]`).classList.remove('active');
+    document.querySelector(`.step[data-step="${step - 1}"]`).classList.remove('completed');
+    document.querySelector(`.step[data-step="${step - 1}"]`).classList.add('active');
+    
+    currentStep = step - 1;
+}
+
+function validateStep(step) {
+    if (step === 1) {
+        return selectedResumeId || uploadedFile;
+    } else if (step === 2) {
+        const jobDescription = document.getElementById('job-description').value.trim();
+        const jobTitle = document.getElementById('job-title').value.trim();
+        return jobDescription.length > 50 && jobTitle.length > 0;
+    }
+    return true;
+}
+
+// Resume selection
+function selectResume(resumeId, title) {
+    selectedResumeId = resumeId;
+    
+    // Update UI
+    document.querySelectorAll('.resume-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    document.querySelector(`[data-resume-id="${resumeId}"]`).classList.add('selected');
+    document.getElementById('next-step-1').disabled = false;
+}
+
+// File upload handling
+const uploadZone = document.getElementById('resume-upload-zone');
+const fileInput = document.getElementById('resume-file');
+
+uploadZone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    uploadZone.classList.add('dragover');
+});
+
+uploadZone.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+});
+
+uploadZone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        handleFileUpload(files[0]);
+    }
+});
+
+fileInput.addEventListener('change', function(e) {
+    if (e.target.files.length > 0) {
+        handleFileUpload(e.target.files[0]);
+    }
+});
+
+function handleFileUpload(file) {
+    if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        return;
+    }
+    
+    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+    if (!allowedTypes.includes(file.type)) {
+        alert('Please upload a PDF, DOCX, or TXT file');
+        return;
+    }
+    
+    uploadedFile = file;
+    selectedResumeId = null;
+    
+    // Update UI
+    document.querySelectorAll('.resume-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    uploadZone.innerHTML = `
+        <div class="upload-content">
+            <i class="fas fa-check-circle fa-3x text-success"></i>
+            <h4>${file.name}</h4>
+            <p>File uploaded successfully</p>
+            <button class="btn btn-link" onclick="resetUpload()">Choose different file</button>
+        </div>
+    `;
+    
+    document.getElementById('next-step-1').disabled = false;
+}
+
+function resetUpload() {
+    uploadedFile = null;
+    uploadZone.innerHTML = `
+        <div class="upload-content">
+            <i class="fas fa-cloud-upload-alt fa-3x"></i>
+            <h4>Drag & drop your resume here</h4>
+            <p>or <button class="btn btn-link" onclick="document.getElementById('resume-file').click()">browse files</button></p>
+            <small>Supports PDF, DOCX, and TXT files (max 5MB)</small>
+        </div>
+    `;
+    document.getElementById('next-step-1').disabled = !selectedResumeId;
+}
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const tabName = this.dataset.tab;
+        
+        // Update tab buttons
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Update tab content
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+    });
+});
+
+// Job description validation
+document.getElementById('job-description').addEventListener('input', function() {
+    const valid = validateStep(2);
+    document.getElementById('next-step-2').disabled = !valid;
+});
+
+document.getElementById('job-title').addEventListener('input', function() {
+    const valid = validateStep(2);
+    document.getElementById('next-step-2').disabled = !valid;
+});
+
+// Template selection
+document.querySelectorAll('.template-option').forEach(option => {
+    option.addEventListener('click', function() {
+        const template = this.dataset.template;
+        
+        // Update UI
+        document.querySelectorAll('.template-option').forEach(opt => opt.classList.remove('selected'));
+        this.classList.add('selected');
+        
+        // Load template content (placeholder)
+        const templates = {
+            'software-engineer': 'We are seeking a Software Engineer with experience in...',
+            'data-scientist': 'Looking for a Data Scientist to join our analytics team...',
+            'product-manager': 'We need a Product Manager to lead our product development...'
+        };
+        
+        document.getElementById('job-description').value = templates[template] || '';
+        document.getElementById('job-title').value = this.querySelector('h4').textContent;
+        
+        // Switch to paste tab
+        document.querySelector('.tab-btn[data-tab="paste"]').click();
+        
+        const valid = validateStep(2);
+        document.getElementById('next-step-2').disabled = !valid;
+    });
+});
+
+// AI Optimization simulation
+function startOptimization() {
+    let progress = 0;
+    const progressBar = document.getElementById('optimization-progress');
+    const steps = document.querySelectorAll('.processing-step');
+    let currentProcessingStep = 0;
+    
+    const interval = setInterval(() => {
+        progress += Math.random() * 15;
+        
+        if (progress > 100) progress = 100;
+        
+        progressBar.style.width = `${progress}%`;
+        
+        // Update processing steps
+        const stepProgress = progress / 25;
+        if (stepProgress > currentProcessingStep && currentProcessingStep < steps.length) {
+            steps[currentProcessingStep].classList.remove('active');
+            steps[currentProcessingStep].classList.add('completed');
+            currentProcessingStep++;
+            if (currentProcessingStep < steps.length) {
+                steps[currentProcessingStep].classList.add('active');
+            }
+        }
+        
+        if (progress >= 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+                showResults();
+            }, 1000);
+        }
+    }, 500);
+}
+
+function showResults() {
+    document.getElementById('step-3').style.display = 'none';
+    document.getElementById('step-4').style.display = 'block';
+    
+    // Update step indicators
+    document.querySelector('.step[data-step="3"]').classList.add('completed');
+    document.querySelector('.step[data-step="4"]').classList.add('active');
+    
+    // Simulate results
+    document.getElementById('before-score').textContent = '67';
+    document.getElementById('after-score').textContent = '92';
+    
+    const improvements = [
+        'Added 15 relevant keywords for better ATS compatibility',
+        'Enhanced action verbs to show greater impact',
+        'Improved formatting for professional appearance',
+        'Quantified achievements with specific metrics',
+        'Optimized skills section for job requirements'
+    ];
+    
+    const improvementsList = document.getElementById('improvements-summary');
+    improvements.forEach(improvement => {
+        const li = document.createElement('li');
+        li.textContent = improvement;
+        improvementsList.appendChild(li);
+    });
+}
+
+// Result actions
+function downloadOptimized() {
+    alert('Download functionality would be implemented here');
+}
+
+function viewOptimized() {
+    alert('Preview functionality would be implemented here');
+}
+
+function saveToAccount() {
+    alert('Save to account functionality would be implemented here');
+}
+
+function startOver() {
+    location.reload();
+}
+
+function extractFromUrl() {
+    const url = document.getElementById('job-url').value;
+    if (url) {
+        alert('URL extraction functionality would be implemented here');
+    }
+}
+</script>
+{% endblock %}
