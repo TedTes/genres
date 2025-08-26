@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% block title %}Error {{ error_code }} - ResumeMatch{% endblock %}
+
+{% block extra_css %}
+<style>
+.error-page {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 0;
+    background: linear-gradient(135deg, var(--light) 0%, #f1f5f9 100%);
+}
+
+.error-container {
+    text-align: center;
+    max-width: 600px;
+    padding: 3rem;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.error-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
+}
+
+.error-icon {
+    width: 6rem;
+    height: 6rem;
+    margin: 0 auto 2rem;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    position: relative;
+    animation: pulse-error 2s infinite;
+}
+
+.error-icon.warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.error-icon.info {
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
+}
+
+.error-code {
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.error-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 1rem;
+}
+
+.error-message {
+    font-size: 1.125rem;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+}
+
+.error-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.error-suggestions {
+    background: var(--light);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: left;
+    margin-top: 2rem;
+    border-left: 4px solid var(--primary);
+}
+
+.error-suggestions h4 {
+    color: var(--dark);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.error-suggestions ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.error-suggestions li {
+    padding: 0.5rem 0;
+    color: var(--text);
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.error-suggestions li:before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.error-suggestions li a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.error-suggestions li a:hover {
+    text-decoration: underline;
+}
+
+.back-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 0.875rem;
+    margin-top: 1rem;
+    transition: var(--transition);
+}
+
+.back-home:hover {
+    color: var(--primary);
+}
+
+@keyframes pulse-error {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+}
+
+@media (max-width: 768px) {
+    .error-container {
+        margin: 1rem;
+        padding: 2rem;
+    }
+    
+    .error-code {
+        font-size: 3rem;
+    }
+    
+    .error-title {
+        font-size: 1.5rem;
+    }
+    
+    .error-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .error-actions .btn {
+        min-width: 200px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="error-page">
+    <div class="container">
+        <div class="error-container">
+            <!-- Error Icon -->
+            {% if error_code == '404' %}
+                <div class="error-icon warning">
+                    <i class="fas fa-search"></i>
+                </div>
+            {% elif error_code == '403' %}
+                <div class="error-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+            {% elif error_code == '500' %}
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+            {% else %}
+                <div class="error-icon info">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+            {% endif %}
+            
+            <!-- Error Code -->
+            <div class="error-code">{{ error_code or '500' }}</div>
+            
+            <!-- Error Title -->
+            <h1 class="error-title">
+                {% if error_code == '404' %}
+                    Page Not Found
+                {% elif error_code == '403' %}
+                    Access Forbidden
+                {% elif error_code == '500' %}
+                    Server Error
+                {% else %}
+                    Something Went Wrong
+                {% endif %}
+            </h1>
+            
+            <!-- Error Message -->
+            <p class="error-message">
+                {% if error_message %}
+                    {{ error_message }}
+                {% elif error_code == '404' %}
+                    The page you're looking for doesn't exist or may have been moved.
+                {% elif error_code == '403' %}
+                    You don't have permission to access this resource.
+                {% elif error_code == '500' %}
+                    We're experiencing technical difficulties. Please try again later.
+                {% else %}
+                    An unexpected error occurred. Our team has been notified.
+                {% endif %}
+            </p>
+            
+            <!-- Action Buttons -->
+            <div class="error-actions">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('root.dashboard') }}" class="btn btn-primary">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Go to Dashboard
+                    </a>
+                    <a href="{{ url_for('resume.resumes') }}" class="btn btn-outline">
+                        <i class="fas fa-file-alt"></i>
+                        My Resumes
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('root.home') }}" class="btn btn-primary">
+                        <i class="fas fa-home"></i>
+                        Back to Home
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Sign In
+                    </a>
+                {% endif %}
+            </div>
+            
+            <!-- Suggestions -->
+            {% if error_code == '404' %}
+            <div class="error-suggestions">
+                <h4>
+                    <i class="fas fa-lightbulb text-warning"></i>
+                    What you can do:
+                </h4>
+                <ul>
+                    <li>Check the URL for typos</li>
+                    <li><a href="{{ url_for('resume.resumes') }}">View your resumes</a></li>
+                    <li><a href="{{ url_for('resume.optimize') }}">Start optimizing a resume</a></li>
+                    <li><a href="{{ url_for('root.dashboard') }}">Go to your dashboard</a></li>
+                    <li><a href="{{ url_for('payment.pricing') }}">Explore our pricing plans</a></li>
+                </ul>
+            </div>
+            {% elif error_code == '500' %}
+            <div class="error-suggestions">
+                <h4>
+                    <i class="fas fa-tools text-primary"></i>
+                    What you can try:
+                </h4>
+                <ul>
+                    <li>Refresh the page</li>
+                    <li>Clear your browser cache</li>
+                    <li>Try again in a few minutes</li>
+                    <li><a href="mailto:support@resumematch.com">Contact our support team</a></li>
+                </ul>
+            </div>
+            {% elif error_code == '403' %}
+            <div class="error-suggestions">
+                <h4>
+                    <i class="fas fa-key text-warning"></i>
+                    Need access?
+                </h4>
+                <ul>
+                    {% if not current_user.is_authenticated %}
+                    <li><a href="{{ url_for('auth.login') }}">Sign in to your account</a></li>
+                    <li><a href="{{ url_for('auth.signup') }}">Create a new account</a></li>
+                    {% else %}
+                    <li><a href="{{ url_for('payment.pricing') }}">Upgrade your subscription</a></li>
+                    <li><a href="{{ url_for('auth.profile') }}">Check your account status</a></li>
+                    {% endif %}
+                    <li><a href="mailto:support@resumematch.com">Contact support</a></li>
+                </ul>
+            </div>
+            {% endif %}
+            
+            <!-- Back link -->
+            <a href="javascript:history.back()" class="back-home">
+                <i class="fas fa-arrow-left"></i>
+                Go back to previous page
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto-refresh for server errors after 30 seconds
+{% if error_code == '500' %}
+setTimeout(function() {
+    if (confirm('Would you like to refresh the page and try again?')) {
+        location.reload();
+    }
+}, 30000);
+{% endif %}
+
+// Track error for analytics (if you have analytics)
+if (typeof gtag !== 'undefined') {
+    gtag('event', 'exception', {
+        'description': 'Error {{ error_code or "unknown" }}',
+        'fatal': false
+    });
+}
+</script>
+{% endblock %}
