@@ -457,3 +457,86 @@ that organize content across different pages and sections.
       gap: 0.5rem;
     }
   }
+
+
+  /* ==========================================================================
+   SECTION SPACING UTILITIES
+   ========================================================================== */
+
+/* Generous padding equivalent to Tailwind's p-12 (3rem = 48px) */
+.section-xl {
+  padding: 6rem 0; /* Extra large sections - equivalent to py-24 */
+}
+
+.section-lg {
+  padding: 4rem 0; /* Large sections - equivalent to py-16 */
+}
+
+.section-md {
+  padding: 3rem 0; /* Medium sections - equivalent to py-12 */
+}
+
+.section-sm {
+  padding: 2rem 0; /* Small sections - equivalent to py-8 */
+}
+
+/* Container max-width and centering */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Section header consistent spacing */
+.section-header {
+  text-align: center;
+  margin-bottom: 4rem; /* Generous bottom margin */
+}
+
+.section-header .section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.section-header .section-subtitle {
+  font-size: 1.125rem;
+  color: var(--text-light);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .section-xl {
+    padding: 4rem 0;
+  }
+  
+  .section-lg {
+    padding: 3rem 0;
+  }
+  
+  .section-md {
+    padding: 2rem 0;
+  }
+  
+  .section-header {
+    margin-bottom: 3rem;
+  }
+  
+  .section-header .section-title {
+    font-size: 2rem;
+  }
+}
