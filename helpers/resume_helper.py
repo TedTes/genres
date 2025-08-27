@@ -1,16 +1,9 @@
 import spacy
-from .themes_helper import generate_theme_css,get_theme
-from .layouts_helper import get_layout
 from jinja2 import  FileSystemLoader
 from flask import Flask,request,render_template,jsonify,current_app
 from io import BytesIO
 from weasyprint import HTML, CSS
 import os
-
-def generate_pdf(html_string):
-    html = HTML(string=html_string)
-    pdf = html.write_pdf()
-    return pdf
 
 
 def calculate_resume_completeness(resume_data):
@@ -194,51 +187,3 @@ def calculate_skill_match(user_skills, job_skills):
     
     return overall_match, skill_matches
 
-
-def generate_resume(app,resume,is_preview=False):
-    try:
-  
-        layout = get_layout(resume.layout_id)
-  
-        theme = get_theme(resume.theme_id)
-        theme_css = generate_theme_css(theme)
-
-        #Get path to the layout-specific CSS
-        css_path = os.path.join(app.static_folder, layout['css_file'].replace('static/', ''))
-    
-        if not os.path.exists(css_path):
-                raise FileNotFoundError(f"CSS file not found: {css_path}")
-        with open(css_path, 'r') as f:
-            layout_css = f.read()
-
-        # Combine layout and theme CSS
-        full_css = layout_css + "\n" + theme_css
-   
-        # Validate resume_data
-        if not isinstance(resume.resume_data, dict) or 'sections' not in resume.resume_data:
-            raise ValueError("Invalid resume_data: 'sections' key missing")
-
-        # Get template
-        template = app.jinja_env.get_template(layout['template'])
-  
-        # Render template
-        html_content = template.render(
-            theme=theme,
-            css_content=full_css,
-            resume=resume.resume_data,
-            is_preview=is_preview
-        )
-        return html_content
-    except Exception as e:
-        print("from generate resume method")
-        print(e)
-        app.logger.error(f"Error generating resume: {str(e)}")
-        raise
-
-
-def generate_pdf(data,base_url):
-    pdf_bytes = BytesIO()
-    html = HTML(string=data,base_url=base_url)
-    html.write_pdf(pdf_bytes)
-    pdf_bytes.seek(0)
-    return pdf_bytes
