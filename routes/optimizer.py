@@ -22,7 +22,7 @@ from providers import get_models, test_provider_connection
 
 
 
-resume_llm_bp = Blueprint('resume_llm_bp', __name__)
+optimizer_bp = Blueprint('optimizer_bp', __name__)
 llm_service = LLMService()
 
 # Resume AI enhancement endpoints
@@ -33,7 +33,7 @@ Resume LLM optimization routes.
 Handles AI-powered resume optimization API endpoints.
 """
 
-@resume_llm_bp.route('/optimize', methods=['POST'])
+@optimizer_bp.route('/optimize', methods=['POST'])
 @login_required
 def optimize_resume():
     """
@@ -308,7 +308,7 @@ def _check_rate_limit(user_id: int, limit_per_hour: int) -> bool:
         return True
 
 
-@resume_llm_bp.route('/health', methods=['GET'])
+@optimizer_bp.route('/health', methods=['GET'])
 def health_check():
     """
     Health check endpoint for resume optimization service.
@@ -353,7 +353,7 @@ def health_check():
         }), 503
 
 
-@resume_llm_bp.route('/test', methods=['POST'])
+@optimizer_bp.route('/test', methods=['POST'])
 @login_required  
 def test_optimization():
     """
@@ -414,7 +414,7 @@ Requirements:
         }), 500
 
 
-@resume_llm_bp.route('/status', methods=['GET'])
+@optimizer_bp.route('/status', methods=['GET'])
 @login_required
 def optimization_status():
     """
@@ -457,7 +457,7 @@ def optimization_status():
         return jsonify({'error': f'Status check failed: {str(e)}'}), 500
 
 
-@resume_llm_bp.errorhandler(400)
+@optimizer_bp.errorhandler(400)
 def handle_bad_request(error):
     """Handle bad request errors."""
     return jsonify({
@@ -467,7 +467,7 @@ def handle_bad_request(error):
     }), 400
 
 
-@resume_llm_bp.errorhandler(429)
+@optimizer_bp.errorhandler(429)
 def handle_rate_limit(error):
     """Handle rate limit errors."""
     return jsonify({
@@ -478,7 +478,7 @@ def handle_rate_limit(error):
     }), 429
 
 
-@resume_llm_bp.errorhandler(500)
+@optimizer_bp.errorhandler(500)
 def handle_internal_error(error):
     """Handle internal server errors."""
     return jsonify({
