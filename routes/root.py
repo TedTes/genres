@@ -23,4 +23,14 @@ def home():
 @login_required
 def dashboard():
    pass
+
+
+@root_bp.route('/optimize', methods=['GET'])
+def optimize_page():
+    """Display the resume optimization page - no authentication required."""
+    try:
+        return render_template('optimize.html')
+    except Exception as e:
+        print(f"Error rendering optimize page: {e}")
+        abort(500)
     
