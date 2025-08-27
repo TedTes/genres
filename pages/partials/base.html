@@ -20,6 +20,52 @@
     <!-- Additional CSS Block -->
     {% block extra_css %}{% endblock %}
 </head>
+<!-- Minimal Navigation - Add to base.html -->
+<nav class="navbar">
+    <div class="container">
+        <div class="navbar-content">
+            <!-- Left: Logo/Brand -->
+            <div class="navbar-brand">
+                <a href="/" class="brand-link">
+                    AI Resume Coach
+                </a>
+            </div>
+            
+            <!-- Right: Navigation Links -->
+            <div class="navbar-links">
+                <a href="#pricing" class="nav-link">Pricing</a>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.logout') }}" class="nav-link">Logout</a>
+                    <a href="{{ url_for('root.dashboard') }}" class="btn btn-primary btn-sm">Dashboard</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="nav-link">Login</a>
+                    <a href="/optimize" class="btn btn-primary btn-sm">Get Started</a>
+                {% endif %}
+            </div>
+            
+            <!-- Mobile Menu Toggle -->
+            <div class="navbar-mobile-toggle">
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="navbar-mobile-menu" id="mobileMenu">
+            <a href="#pricing" class="mobile-nav-link">Pricing</a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('auth.logout') }}" class="mobile-nav-link">Logout</a>
+                <a href="{{ url_for('root.dashboard') }}" class="mobile-nav-link btn btn-primary">Dashboard</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="mobile-nav-link">Login</a>
+                <a href="/optimize" class="mobile-nav-link btn btn-primary">Get Started</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
 <body class="page-{% block body_class %}{% endblock %}">
     <!-- Flash Messages (Universal) -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -57,5 +103,79 @@
             });
         }, 5000);
     </script>
+    <!-- Mobile Navigation JavaScript - Add to base.html before closing </body> -->
+<script>
+    function toggleMobileMenu() {
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuBtn = document.querySelector('.mobile-menu-btn');
+        
+        if (mobileMenu.classList.contains('active')) {
+            mobileMenu.classList.remove('active');
+            menuBtn.classList.remove('active');
+        } else {
+            mobileMenu.classList.add('active');
+            menuBtn.classList.add('active');
+        }
+    }
+    
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const navbar = document.querySelector('.navbar');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuBtn = document.querySelector('.mobile-menu-btn');
+        
+        if (!navbar.contains(event.target) && mobileMenu.classList.contains('active')) {
+            mobileMenu.classList.remove('active');
+            menuBtn.classList.remove('active');
+        }
+    });
+    
+    // Close mobile menu when clicking on a link
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            mobileMenu.classList.remove('active');
+            menuBtn.classList.remove('active');
+        });
+    });
+    
+    // Smooth scroll for pricing anchor
+    document.addEventListener('DOMContentLoaded', function() {
+        const pricingLinks = document.querySelectorAll('a[href="#pricing"]');
+        
+        pricingLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const pricingSection = document.querySelector('.pricing-section');
+                
+                if (pricingSection) {
+                    pricingSection.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    });
+    </script>
 </body>
+<footer class="footer-minimal">
+    <div class="container">
+        <div class="footer-content">
+            <!-- Brand/Copyright -->
+            <div class="footer-brand">
+                <p>&copy; {{ current_year or 2025 }} AI Resume Coach. All rights reserved.</p>
+            </div>
+            
+            <!-- Essential Links -->
+            <div class="footer-links">
+                <a href="/privacy" class="footer-link">Privacy Policy</a>
+                <a href="/terms" class="footer-link">Terms of Use</a>
+                <a href="/contact" class="footer-link">Contact</a>
+            </div>
+        </div>
+    </div>
+</footer>
 </html>

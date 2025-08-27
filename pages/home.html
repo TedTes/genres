@@ -1,341 +1,197 @@
 
-
-
-
 {% extends "partials/base.html" %}
-{% block title %}Optimize Your Resume with AI - ResumeMatch{% endblock %}
-{% block body_class %}home{% endblock %}
-
-
-
-
-{% block footer %}
-<!-- Custom Landing Page Footer -->
-<footer class="footer">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <div class="logo">
-                    <a href="{{ url_for('root.home') }}">ResumeMatch</a>
-                </div>
-                <p>AI-powered resume optimization platform helping professionals land their dream jobs.</p>
-                <div class="footer-social">
-                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
-                </div>
-            </div>
-            
-            <div class="footer-links">
-                <div class="footer-column">
-                    <h4>Product</h4>
-                    <ul>
-                        <li><a href="#features">Features</a></li>
-                        <li><a href="{{ url_for('payment.pricing') }}">Pricing</a></li>
-                        <li><a href="{{ url_for('auth.register') }}">Get Started</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h4>Resources</h4>
-                    <ul>
-                        <li><a href="/blog">Resume Tips</a></li>
-                        <li><a href="/guides">Career Guides</a></li>
-                        <li><a href="/examples">Resume Examples</a></li>
-                        <li><a href="/support">Help Center</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h4>Company</h4>
-                    <ul>
-                        <li><a href="/about">About Us</a></li>
-                        <li><a href="/contact">Contact</a></li>
-                        <li><a href="/privacy">Privacy Policy</a></li>
-                        <li><a href="/terms">Terms of Service</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <div class="footer-copyright">
-                <p>&copy; {{ current_year or 2025 }} ResumeMatch. All rights reserved.</p>
-            </div>
-        </div>
-    </div>
-</footer>
-{%endblock%}
-{% block meta_tags %}
-<meta name="description" content="Optimize your resume with AI. Transform your resume into a job-winning masterpiece with intelligent keyword optimization, skills analysis, and ATS compatibility.">
-<meta name="keywords" content="resume optimization, AI resume, ATS optimization, resume builder, job application, career">
-{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero">
-    <div class="container">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1 class="hero-title">
-                    Optimize Your Resume with <span style="color: var(--primary);">AI</span>
-                </h1>
-                <p class="hero-subtitle">
-                    Transform your resume into a job-winning masterpiece. Our AI analyzes job descriptions and optimizes your content for maximum impact and ATS compatibility.
-                </p>
-                
-                <!-- Stats highlights -->
-                <div class="stats-highlights">
-                    <div class="highlight">
-                        <span class="highlight-number">NEW</span>
-                        <span class="highlight-text">AI-Powered Solution</span>
-                    </div>
-                    <div class="highlight">
-                        <span class="highlight-number">FREE</span>
-                        <span class="highlight-text">Early Access</span>
-                    </div>
-                    <div class="highlight">
-                        <span class="highlight-number">MVP</span>
-                        <span class="highlight-text">Beta Version</span>
+<div class="page-home">
+    
+    <!-- Hero Section -->
+    <section class="hero section-xl">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-title">
+                        Beat résumé-screen bias—<span>without hiding your experience.</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        AI Resume Coach restructures and modernizes your résumé for ATS and humans: keyword coverage, age-signal audit, and explain-your-changes transparency.
+                    </p>
+                    
+                    <!-- ✅ PRIMARY CTA: Upload Resume → /optimize -->
+                    <div class="hero-cta">
+                        <a href="/optimize" class="btn btn-primary btn-large">
+                            <i class="fas fa-upload"></i> Upload Resume
+                        </a>
                     </div>
                 </div>
                 
-                <!-- CTA buttons -->
-                <div class="hero-cta">
-                    {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('root.dashboard') }}" class="btn btn-primary btn-large">
-                            <i class="fas fa-rocket"></i> Optimize Resume
-                        </a>
-                        <a href="{{ url_for('resume.resumes') }}" class="btn btn-outline btn-large">
-                            <i class="fas fa-file-alt"></i> My Resumes
-                        </a>
-                    {% else %}
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-large">
-                            <i class="fas fa-rocket"></i> Start Optimizing
-                        </a>
-                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-large">
-                            <i class="fas fa-sign-in-alt"></i> Sign In
-                        </a>
-                    {% endif %}
+                <div class="hero-image">
+                    <div class="hero-image-backdrop"></div>
+                    <img src="{{ url_for('static', filename='images/resume-optimization-hero.jpg') }}" 
+                         alt="AI Resume Optimization" 
+                         loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What It Does Section -->
+    <section class="value-section section-xl">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">What It Does</h2>
+            </div>
+            
+            <div class="mvp-grid">
+                <!-- Value Card 1: Keyword Coverage -->
+                <div class="mvp-card">
+                    <div class="mvp-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Keyword Coverage</h3>
+                    <p>Match job descriptions by surfacing the critical skills recruiters and screening systems are actually looking for.</p>
+                    <!-- ✅ CONSISTENT CTA: → /optimize -->
+                    <a href="/optimize" class="btn btn-primary">Try It Now</a>
                 </div>
                 
-                <!-- Trust indicators -->
-                <div class="resume-counter">
-                    <div class="counter-icon">
-                        <i class="fas fa-shield-alt text-success"></i>
+                <!-- Value Card 2: ATS Red Flags -->
+                <div class="mvp-card">
+                    <div class="mvp-icon">
+                        <i class="fas fa-clock"></i>
                     </div>
-                    <div class="counter-text">
-                        <small class="text-muted">ATS-Optimized • AI-Powered • Professional Quality</small>
+                    <h3>ATS Red Flags</h3>
+                    <p>We highlight and fix formatting, dates, and details that screening software often misinterprets—so your skills shine through.</p>
+                    <!-- ✅ CONSISTENT CTA: → /optimize -->
+                    <a href="/optimize" class="btn btn-primary">Get Started</a>
+                </div>
+                
+                <!-- Value Card 3: Explainable Changes -->
+                <div class="mvp-card">
+                    <div class="mvp-icon">
+                        <i class="fas fa-comments"></i>
                     </div>
+                    <h3>Explainable Changes</h3>
+                    <p>Every edit comes with a clear reason—whether for clarity, relevance, or ATS parsing—so you always stay in control of your story.</p>
+                    <!-- ✅ CONSISTENT CTA: → /optimize -->
+                    <a href="/optimize" class="btn btn-primary">Learn More</a>
                 </div>
             </div>
             
-            <div class="hero-image">
-                <img src="{{ url_for('static', filename='images/resume-optimization-hero.jpg') }}" alt="Resume optimization with AI" />
-                <div class="hero-image-backdrop"></div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- The Problem Section -->
-<section class="problem-section">
-    <div class="container">
-        <div class="section-header text-center">
-            <h2 class="section-title">The Resume Problem</h2>
-            <p class="section-subtitle">Why we're building this solution</p>
-        </div>
-        
-        <div class="problem-grid">
-            <div class="problem-card">
-                <div class="problem-icon">
-                    <i class="fas fa-robot text-danger"></i>
-                </div>
-                <div class="problem-content">
-                    <h3>ATS Systems Everywhere</h3>
-                    <p>Most companies use Applicant Tracking Systems that filter resumes before humans see them. Without the right keywords, your resume disappears.</p>
-                </div>
-            </div>
-            
-            <div class="problem-card">
-                <div class="problem-icon">
-                    <i class="fas fa-search-minus text-warning"></i>
-                </div>
-                <div class="problem-content">
-                    <h3>Keyword Guessing Game</h3>
-                    <p>You spend hours tweaking your resume, guessing which keywords recruiters want. It's frustrating and time-consuming.</p>
-                </div>
-            </div>
-            
-            <div class="problem-card">
-                <div class="problem-icon">
-                    <i class="fas fa-clock text-danger"></i>
-                </div>
-                <div class="problem-content">
-                    <h3>Manual Optimization</h3>
-                    <p>Customizing your resume for each job application takes forever. You need a better way to optimize quickly.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="features">
-    <div class="container">
-        <div class="section-header text-center">
-            <h2 class="section-title">Our AI Solution</h2>
-            <p class="section-subtitle">What we're building to solve these problems</p>
-        </div>
-        
-        <div name="features-grid">
-            <div class="feature-card mvp-card">
-                <div class="feature-icon">
-                    <i class="fas fa-brain"></i>
-                </div>
-                <div class="feature-badge">BETA</div>
-                <h3>AI Keyword Analysis</h3>
-                <p>Upload your resume and job description. Our AI identifies missing keywords and suggests optimizations to improve ATS compatibility.</p>
-            </div>
-            
-            <div class="feature-card mvp-card">
-                <div class="feature-icon">
-                    <i class="fas fa-search-plus"></i>
-                </div>
-                <div class="feature-badge">BETA</div>
-                <h3>Skills Gap Detection</h3>
-                <p>See which skills and keywords you're missing for your target role. Get specific recommendations for improvement.</p>
-            </div>
-            
-            <div class="feature-card mvp-card">
-                <div class="feature-icon">
-                    <i class="fas fa-file-export"></i>
-                </div>
-                <div class="feature-badge">BETA</div>
-                <h3>Optimized Export</h3>
-                <p>Download your optimized resume in PDF or DOCX format, ready to submit with confidence.</p>
-            </div>
-        </div>
-        
-        <div class="mvp-notice">
-            <div class="notice-content">
-                <i class="fas fa-info-circle"></i>
-                <div>
-                    <h4>Early Access MVP</h4>
-                    <p>We're launching our beta version. Join early adopters testing our AI resume optimization technology.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- How It Works Section -->
-<section class="how-it-works">
-    <div class="container">
-        <div class="section-header text-center">
-            <h2 class="section-title">How It Works (Beta)</h2>
-            <p class="section-subtitle">Simple 3-step process we're perfecting</p>
-        </div>
-        
-        <div class="steps">
-            <div class="step">
-                <div class="step-icon">
-                    <i class="fas fa-upload"></i>
-                </div>
-                <div class="step-content">
-                    <h3>1. Upload & Analyze</h3>
-                    <p>Upload your resume and paste the job description. Our AI analyzes both to identify optimization opportunities.</p>
-                </div>
-            </div>
-            
-            <div class="step">
-                <div class="step-icon">
-                    <i class="fas fa-cog"></i>
-                </div>
-                <div class="step-content">
-                    <h3>2. AI Processing</h3>
-                    <p>Our algorithm compares your content against job requirements and suggests keyword and content improvements.</p>
-                </div>
-            </div>
-            
-            <div class="step">
-                <div class="step-icon">
-                    <i class="fas fa-download"></i>
-                </div>
-                <div class="step-content">
-                    <h3>3. Get Results</h3>
-                    <p>Review suggestions, make edits, and download your optimized resume. Perfect for your next application.</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="beta-cta text-center" style="margin-top: 3rem;">
-            {% if not current_user.is_authenticated %}
-                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-large">
-                    <i class="fas fa-rocket"></i> Try Beta Version
+            <!-- ✅ SECTION-LEVEL CTA: Drives to primary action -->
+            <div class="section-cta">
+                <a href="/optimize" class="btn btn-primary btn-large">
+                    Start Optimizing Your Resume
                 </a>
-                <p style="margin-top: 1rem; color: #6b7280; font-size: 0.875rem;">Free during beta testing</p>
-            {% endif %}
+            </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="mvp-proof">
-    <div class="container">
-        <div class="section-header text-center">
-            <h2 class="section-title">Join the Beta</h2>
-            <p class="section-subtitle">Help us perfect AI resume optimization</p>
-        </div>
-        
-        <div class="mvp-grid">
-            <div class="mvp-card">
-                <div class="mvp-icon">
-                    <i class="fas fa-flask"></i>
-                </div>
-                <h3>Beta Testers Wanted</h3>
-                <p>Be among the first to try AI-powered resume optimization. Your feedback helps us improve the product.</p>
+    <!-- Pricing Section -->
+    <section class="pricing-section section-xl">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Simple, Transparent Pricing</h2>
             </div>
             
-            <div class="mvp-card">
-                <div class="mvp-icon">
-                    <i class="fas fa-gift"></i>
+            <div class="pricing-grid">
+                <!-- Single Resume Plan -->
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Single Resume</h3>
+                        <div class="pricing-amount">
+                            <span class="currency">$</span>
+                            <span class="price">39</span>
+                        </div>
+                    </div>
+                    <div class="pricing-description">
+                        <p>One-time optimization for one job application.</p>
+                    </div>
+                    <div class="pricing-cta">
+                        <!-- ✅ PRICING CTA: → /checkout -->
+                        <a href="/checkout?plan=single" class="btn btn-primary btn-large">
+                            Get Started
+                        </a>
+                    </div>
                 </div>
-                <h3>Free During Beta</h3>
-                <p>Test all features at no cost during our beta phase. Help us build something great together.</p>
+                
+                <!-- Unlimited Plan -->
+                <div class="pricing-card pricing-card-featured">
+                    <div class="pricing-header">
+                        <h3>Unlimited Plan</h3>
+                        <div class="pricing-amount">
+                            <span class="currency">$</span>
+                            <span class="price">99</span>
+                            <span class="period">/month</span>
+                        </div>
+                    </div>
+                    <div class="pricing-description">
+                        <p>Unlimited edits, JD tailoring, and cover letters.</p>
+                    </div>
+                    <div class="pricing-cta">
+                        <!-- ✅ PRICING CTA: → /checkout -->
+                        <a href="/checkout?plan=monthly" class="btn btn-primary btn-large">
+                            Start Now
+                        </a>
+                    </div>
+                </div>
             </div>
             
-            <div class="mvp-card">
-                <div class="mvp-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h3>Early Access</h3>
-                <p>Get first access to new features and improvements as we develop the platform based on real user needs.</p>
+            <!-- ✅ FALLBACK CTA: For users who want to try first -->
+            <div class="section-cta-secondary">
+                <p class="cta-helper-text">Want to try it first?</p>
+                <a href="/optimize" class="btn btn-outline btn-large">
+                    Upload Resume for Free Preview
+                </a>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- CTA Section -->
-<section class="cta">
-    <div class="container">
-        <div class="cta-content text-center">
-            <h2>Ready to Test Our AI?</h2>
-            <p>Join beta testers improving their resumes with AI. Free during beta, feedback welcomed.</p>
-            <div class="cta-buttons">
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('root.dashboard') }}" class="btn btn-primary btn-large">
-                        <i class="fas fa-rocket"></i> Start Beta Testing
-                    </a>
-                {% else %}
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-large">
-                        <i class="fas fa-rocket"></i> Join Beta (Free)
-                    </a>
-                    <a href="{{ url_for('payment.pricing') }}" class="btn btn-outline-white btn-large">
-                        <i class="fas fa-info"></i> Learn More
-                    </a>
-                {% endif %}
+    <!-- Ethical Transparency Note -->
+    <section class="transparency-section section-md">
+        <div class="container">
+            <div class="transparency-content">
+                <p class="transparency-note">
+                    We don't erase your experience—we modernize and structure it so hiring software and managers see what matters. You always control what's included.
+                </p>
             </div>
-            <p style="margin-top: 1rem; opacity: 0.8; font-size: 0.875rem;">No credit card required • Beta access free</p>
         </div>
-    </div>
-</section>
+    </section>
+
+    <section class="tracking-section">
+        <div class="container">
+            <div class="tracking-content">
+                <h3>Track Your Own Results</h3>
+                <p>See your match score improvement per job description. We'll show you exactly how your resume performs before and after optimization.</p>
+                <div class="tracking-features">
+                    <div class="tracking-feature">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Individual match score tracking</span>
+                    </div>
+                    <div class="tracking-feature">
+                        <i class="fas fa-eye"></i>
+                        <span>Before/after comparison</span>
+                    </div>
+                    <div class="tracking-feature">
+                        <i class="fas fa-clipboard-check"></i>
+                        <span>Personal performance metrics</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content text-center">
+                <h2>Ready to Modernize Your Resume?</h2>
+                <p>Upload your resume and see how AI can restructure it for better ATS compatibility and human readability.</p>
+                <div class="cta-buttons">
+                    <a href="/optimize" class="btn btn-primary btn-large">
+                        <i class="fas fa-upload"></i> Try It Now
+                    </a>
+                </div>
+                <!-- ✅ HONEST DISCLAIMER -->
+                <p class="cta-disclaimer">No guarantees on outcomes—results depend on many factors including job market conditions, competition, and individual circumstances.</p>
+            </div>
+        </div>
+    </section>
+</div>
 {% endblock %}
