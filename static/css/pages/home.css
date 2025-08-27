@@ -16,12 +16,11 @@ Expected HTML hooks:
 */
 
 @layer pages {
-  /* Base mobile styles (320px+) */
-.page-home {
-  /* Ensure proper text scaling */
-  -webkit-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
-}
+  .page-home {
+  
+    background: var(--background);
+    color: var(--text);
+  }
     /* ==========================================================================
        HERO SECTION
        ========================================================================== */
@@ -580,7 +579,6 @@ Expected HTML hooks:
       
       .page-home .hero-image {
         order: -1;
-        
       }
     }
     
