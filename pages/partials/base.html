@@ -16,12 +16,11 @@
     
     <!-- Core CSS Imports -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
-    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
     <!-- Additional CSS Block -->
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="page-{% block body_class %}{% endblock %}">
     <!-- Flash Messages (Universal) -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
