@@ -1,0 +1,381 @@
+/* 
+==============================================================================
+UTILITY CLASSES - Single Purpose Helpers
+==============================================================================
+This file contains single-purpose utility classes that can be applied
+to any element for common styling needs like text alignment, colors, etc.
+*/
+
+/* ==========================================================================
+   TEXT UTILITIES
+   ========================================================================== */
+
+   .text-center {
+    text-align: center;
+  }
+  
+  .text-left {
+    text-align: left;
+  }
+  
+  .text-right {
+    text-align: right;
+  }
+  
+  .text-justify {
+    text-align: justify;
+  }
+  
+  /* Text Colors */
+  .text-muted {
+    color: var(--text-muted) !important;
+  }
+  
+  .text-success {
+    color: var(--success) !important;
+  }
+  
+  .text-warning {
+    color: var(--warning) !important;
+  }
+  
+  .text-danger {
+    color: var(--danger) !important;
+  }
+  
+  .text-primary {
+    color: var(--primary) !important;
+  }
+  
+  .text-secondary {
+    color: var(--secondary) !important;
+  }
+  
+  .text-dark {
+    color: var(--dark) !important;
+  }
+  
+  .text-light {
+    color: var(--text-light) !important;
+  }
+  
+  .text-white {
+    color: var(--white) !important;
+  }
+  
+  /* ==========================================================================
+     CONTAINER UTILITY
+     ========================================================================== */
+  
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  @media (min-width: 640px) {
+    .container {
+      padding: 0 2rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .container {
+      padding: 0 1rem;
+    }
+  }
+  
+  /* Container Variants */
+  .container-sm {
+    max-width: 640px;
+  }
+  
+  .container-md {
+    max-width: 768px;
+  }
+  
+  .container-lg {
+    max-width: 1024px;
+  }
+  
+  .container-xl {
+    max-width: 1280px;
+  }
+  
+  .container-fluid {
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  /* ==========================================================================
+     SECTION UTILITIES
+     ========================================================================== */
+  
+  .section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .section-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 1rem;
+  }
+  
+  .section-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-light);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  /* ==========================================================================
+     IMAGE UTILITIES
+     ========================================================================== */
+  
+  /* Global image responsiveness */
+  .img-responsive {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .img-rounded {
+    border-radius: var(--radius);
+  }
+  
+  .img-circle {
+    border-radius: var(--radius-full);
+  }
+  
+  /* Fix for missing hero image - use a placeholder */
+  .hero-image img {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    transform: rotate(2deg);
+    max-height: 600px;
+    position: relative;
+    z-index: 2;
+    /* Fallback for missing image */
+    background-color: var(--light);
+    min-height: 400px;
+  }
+  
+  /* Show placeholder when image fails to load */
+  .hero-image img[src*="resume-optimization-hero.jpg"] {
+    position: relative;
+  }
+  
+  .hero-image img[src*="resume-optimization-hero.jpg"]:after {
+    content: "🚀 AI Resume Optimization";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    color: var(--primary);
+    text-align: center;
+    width: 100%;
+  }
+  
+  /* Fix missing image handling globally */
+  img[src*="template-placeholder.png"],
+  img[src*="resume-optimization-hero.jpg"] {
+    background-color: var(--light);
+    border: 2px dashed var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    position: relative;
+  }
+  
+  img[src*="template-placeholder.png"]:before,
+  img[src*="resume-optimization-hero.jpg"]:before {
+    content: "📄 Image Loading...";
+    position: absolute;
+    color: var(--text-light);
+    font-size: 1rem;
+  }
+  
+  /* ==========================================================================
+     SPACING UTILITIES
+     ========================================================================== */
+  
+  /* Margin utilities */
+  .m-0 { margin: 0; }
+  .m-1 { margin: var(--space-1); }
+  .m-2 { margin: var(--space-2); }
+  .m-3 { margin: var(--space-3); }
+  .m-4 { margin: var(--space-4); }
+  .m-6 { margin: var(--space-6); }
+  .m-8 { margin: var(--space-8); }
+  
+  .mt-0 { margin-top: 0; }
+  .mt-1 { margin-top: var(--space-1); }
+  .mt-2 { margin-top: var(--space-2); }
+  .mt-3 { margin-top: var(--space-3); }
+  .mt-4 { margin-top: var(--space-4); }
+  
+  .mb-0 { margin-bottom: 0; }
+  .mb-1 { margin-bottom: var(--space-1); }
+  .mb-2 { margin-bottom: var(--space-2); }
+  .mb-3 { margin-bottom: var(--space-3); }
+  .mb-4 { margin-bottom: var(--space-4); }
+  
+  .mx-auto { 
+    margin-left: auto; 
+    margin-right: auto; 
+  }
+  
+  /* Padding utilities */
+  .p-0 { padding: 0; }
+  .p-1 { padding: var(--space-1); }
+  .p-2 { padding: var(--space-2); }
+  .p-3 { padding: var(--space-3); }
+  .p-4 { padding: var(--space-4); }
+  
+  /* ==========================================================================
+     DISPLAY UTILITIES
+     ========================================================================== */
+  
+  .d-none { display: none; }
+  .d-block { display: block; }
+  .d-inline { display: inline; }
+  .d-inline-block { display: inline-block; }
+  .d-flex { display: flex; }
+  .d-inline-flex { display: inline-flex; }
+  .d-grid { display: grid; }
+  
+  /* Flexbox utilities */
+  .flex-row { flex-direction: row; }
+  .flex-column { flex-direction: column; }
+  .flex-wrap { flex-wrap: wrap; }
+  .flex-nowrap { flex-wrap: nowrap; }
+  
+  .justify-start { justify-content: flex-start; }
+  .justify-end { justify-content: flex-end; }
+  .justify-center { justify-content: center; }
+  .justify-between { justify-content: space-between; }
+  .justify-around { justify-content: space-around; }
+  
+  .align-start { align-items: flex-start; }
+  .align-end { align-items: flex-end; }
+  .align-center { align-items: center; }
+  .align-stretch { align-items: stretch; }
+  
+  .flex-1 { flex: 1; }
+  .flex-auto { flex: auto; }
+  .flex-none { flex: none; }
+  
+  /* ==========================================================================
+     POSITION UTILITIES
+     ========================================================================== */
+  
+  .position-static { position: static; }
+  .position-relative { position: relative; }
+  .position-absolute { position: absolute; }
+  .position-fixed { position: fixed; }
+  .position-sticky { position: sticky; }
+  
+  /* ==========================================================================
+     BACKGROUND UTILITIES
+     ========================================================================== */
+  
+  .bg-white { background-color: var(--white); }
+  .bg-light { background-color: var(--light); }
+  .bg-primary { background-color: var(--primary); }
+  .bg-success { background-color: var(--success); }
+  .bg-warning { background-color: var(--warning); }
+  .bg-danger { background-color: var(--danger); }
+  .bg-transparent { background-color: transparent; }
+  
+  /* ==========================================================================
+     BORDER UTILITIES
+     ========================================================================== */
+  
+  .border { border: 1px solid var(--border); }
+  .border-top { border-top: 1px solid var(--border); }
+  .border-bottom { border-bottom: 1px solid var(--border); }
+  .border-left { border-left: 1px solid var(--border); }
+  .border-right { border-right: 1px solid var(--border); }
+  
+  .border-0 { border: 0; }
+  .border-primary { border-color: var(--primary); }
+  .border-success { border-color: var(--success); }
+  .border-warning { border-color: var(--warning); }
+  .border-danger { border-color: var(--danger); }
+  
+  .rounded { border-radius: var(--radius); }
+  .rounded-sm { border-radius: var(--radius-sm); }
+  .rounded-lg { border-radius: var(--radius-lg); }
+  .rounded-xl { border-radius: var(--radius-xl); }
+  .rounded-full { border-radius: var(--radius-full); }
+  
+  /* ==========================================================================
+     SHADOW UTILITIES
+     ========================================================================== */
+  
+  .shadow-none { box-shadow: var(--shadow-none); }
+  .shadow-sm { box-shadow: var(--shadow-sm); }
+  .shadow { box-shadow: var(--shadow); }
+  .shadow-md { box-shadow: var(--shadow-md); }
+  .shadow-lg { box-shadow: var(--shadow-lg); }
+  .shadow-xl { box-shadow: var(--shadow-xl); }
+  
+  /* ==========================================================================
+     OVERFLOW UTILITIES
+     ========================================================================== */
+  
+  .overflow-hidden { overflow: hidden; }
+  .overflow-visible { overflow: visible; }
+  .overflow-scroll { overflow: scroll; }
+  .overflow-auto { overflow: auto; }
+  
+  /* ==========================================================================
+     WIDTH & HEIGHT UTILITIES
+     ========================================================================== */
+  
+  .w-auto { width: auto; }
+  .w-full { width: 100%; }
+  .w-fit { width: fit-content; }
+  
+  .h-auto { height: auto; }
+  .h-full { height: 100%; }
+  .h-screen { height: 100vh; }
+  
+  .min-h-screen { min-height: 100vh; }
+  
+  /* ==========================================================================
+     FONT WEIGHT UTILITIES
+     ========================================================================== */
+  
+  .font-thin { font-weight: var(--font-weight-thin); }
+  .font-light { font-weight: var(--font-weight-light); }
+  .font-normal { font-weight: var(--font-weight-normal); }
+  .font-medium { font-weight: var(--font-weight-medium); }
+  .font-semibold { font-weight: var(--font-weight-semibold); }
+  .font-bold { font-weight: var(--font-weight-bold); }
+  .font-extrabold { font-weight: var(--font-weight-extrabold); }
+  
+  /* ==========================================================================
+     RESPONSIVE UTILITIES
+     ========================================================================== */
+  
+  /* Show/hide on different screen sizes */
+  @media (max-width: 639px) {
+    .hidden-sm { display: none !important; }
+  }
+  
+  @media (min-width: 640px) and (max-width: 767px) {
+    .hidden-md { display: none !important; }
+  }
+  
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .hidden-lg { display: none !important; }
+  }
+  
+  @media (min-width: 1024px) {
+    .hidden-xl { display: none !important; }
+  }
