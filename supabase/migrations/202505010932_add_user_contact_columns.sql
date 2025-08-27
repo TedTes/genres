@@ -1,7 +1,0 @@
-ALTER TABLE "user" 
-    ADD COLUMN name VARCHAR(100),
-    ADD COLUMN phone VARCHAR(20),
-    ADD COLUMN location VARCHAR(100),
-    ADD COLUMN linkedin VARCHAR(200),
-    ADD COLUMN github VARCHAR(200),
-    ADD COLUMN website VARCHAR(200);
