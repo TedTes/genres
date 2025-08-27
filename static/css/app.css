@@ -1,0 +1,12 @@
+@layer tokens, base, utilities, components, layouts, pages;
+
+@import url('./tokens.css') layer(tokens);
+@import url('./base.css') layer(base);
+@import url('./utilities.css') layer(utilities);
+@import url('./components.css') layer(components);
+@import url('./layouts.css') layer(layouts);
+
+@import url('./pages/home.css') layer(pages);
+@import url('./pages/optimize.css') layer(pages);
+@import url('./pages/resume.css') layer(pages);
+@import url('./pages/auth.css') layer(pages);
