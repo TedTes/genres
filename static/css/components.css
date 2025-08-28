@@ -1585,3 +1585,27 @@ and icons that can be used across different pages and sections.
   color: var(--success);
   font-size: 1rem;
 }
+
+
+/* Enhanced Success State Styles */
+.success-content {
+  max-width: 500px;
+}
+
+.score-highlight {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.auto-redirect {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.auto-redirect span {
+  font-weight: 600;
+  color: var(--primary);
+}

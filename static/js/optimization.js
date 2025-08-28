@@ -401,13 +401,96 @@ function hideLoadingState() {
 function handleOptimizationSuccess(result) {
     console.log('Optimization successful:', result);
     
-    // Store results for next step (COMMIT 5 - Results Display)
+    // Store results for results page
     window.optimizationState.results = result;
     
-    // For now, show success message - this will be replaced with results page in COMMIT 5
-    showOptimizationComplete(result);
+    // Store in localStorage for results page access
+    try {
+        localStorage.setItem('optimizationResults', JSON.stringify({
+            ...result,
+            timestamp: Date.now(),
+            original_resume: window.optimizationState.resumeData.text || '[Uploaded File]'
+        }));
+    } catch (e) {
+        console.warn('Could not store results in localStorage:', e);
+    }
+    
+    // Show completion and redirect to results
+    showOptimizationCompleteAndRedirect(result);
 }
 
+/**
+ * Show completion and redirect to results page
+ */
+function showOptimizationCompleteAndRedirect(result) {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.innerHTML = `
+            <div class="success-content">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>Resume Optimized Successfully!</h3>
+                <div class="result-preview">
+                    <p><strong>Match Score:</strong> <span class="score-highlight">${Math.round(result.match_score || 0)}%</span></p>
+                    <p><strong>Keywords Added:</strong> ${result.missing_keywords?.length || 0}</p>
+                    <p><strong>Processing Time:</strong> ${result.processing_time_ms ? Math.round(result.processing_time_ms / 1000) : 'N/A'} seconds</p>
+                </div>
+                <div class="success-actions">
+                    <button class="btn btn-primary" onclick="redirectToResults()">
+                        <i class="fas fa-eye"></i> View Detailed Results
+                    </button>
+                    <button class="btn btn-outline" onclick="startOver()">
+                        <i class="fas fa-redo"></i> Start Over
+                    </button>
+                </div>
+                <p class="auto-redirect">Redirecting to results in <span id="redirect-countdown">5</span> seconds...</p>
+            </div>
+        `;
+        
+        // Auto-redirect countdown
+        startRedirectCountdown();
+    }
+}
+
+/**
+ * Start countdown and auto-redirect to results
+ */
+function startRedirectCountdown() {
+    let countdown = 5;
+    const countdownElement = document.getElementById('redirect-countdown');
+    
+    const interval = setInterval(() => {
+        countdown--;
+        if (countdownElement) {
+            countdownElement.textContent = countdown;
+        }
+        
+        if (countdown <= 0) {
+            clearInterval(interval);
+            redirectToResults();
+        }
+    }, 1000);
+    
+    // Store interval for manual redirect
+    window.redirectInterval = interval;
+}
+
+/**
+ * Redirect to results page
+ */
+function redirectToResults() {
+    // Clear any redirect interval
+    if (window.redirectInterval) {
+        clearInterval(window.redirectInterval);
+    }
+    
+    // Generate a simple result ID for URL (timestamp-based)
+    const resultId = Date.now().toString(36);
+    
+    // Redirect to results page
+    window.location.href = `/optimizer/results/${resultId}`;
+}
 /**
  * Handle optimization API errors
  */
