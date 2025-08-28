@@ -379,9 +379,63 @@ function toggleComparisonView(view) {
 }
 
 function downloadResume() {
-    // This will be implemented in COMMIT 6
-    alert('Download functionality will be implemented in COMMIT 6');
-    console.log('Download triggered for:', window.resultsData);
+    if (!window.resultsData) {
+        alert('No results data available for download');
+        return;
+    }
+    
+    // Show download options
+    showDownloadOptions();
+}
+
+function closeDownloadModal() {
+    const modal = document.getElementById('download-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+function showDownloadOptions() {
+    // Create download modal
+    const modal = document.createElement('div');
+    modal.id = 'download-modal';
+    modal.innerHTML = `
+        <div class="modal-overlay" onclick="closeDownloadModal()">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3><i class="fas fa-download"></i> Download Your Resume</h3>
+                    <button class="modal-close" onclick="closeDownloadModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <p>Choose your preferred format:</p>
+                    <div class="download-options">
+                        <button class="download-option" onclick="initiateDownload('pdf')">
+                            <div class="option-icon"><i class="fas fa-file-pdf"></i></div>
+                            <div class="option-info">
+                                <h4>PDF Format</h4>
+                                <p>Best for job applications and ATS systems</p>
+                            </div>
+                        </button>
+                        <button class="download-option" onclick="initiateDownload('docx')">
+                            <div class="option-icon"><i class="fas fa-file-word"></i></div>
+                            <div class="option-info">
+                                <h4>Word Document</h4>
+                                <p>Editable format for further customization</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Animate in
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
 }
 
 function startNewOptimization() {
@@ -405,6 +459,150 @@ function showNoResultsMessage() {
             </div>
         </div>
     `;
+}
+
+function initiateDownload(fileType) {
+    const resultId = window.resultsData.request_hash || Date.now().toString(36);
+    
+    // Show download progress
+    showDownloadProgress(fileType);
+    
+    // Check if direct download URLs are available
+    const artifacts = window.resultsData.artifacts || {};
+    const directUrl = artifacts[`${fileType}_url`];
+    
+    if (directUrl && directUrl.startsWith('http')) {
+        // Direct download from storage
+        window.location.href = directUrl;
+        hideDownloadProgress();
+        closeDownloadModal();
+    } else {
+        // Generate and download via our endpoint
+        downloadViaEndpoint(fileType, resultId);
+    }
+}
+function downloadViaEndpoint(fileType, resultId) {
+    const downloadUrl = `/optimizer/download/${fileType}/${resultId}`;
+    
+    // Create hidden link and trigger download
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `optimized_resume.${fileType}`;
+    link.style.display = 'none';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Close modal and hide progress
+    setTimeout(() => {
+        hideDownloadProgress();
+        closeDownloadModal();
+    }, 1000);
+    
+    // Handle download errors
+    setTimeout(() => {
+        checkDownloadSuccess(downloadUrl, fileType);
+    }, 2000);
+}
+function showDownloadProgress(fileType) {
+    const modal = document.getElementById('download-modal');
+    if (modal) {
+        const modalBody = modal.querySelector('.modal-body');
+        modalBody.innerHTML = `
+            <div class="download-progress">
+                <div class="progress-icon">
+                    <div class="loading-spinner"></div>
+                </div>
+                <h4>Preparing ${fileType.toUpperCase()} Download</h4>
+                <p>Generating your optimized resume...</p>
+                <div class="progress-steps">
+                    <div class="step active">Formatting document</div>
+                    <div class="step">Applying template</div>
+                    <div class="step">Finalizing download</div>
+                </div>
+            </div>
+        `;
+    }
+}
+function hideDownloadProgress() {
+    const modal = document.getElementById('download-modal');
+    if (modal) {
+        const modalBody = modal.querySelector('.modal-body');
+        modalBody.innerHTML = `
+            <div class="download-complete">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h4>Download Started</h4>
+                <p>Your resume should download automatically.</p>
+            </div>
+        `;
+    }
+}
+function checkDownloadSuccess(downloadUrl, fileType) {
+    // Simple check - in production you'd want more robust error handling
+    fetch(downloadUrl, { method: 'HEAD' })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+        })
+        .catch(error => {
+            console.warn('Download may have failed:', error);
+            // Show fallback options or regenerate files
+            showDownloadFallback(fileType);
+        });
+}
+
+function showDownloadFallback(fileType) {
+    const modal = document.getElementById('download-modal');
+    if (modal) {
+        const modalBody = modal.querySelector('.modal-body');
+        modalBody.innerHTML = `
+            <div class="download-error">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h4>Download Issue</h4>
+                <p>There was an issue with the download. Let's try regenerating the file.</p>
+                <button class="btn btn-primary" onclick="regenerateAndDownload('${fileType}')">
+                    <i class="fas fa-redo"></i> Regenerate ${fileType.toUpperCase()}
+                </button>
+            </div>
+        `;
+    }
+}
+
+function regenerateAndDownload(fileType) {
+    if (!window.resultsData) return;
+    
+    const resultId = window.resultsData.request_hash || Date.now().toString(36);
+    
+    // Call regeneration endpoint
+    fetch(`/optimizer/generate-download/${resultId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': window.csrfToken || ''
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Use new download URL
+            const downloadUrl = data.downloads[`${fileType}_url`];
+            window.location.href = downloadUrl;
+            closeDownloadModal();
+        } else {
+            throw new Error(data.error || 'Regeneration failed');
+        }
+    })
+    .catch(error => {
+        console.error('Regeneration failed:', error);
+        alert('File regeneration failed. Please try optimizing your resume again.');
+        closeDownloadModal();
+    });
 }
 </script>
 {% endblock %}

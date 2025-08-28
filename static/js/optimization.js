@@ -849,3 +849,29 @@ function updateProgressStep(stepNumber, progressPercent, statusText) {
         timeRemaining.innerHTML = `<i class="fas fa-check"></i> Complete!`;
     }
 }
+
+
+function storeResultsForDownload(result) {
+    try {
+        // Store in localStorage with expiration
+        const resultData = {
+            ...result,
+            timestamp: Date.now(),
+            expires_at: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
+            original_resume: window.optimizationState.resumeData?.text || '[Uploaded File]'
+        };
+        
+        localStorage.setItem('optimizationResults', JSON.stringify(resultData));
+        
+        // Also store with result_id for direct access
+        const resultId = result.request_hash || Date.now().toString(36);
+        localStorage.setItem(`result_${resultId}`, JSON.stringify(resultData));
+        
+        console.log(`Results stored with ID: ${resultId}`);
+        return resultId;
+        
+    } catch (e) {
+        console.warn('Could not store results:', e);
+        return null;
+    }
+}
