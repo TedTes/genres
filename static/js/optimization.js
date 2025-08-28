@@ -291,6 +291,7 @@ async function submitOptimizationRequest(payload) {
 /**
  * Show loading state during API processing
  */
+
 function showLoadingState() {
     const submitBtn = document.getElementById('optimize-submit-btn');
     
@@ -305,13 +306,17 @@ function showLoadingState() {
         submitBtn.classList.add('loading');
     }
     
-    // Add loading overlay to prevent user interaction
-    addLoadingOverlay();
-    
-    // Show processing steps
-    showProcessingSteps();
+    // Add enhanced loading overlay
+    addEnhancedLoadingOverlay();
 }
-
+function addEnhancedLoadingOverlay() {
+    const overlay = document.createElement('div');
+    overlay.id = 'loading-overlay';
+    document.body.appendChild(overlay);
+    
+    // Show enhanced progress indicator
+    showEnhancedProgressIndicator();
+}
 /**
  * Add loading overlay to prevent form interaction
  */
@@ -643,4 +648,121 @@ function debugOptimizationState() {
     console.log('Resume Data Valid:', !!window.optimizationState.resumeData);
     console.log('Job Data Valid:', !!window.optimizationState.jobData);
     console.log('Current Step:', window.optimizationState.currentStep);
+}
+
+/**
+ * Enhanced processing steps with real-time progress
+ */
+function showEnhancedProgressIndicator() {
+    const overlay = document.getElementById('loading-overlay');
+    if (!overlay) return;
+    
+    overlay.innerHTML = `
+        <div class="loading-content">
+            <div class="progress-header">
+                <h3>AI is optimizing your resume...</h3>
+                <div class="estimated-time">
+                    <i class="fas fa-clock"></i>
+                    <span id="time-remaining">Estimated: 45-60 seconds</span>
+                </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="progress-bar-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="progress-percentage" id="progress-percentage">0%</div>
+            </div>
+            
+            <!-- Step Indicators -->
+            <div class="processing-steps-enhanced" id="processing-steps-enhanced">
+                <div class="step-item" data-step="1">
+                    <div class="step-icon"><i class="fas fa-file-text"></i></div>
+                    <div class="step-text">Parsing resume content</div>
+                    <div class="step-status pending">⏳</div>
+                </div>
+                <div class="step-item" data-step="2">
+                    <div class="step-icon"><i class="fas fa-search"></i></div>
+                    <div class="step-text">Analyzing skill gaps</div>
+                    <div class="step-status pending">⏳</div>
+                </div>
+                <div class="step-item" data-step="3">
+                    <div class="step-icon"><i class="fas fa-brain"></i></div>
+                    <div class="step-text">AI optimization</div>
+                    <div class="step-status pending">⏳</div>
+                </div>
+                <div class="step-item" data-step="4">
+                    <div class="step-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="step-text">Generating explanations</div>
+                    <div class="step-status pending">⏳</div>
+                </div>
+                <div class="step-item" data-step="5">
+                    <div class="step-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="step-text">Applying guardrails</div>
+                    <div class="step-status pending">⏳</div>
+                </div>
+                <div class="step-item" data-step="6">
+                    <div class="step-icon"><i class="fas fa-file-pdf"></i></div>
+                    <div class="step-text">Creating documents</div>
+                    <div class="step-status pending">⏳</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Start progress simulation
+    simulateProgressUpdates();
+}
+
+/**
+ * Simulate progress updates based on typical processing times
+ */
+function simulateProgressUpdates() {
+    const steps = [
+        { step: 1, delay: 2000, progress: 15, text: "Resume parsed successfully" },
+        { step: 2, delay: 8000, progress: 35, text: "Gap analysis complete" },
+        { step: 3, delay: 25000, progress: 70, text: "AI optimization in progress" },
+        { step: 4, delay: 35000, progress: 85, text: "Generating explanations" },
+        { step: 5, delay: 40000, progress: 95, text: "Applying final checks" },
+        { step: 6, delay: 45000, progress: 100, text: "Documents ready" }
+    ];
+    
+    steps.forEach(({ step, delay, progress, text }) => {
+        setTimeout(() => {
+            updateProgressStep(step, progress, text);
+        }, delay);
+    });
+}
+
+/**
+ * Update individual progress step
+ */
+function updateProgressStep(stepNumber, progressPercent, statusText) {
+    const stepItem = document.querySelector(`[data-step="${stepNumber}"]`);
+    const progressFill = document.getElementById('progress-fill');
+    const progressPercentage = document.getElementById('progress-percentage');
+    const timeRemaining = document.getElementById('time-remaining');
+    
+    if (stepItem) {
+        const statusElement = stepItem.querySelector('.step-status');
+        statusElement.textContent = '✅';
+        statusElement.className = 'step-status complete';
+        stepItem.classList.add('completed');
+    }
+    
+    if (progressFill) {
+        progressFill.style.width = `${progressPercent}%`;
+    }
+    
+    if (progressPercentage) {
+        progressPercentage.textContent = `${progressPercent}%`;
+    }
+    
+    if (timeRemaining && progressPercent < 100) {
+        const remainingSeconds = Math.max(5, Math.floor((100 - progressPercent) / 2));
+        timeRemaining.innerHTML = `<i class="fas fa-clock"></i> ${remainingSeconds} seconds remaining`;
+    } else if (timeRemaining && progressPercent === 100) {
+        timeRemaining.innerHTML = `<i class="fas fa-check"></i> Complete!`;
+    }
 }
