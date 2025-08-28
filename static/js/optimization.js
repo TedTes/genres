@@ -875,3 +875,602 @@ function storeResultsForDownload(result) {
         return null;
     }
 }
+
+
+/**
+ * Enhanced File Validation Utilities
+ * Add these functions to static/js/optimization.js
+ */
+
+// File validation constants
+const FILE_VALIDATION = {
+    MAX_SIZE: 5 * 1024 * 1024, // 5MB
+    MIN_TEXT_LENGTH: 100,
+    MAX_TEXT_LENGTH: 50000,
+    ALLOWED_TYPES: {
+        'application/pdf': 'PDF',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word Document',
+        'text/plain': 'Text File'
+    },
+    MALICIOUS_PATTERNS: [
+        /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+        /javascript:/gi,
+        /on\w+\s*=/gi,
+        /data:text\/html/gi
+    ]
+};
+
+/**
+ * Enhanced file validation with detailed error messages
+ */
+function validateFileUpload(file) {
+    const errors = [];
+    const warnings = [];
+    
+    // Check file size
+    if (file.size === 0) {
+        errors.push('File appears to be empty. Please select a valid resume file.');
+        return { isValid: false, errors, warnings };
+    }
+    
+    if (file.size > FILE_VALIDATION.MAX_SIZE) {
+        errors.push(`File size (${formatFileSize(file.size)}) exceeds the 5MB limit. Please compress your file or use a smaller version.`);
+    }
+    
+    // Check file type
+    if (!FILE_VALIDATION.ALLOWED_TYPES[file.type]) {
+        errors.push(`File type "${file.type}" is not supported. Please upload PDF, DOCX, or TXT files only.`);
+        return { isValid: false, errors, warnings };
+    }
+    
+    // Check filename for suspicious content
+    if (containsSuspiciousPatterns(file.name)) {
+        errors.push('Filename contains invalid characters. Please rename your file and try again.');
+    }
+    
+    // Size warnings
+    if (file.size < 1024) {
+        warnings.push('File seems very small. Make sure it contains your complete resume.');
+    }
+    
+    if (file.size > 2 * 1024 * 1024) {
+        warnings.push('Large file detected. Processing may take longer than usual.');
+    }
+    
+    return {
+        isValid: errors.length === 0,
+        errors,
+        warnings,
+        fileInfo: {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            typeDisplay: FILE_VALIDATION.ALLOWED_TYPES[file.type]
+        }
+    };
+}
+
+/**
+ * Enhanced text validation
+ */
+function validateTextInput(text) {
+    const errors = [];
+    const warnings = [];
+    const cleanText = text.trim();
+    
+    // Length validation
+    if (cleanText.length < FILE_VALIDATION.MIN_TEXT_LENGTH) {
+        errors.push(`Resume text is too short (${cleanText.length} characters). Please provide at least ${FILE_VALIDATION.MIN_TEXT_LENGTH} characters.`);
+        return { isValid: false, errors, warnings };
+    }
+    
+    if (cleanText.length > FILE_VALIDATION.MAX_TEXT_LENGTH) {
+        errors.push(`Resume text is too long (${cleanText.length} characters). Please limit to ${FILE_VALIDATION.MAX_TEXT_LENGTH} characters.`);
+    }
+    
+    // Content validation
+    if (!containsResumeKeywords(cleanText)) {
+        warnings.push('Text doesn\'t appear to contain typical resume content. Please ensure you\'ve pasted your complete resume.');
+    }
+    
+    // Security validation
+    if (containsMaliciousContent(cleanText)) {
+        errors.push('Text contains potentially harmful content. Please remove any scripts or suspicious code.');
+    }
+    
+    // Quality checks
+    const wordCount = cleanText.split(/\s+/).length;
+    if (wordCount < 50) {
+        warnings.push('Resume seems very brief. Consider adding more details about your experience and skills.');
+    }
+    
+    if (!containsContactInfo(cleanText)) {
+        warnings.push('No contact information detected. Make sure to include your name and email address.');
+    }
+    
+    return {
+        isValid: errors.length === 0,
+        errors,
+        warnings,
+        textInfo: {
+            length: cleanText.length,
+            wordCount: wordCount,
+            hasContactInfo: containsContactInfo(cleanText),
+            hasExperience: containsExperienceSection(cleanText)
+        }
+    };
+}
+
+/**
+ * Job description validation
+ */
+function validateJobDescription(text, title = '') {
+    const errors = [];
+    const warnings = [];
+    const cleanText = text.trim();
+    
+    // Length validation (more lenient for JD)
+    if (cleanText.length > 0 && cleanText.length < 50) {
+        warnings.push('Job description seems very brief. More detailed descriptions produce better optimization results.');
+    }
+    
+    if (cleanText.length > 20000) {
+        warnings.push('Very long job description. We\'ll focus on the most relevant parts for optimization.');
+    }
+    
+    // Content quality checks
+    if (cleanText.length > 0) {
+        if (!containsJobKeywords(cleanText)) {
+            warnings.push('Text doesn\'t appear to be a typical job description. Please paste the complete job posting.');
+        }
+        
+        if (containsMaliciousContent(cleanText)) {
+            errors.push('Job description contains potentially harmful content.');
+        }
+    }
+    
+    return {
+        isValid: errors.length === 0,
+        errors,
+        warnings,
+        jdInfo: {
+            length: cleanText.length,
+            wordCount: cleanText.split(/\s+/).length,
+            hasTitle: title.trim().length > 0,
+            hasRequirements: /requirements?|qualifications?|skills?/i.test(cleanText)
+        }
+    };
+}
+
+/**
+ * Helper functions for content validation
+ */
+function containsResumeKeywords(text) {
+    const resumePatterns = [
+        /experience|employment|work history/i,
+        /skills|proficient|expertise/i,
+        /education|degree|university|college/i,
+        /@[\w.-]+\.\w+/, // Email pattern
+        /\(\d{3}\)|\d{3}[-.\s]\d{3}[-.\s]\d{4}/ // Phone pattern
+    ];
+    
+    return resumePatterns.some(pattern => pattern.test(text));
+}
+
+function containsJobKeywords(text) {
+    const jobPatterns = [
+        /responsibilities|duties|requirements/i,
+        /qualifications|experience|skills/i,
+        /seeking|looking for|hiring/i,
+        /position|role|opportunity/i
+    ];
+    
+    return jobPatterns.some(pattern => pattern.test(text));
+}
+
+function containsContactInfo(text) {
+    const emailPattern = /@[\w.-]+\.\w+/;
+    const phonePattern = /\(\d{3}\)|\d{3}[-.\s]\d{3}[-.\s]\d{4}/;
+    
+    return emailPattern.test(text) || phonePattern.test(text);
+}
+
+function containsExperienceSection(text) {
+    const experiencePatterns = [
+        /experience|employment|work\s+history/i,
+        /\d{4}\s*[-–]\s*\d{4}/, // Date ranges
+        /\d{4}\s*[-–]\s*(present|current)/i
+    ];
+    
+    return experiencePatterns.some(pattern => pattern.test(text));
+}
+
+function containsSuspiciousPatterns(text) {
+    return FILE_VALIDATION.MALICIOUS_PATTERNS.some(pattern => pattern.test(text));
+}
+
+function containsMaliciousContent(text) {
+    return containsSuspiciousPatterns(text);
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+/**
+ * Enhanced error display with categorization
+ */
+function showValidationResults(validation, containerId = 'upload-messages') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    let html = '';
+    
+    // Show errors (blocking)
+    if (validation.errors && validation.errors.length > 0) {
+        validation.errors.forEach(error => {
+            html += `
+                <div class="message error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="message-content">
+                        <strong>Error:</strong> ${error}
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    // Show warnings (non-blocking)
+    if (validation.warnings && validation.warnings.length > 0) {
+        validation.warnings.forEach(warning => {
+            html += `
+                <div class="message warning">
+                    <i class="fas fa-info-circle"></i>
+                    <div class="message-content">
+                        <strong>Note:</strong> ${warning}
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    container.innerHTML = html;
+    
+    // Auto-clear warnings after 8 seconds
+    if (validation.warnings && validation.warnings.length > 0 && validation.errors.length === 0) {
+        setTimeout(() => {
+            const warningMessages = container.querySelectorAll('.message.warning');
+            warningMessages.forEach(msg => {
+                msg.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => msg.remove(), 300);
+            });
+        }, 8000);
+    }
+}
+
+/**
+ * Pre-submit validation for entire optimization request
+ */
+function validateOptimizationRequest() {
+    const errors = [];
+    const warnings = [];
+    
+    // Validate resume data
+    if (!window.optimizationState.resumeData) {
+        errors.push('No resume data found. Please upload a resume or paste resume text.');
+        return { isValid: false, errors, warnings };
+    }
+    
+    const { resumeData, jobData } = window.optimizationState;
+    
+    // Validate resume content
+    if (resumeData.type === 'text') {
+        const textValidation = validateTextInput(resumeData.text || '');
+        errors.push(...textValidation.errors);
+        warnings.push(...textValidation.warnings);
+    }
+    
+    // Validate job description (if provided)
+    if (jobData && jobData.text) {
+        const jdValidation = validateJobDescription(jobData.text, jobData.title);
+        errors.push(...jdValidation.errors);
+        warnings.push(...jdValidation.warnings);
+    } else {
+        warnings.push('No job description provided. Adding one significantly improves optimization quality.');
+    }
+    
+    // Check for potential issues
+    if (resumeData.type === 'file' && resumeData.file) {
+        const fileValidation = validateFileUpload(resumeData.file);
+        errors.push(...fileValidation.errors);
+        warnings.push(...fileValidation.warnings);
+    }
+    
+    return {
+        isValid: errors.length === 0,
+        errors,
+        warnings
+    };
+}
+
+/**
+ * Network error handling
+ */
+function handleNetworkError(error, context = 'optimization') {
+    console.error(`Network error in ${context}:`, error);
+    
+    let userMessage = 'A network error occurred. Please check your connection and try again.';
+    let canRetry = true;
+    
+    if (error.message) {
+        if (error.message.includes('fetch')) {
+            userMessage = 'Unable to connect to the optimization service. Please check your internet connection.';
+        } else if (error.message.includes('timeout')) {
+            userMessage = 'Request timed out. The service may be experiencing high load. Please try again in a moment.';
+        } else if (error.message.includes('Rate limit')) {
+            userMessage = 'You\'ve reached the usage limit. Please wait before trying again.';
+            canRetry = false;
+        } else if (error.message.includes('Authentication')) {
+            userMessage = 'Session expired. Please refresh the page and try again.';
+            canRetry = false;
+        }
+    }
+    
+    return { userMessage, canRetry };
+}
+
+/**
+ * API error response handler
+ */
+function handleAPIError(response, responseData) {
+    const context = {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url
+    };
+    
+    console.error('API Error:', context, responseData);
+    
+    let errorMessage = 'Optimization failed. Please try again.';
+    let canRetry = true;
+    let suggestedAction = null;
+    
+    switch (response.status) {
+        case 400:
+            errorMessage = responseData.error || 'Invalid request. Please check your input and try again.';
+            canRetry = true;
+            suggestedAction = 'verify_input';
+            break;
+            
+        case 401:
+            errorMessage = 'Session expired. Please refresh the page and log in again.';
+            canRetry = false;
+            suggestedAction = 'refresh_page';
+            break;
+            
+        case 413:
+            errorMessage = 'File too large. Please use a smaller resume file (under 5MB).';
+            canRetry = true;
+            suggestedAction = 'reduce_file_size';
+            break;
+            
+        case 429:
+            errorMessage = 'Too many requests. Please wait a moment before trying again.';
+            canRetry = true;
+            suggestedAction = 'wait_and_retry';
+            break;
+            
+        case 500:
+            errorMessage = 'Internal server error. Our team has been notified.';
+            canRetry = true;
+            suggestedAction = 'contact_support';
+            break;
+            
+        case 503:
+            errorMessage = 'Service temporarily unavailable. Please try again in a few minutes.';
+            canRetry = true;
+            suggestedAction = 'wait_and_retry';
+            break;
+            
+        default:
+            errorMessage = responseData.error || `Unexpected error (${response.status}). Please try again.`;
+            canRetry = true;
+    }
+    
+    return {
+        message: errorMessage,
+        canRetry,
+        suggestedAction,
+        details: responseData.details || null
+    };
+}
+
+/**
+ * Enhanced error message display with actions
+ */
+function showEnhancedError(errorInfo, containerId = 'upload-messages') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    const actionsHtml = errorInfo.canRetry ? `
+        <div class="error-actions">
+            ${getErrorActionButton(errorInfo.suggestedAction)}
+            <button class="btn btn-outline btn-sm" onclick="clearMessages()">
+                <i class="fas fa-times"></i> Dismiss
+            </button>
+        </div>
+    ` : '';
+    
+    container.innerHTML = `
+        <div class="message error enhanced">
+            <div class="message-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="message-content">
+                <div class="error-message">${errorInfo.message}</div>
+                ${errorInfo.details ? `<div class="error-details">${errorInfo.details}</div>` : ''}
+                ${actionsHtml}
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Get appropriate action button for error type
+ */
+function getErrorActionButton(actionType) {
+    switch (actionType) {
+        case 'verify_input':
+            return `
+                <button class="btn btn-primary btn-sm" onclick="showInputValidationHelp()">
+                    <i class="fas fa-question-circle"></i> Check Input Format
+                </button>
+            `;
+        case 'refresh_page':
+            return `
+                <button class="btn btn-primary btn-sm" onclick="window.location.reload()">
+                    <i class="fas fa-sync"></i> Refresh Page
+                </button>
+            `;
+        case 'reduce_file_size':
+            return `
+                <button class="btn btn-primary btn-sm" onclick="showFileSizeHelp()">
+                    <i class="fas fa-compress"></i> File Size Help
+                </button>
+            `;
+        case 'wait_and_retry':
+            return `
+                <button class="btn btn-primary btn-sm" onclick="scheduleRetry()">
+                    <i class="fas fa-clock"></i> Retry in 30s
+                </button>
+            `;
+        case 'contact_support':
+            return `
+                <button class="btn btn-primary btn-sm" onclick="showSupportOptions()">
+                    <i class="fas fa-life-ring"></i> Get Help
+                </button>
+            `;
+        default:
+            return `
+                <button class="btn btn-primary btn-sm" onclick="startOptimization()">
+                    <i class="fas fa-redo"></i> Try Again
+                </button>
+            `;
+    }
+}
+
+/**
+ * Help functions for specific error types
+ */
+function showInputValidationHelp() {
+    alert(`Resume Format Help:
+
+Your resume should include:
+✓ Your name and contact information
+✓ Work experience with dates
+✓ Skills and qualifications
+✓ Education background
+
+Example format:
+John Smith
+Email: john@email.com | Phone: (555) 123-4567
+
+EXPERIENCE
+Software Developer | TechCorp | 2020-2023
+• Built web applications...
+
+SKILLS
+Python, JavaScript, SQL...`);
+}
+
+function showFileSizeHelp() {
+    alert(`File Size Help:
+
+To reduce file size:
+• Save as PDF instead of Word document
+• Remove unnecessary images or graphics
+• Use "Save as Web Quality" option in Word
+• Compress images before inserting
+• Keep resume to 1-2 pages maximum
+
+If you need help, try converting to plain text first.`);
+}
+
+function scheduleRetry() {
+    let countdown = 30;
+    const container = document.getElementById('upload-messages');
+    
+    const interval = setInterval(() => {
+        countdown--;
+        container.querySelector('.btn').innerHTML = `
+            <i class="fas fa-clock"></i> Retry in ${countdown}s
+        `;
+        
+        if (countdown <= 0) {
+            clearInterval(interval);
+            startOptimization();
+        }
+    }, 1000);
+}
+
+function showSupportOptions() {
+    alert(`Get Help:
+
+If you continue experiencing issues:
+
+1. Try using plain text instead of file upload
+2. Ensure your resume is in a standard format
+3. Check that your internet connection is stable
+4. Contact our support team with error details
+
+For technical support, include:
+• Error message details
+• File type and size
+• Browser and operating system`);
+}
+
+/**
+ * Enhanced retry mechanism with exponential backoff
+ */
+class RetryManager {
+    constructor(maxRetries = 3, baseDelay = 1000) {
+        this.maxRetries = maxRetries;
+        this.baseDelay = baseDelay;
+        this.currentRetry = 0;
+    }
+    
+    async executeWithRetry(asyncFunction, context = 'operation') {
+        this.currentRetry = 0;
+        
+        while (this.currentRetry <= this.maxRetries) {
+            try {
+                return await asyncFunction();
+            } catch (error) {
+                this.currentRetry++;
+                
+                if (this.currentRetry > this.maxRetries) {
+                    throw new Error(`${context} failed after ${this.maxRetries} retries: ${error.message}`);
+                }
+                
+                const delay = this.baseDelay * Math.pow(2, this.currentRetry - 1);
+                console.log(`Retry ${this.currentRetry}/${this.maxRetries} in ${delay}ms...`);
+                
+                await this.delay(delay);
+            }
+        }
+    }
+    
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    
+    reset() {
+        this.currentRetry = 0;
+    }
+}
