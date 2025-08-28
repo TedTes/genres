@@ -1,11 +1,13 @@
-from flask import Blueprint, request, jsonify,current_app
+from flask import Blueprint, request, jsonify,current_app,send_file, make_response,Response
 from services.llm_service import LLMService
 from flask_login import login_required,current_user
 from werkzeug.exceptions import BadRequest
 import asyncio
 import time
-from typing import Dict, Any
-
+from typing import Dict, Any,Optional
+import io
+import tempfile
+import os
 from services.resume.schemas import (
     ResumeInput, JDInput, OptimizationOptions, OptimizationResult,
     validate_json_with_retry_sync
@@ -33,8 +35,9 @@ Resume LLM optimization routes.
 Handles AI-powered resume optimization API endpoints.
 """
 
+# Update the optimize_resume endpoint decorator
 @optimizer_bp.route('/optimize', methods=['POST'])
-@login_required
+# @login_required  # Temporarily commented for MVP testing
 def optimize_resume():
     """
     Main resume optimization endpoint.
@@ -53,63 +56,71 @@ def optimize_resume():
     start_time = time.time()
     
     try:
+        # Authentication temporarily disabled for MVP testing
+        # if not current_user.is_authenticated:
+        #     return jsonify({'error': 'Authentication required'}), 401
+        # user_id = current_user.id
+        
+        # Use temporary user ID for MVP testing
+        user_id = 999999
+        
         # Validate request
         if not request.is_json:
             return jsonify({'error': 'Content-Type must be application/json'}), 400
         
         data = request.get_json()
+        print(f"📥 Received optimization request: {len(str(data))} characters")
         
         # Validate input schemas
         try:
             resume_input = ResumeInput(**data.get('resume_input', {}))
             jd_input = JDInput(**data.get('job_description', {}))
             options = OptimizationOptions(**data.get('options', {}))
+            
+            # Debug logging for MVP
+            print(f"📄 Resume input type: {resume_input.input_type}")
+            print(f"📋 Job description length: {len(jd_input.text) if jd_input.text else 0} chars")
+            print(f"⚙️  Options: {options.tone}, PDF: {options.include_pdf}")
+            
         except Exception as e:
+            print(f"❌ Input validation error: {str(e)}")
             return jsonify({'error': f'Invalid input: {str(e)}'}), 400
         
         # Check if optimization is enabled
         if not current_app.config.get('RESUME_OPTIMIZER_ENABLED', True):
             return jsonify({'error': 'Resume optimization is currently disabled'}), 503
         
-        # Rate limiting check (basic implementation)
-        rate_limit = current_app.config.get('RATE_LIMIT_PER_HOUR', 10)
-        if not _check_rate_limit(current_user.id, rate_limit):
-            return jsonify({'error': 'Rate limit exceeded. Please try again later.'}), 429
+        # Rate limiting check (temporarily disabled for testing)
+        # rate_limit = current_app.config.get('RATE_LIMIT_PER_HOUR', 10)
+        # if not _check_rate_limit(user_id, rate_limit):
+        #     return jsonify({'error': 'Rate limit exceeded. Please try again later.'}), 429
         
-        print(f"🚀 Starting resume optimization for user {current_user.id}")
+        print(f"🚀 Starting resume optimization for user {user_id}")
         
         # Generate request hash for caching
         resume_text = resume_input.text or "file_input"
         request_hash = generate_resume_hash_sync(resume_text, jd_input.text, options.dict())
         
-        # Check cache first
+        # Check cache first (optional for MVP)
         cache = get_enhanced_cache()
-        cached_result = asyncio.run(cache.get_cached_result(
-            resume_text=resume_text,
-            jd_text=jd_input.text,
-            options=options.dict(),
-            model_info=_get_model_info()
-        ))
-        
-        if cached_result:
-            print(f"⚡ Returning cached result for request {request_hash}")
-            return jsonify(cached_result), 200
+     
         
         # Process optimization pipeline
         try:
+            print("🔄 Running optimization pipeline...")
             result = _run_optimization_pipeline(
-                resume_input, jd_input, options, request_hash, current_user.id
+                resume_input, jd_input, options, request_hash, user_id
             )
             
-            # Cache the result
-            asyncio.run(cache.cache_result(
-                resume_text=resume_text,
-                jd_text=jd_input.text,
-                result=result,
-                options=options.dict(),
-                model_info=_get_model_info(),
-                ttl=24*60*60  # 24 hours
-            ))
+            # Cache the result (temporarily disabled for testing)
+            # asyncio.run(cache.cache_result(
+            #     resume_text=resume_text,
+            #     jd_text=jd_input.text,
+            #     result=result,
+            #     options=options.dict(),
+            #     model_info=_get_model_info(),
+            #     ttl=24*60*60  # 24 hours
+            # ))
             
             # Add processing metadata
             total_time = (time.time() - start_time) * 1000
@@ -118,36 +129,44 @@ def optimize_resume():
             result['request_hash'] = request_hash
             
             print(f"✅ Optimization complete in {total_time:.0f}ms")
+            print(f"📊 Match score: {result.get('match_score', 'N/A')}%")
+            print(f"🔧 Missing keywords: {len(result.get('missing_keywords', []))}")
             
             return jsonify(result), 200
             
         except ValueError as e:
+            print(f"❌ Validation error: {str(e)}")
             return jsonify({'error': str(e)}), 400
         except Exception as e:
             print(f"❌ Optimization pipeline failed: {str(e)}")
-            return jsonify({'error': 'Internal processing error'}), 500
+            return jsonify({
+                'error': 'Internal processing error',
+                'details': str(e)  # Show details for debugging
+            }), 500
     
     except Exception as e:
         print(f"❌ Request processing failed: {str(e)}")
-        return jsonify({'error': 'Request processing failed'}), 500
+        return jsonify({
+            'error': 'Request processing failed',
+            'details': str(e)  # Show details for debugging
+        }), 500
+
 
 
 def _run_optimization_pipeline(
     resume_input: ResumeInput,
     jd_input: JDInput, 
     options: OptimizationOptions,
-    request_hash: str,
-    user_id: int
+    request_hash: str
 ) -> Dict[str, Any]:
     """
-    Execute the complete optimization pipeline.
+    Execute the complete optimization pipeline - simplified without user tracking.
     
     Args:
         resume_input: Resume input data
         jd_input: Job description input
         options: Optimization options
         request_hash: Unique request identifier
-        user_id: Current user ID
         
     Returns:
         Complete optimization result
@@ -202,19 +221,19 @@ def _run_optimization_pipeline(
         resume_sections=parsed_resume.sections
     )
     
-    # Step 7: Generate documents
+    # Step 7: Generate documents (simplified - no user storage)
     print("📄 Step 7: Generating documents...")
     contact_info = _extract_contact_info(parsed_resume.sections.get('header', ''))
     
     docx_bytes = create_docx_sync(clean_resume, contact_info)
     pdf_bytes = create_pdf_sync(clean_resume, contact_info) if options.include_pdf else None
     
-    # Step 8: Store files
+    # Step 8: Store files temporarily (simplified)
     print("💾 Step 8: Storing files...")
     file_urls = store_resume_files_sync(
         docx_bytes=docx_bytes,
         pdf_bytes=pdf_bytes,
-        user_id=str(user_id),
+        user_id="anonymous",  # Simplified - no user tracking
         resume_hash=request_hash,
         contact_info=contact_info
     )
@@ -414,47 +433,51 @@ Requirements:
         }), 500
 
 
-@optimizer_bp.route('/status', methods=['GET'])
-@login_required
+@optimizer_bp.route('/status', methods=['GET']) 
 def optimization_status():
     """
-    Get current optimization service status and user stats.
-    
-    Returns:
-        Service status and user-specific information
+    Get current optimization service status.
+    Useful for frontend to check if service is available.
     """
     
     try:
-        cache = get_enhanced_cache()
+        # Test provider connection
+        provider_test = test_provider_connection()
         
-        # Get user-specific stats (you could track these in database)
-        user_stats = {
-            'optimizations_today': 0,  # Could implement actual tracking
-            'remaining_quota': current_app.config.get('RATE_LIMIT_PER_HOUR', 10),
-            'subscription_tier': 'premium'  # From your existing subscription service
-        }
-        
-        # Service status
+        # Basic system info
         status_data = {
-            'service_available': current_app.config.get('RESUME_OPTIMIZER_ENABLED', True),
-            'provider': current_app.config.get('MODEL_PROVIDER'),
-            'cache_type': cache.cache_type,
-            'user_stats': user_stats,
-            'supported_formats': ['text', 'docx', 'pdf'],
-            'max_file_size_mb': current_app.config.get('MAX_RESUME_SIZE_MB', 5),
-            'features': {
-                'pdf_export': True,
-                's3_storage': bool(current_app.config.get('AWS_S3_BUCKET')),
-                'cache_enabled': True,
-                'explanations': True,
-                'gap_analysis': True
-            }
+            'status': 'available' if provider_test['status'] == 'success' else 'degraded',
+            'timestamp': time.time(),
+            'mvp_testing_mode': MVP_TESTING_MODE,
+            'provider_status': provider_test,
+            'rate_limit_per_hour': current_app.config.get('RATE_LIMIT_PER_HOUR', 10),
+            'max_file_size_mb': current_app.config.get('MAX_RESUME_SIZE_MB', 5)
         }
         
         return jsonify(status_data), 200
         
     except Exception as e:
-        return jsonify({'error': f'Status check failed: {str(e)}'}), 500
+        return jsonify({
+            'status': 'error',
+            'error': str(e),
+            'timestamp': time.time()
+        }), 500
+
+
+
+
+# Add CSRF token endpoint for frontend
+@optimizer_bp.route('/csrf-token', methods=['GET'])
+def get_csrf_token():
+    """Get CSRF token for form submissions."""
+    try:
+        # Generate or get CSRF token
+        from flask_wtf.csrf import generate_csrf
+        token = generate_csrf()
+        return jsonify({'csrf_token': token}), 200
+    except:
+        # Fallback if CSRF is not configured
+        return jsonify({'csrf_token': 'not-required'}), 200
 
 
 @optimizer_bp.errorhandler(400)
@@ -486,3 +509,318 @@ def handle_internal_error(error):
         'message': 'Resume optimization service encountered an error',
         'status_code': 500
     }), 500
+
+
+@optimizer_bp.route('/results/<result_id>', methods=['GET'])
+def show_results(result_id):
+    """
+    Display optimization results page.
+    
+    Args:
+        result_id: The optimization result identifier
+    """
+    try:
+        # For MVP, we'll pass result_id through URL and handle in frontend
+        # Later this can load from database when auth is re-enabled
+        return render_template('results.html', result_id=result_id)
+        
+    except Exception as e:
+        print(f"Error displaying results: {e}")
+        return redirect(url_for('root.optimize_page'))
+
+@optimizer_bp.route('/results', methods=['GET'])  
+def show_results_direct():
+    """Direct results page access."""
+    return render_template('results.html')
+
+
+
+@optimizer_bp.route('/download/<file_type>/<result_id>', methods=['GET'])
+def download_resume(file_type, result_id):
+    """
+    Download optimized resume in specified format.
+    
+    Args:
+        file_type: 'pdf' or 'docx'
+        result_id: Unique identifier for the optimization result
+        
+    Returns:
+        File download response
+    """
+    
+    try:
+        # Validate file type
+        if file_type not in ['pdf', 'docx']:
+            return jsonify({'error': 'Invalid file type. Use pdf or docx'}), 400
+        
+        # For MVP: Get results from session/temp storage
+        # Later: Fetch from database using result_id and user authentication
+        
+        # Try to get results from a temporary storage mechanism
+        # This is a simplified approach for MVP
+        result_data = _get_cached_optimization_result(result_id)
+        
+        if not result_data:
+            return jsonify({'error': 'Optimization result not found or expired'}), 404
+        
+        # Get file URL from artifacts
+        artifacts = result_data.get('artifacts', {})
+        file_url = artifacts.get(f'{file_type}_url')
+        
+        if not file_url:
+            return jsonify({'error': f'{file_type.upper()} file not available'}), 404
+        
+        # For local files, serve directly
+        if file_url.startswith('/download/resume/'):
+            filename = file_url.split('/')[-1]
+            return _serve_local_file(filename, file_type)
+        
+        # For S3/remote files, proxy the download
+        return _proxy_remote_file(file_url, file_type, result_data)
+        
+    except Exception as e:
+        print(f"❌ Download error: {str(e)}")
+        return jsonify({'error': 'Download failed'}), 500
+
+
+@optimizer_bp.route('/generate-download/<result_id>', methods=['POST'])
+def generate_download_files(result_id):
+    """
+    Generate fresh download files for a given optimization result.
+    Useful if original files are expired or unavailable.
+    
+    Args:
+        result_id: Optimization result identifier
+        
+    Returns:
+        New download URLs
+    """
+    
+    try:
+        # Get the optimization result
+        result_data = _get_cached_optimization_result(result_id)
+        
+        if not result_data:
+            return jsonify({'error': 'Optimization result not found'}), 404
+        
+        # Extract optimized resume data
+        optimized_resume_data = result_data.get('optimized_resume', {})
+        
+        # Convert dict back to OptimizedResume object
+        from services.resume.schemas import OptimizedResume
+        optimized_resume = OptimizedResume(**optimized_resume_data)
+        
+        # Get contact info (stored in result or extract from original)
+        contact_info = result_data.get('contact_info', {})
+        
+        # Generate fresh files
+        docx_bytes = create_docx_sync(optimized_resume, contact_info, 'professional')
+        pdf_bytes = create_pdf_sync(optimized_resume, contact_info)
+        
+        # Store files temporarily for download
+        temp_storage = _store_temp_files(docx_bytes, pdf_bytes, result_id)
+        
+        return jsonify({
+            'status': 'success',
+            'downloads': {
+                'pdf_url': f"/optimizer/download/pdf/{result_id}",
+                'docx_url': f"/optimizer/download/docx/{result_id}"
+            },
+            'temp_storage': temp_storage
+        }), 200
+        
+    except Exception as e:
+        print(f"❌ Generate download error: {str(e)}")
+        return jsonify({'error': 'Failed to generate download files'}), 500
+
+# Add file cleanup route for maintenance
+@optimizer_bp.route('/cleanup-temp-files', methods=['POST'])
+def cleanup_temp_files():
+    """
+    Clean up expired temporary download files.
+    Should be called periodically by a maintenance job.
+    """
+    
+    try:
+        temp_dir = current_app.config.get('TEMP_DOWNLOAD_PATH', 'temp_downloads')
+        if not os.path.exists(temp_dir):
+            return jsonify({'message': 'No temp directory found'}), 200
+        
+        cleaned_count = 0
+        current_time = time.time()
+        
+        # Clean files older than 24 hours
+        for filename in os.listdir(temp_dir):
+            file_path = os.path.join(temp_dir, filename)
+            file_age = current_time - os.path.getctime(file_path)
+            
+            if file_age > 86400:  # 24 hours
+                try:
+                    os.remove(file_path)
+                    cleaned_count += 1
+                except:
+                    pass
+        
+        return jsonify({
+            'status': 'success',
+            'files_cleaned': cleaned_count
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+def _get_cached_optimization_result(result_id: str) -> Optional[Dict]:
+    """
+    Get cached optimization result by ID.
+    For MVP, this uses a simple approach.
+    """
+    try:
+        cache = get_enhanced_cache()
+        # Simple cache key based on result_id
+        cache_key = f"result:{result_id}"
+        
+        # Try to get from cache
+        result = asyncio.run(cache.cache.get(cache_key))
+        return result
+        
+    except:
+        return None
+
+
+def _serve_local_file(filename: str, file_type: str) -> Response:
+    """
+    Serve file from local storage.
+    
+    Args:
+        filename: Local filename
+        file_type: pdf or docx
+        
+    Returns:
+        File response
+    """
+    
+    # Construct local file path (adjust based on your storage setup)
+    local_storage_path = current_app.config.get('LOCAL_STORAGE_PATH', 'temp_files')
+    file_path = os.path.join(local_storage_path, filename)
+    
+    if not os.path.exists(file_path):
+        return jsonify({'error': 'File not found'}), 404
+    
+    # Determine MIME type and filename
+    if file_type == 'pdf':
+        mimetype = 'application/pdf'
+        download_name = f"optimized_resume.pdf"
+    else:  # docx
+        mimetype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        download_name = f"optimized_resume.docx"
+    
+    return send_file(
+        file_path,
+        mimetype=mimetype,
+        as_attachment=True,
+        download_name=download_name
+    )
+
+def _proxy_remote_file(file_url: str, file_type: str, result_data: Dict) -> Response:
+    """
+    Proxy download from remote storage (S3, etc.).
+    
+    Args:
+        file_url: Remote file URL
+        file_type: pdf or docx
+        result_data: Optimization result data
+        
+    Returns:
+        File response
+    """
+    
+    try:
+        import requests
+        
+        # Download file from remote storage
+        response = requests.get(file_url, timeout=30)
+        response.raise_for_status()
+        
+        # Create in-memory file
+        file_data = io.BytesIO(response.content)
+        file_data.seek(0)
+        
+        # Determine MIME type and filename
+        if file_type == 'pdf':
+            mimetype = 'application/pdf'
+            download_name = f"optimized_resume.pdf"
+        else:  # docx
+            mimetype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            download_name = f"optimized_resume.docx"
+        
+        return send_file(
+            file_data,
+            mimetype=mimetype,
+            as_attachment=True,
+            download_name=download_name
+        )
+        
+    except Exception as e:
+        print(f"❌ Remote file download error: {str(e)}")
+        return jsonify({'error': 'Failed to download file from storage'}), 500
+
+
+def _store_temp_files(docx_bytes: bytes, pdf_bytes: bytes, result_id: str) -> Dict[str, str]:
+    """
+    Store files temporarily for download.
+    
+    Args:
+        docx_bytes: DOCX file content
+        pdf_bytes: PDF file content  
+        result_id: Result identifier
+        
+    Returns:
+        Storage information
+    """
+    
+    try:
+        # Create temp directory if needed
+        temp_dir = current_app.config.get('TEMP_DOWNLOAD_PATH', 'temp_downloads')
+        os.makedirs(temp_dir, exist_ok=True)
+        
+        # Generate temporary filenames
+        docx_filename = f"resume_{result_id}.docx"
+        pdf_filename = f"resume_{result_id}.pdf"
+        
+        docx_path = os.path.join(temp_dir, docx_filename)
+        pdf_path = os.path.join(temp_dir, pdf_filename)
+        
+        # Write files
+        with open(docx_path, 'wb') as f:
+            f.write(docx_bytes)
+            
+        with open(pdf_path, 'wb') as f:
+            f.write(pdf_bytes)
+        
+        # Store in cache for lookup
+        cache = get_enhanced_cache()
+        file_info = {
+            'docx_path': docx_path,
+            'pdf_path': pdf_path,
+            'created_at': time.time(),
+            'result_id': result_id
+        }
+        
+        # Cache for 24 hours
+        cache_key = f"temp_files:{result_id}"
+        asyncio.run(cache.cache.set(cache_key, file_info, ttl=86400))
+        
+        return {
+            'storage_type': 'local_temp',
+            'docx_path': docx_path,
+            'pdf_path': pdf_path,
+            'expires_in': 86400
+        }
+        
+    except Exception as e:
+        print(f"❌ Temp storage error: {str(e)}")
+        return {'error': str(e)}
+
+

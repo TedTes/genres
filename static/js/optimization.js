@@ -291,6 +291,7 @@ async function submitOptimizationRequest(payload) {
 /**
  * Show loading state during API processing
  */
+
 function showLoadingState() {
     const submitBtn = document.getElementById('optimize-submit-btn');
     
@@ -305,13 +306,17 @@ function showLoadingState() {
         submitBtn.classList.add('loading');
     }
     
-    // Add loading overlay to prevent user interaction
-    addLoadingOverlay();
-    
-    // Show processing steps
-    showProcessingSteps();
+    // Add enhanced loading overlay
+    addEnhancedLoadingOverlay();
 }
-
+function addEnhancedLoadingOverlay() {
+    const overlay = document.createElement('div');
+    overlay.id = 'loading-overlay';
+    document.body.appendChild(overlay);
+    
+    // Show enhanced progress indicator
+    showEnhancedProgressIndicator();
+}
 /**
  * Add loading overlay to prevent form interaction
  */
@@ -396,13 +401,96 @@ function hideLoadingState() {
 function handleOptimizationSuccess(result) {
     console.log('Optimization successful:', result);
     
-    // Store results for next step (COMMIT 5 - Results Display)
+    // Store results for results page
     window.optimizationState.results = result;
     
-    // For now, show success message - this will be replaced with results page in COMMIT 5
-    showOptimizationComplete(result);
+    // Store in localStorage for results page access
+    try {
+        localStorage.setItem('optimizationResults', JSON.stringify({
+            ...result,
+            timestamp: Date.now(),
+            original_resume: window.optimizationState.resumeData.text || '[Uploaded File]'
+        }));
+    } catch (e) {
+        console.warn('Could not store results in localStorage:', e);
+    }
+    
+    // Show completion and redirect to results
+    showOptimizationCompleteAndRedirect(result);
 }
 
+/**
+ * Show completion and redirect to results page
+ */
+function showOptimizationCompleteAndRedirect(result) {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.innerHTML = `
+            <div class="success-content">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>Resume Optimized Successfully!</h3>
+                <div class="result-preview">
+                    <p><strong>Match Score:</strong> <span class="score-highlight">${Math.round(result.match_score || 0)}%</span></p>
+                    <p><strong>Keywords Added:</strong> ${result.missing_keywords?.length || 0}</p>
+                    <p><strong>Processing Time:</strong> ${result.processing_time_ms ? Math.round(result.processing_time_ms / 1000) : 'N/A'} seconds</p>
+                </div>
+                <div class="success-actions">
+                    <button class="btn btn-primary" onclick="redirectToResults()">
+                        <i class="fas fa-eye"></i> View Detailed Results
+                    </button>
+                    <button class="btn btn-outline" onclick="startOver()">
+                        <i class="fas fa-redo"></i> Start Over
+                    </button>
+                </div>
+                <p class="auto-redirect">Redirecting to results in <span id="redirect-countdown">5</span> seconds...</p>
+            </div>
+        `;
+        
+        // Auto-redirect countdown
+        startRedirectCountdown();
+    }
+}
+
+/**
+ * Start countdown and auto-redirect to results
+ */
+function startRedirectCountdown() {
+    let countdown = 5;
+    const countdownElement = document.getElementById('redirect-countdown');
+    
+    const interval = setInterval(() => {
+        countdown--;
+        if (countdownElement) {
+            countdownElement.textContent = countdown;
+        }
+        
+        if (countdown <= 0) {
+            clearInterval(interval);
+            redirectToResults();
+        }
+    }, 1000);
+    
+    // Store interval for manual redirect
+    window.redirectInterval = interval;
+}
+
+/**
+ * Redirect to results page
+ */
+function redirectToResults() {
+    // Clear any redirect interval
+    if (window.redirectInterval) {
+        clearInterval(window.redirectInterval);
+    }
+    
+    // Generate a simple result ID for URL (timestamp-based)
+    const resultId = Date.now().toString(36);
+    
+    // Redirect to results page
+    window.location.href = `/optimizer/results/${resultId}`;
+}
 /**
  * Handle optimization API errors
  */
@@ -643,4 +731,147 @@ function debugOptimizationState() {
     console.log('Resume Data Valid:', !!window.optimizationState.resumeData);
     console.log('Job Data Valid:', !!window.optimizationState.jobData);
     console.log('Current Step:', window.optimizationState.currentStep);
+}
+
+/**
+ * Enhanced processing steps with real-time progress
+ */
+function showEnhancedProgressIndicator() {
+    const overlay = document.getElementById('loading-overlay');
+    if (!overlay) return;
+    
+    overlay.innerHTML = `
+        <div class="loading-content">
+            <div class="progress-header">
+                <h3>AI is optimizing your resume...</h3>
+                <div class="estimated-time">
+                    <i class="fas fa-clock"></i>
+                    <span id="time-remaining">Estimated: 45-60 seconds</span>
+                </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="progress-bar-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="progress-percentage" id="progress-percentage">0%</div>
+            </div>
+            
+            <!-- Step Indicators -->
+            <div class="processing-steps-enhanced" id="processing-steps-enhanced">
+                <div class="step-item" data-step="1">
+                    <div class="step-icon"><i class="fas fa-file-text"></i></div>
+                    <div class="step-text">Parsing resume content</div>
+                    <div class="step-status pending">⏳</div>
+                </div>
+                <div class="step-item" data-step="2">
+                    <div class="step-icon"><i class="fas fa-search"></i></div>
+                    <div class="step-text">Analyzing skill gaps</div>
+                    <div class="step-status pending">⏳</div>
+                </div>
+                <div class="step-item" data-step="3">
+                    <div class="step-icon"><i class="fas fa-brain"></i></div>
+                    <div class="step-text">AI optimization</div>
+                    <div class="step-status pending">⏳</div>
+                </div>
+                <div class="step-item" data-step="4">
+                    <div class="step-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="step-text">Generating explanations</div>
+                    <div class="step-status pending">⏳</div>
+                </div>
+                <div class="step-item" data-step="5">
+                    <div class="step-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="step-text">Applying guardrails</div>
+                    <div class="step-status pending">⏳</div>
+                </div>
+                <div class="step-item" data-step="6">
+                    <div class="step-icon"><i class="fas fa-file-pdf"></i></div>
+                    <div class="step-text">Creating documents</div>
+                    <div class="step-status pending">⏳</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Start progress simulation
+    simulateProgressUpdates();
+}
+
+/**
+ * Simulate progress updates based on typical processing times
+ */
+function simulateProgressUpdates() {
+    const steps = [
+        { step: 1, delay: 2000, progress: 15, text: "Resume parsed successfully" },
+        { step: 2, delay: 8000, progress: 35, text: "Gap analysis complete" },
+        { step: 3, delay: 25000, progress: 70, text: "AI optimization in progress" },
+        { step: 4, delay: 35000, progress: 85, text: "Generating explanations" },
+        { step: 5, delay: 40000, progress: 95, text: "Applying final checks" },
+        { step: 6, delay: 45000, progress: 100, text: "Documents ready" }
+    ];
+    
+    steps.forEach(({ step, delay, progress, text }) => {
+        setTimeout(() => {
+            updateProgressStep(step, progress, text);
+        }, delay);
+    });
+}
+
+/**
+ * Update individual progress step
+ */
+function updateProgressStep(stepNumber, progressPercent, statusText) {
+    const stepItem = document.querySelector(`[data-step="${stepNumber}"]`);
+    const progressFill = document.getElementById('progress-fill');
+    const progressPercentage = document.getElementById('progress-percentage');
+    const timeRemaining = document.getElementById('time-remaining');
+    
+    if (stepItem) {
+        const statusElement = stepItem.querySelector('.step-status');
+        statusElement.textContent = '✅';
+        statusElement.className = 'step-status complete';
+        stepItem.classList.add('completed');
+    }
+    
+    if (progressFill) {
+        progressFill.style.width = `${progressPercent}%`;
+    }
+    
+    if (progressPercentage) {
+        progressPercentage.textContent = `${progressPercent}%`;
+    }
+    
+    if (timeRemaining && progressPercent < 100) {
+        const remainingSeconds = Math.max(5, Math.floor((100 - progressPercent) / 2));
+        timeRemaining.innerHTML = `<i class="fas fa-clock"></i> ${remainingSeconds} seconds remaining`;
+    } else if (timeRemaining && progressPercent === 100) {
+        timeRemaining.innerHTML = `<i class="fas fa-check"></i> Complete!`;
+    }
+}
+
+
+function storeResultsForDownload(result) {
+    try {
+        // Store in localStorage with expiration
+        const resultData = {
+            ...result,
+            timestamp: Date.now(),
+            expires_at: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
+            original_resume: window.optimizationState.resumeData?.text || '[Uploaded File]'
+        };
+        
+        localStorage.setItem('optimizationResults', JSON.stringify(resultData));
+        
+        // Also store with result_id for direct access
+        const resultId = result.request_hash || Date.now().toString(36);
+        localStorage.setItem(`result_${resultId}`, JSON.stringify(resultData));
+        
+        console.log(`Results stored with ID: ${resultId}`);
+        return resultId;
+        
+    } catch (e) {
+        console.warn('Could not store results:', e);
+        return null;
+    }
 }
