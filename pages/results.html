@@ -1,0 +1,410 @@
+{% extends "partials/base.html" %}
+{% block title %}Resume Optimization Results - AI Resume Coach{% endblock %}
+
+{% block content %}
+<div class="page-results">
+    <!-- Results Header -->
+    <section class="results-header">
+        <div class="container">
+            <div class="results-header-content">
+                <div class="results-title">
+                    <h1>Your Resume Has Been Optimized</h1>
+                    <p class="results-subtitle">Here's how we improved your resume for better ATS compatibility and keyword matching.</p>
+                </div>
+                <div class="match-score-display">
+                    <div class="score-circle" id="score-circle">
+                        <div class="score-value" id="score-value">--</div>
+                        <div class="score-label">Match Score</div>
+                    </div>
+                    <div class="score-improvement" id="score-improvement" style="display: none;">
+                        <span class="improvement-text">+<span id="improvement-value">0</span>% improvement</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Content -->
+    <section class="results-content">
+        <div class="container">
+            <div class="results-layout">
+                
+                <!-- Left Column: Analytics & Changes -->
+                <div class="analytics-column">
+                    
+                    <!-- Match Score Breakdown -->
+                    <div class="analytics-card">
+                        <h3><i class="fas fa-chart-bar"></i> Score Breakdown</h3>
+                        <div class="score-breakdown" id="score-breakdown">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Keywords Added -->
+                    <div class="analytics-card">
+                        <h3><i class="fas fa-plus-circle"></i> Keywords Added</h3>
+                        <div class="keywords-section">
+                            <div class="keywords-list" id="keywords-added">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                            <p class="keywords-help">
+                                <i class="fas fa-info-circle"></i>
+                                These keywords improve your ATS match rate for this role.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Key Changes Made -->
+                    <div class="analytics-card">
+                        <h3><i class="fas fa-edit"></i> Key Changes</h3>
+                        <div class="changes-list" id="changes-list">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: Before/After Comparison -->
+                <div class="comparison-column">
+                    
+                    <!-- Comparison Toggle -->
+                    <div class="comparison-header">
+                        <h3>Before & After Comparison</h3>
+                        <div class="comparison-toggle">
+                            <button class="toggle-btn active" data-view="side-by-side" onclick="toggleComparisonView('side-by-side')">
+                                <i class="fas fa-columns"></i> Side by Side
+                            </button>
+                            <button class="toggle-btn" data-view="overlay" onclick="toggleComparisonView('overlay')">
+                                <i class="fas fa-eye"></i> Overlay
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Comparison Content -->
+                    <div class="comparison-content">
+                        
+                        <!-- Side by Side View -->
+                        <div class="comparison-view side-by-side active" id="side-by-side-view">
+                            <div class="resume-comparison">
+                                <div class="resume-panel original">
+                                    <h4><i class="fas fa-file"></i> Original Resume</h4>
+                                    <div class="resume-preview" id="original-resume">
+                                        <!-- Populated by JavaScript -->
+                                    </div>
+                                </div>
+                                <div class="resume-panel optimized">
+                                    <h4><i class="fas fa-magic"></i> Optimized Resume</h4>
+                                    <div class="resume-preview" id="optimized-resume">
+                                        <!-- Populated by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Overlay View -->
+                        <div class="comparison-view overlay" id="overlay-view" style="display: none;">
+                            <div class="overlay-controls">
+                                <label class="overlay-slider-label">
+                                    <input type="range" id="overlay-slider" min="0" max="100" value="50">
+                                    <span>Drag to compare</span>
+                                </label>
+                            </div>
+                            <div class="overlay-comparison" id="overlay-comparison">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Action Section -->
+    <section class="results-actions">
+        <div class="container">
+            <div class="actions-content">
+                <div class="actions-left">
+                    <h3>What's Next?</h3>
+                    <p>Your optimized resume is ready for download and job applications.</p>
+                </div>
+                <div class="actions-right">
+                    <div class="action-buttons">
+                        <button class="btn btn-primary btn-lg" id="download-btn" onclick="downloadResume()">
+                            <i class="fas fa-download"></i>
+                            Download Resume
+                        </button>
+                        <button class="btn btn-outline btn-lg" onclick="startNewOptimization()">
+                            <i class="fas fa-plus"></i>
+                            Optimize Another
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Global results state
+window.resultsData = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeResults();
+});
+
+function initializeResults() {
+    // Get results data from previous page or URL params
+    loadResultsData();
+    
+    if (window.resultsData) {
+        populateResults(window.resultsData);
+    } else {
+        showNoResultsMessage();
+    }
+}
+
+function loadResultsData() {
+    // Try to get from optimization state (if coming from optimize page)
+    if (window.optimizationState && window.optimizationState.results) {
+        window.resultsData = window.optimizationState.results;
+        return;
+    }
+    
+    // Try to get from localStorage as fallback
+    try {
+        const stored = localStorage.getItem('optimizationResults');
+        if (stored) {
+            window.resultsData = JSON.parse(stored);
+        }
+    } catch (e) {
+        console.log('No stored results found');
+    }
+}
+
+function populateResults(data) {
+    populateScoreDisplay(data);
+    populateScoreBreakdown(data);
+    populateKeywordsAdded(data);
+    populateChanges(data);
+    populateComparison(data);
+}
+
+function populateScoreDisplay(data) {
+    const scoreValue = document.getElementById('score-value');
+    const scoreCircle = document.getElementById('score-circle');
+    const improvement = document.getElementById('score-improvement');
+    
+    const matchScore = Math.round(data.match_score || 0);
+    
+    if (scoreValue) {
+        scoreValue.textContent = `${matchScore}%`;
+    }
+    
+    if (scoreCircle) {
+        // Add score-based styling
+        if (matchScore >= 85) {
+            scoreCircle.classList.add('excellent');
+        } else if (matchScore >= 70) {
+            scoreCircle.classList.add('good');
+        } else if (matchScore >= 55) {
+            scoreCircle.classList.add('fair');
+        } else {
+            scoreCircle.classList.add('needs-work');
+        }
+    }
+    
+    // Show improvement if available
+    if (improvement && data.score_breakdown && data.score_breakdown.improvement) {
+        const improvementValue = document.getElementById('improvement-value');
+        if (improvementValue) {
+            improvementValue.textContent = data.score_breakdown.improvement;
+            improvement.style.display = 'block';
+        }
+    }
+}
+
+function populateScoreBreakdown(data) {
+    const container = document.getElementById('score-breakdown');
+    if (!container || !data.score_breakdown) return;
+    
+    const breakdown = data.score_breakdown;
+    
+    container.innerHTML = `
+        <div class="breakdown-item">
+            <span class="breakdown-label">Keyword Coverage</span>
+            <div class="breakdown-bar">
+                <div class="breakdown-fill" style="width: ${(breakdown.keyword_coverage_score || 0) * 100}%"></div>
+            </div>
+            <span class="breakdown-score">${Math.round((breakdown.keyword_coverage_score || 0) * 100)}%</span>
+        </div>
+        <div class="breakdown-item">
+            <span class="breakdown-label">Skills Alignment</span>
+            <div class="breakdown-bar">
+                <div class="breakdown-fill" style="width: ${(breakdown.skills_alignment_score || 0) * 100}%"></div>
+            </div>
+            <span class="breakdown-score">${Math.round((breakdown.skills_alignment_score || 0) * 100)}%</span>
+        </div>
+        <div class="breakdown-item">
+            <span class="breakdown-label">Experience Match</span>
+            <div class="breakdown-bar">
+                <div class="breakdown-fill" style="width: ${(breakdown.experience_relevance_score || 0) * 100}%"></div>
+            </div>
+            <span class="breakdown-score">${Math.round((breakdown.experience_relevance_score || 0) * 100)}%</span>
+        </div>
+    `;
+}
+
+function populateKeywordsAdded(data) {
+    const container = document.getElementById('keywords-added');
+    if (!container) return;
+    
+    const keywords = data.missing_keywords || [];
+    
+    if (keywords.length === 0) {
+        container.innerHTML = '<p class="no-keywords">No additional keywords needed - your resume already covers the key terms!</p>';
+        return;
+    }
+    
+    const keywordTags = keywords.slice(0, 10).map(keyword => 
+        `<span class="keyword-tag">${keyword}</span>`
+    ).join('');
+    
+    container.innerHTML = `
+        <div class="keywords-grid">
+            ${keywordTags}
+        </div>
+        ${keywords.length > 10 ? `<p class="keywords-more">+${keywords.length - 10} more keywords added</p>` : ''}
+    `;
+}
+
+function populateChanges(data) {
+    const container = document.getElementById('changes-list');
+    if (!container || !data.explanations) return;
+    
+    const changes = data.explanations.changes || [];
+    
+    if (changes.length === 0) {
+        container.innerHTML = '<p class="no-changes">No major structural changes needed.</p>';
+        return;
+    }
+    
+    const changeItems = changes.slice(0, 5).map(change => `
+        <div class="change-item">
+            <div class="change-type">
+                <i class="fas fa-arrow-right"></i>
+                <span>${change.type || 'Enhancement'}</span>
+            </div>
+            <div class="change-description">${change.description || change}</div>
+        </div>
+    `).join('');
+    
+    container.innerHTML = changeItems;
+}
+
+function populateComparison(data) {
+    const originalContainer = document.getElementById('original-resume');
+    const optimizedContainer = document.getElementById('optimized-resume');
+    
+    if (!originalContainer || !optimizedContainer) return;
+    
+    // Format original resume (from input)
+    const originalText = data.original_resume || 'Original resume content not available';
+    originalContainer.innerHTML = `<pre class="resume-text">${escapeHtml(originalText)}</pre>`;
+    
+    // Format optimized resume
+    const optimizedResume = data.optimized_resume || {};
+    const optimizedText = formatOptimizedResumeForDisplay(optimizedResume);
+    optimizedContainer.innerHTML = `<pre class="resume-text highlighted">${optimizedText}</pre>`;
+}
+
+function formatOptimizedResumeForDisplay(resumeData) {
+    let formatted = '';
+    
+    // Header/Contact Info
+    if (resumeData.header) {
+        formatted += resumeData.header + '\n\n';
+    }
+    
+    // Professional Summary
+    if (resumeData.professional_summary) {
+        formatted += 'PROFESSIONAL SUMMARY\n';
+        formatted += resumeData.professional_summary + '\n\n';
+    }
+    
+    // Experience
+    if (resumeData.experience_items && resumeData.experience_items.length > 0) {
+        formatted += 'EXPERIENCE\n';
+        resumeData.experience_items.forEach(exp => {
+            formatted += `${exp.role || ''} | ${exp.company || ''} | ${exp.dates || ''}\n`;
+            if (exp.bullets) {
+                exp.bullets.forEach(bullet => {
+                    formatted += `• ${bullet}\n`;
+                });
+            }
+            formatted += '\n';
+        });
+    }
+    
+    // Skills
+    if (resumeData.technical_skills && resumeData.technical_skills.length > 0) {
+        formatted += 'TECHNICAL SKILLS\n';
+        formatted += resumeData.technical_skills.join(', ') + '\n\n';
+    }
+    
+    return escapeHtml(formatted);
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function toggleComparisonView(view) {
+    // Update button states
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[data-view="${view}"]`).classList.add('active');
+    
+    // Show selected view
+    document.querySelectorAll('.comparison-view').forEach(view => {
+        view.style.display = 'none';
+    });
+    document.getElementById(`${view}-view`).style.display = 'block';
+}
+
+function downloadResume() {
+    // This will be implemented in COMMIT 6
+    alert('Download functionality will be implemented in COMMIT 6');
+    console.log('Download triggered for:', window.resultsData);
+}
+
+function startNewOptimization() {
+    // Clear results and redirect to optimize page
+    localStorage.removeItem('optimizationResults');
+    window.location.href = '/optimize';
+}
+
+function showNoResultsMessage() {
+    document.querySelector('.page-results').innerHTML = `
+        <div class="no-results">
+            <div class="container">
+                <div class="no-results-content">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h2>No Results Found</h2>
+                    <p>We couldn't find your optimization results. Please try optimizing your resume again.</p>
+                    <a href="/optimize" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Start New Optimization
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+}
+</script>
+{% endblock %}
