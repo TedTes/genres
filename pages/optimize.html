@@ -384,7 +384,7 @@ function startAnalysis() {
     sessionStorage.setItem('resume_data', JSON.stringify(resumeData));
     sessionStorage.setItem('job_data', JSON.stringify(jobData));
     
-    showMessage('Starting AI analysis... (Results page will be implemented in COMMIT 4-5)', 'success');
+    showMessage('Starting AI analysis...', 'success');
 }
 
 function showMessage(text, type) {
@@ -411,4 +411,6 @@ function clearMessages() {
     document.getElementById('messages').innerHTML = '';
 }
 </script>
+<!-- Include optimization API integration -->
+<script src="{{ url_for('static', filename='js/optimization.js') }}"></script>
 {% endblock %}
