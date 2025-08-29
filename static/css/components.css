@@ -1893,3 +1893,303 @@ and icons that can be used across different pages and sections.
     min-width: auto;
   }
 }
+
+/* ==========================================================================
+   ENHANCED ERROR HANDLING STYLES 
+   ========================================================================== */
+
+/* Enhanced Error Messages */
+.message.enhanced {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  position: relative;
+  animation: slideInFromTop 0.3s ease;
+}
+
+.message.error.enhanced {
+  background: linear-gradient(135deg, #fef2f2, #fecaca);
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+}
+
+.message.warning.enhanced {
+  background: linear-gradient(135deg, #fffbeb, #fed7aa);
+  border: 1px solid #fdba74;
+  color: #92400e;
+}
+
+.message-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding-top: 0.125rem;
+}
+
+.message-icon i {
+  font-size: 1.25rem;
+}
+
+.message-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.error-message {
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.error-details {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  font-family: var(--font-family-mono);
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  border-left: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.error-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.error-actions .btn {
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+}
+
+/* Validation Results Display */
+.validation-summary {
+  background: var(--light);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid var(--info);
+}
+
+.validation-summary h4 {
+  margin: 0 0 1rem 0;
+  color: var(--dark);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.validation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.validation-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.validation-item.error {
+  color: var(--danger);
+}
+
+.validation-item.warning {
+  color: var(--warning);
+}
+
+.validation-item i {
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+}
+
+/* File Upload Error States */
+.file-error {
+  background: #fef2f2;
+  border: 2px solid #fca5a5;
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-top: 1rem;
+  animation: shake 0.5s ease;
+}
+
+.file-error .error-icon {
+  color: var(--danger);
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.file-error h4 {
+  color: var(--danger);
+  margin: 0 0 0.5rem 0;
+}
+
+.file-error p {
+  color: #7f1d1d;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+/* Processing Error States */
+.processing-error {
+  text-align: center;
+  padding: 2rem;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  border: 1px solid #fca5a5;
+}
+
+.processing-error .error-icon {
+  font-size: 3rem;
+  color: var(--danger);
+  margin-bottom: 1.5rem;
+}
+
+.processing-error h3 {
+  color: var(--danger);
+  margin-bottom: 1rem;
+}
+
+.processing-error p {
+  color: var(--text);
+  margin-bottom: 2rem;
+}
+
+.processing-error .error-code {
+  font-family: var(--font-family-mono);
+  font-size: 0.75rem;
+  color: var(--text-light);
+  background: var(--light);
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  margin-top: 1rem;
+}
+
+/* Retry Button States */
+.retry-button {
+  position: relative;
+}
+
+.retry-button.retrying {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.retry-button.retrying::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Connection Status Indicator */
+.connection-status {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.connection-status.online {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.connection-status.offline {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.connection-status.checking {
+  border-color: var(--warning);
+  color: var(--warning);
+}
+
+.connection-status .status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.connection-status.checking .status-dot {
+  animation: pulse 1.5s infinite;
+}
+
+/* Animations */
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Responsive Error Handling */
+@media (max-width: 576px) {
+  .message.enhanced {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .message-icon {
+    align-self: center;
+  }
+  
+  .error-actions {
+    justify-content: center;
+  }
+  
+  .connection-status {
+    bottom: 0.5rem;
+    right: 0.5rem;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+}

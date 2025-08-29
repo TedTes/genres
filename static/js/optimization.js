@@ -494,31 +494,161 @@ function redirectToResults() {
 /**
  * Handle optimization API errors
  */
+/**
+ * Enhanced optimization error handler with retry logic
+ */
 function handleOptimizationError(error) {
     console.error('Optimization error:', error);
     
-    let errorMessage = 'Optimization failed. Please try again.';
+    let errorInfo = { message: 'Optimization failed. Please try again.', canRetry: true };
     
-    // Parse specific error messages
+    // Handle different error types
     if (error.message) {
-        if (error.message.includes('Rate limit')) {
-            errorMessage = 'You\'ve reached the optimization limit. Please try again later.';
-        } else if (error.message.includes('Invalid input')) {
-            errorMessage = 'Invalid resume or job description format. Please check your input.';
-        } else if (error.message.includes('authentication') || error.message.includes('login')) {
-            errorMessage = 'Session expired. Please refresh the page and try again.';
-        } else {
-            errorMessage = error.message;
-        }
+        const networkError = handleNetworkError(error);
+        errorInfo = { ...errorInfo, ...networkError };
+    } else if (error.response) {
+        // API returned error response
+        error.response.json().then(responseData => {
+            const apiError = handleAPIError(error.response, responseData);
+            showEnhancedError(apiError);
+        }).catch(() => {
+            // Fallback if response parsing fails
+            showEnhancedError(errorInfo);
+        });
+        return; // Exit early, error handling continues in promise
     }
     
-    // Show error message
-    showMessage(errorMessage, 'error');
-    
-    // Add retry button
-    addRetryButton();
+    showEnhancedError(errorInfo);
 }
 
+/**
+ * Enhanced form validation before submission
+ */
+async function validateBeforeOptimization() {
+    // Clear previous messages
+    clearMessages();
+    
+    // Run comprehensive validation
+    const validation = validateOptimizationRequest();
+    
+    if (!validation.isValid) {
+        showValidationResults(validation);
+        return false;
+    }
+    
+    // Show warnings but allow continuation
+    if (validation.warnings.length > 0) {
+        showValidationResults({ errors: [], warnings: validation.warnings });
+    }
+    
+    return true;
+}
+
+/**
+ * Enhanced optimization flow with validation and error handling
+ */
+async function startOptimization() {
+    if (window.optimizationState.isProcessing) {
+        return; // Prevent double submission
+    }
+    
+    try {
+        // Pre-submit validation
+        const isValid = await validateBeforeOptimization();
+        if (!isValid) {
+            return;
+        }
+        
+        // Collect job description data
+        collectJobDescriptionData();
+        
+        // Show loading state
+        showLoadingState();
+        window.optimizationState.isProcessing = true;
+        
+        // Prepare API payload
+        const payload = await buildAPIPayload();
+        
+        // Use retry manager for robust submission
+        const retryManager = new RetryManager(3, 2000); // 3 retries, 2s base delay
+        
+        const result = await retryManager.executeWithRetry(async () => {
+            return await submitOptimizationRequest(payload);
+        }, 'resume optimization');
+        
+        // Handle successful response
+        handleOptimizationSuccess(result);
+        
+    } catch (error) {
+        console.error('Optimization failed:', error);
+        handleOptimizationError(error);
+    } finally {
+        window.optimizationState.isProcessing = false;
+        hideLoadingState();
+    }
+}
+
+/**
+ * Enhanced API submission with better error handling
+ */
+async function submitOptimizationRequest(payload) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
+    
+    try {
+        const response = await fetch('/optimizer/optimize', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrfToken || ''
+            },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ 
+                error: 'Request failed', 
+                message: `HTTP ${response.status}: ${response.statusText}` 
+            }));
+            
+            const apiError = handleAPIError(response, errorData);
+            throw new APIError(apiError.message, response.status, apiError);
+        }
+        
+        const result = await response.json();
+        
+        // Validate response structure
+        if (!result || typeof result !== 'object') {
+            throw new Error('Invalid response format from optimization service');
+        }
+        
+        return result;
+        
+    } catch (error) {
+        clearTimeout(timeoutId);
+        
+        if (error.name === 'AbortError') {
+            throw new Error('Request timed out after 2 minutes. Please try again with a shorter resume.');
+        }
+        
+        throw error;
+    }
+}
+
+/**
+ * Custom API Error class
+ */
+class APIError extends Error {
+    constructor(message, status, details = null) {
+        super(message);
+        this.name = 'APIError';
+        this.status = status;
+        this.details = details;
+    }
+}
 /**
  * Show optimization completion (temporary - will be replaced by COMMIT 5)
  */
@@ -877,10 +1007,8 @@ function storeResultsForDownload(result) {
 }
 
 
-/**
- * Enhanced File Validation Utilities
- * Add these functions to static/js/optimization.js
- */
+
+
 
 // File validation constants
 const FILE_VALIDATION = {
@@ -1474,3 +1602,112 @@ class RetryManager {
         this.currentRetry = 0;
     }
 }
+
+
+/**
+ * Connection and service status monitoring
+ */
+class ServiceMonitor {
+    constructor() {
+        this.isOnline = navigator.onLine;
+        this.lastCheckTime = Date.now();
+        this.checkInterval = null;
+        this.statusElement = null;
+        
+        this.init();
+    }
+    
+    init() {
+        this.createStatusIndicator();
+        this.setupEventListeners();
+        this.startPeriodicChecks();
+        this.checkServiceStatus();
+    }
+    
+    createStatusIndicator() {
+        this.statusElement = document.createElement('div');
+        this.statusElement.className = 'connection-status checking';
+        this.statusElement.innerHTML = `
+            <div class="status-dot"></div>
+            <span>Checking...</span>
+        `;
+        document.body.appendChild(this.statusElement);
+    }
+    
+    setupEventListeners() {
+        window.addEventListener('online', () => this.updateConnectionStatus(true));
+        window.addEventListener('offline', () => this.updateConnectionStatus(false));
+    }
+    
+    startPeriodicChecks() {
+        // Check service every 30 seconds
+        this.checkInterval = setInterval(() => {
+            this.checkServiceStatus();
+        }, 30000);
+    }
+    
+    async checkServiceStatus() {
+        try {
+            const response = await fetch('/optimizer/status', {
+                method: 'GET',
+                headers: { 'Cache-Control': 'no-cache' }
+            });
+            
+            const status = await response.json();
+            this.updateServiceStatus(status);
+            
+        } catch (error) {
+            console.warn('Service status check failed:', error);
+            this.updateServiceStatus({ status: 'error' });
+        }
+    }
+    
+    updateConnectionStatus(isOnline) {
+        this.isOnline = isOnline;
+        
+        if (this.statusElement) {
+            this.statusElement.className = `connection-status ${isOnline ? 'online' : 'offline'}`;
+            this.statusElement.innerHTML = `
+                <div class="status-dot"></div>
+                <span>${isOnline ? 'Connected' : 'Offline'}</span>
+            `;
+        }
+    }
+    
+    updateServiceStatus(status) {
+        if (!this.statusElement) return;
+        
+        const isAvailable = status.status === 'available';
+        const className = isAvailable ? 'online' : (status.status === 'degraded' ? 'checking' : 'offline');
+        const text = isAvailable ? 'Service Ready' : (status.status === 'degraded' ? 'Service Slow' : 'Service Down');
+        
+        this.statusElement.className = `connection-status ${className}`;
+        this.statusElement.innerHTML = `
+            <div class="status-dot"></div>
+            <span>${text}</span>
+        `;
+        
+        // Auto-hide when service is working
+        if (isAvailable) {
+            setTimeout(() => {
+                if (this.statusElement) {
+                    this.statusElement.style.opacity = '0.7';
+                }
+            }, 3000);
+        }
+    }
+    
+    destroy() {
+        if (this.checkInterval) {
+            clearInterval(this.checkInterval);
+        }
+        if (this.statusElement) {
+            this.statusElement.remove();
+        }
+    }
+}
+
+// Initialize service monitor when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    window.serviceMonitor = new ServiceMonitor();
+});
