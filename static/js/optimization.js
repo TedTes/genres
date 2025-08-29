@@ -32,45 +32,7 @@ function setupCSRFToken() {
     }
 }
 
-/**
- * Enhance existing upload functionality with API integration
- */
-function enhanceExistingFunctionality() {
-    // Override the existing proceedToNextStep function to include API logic
-    window.originalProceedToNextStep = window.proceedToNextStep;
-    
-    window.proceedToNextStep = function() {
-        collectResumeData();
-        showJobDescriptionSection();
-        window.optimizationState.currentStep = 2;
-    };
-}
 
-/**
- * Collect and store resume data from current form state
- */
-function collectResumeData() {
-    const activeType = document.querySelector('.upload-type-btn.active').dataset.type;
-    
-    if (activeType === 'file' && window.currentFile) {
-        window.optimizationState.resumeData = {
-            type: 'file',
-            file: window.currentFile,
-            text: null
-        };
-    } else if (activeType === 'text' && window.currentText) {
-        window.optimizationState.resumeData = {
-            type: 'text',
-            file: null,
-            text: window.currentText.trim()
-        };
-    }
-    
-    console.log('Resume data collected:', {
-        type: window.optimizationState.resumeData.type,
-        hasData: window.optimizationState.resumeData.file || window.optimizationState.resumeData.text
-    });
-}
 
 /**
  * Show job description section and add optimization button
@@ -121,7 +83,7 @@ function addOptimizationButton() {
 }
 
 /**
- * Main optimization function - submits data to API
+ * Enhanced optimization flow with validation and error handling
  */
 async function startOptimization() {
     if (window.optimizationState.isProcessing) {
@@ -129,13 +91,14 @@ async function startOptimization() {
     }
     
     try {
-        // Collect job description data
-        collectJobDescriptionData();
-        
-        // Validate we have minimum required data
-        if (!validateOptimizationData()) {
+        // Pre-submit validation
+        const isValid = await validateBeforeOptimization();
+        if (!isValid) {
             return;
         }
+        
+        // Collect job description data
+        collectJobDescriptionData();
         
         // Show loading state
         showLoadingState();
@@ -144,8 +107,12 @@ async function startOptimization() {
         // Prepare API payload
         const payload = await buildAPIPayload();
         
-        // Submit to optimization API
-        const result = await submitOptimizationRequest(payload);
+        // Use retry manager for robust submission
+        const retryManager = new RetryManager(3, 2000); // 3 retries, 2s base delay
+        
+        const result = await retryManager.executeWithRetry(async () => {
+            return await submitOptimizationRequest(payload);
+        }, 'resume optimization');
         
         // Handle successful response
         handleOptimizationSuccess(result);
@@ -158,7 +125,6 @@ async function startOptimization() {
         hideLoadingState();
     }
 }
-
 /**
  * Collect job description data from form
  */
@@ -177,31 +143,6 @@ function collectJobDescriptionData() {
         hasDescription: !!jobDescription,
         descriptionLength: jobDescription.length
     });
-}
-
-/**
- * Validate that we have minimum data required for optimization
- */
-function validateOptimizationData() {
-    const { resumeData, jobData } = window.optimizationState;
-    
-    // Must have resume data
-    if (!resumeData || (!resumeData.file && !resumeData.text)) {
-        showMessage('Please upload or paste your resume first', 'error');
-        return false;
-    }
-    
-    // Job description is optional but recommended
-    if (!jobData || !jobData.text) {
-        const proceed = confirm('No job description provided. We recommend adding one for better optimization. Continue anyway?');
-        if (!proceed) {
-            return false;
-        }
-        // Set default empty job data
-        window.optimizationState.jobData = { title: '', text: '', company: '' };
-    }
-    
-    return true;
 }
 
 /**
@@ -241,53 +182,67 @@ async function buildAPIPayload() {
  * Extract text content from uploaded file
  */
 async function extractTextFromFile(file) {
-    return new Promise((resolve, reject) => {
+    if (file.type === 'text/plain') {
+      return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            if (file.type === 'text/plain') {
-                resolve(e.target.result);
-            } else {
-                // For PDF/DOCX files, send the text as is for now
-                // Backend will handle file processing
-                resolve('[FILE_CONTENT]'); // Backend will process the actual file
-            }
-        };
-        
-        reader.onerror = function() {
-            reject(new Error('Failed to read file'));
-        };
-        
-        if (file.type === 'text/plain') {
-            reader.readAsText(file);
-        } else {
-            // For non-text files, let backend handle processing
-            resolve('[FILE_UPLOAD]');
-        }
-    });
-}
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsText(file);
+      });
+    }
+    // Non-text: let backend handle it
+    return '[FILE_UPLOAD]';
+  }
 
 /**
- * Submit optimization request to backend API
+ * Enhanced API submission with better error handling
  */
 async function submitOptimizationRequest(payload) {
-    const response = await fetch('/optimizer/optimize', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': window.csrfToken || ''
-        },
-        body: JSON.stringify(payload)
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
     
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Request failed' }));
-        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+    try {
+        const response = await fetch('/optimizer/optimize', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrfToken || ''
+            },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ 
+                error: 'Request failed', 
+                message: `HTTP ${response.status}: ${response.statusText}` 
+            }));
+            
+            const apiError = handleAPIError(response, errorData);
+            throw new APIError(apiError.message, response.status, apiError);
+        }
+        
+        const result = await response.json();
+        
+        // Validate response structure
+        if (!result || typeof result !== 'object') {
+            throw new Error('Invalid response format from optimization service');
+        }
+        
+        return result;
+        
+    } catch (error) {
+        clearTimeout(timeoutId);
+        
+        if (error.name === 'AbortError') {
+            throw new Error('Request timed out after 2 minutes. Please try again with a shorter resume.');
+        }
+        
+        throw error;
     }
-    
-    return await response.json();
 }
-
 /**
  * Show loading state during API processing
  */
@@ -317,83 +272,8 @@ function addEnhancedLoadingOverlay() {
     // Show enhanced progress indicator
     showEnhancedProgressIndicator();
 }
-/**
- * Add loading overlay to prevent form interaction
- */
-function addLoadingOverlay() {
-    const overlay = document.createElement('div');
-    overlay.id = 'loading-overlay';
-    overlay.innerHTML = `
-        <div class="loading-content">
-            <div class="loading-spinner large"></div>
-            <h3>AI is optimizing your resume...</h3>
-            <p>This usually takes 30-60 seconds</p>
-            <div class="processing-steps" id="processing-steps"></div>
-        </div>
-    `;
-    
-    document.body.appendChild(overlay);
-}
 
-/**
- * Show processing steps during optimization
- */
-function showProcessingSteps() {
-    const steps = [
-        'Parsing resume content...',
-        'Analyzing skill gaps...',
-        'Optimizing with AI...',
-        'Generating explanations...',
-        'Applying guardrails...',
-        'Creating documents...'
-    ];
-    
-    const stepsContainer = document.getElementById('processing-steps');
-    if (!stepsContainer) return;
-    
-    let currentStepIndex = 0;
-    
-    const stepInterval = setInterval(() => {
-        if (currentStepIndex < steps.length) {
-            const stepElement = document.createElement('div');
-            stepElement.className = 'processing-step';
-            stepElement.innerHTML = `
-                <i class="fas fa-check-circle"></i>
-                ${steps[currentStepIndex]}
-            `;
-            stepsContainer.appendChild(stepElement);
-            currentStepIndex++;
-        } else {
-            clearInterval(stepInterval);
-        }
-    }, 8000); // Show new step every 8 seconds
-    
-    // Store interval for cleanup
-    window.processingStepInterval = stepInterval;
-}
 
-/**
- * Hide loading state and reset UI
- */
-function hideLoadingState() {
-    const submitBtn = document.getElementById('optimize-submit-btn');
-    const overlay = document.getElementById('loading-overlay');
-    
-    if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.classList.remove('loading');
-        submitBtn.innerHTML = '<i class="fas fa-magic"></i> Optimize My Resume';
-    }
-    
-    if (overlay) {
-        overlay.remove();
-    }
-    
-    // Clear processing step interval
-    if (window.processingStepInterval) {
-        clearInterval(window.processingStepInterval);
-    }
-}
 
 /**
  * Handle successful optimization response
@@ -406,7 +286,7 @@ function handleOptimizationSuccess(result) {
     
     // Store in localStorage for results page access
     try {
-        localStorage.setItem('optimizationResults', JSON.stringify({
+        localStorage.setItem('optimizationSuccess', JSON.stringify({
             ...result,
             timestamp: Date.now(),
             original_resume: window.optimizationState.resumeData.text || '[Uploaded File]'
@@ -491,35 +371,6 @@ function redirectToResults() {
     // Redirect to results page
     window.location.href = `/optimizer/results/${resultId}`;
 }
-/**
- * Handle optimization API errors
- */
-/**
- * Enhanced optimization error handler with retry logic
- */
-function handleOptimizationError(error) {
-    console.error('Optimization error:', error);
-    
-    let errorInfo = { message: 'Optimization failed. Please try again.', canRetry: true };
-    
-    // Handle different error types
-    if (error.message) {
-        const networkError = handleNetworkError(error);
-        errorInfo = { ...errorInfo, ...networkError };
-    } else if (error.response) {
-        // API returned error response
-        error.response.json().then(responseData => {
-            const apiError = handleAPIError(error.response, responseData);
-            showEnhancedError(apiError);
-        }).catch(() => {
-            // Fallback if response parsing fails
-            showEnhancedError(errorInfo);
-        });
-        return; // Exit early, error handling continues in promise
-    }
-    
-    showEnhancedError(errorInfo);
-}
 
 /**
  * Enhanced form validation before submission
@@ -544,99 +395,38 @@ async function validateBeforeOptimization() {
     return true;
 }
 
-/**
- * Enhanced optimization flow with validation and error handling
- */
-async function startOptimization() {
-    if (window.optimizationState.isProcessing) {
-        return; // Prevent double submission
-    }
-    
-    try {
-        // Pre-submit validation
-        const isValid = await validateBeforeOptimization();
-        if (!isValid) {
-            return;
-        }
-        
-        // Collect job description data
-        collectJobDescriptionData();
-        
-        // Show loading state
-        showLoadingState();
-        window.optimizationState.isProcessing = true;
-        
-        // Prepare API payload
-        const payload = await buildAPIPayload();
-        
-        // Use retry manager for robust submission
-        const retryManager = new RetryManager(3, 2000); // 3 retries, 2s base delay
-        
-        const result = await retryManager.executeWithRetry(async () => {
-            return await submitOptimizationRequest(payload);
-        }, 'resume optimization');
-        
-        // Handle successful response
-        handleOptimizationSuccess(result);
-        
-    } catch (error) {
-        console.error('Optimization failed:', error);
-        handleOptimizationError(error);
-    } finally {
-        window.optimizationState.isProcessing = false;
-        hideLoadingState();
-    }
+let progressTimers = [];
+function simulateProgressUpdates() {
+  const steps = [
+    { step: 1, delay: 2000,  progress: 15,  text: "Resume parsed successfully" },
+    { step: 2, delay: 8000,  progress: 35,  text: "Gap analysis complete" },
+    { step: 3, delay: 25000, progress: 70,  text: "AI optimization in progress" },
+    { step: 4, delay: 35000, progress: 85,  text: "Generating explanations" },
+    { step: 5, delay: 40000, progress: 95,  text: "Applying final checks" },
+    { step: 6, delay: 45000, progress: 100, text: "Documents ready" }
+  ];
+  // clear existing
+  progressTimers.forEach(id => clearTimeout(id));
+  progressTimers = [];
+  steps.forEach(({ step, delay, progress, text }) => {
+    const id = setTimeout(() => updateProgressStep(step, progress, text), delay);
+    progressTimers.push(id);
+  });
+}
+function hideLoadingState() {
+  const submitBtn = document.getElementById('optimize-submit-btn');
+  const overlay = document.getElementById('loading-overlay');
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.classList.remove('loading');
+    submitBtn.innerHTML = '<i class="fas fa-magic"></i> Optimize My Resume';
+  }
+  if (overlay) overlay.remove();
+  if (window.processingStepInterval) clearInterval(window.processingStepInterval);
+  progressTimers.forEach(id => clearTimeout(id));
+  progressTimers = [];
 }
 
-/**
- * Enhanced API submission with better error handling
- */
-async function submitOptimizationRequest(payload) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
-    
-    try {
-        const response = await fetch('/optimizer/optimize', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': window.csrfToken || ''
-            },
-            body: JSON.stringify(payload),
-            signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ 
-                error: 'Request failed', 
-                message: `HTTP ${response.status}: ${response.statusText}` 
-            }));
-            
-            const apiError = handleAPIError(response, errorData);
-            throw new APIError(apiError.message, response.status, apiError);
-        }
-        
-        const result = await response.json();
-        
-        // Validate response structure
-        if (!result || typeof result !== 'object') {
-            throw new Error('Invalid response format from optimization service');
-        }
-        
-        return result;
-        
-    } catch (error) {
-        clearTimeout(timeoutId);
-        
-        if (error.name === 'AbortError') {
-            throw new Error('Request timed out after 2 minutes. Please try again with a shorter resume.');
-        }
-        
-        throw error;
-    }
-}
 
 /**
  * Custom API Error class
@@ -649,40 +439,7 @@ class APIError extends Error {
         this.details = details;
     }
 }
-/**
- * Show optimization completion (temporary - will be replaced by COMMIT 5)
- */
-function showOptimizationComplete(result) {
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) {
-        overlay.innerHTML = `
-            <div class="success-content">
-                <div class="success-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <h3>Resume Optimized Successfully!</h3>
-                <div class="result-preview">
-                    <p><strong>Match Score:</strong> ${result.match_score || 'N/A'}%</p>
-                    <p><strong>Processing Time:</strong> ${result.processing_time_ms ? Math.round(result.processing_time_ms / 1000) : 'N/A'} seconds</p>
-                    <p><strong>Keywords Added:</strong> ${result.missing_keywords?.length || 0}</p>
-                </div>
-                <div class="success-actions">
-                    <button class="btn btn-primary" onclick="viewResults()">
-                        <i class="fas fa-eye"></i> View Results
-                    </button>
-                    <button class="btn btn-outline" onclick="startOver()">
-                        <i class="fas fa-redo"></i> Start Over
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        // Auto-hide after 10 seconds
-        setTimeout(() => {
-            if (overlay) overlay.remove();
-        }, 10000);
-    }
-}
+
 
 /**
  * Add retry button for failed optimizations
@@ -980,31 +737,6 @@ function updateProgressStep(stepNumber, progressPercent, statusText) {
     }
 }
 
-
-function storeResultsForDownload(result) {
-    try {
-        // Store in localStorage with expiration
-        const resultData = {
-            ...result,
-            timestamp: Date.now(),
-            expires_at: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
-            original_resume: window.optimizationState.resumeData?.text || '[Uploaded File]'
-        };
-        
-        localStorage.setItem('optimizationResults', JSON.stringify(resultData));
-        
-        // Also store with result_id for direct access
-        const resultId = result.request_hash || Date.now().toString(36);
-        localStorage.setItem(`result_${resultId}`, JSON.stringify(resultData));
-        
-        console.log(`Results stored with ID: ${resultId}`);
-        return resultId;
-        
-    } catch (e) {
-        console.warn('Could not store results:', e);
-        return null;
-    }
-}
 
 
 
@@ -1325,32 +1057,6 @@ function validateOptimizationRequest() {
         errors,
         warnings
     };
-}
-
-/**
- * Network error handling
- */
-function handleNetworkError(error, context = 'optimization') {
-    console.error(`Network error in ${context}:`, error);
-    
-    let userMessage = 'A network error occurred. Please check your connection and try again.';
-    let canRetry = true;
-    
-    if (error.message) {
-        if (error.message.includes('fetch')) {
-            userMessage = 'Unable to connect to the optimization service. Please check your internet connection.';
-        } else if (error.message.includes('timeout')) {
-            userMessage = 'Request timed out. The service may be experiencing high load. Please try again in a moment.';
-        } else if (error.message.includes('Rate limit')) {
-            userMessage = 'You\'ve reached the usage limit. Please wait before trying again.';
-            canRetry = false;
-        } else if (error.message.includes('Authentication')) {
-            userMessage = 'Session expired. Please refresh the page and try again.';
-            canRetry = false;
-        }
-    }
-    
-    return { userMessage, canRetry };
 }
 
 /**
@@ -1711,3 +1417,21 @@ class ServiceMonitor {
 document.addEventListener('DOMContentLoaded', function() {
     window.serviceMonitor = new ServiceMonitor();
 });
+
+/**
+ optimization error handler with retry logic
+ */
+function handleOptimizationError(error) {
+    // APIError or generic Error
+    const isApi = error instanceof APIError;
+    const message = isApi ? error.message : (error?.message || 'Optimization failed. Please try again.');
+    const suggestedAction = isApi ? error.details?.suggestedAction : null;
+    const canRetry = isApi ? error.details?.canRetry ?? true : true;
+  
+    showEnhancedError({
+      message,
+      canRetry,
+      suggestedAction,
+      details: isApi ? (error.details?.details ?? null) : null
+    });
+  }
