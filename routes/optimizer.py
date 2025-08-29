@@ -4,7 +4,7 @@ from flask_login import login_required,current_user
 from werkzeug.exceptions import BadRequest
 import asyncio
 import time
-from typing import Dict, Any,Optional
+from typing import Dict, Any,Optional,Dict,Tuple,List
 import io
 import tempfile
 import os
@@ -21,6 +21,9 @@ from services.resume.formatting import create_docx_sync, create_pdf_sync
 from services.resume.storage import store_resume_files_sync, generate_resume_hash_sync
 from services.resume.cache import get_enhanced_cache
 from providers import get_models, test_provider_connection
+
+import traceback
+from datetime import datetime
 
 
 
@@ -823,4 +826,272 @@ def _store_temp_files(docx_bytes: bytes, pdf_bytes: bytes, result_id: str) -> Di
         print(f"❌ Temp storage error: {str(e)}")
         return {'error': str(e)}
 
+
+
+def validate_optimization_input(data: Dict) -> Tuple[bool, List[str]]:
+    """
+    Comprehensive input validation for optimization requests.
+    
+    Args:
+        data: Request JSON data
+        
+    Returns:
+        Tuple of (is_valid, error_messages)
+    """
+    
+    errors = []
+    
+    # Check required top-level structure
+    required_fields = ['resume_input', 'job_description', 'options']
+    for field in required_fields:
+        if field not in data:
+            errors.append(f"Missing required field: '{field}'")
+    
+    if errors:
+        return False, errors
+    
+    # Validate resume input
+    resume_input = data.get('resume_input', {})
+    if not any([
+        resume_input.get('text'),
+        resume_input.get('docx_url'),
+        resume_input.get('pdf_url')
+    ]):
+        errors.append("Resume input must contain 'text', 'docx_url', or 'pdf_url'")
+    
+    # Validate text length if provided
+    if resume_input.get('text'):
+        text_len = len(resume_input['text'].strip())
+        if text_len < 100:
+            errors.append(f"Resume text too short ({text_len} characters). Minimum 100 characters required.")
+        elif text_len > 50000:
+            errors.append(f"Resume text too long ({text_len} characters). Maximum 50,000 characters allowed.")
+    
+    # Validate job description
+    job_desc = data.get('job_description', {})
+    if job_desc.get('text') and len(job_desc['text']) > 20000:
+        errors.append("Job description too long. Maximum 20,000 characters allowed.")
+    
+    # Validate options
+    options = data.get('options', {})
+    valid_tones = ['professional-concise', 'creative', 'technical', 'executive']
+    if options.get('tone') and options['tone'] not in valid_tones:
+        errors.append(f"Invalid tone '{options['tone']}'. Must be one of: {', '.join(valid_tones)}")
+    
+    return len(errors) == 0, errors
+
+
+def handle_optimization_error(error: Exception, context: str = "optimization") -> Tuple[Dict[str, Any], int]:
+    """
+    Handle optimization errors with appropriate user messages and status codes.
+    
+    Args:
+        error: The exception that occurred
+        context: Context where error occurred
+        
+    Returns:
+        Tuple of (error_response_dict, http_status_code)
+    """
+    
+    error_id = f"err_{int(time.time())}_{hash(str(error)) % 10000}"
+    
+    # Log full error details for debugging
+    print(f"🔥 Error {error_id} in {context}: {str(error)}")
+    print(f"🔍 Traceback: {traceback.format_exc()}")
+    
+    # Categorize error types
+    if isinstance(error, ValueError):
+        return _handle_validation_error(error, error_id)
+    elif isinstance(error, ConnectionError):
+        return _handle_connection_error(error, error_id)
+    elif isinstance(error, TimeoutError):
+        return _handle_timeout_error(error, error_id)
+    elif "rate limit" in str(error).lower():
+        return _handle_rate_limit_error(error, error_id)
+    elif "api" in str(error).lower() and ("key" in str(error).lower() or "auth" in str(error).lower()):
+        return _handle_api_auth_error(error, error_id)
+    else:
+        return _handle_generic_error(error, error_id)
+
+
+def _handle_validation_error(error: Exception, error_id: str) -> Tuple[Dict[str, Any], int]:
+    """Handle validation errors (400 status)."""
+    
+    return {
+        'error': 'Input Validation Error',
+        'message': str(error),
+        'error_id': error_id,
+        'category': 'validation',
+        'suggested_actions': [
+            'Check that your resume contains standard sections (experience, skills, etc.)',
+            'Ensure file is not corrupted or empty',
+            'Try using plain text instead of file upload'
+        ]
+    }, 400
+
+
+def _handle_connection_error(error: Exception, error_id: str) -> Tuple[Dict[str, Any], int]:
+    """Handle connection errors (503 status)."""
+    
+    return {
+        'error': 'Service Connection Error',
+        'message': 'Unable to connect to AI optimization service. Please try again in a moment.',
+        'error_id': error_id,
+        'category': 'connection',
+        'retry_recommended': True,
+        'retry_delay_seconds': 30
+    }, 503
+
+
+def _handle_timeout_error(error: Exception, error_id: str) -> Tuple[Dict[str, Any], int]:
+    """Handle timeout errors (408 status)."""
+    
+    return {
+        'error': 'Request Timeout',
+        'message': 'Optimization is taking longer than expected. Please try again with a shorter resume.',
+        'error_id': error_id,
+        'category': 'timeout',
+        'retry_recommended': True,
+        'suggested_actions': [
+            'Try shortening your resume content',
+            'Use simpler job description',
+            'Check your internet connection stability'
+        ]
+    }, 408
+
+
+def _handle_rate_limit_error(error: Exception, error_id: str) -> Tuple[Dict[str, Any], int]:
+    """Handle rate limiting errors (429 status)."""
+    
+    return {
+        'error': 'Rate Limit Exceeded',
+        'message': 'You\'ve reached the optimization limit. Please try again later.',
+        'error_id': error_id,
+        'category': 'rate_limit',
+        'retry_recommended': True,
+        'retry_after_seconds': 3600,
+        'suggested_actions': [
+            'Wait an hour before trying again',
+            'Consider upgrading to premium for higher limits'
+        ]
+    }, 429
+
+
+def _handle_api_auth_error(error: Exception, error_id: str) -> Tuple[Dict[str, Any], int]:
+    """Handle API authentication errors (502 status)."""
+    
+    return {
+        'error': 'AI Service Unavailable',
+        'message': 'AI optimization service is temporarily unavailable. Please try again later.',
+        'error_id': error_id,
+        'category': 'service_unavailable',
+        'retry_recommended': True,
+        'retry_delay_seconds': 300  # 5 minutes
+    }, 502
+
+
+def _handle_generic_error(error: Exception, error_id: str) -> Tuple[Dict[str, Any], int]:
+    """Handle generic errors (500 status)."""
+    
+    return {
+        'error': 'Internal Processing Error',
+        'message': 'An unexpected error occurred during optimization. Please try again.',
+        'error_id': error_id,
+        'category': 'internal',
+        'retry_recommended': True,
+        'suggested_actions': [
+            'Try again with the same input',
+            'If problem persists, try with a different resume format',
+            'Contact support if errors continue'
+        ]
+    }, 500
+
+
+def log_optimization_attempt(
+    user_id: int,
+    resume_input: 'ResumeInput',
+    jd_input: 'JDInput',
+    success: bool,
+    error_details: Optional[str] = None,
+    processing_time_ms: Optional[float] = None
+):
+    """
+    Log optimization attempts for monitoring and debugging.
+    
+    Args:
+        user_id: User ID
+        resume_input: Resume input data
+        jd_input: Job description input
+        success: Whether optimization succeeded
+        error_details: Error details if failed
+        processing_time_ms: Processing time if successful
+    """
+    
+    try:
+        log_entry = {
+            'timestamp': datetime.utcnow().isoformat(),
+            'user_id': user_id,
+            'success': success,
+            'resume_input_type': resume_input.input_type,
+            'resume_length': len(resume_input.text) if resume_input.text else 0,
+            'jd_length': len(jd_input.text) if jd_input.text else 0,
+            'has_job_title': bool(jd_input.title),
+            'processing_time_ms': processing_time_ms,
+            'error_details': error_details,
+            'user_agent': request.headers.get('User-Agent', 'unknown'),
+            'ip_address': request.remote_addr
+        }
+        
+        # In production, send to logging service
+        print(f"📊 Optimization Log: {json.dumps(log_entry)}")
+        
+    except Exception as e:
+        print(f"❌ Logging failed: {str(e)}")
+
+
+# Enhanced error handling wrapper for the main optimization function
+def safe_optimization_pipeline(
+    resume_input: 'ResumeInput',
+    jd_input: 'JDInput',
+    options: 'OptimizationOptions',
+    request_hash: str,
+    user_id: int
+) -> Dict[str, Any]:
+    """
+    Execute optimization pipeline with comprehensive error handling.
+    
+    This is a wrapper around _run_optimization_pipeline with enhanced error handling.
+    """
+    
+    start_time = time.time()
+    
+    try:
+        # Log the attempt
+        log_optimization_attempt(user_id, resume_input, jd_input, False)
+        
+        # Execute pipeline
+        result = _run_optimization_pipeline(
+            resume_input, jd_input, options, request_hash, user_id
+        )
+        
+        # Log success
+        processing_time = (time.time() - start_time) * 1000
+        log_optimization_attempt(
+            user_id, resume_input, jd_input, True,
+            processing_time_ms=processing_time
+        )
+        
+        return result
+        
+    except Exception as e:
+        # Log failure
+        processing_time = (time.time() - start_time) * 1000
+        log_optimization_attempt(
+            user_id, resume_input, jd_input, False,
+            error_details=str(e),
+            processing_time_ms=processing_time
+        )
+        
+        # Re-raise for handling by route
+        raise
 
