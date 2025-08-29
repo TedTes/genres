@@ -587,29 +587,38 @@ function startOver() {
     }
 }
 
-/**
- * Enhanced message function for API integration
- */
-function showMessage(text, type, duration = null) {
-    // Use existing showMessage function if available
-    if (window.showMessage && typeof window.showMessage === 'function') {
-        window.showMessage(text, type);
-    } else {
-        // Fallback implementation
-        console.log(`${type.toUpperCase()}: ${text}`);
-        alert(`${type.toUpperCase()}: ${text}`);
+function showMessage(text, type = 'info', duration = null, containerId = 'messages') {
+    const icons = { success: 'check-circle', error: 'exclamation-triangle', warning: 'info-circle', info: 'info-circle' };
+    const container = document.getElementById(containerId);
+  
+    // Fallback if container not found
+    if (!container) {
+      const label = (type || 'info').toUpperCase();
+      (type === 'error' ? console.error : console.log)(`${label}: ${text}`);
+      if (duration) setTimeout(() => window.clearMessages?.(), duration);
+      return;
     }
-    
-    // Auto-clear after duration
-    if (duration) {
-        setTimeout(() => {
-            if (window.clearMessages) {
-                window.clearMessages();
-            }
-        }, duration);
-    }
-}
-
+  
+    // Build DOM safely (avoid innerHTML injection on text)
+    const wrapper = document.createElement('div');
+    wrapper.className = `message ${type}`;
+  
+    const iconEl = document.createElement('i');
+    iconEl.className = `fas fa-${icons[type] || icons.info}`;
+  
+    const textEl = document.createElement('span');
+    textEl.textContent = String(text);
+  
+    wrapper.append(iconEl, textEl);
+  
+    // Replace existing content
+    container.innerHTML = '';
+    container.appendChild(wrapper);
+  
+    // Auto clear
+    const auto = duration ?? (type === 'success' ? 4000 : null);
+    if (auto) setTimeout(() => { if (container.firstChild === wrapper) container.innerHTML = ''; }, auto);
+  }
 /**
  * Debug function for development
  */

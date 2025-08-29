@@ -387,25 +387,7 @@ function startAnalysis() {
     showMessage('Starting AI analysis...', 'success');
 }
 
-function showMessage(text, type) {
-    const container = document.getElementById('messages');
-    const icons = {
-        success: 'check-circle',
-        error: 'exclamation-triangle',
-        warning: 'info-circle'
-    };
-    
-    container.innerHTML = `
-        <div class="message ${type}">
-            <i class="fas fa-${icons[type]}"></i>
-            ${text}
-        </div>
-    `;
-    
-    if (type === 'success') {
-        setTimeout(() => container.innerHTML = '', 4000);
-    }
-}
+
 
 function clearMessages() {
     document.getElementById('messages').innerHTML = '';
