@@ -66,7 +66,7 @@ and icons that can be used across different pages and sections.
   .btn-outline-danger {
     background-color: transparent;
     color: var(--danger);
-    border: 1px solid var(--danger);
+    border: 2px solid var(--danger);
   }
   
   .btn-outline-danger:hover {
@@ -81,12 +81,7 @@ and icons that can be used across different pages and sections.
     font-size: 0.875rem;
   }
   
-  .btn-large {
-    padding: 1rem 2rem;
-    font-size: 1.125rem;
-  }
-  
-  .btn-lg {
+  .btn-lg,.btn-large {
     padding: 1rem 2rem;
     font-size: 1.125rem;
   }
@@ -123,11 +118,7 @@ and icons that can be used across different pages and sections.
     padding: 1.5rem;
   }
   
-  .card-header {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-    background-color: var(--light);
-  }
+
   
   .card-footer {
     padding: 1rem 1.5rem;
@@ -656,21 +647,7 @@ and icons that can be used across different pages and sections.
     position: relative;
   }
   
-  .step-icon {
-    width: 5rem;
-    height: 5rem;
-    background: linear-gradient(135deg, var(--primary), #7c3aed);
-    color: var(--white);
-    border-radius: var(--radius-full);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    margin: 0 auto 1.5rem;
-    position: relative;
-    box-shadow: var(--shadow-primary);
-    transition: var(--transition);
-  }
+
   
   .step:hover .step-icon {
     transform: scale(1.1);
@@ -1147,13 +1124,7 @@ and icons that can be used across different pages and sections.
       padding: 1.5rem 0;
     }
   }
-  
-  /* Ensure footer stays at bottom of page */
-  body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
+
   
   main {
     flex: 1;
@@ -1326,7 +1297,6 @@ and icons that can be used across different pages and sections.
   border-color: var(--primary);
   box-shadow: var(--shadow-md);
 }
-
 .card-header {
   padding: 1.5rem;
   cursor: pointer;
@@ -1554,18 +1524,20 @@ and icons that can be used across different pages and sections.
 }
 
 .step-icon {
-  width: 2rem;
-  height: 2rem;
-  background: var(--border);
-  color: var(--text-light);
+  width: 5rem;
+  height: 5rem;
+  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  color: var(--white);
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.875rem;
-  flex-shrink: 0;
+  font-size: 2rem;
+  margin: 0 auto 1.5rem;
+  position: relative;
+  box-shadow: var(--shadow-primary);
+  transition: var(--transition);
 }
-
 .step-item.completed .step-icon {
   background: var(--success);
   color: var(--white);
