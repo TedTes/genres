@@ -177,6 +177,28 @@ async function buildAPIPayload() {
     
     return payload;
 }
+/**
+ * Clear messages from any message container
+ */
+function clearMessages() {
+    // Clear upload messages
+    const uploadMessages = document.getElementById('upload-messages');
+    if (uploadMessages) {
+        uploadMessages.innerHTML = '';
+    }
+    
+    // Clear any other message containers
+    const messages = document.getElementById('messages');
+    if (messages) {
+        messages.innerHTML = '';
+    }
+    
+    // Remove retry button if it exists
+    const retryBtn = document.getElementById('retry-btn');
+    if (retryBtn) {
+        retryBtn.remove();
+    }
+}
 
 /**
  * Extract text content from uploaded file
@@ -369,7 +391,8 @@ function redirectToResults() {
     const resultId = Date.now().toString(36);
     
     // Redirect to results page
-    window.location.href = `/optimizer/results/${resultId}`;
+    // window.location.href = `/optimizer/results/${resultId}`;
+    window.location.href = '/optimizer/results';
 }
 
 /**
@@ -529,6 +552,49 @@ function setupFormSubmission() {
     });
 }
 
+function enhanceExistingFunctionality() {
+    // Hook into existing resume upload functionality
+    hookIntoResumeUpload();
+    console.log('Enhanced functionality loaded');
+}
+function hookIntoResumeUpload() {
+    // Connect to existing resume upload functionality
+    const originalHandleTextInput = window.handleTextInput;
+    if (originalHandleTextInput) {
+        window.handleTextInput = function(text) {
+            // Call original function
+            originalHandleTextInput(text);
+            
+            // Update our state
+            window.optimizationState.resumeData = {
+                type: 'text',
+                text: text
+            };
+            
+            // Show job description section
+            showJobDescriptionSection();
+        };
+    }
+    
+    // Hook into file upload
+    const originalHandleFileUpload = window.handleFileUpload;
+    if (originalHandleFileUpload) {
+        window.handleFileUpload = function(file) {
+            // Call original function
+            originalHandleFileUpload(file);
+            
+            // Update our state  
+            window.optimizationState.resumeData = {
+                type: 'file',
+                file: file
+            };
+            
+            // Show job description section
+            showJobDescriptionSection();
+        };
+    }
+}
+
 /**
  * Temporary functions for handling results (will be replaced by COMMIT 5)
  */
@@ -587,29 +653,38 @@ function startOver() {
     }
 }
 
-/**
- * Enhanced message function for API integration
- */
-function showMessage(text, type, duration = null) {
-    // Use existing showMessage function if available
-    if (window.showMessage && typeof window.showMessage === 'function') {
-        window.showMessage(text, type);
-    } else {
-        // Fallback implementation
-        console.log(`${type.toUpperCase()}: ${text}`);
-        alert(`${type.toUpperCase()}: ${text}`);
+function showMessage(text, type = 'info', duration = null, containerId = 'messages') {
+    const icons = { success: 'check-circle', error: 'exclamation-triangle', warning: 'info-circle', info: 'info-circle' };
+    const container = document.getElementById(containerId);
+  
+    // Fallback if container not found
+    if (!container) {
+      const label = (type || 'info').toUpperCase();
+      (type === 'error' ? console.error : console.log)(`${label}: ${text}`);
+      if (duration) setTimeout(() => window.clearMessages?.(), duration);
+      return;
     }
-    
-    // Auto-clear after duration
-    if (duration) {
-        setTimeout(() => {
-            if (window.clearMessages) {
-                window.clearMessages();
-            }
-        }, duration);
-    }
-}
-
+  
+    // Build DOM safely (avoid innerHTML injection on text)
+    const wrapper = document.createElement('div');
+    wrapper.className = `message ${type}`;
+  
+    const iconEl = document.createElement('i');
+    iconEl.className = `fas fa-${icons[type] || icons.info}`;
+  
+    const textEl = document.createElement('span');
+    textEl.textContent = String(text);
+  
+    wrapper.append(iconEl, textEl);
+  
+    // Replace existing content
+    container.innerHTML = '';
+    container.appendChild(wrapper);
+  
+    // Auto clear
+    const auto = duration ?? (type === 'success' ? 4000 : null);
+    if (auto) setTimeout(() => { if (container.firstChild === wrapper) container.innerHTML = ''; }, auto);
+  }
 /**
  * Debug function for development
  */
