@@ -13,9 +13,165 @@ window.optimizationState = {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
+    setupUploadHandlers();
+    updateValidation();
     initializeOptimization();
 });
 
+
+function setupUploadHandlers() {
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const browseBtn = document.getElementById('browse-btn');
+    const resumeText = document.getElementById('resume-text');
+    const jobTitle = document.getElementById('job-title');
+    const jobDescription = document.getElementById('job-description');
+    
+    // File upload handlers
+    if (browseBtn) {
+        browseBtn.addEventListener('click', () => fileInput.click());
+    }
+    
+    if (dropZone) {
+        dropZone.addEventListener('click', (e) => {
+            if (e.target !== browseBtn) fileInput.click();
+        });
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+        
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files[0]) {
+                handleFileUpload(e.dataTransfer.files[0]);
+            }
+        });
+    }
+    
+    if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) {
+                handleFileUpload(e.target.files[0]);
+            }
+        });
+    }
+    
+    // Text input handler
+    if (resumeText) {
+        resumeText.addEventListener('input', function() {
+            resumeData = { type: 'text', content: this.value };
+            document.getElementById('char-count').textContent = `${this.value.length} characters`;
+            updateValidation();
+        });
+    }
+    
+    // Job input handlers
+    if (jobTitle) {
+        jobTitle.addEventListener('input', function() {
+            jobData.title = this.value;
+            updateValidation();
+        });
+    }
+    
+    if (jobDescription) {
+        jobDescription.addEventListener('input', function() {
+            jobData.description = this.value;
+            document.getElementById('job-char-count').textContent = `${this.value.length} characters`;
+            updateValidation();
+        });
+    }
+}
+
+function updateValidation() {
+    const hasResume = resumeData && 
+        (resumeData.type === 'file' || 
+         (resumeData.type === 'text' && resumeData.content.trim().length > 100));
+    
+    const hasJob = jobData.title.trim() || jobData.description.trim().length > 50;
+    
+    // Update resume status
+    const resumeStatus = document.getElementById('resume-status');
+    if (hasResume) {
+        resumeStatus.innerHTML = '<i class="fas fa-check-circle"></i>';
+        resumeStatus.classList.add('completed');
+    } else {
+        resumeStatus.innerHTML = '<i class="fas fa-circle"></i>';
+        resumeStatus.classList.remove('completed');
+    }
+    
+    // Update job status
+    const jobStatus = document.getElementById('job-status');
+    if (hasJob) {
+        jobStatus.innerHTML = '<i class="fas fa-check-circle"></i>';
+        jobStatus.classList.add('completed');
+    } else {
+        jobStatus.innerHTML = '<span class="optional-label">Optional</span>';
+        jobStatus.classList.remove('completed');
+    }
+    
+    // Update CTA button
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const ctaText = document.getElementById('cta-text');
+    
+    analyzeBtn.disabled = !hasResume;
+    
+    if (hasResume && hasJob) {
+        ctaText.textContent = 'Analyze Resume Against Job';
+    } else if (hasResume) {
+        ctaText.textContent = 'Analyze My Resume';
+    } else {
+        ctaText.textContent = 'Upload Resume First';
+    }
+}
+function handleFileUpload(file) {
+    // Validate file
+    if (file.size > 5 * 1024 * 1024) {
+        showMessage('File size must be less than 5MB', 'error');
+        return;
+    }
+    
+    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+    if (!allowedTypes.includes(file.type)) {
+        showMessage('Please upload PDF, DOCX, or TXT files only', 'error');
+        return;
+    }
+    
+    resumeData = { type: 'file', content: file };
+    
+    // Show success state
+    document.getElementById('file-success').innerHTML = `
+        <div class="success-content">
+            <div class="success-info">
+                <i class="fas fa-check-circle"></i>
+                <div class="file-details">
+                    <strong>${file.name}</strong>
+                    <span>${(file.size/1024/1024).toFixed(1)} MB</span>
+                </div>
+            </div>
+            <button onclick="clearFile()" class="remove-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    document.getElementById('file-success').style.display = 'block';
+    
+    showMessage('Resume uploaded successfully!', 'success');
+    updateValidation();
+}
+function clearFile() {
+    resumeData = null;
+    document.getElementById('file-success').style.display = 'none';
+    document.getElementById('file-input').value = '';
+    updateValidation();
+}
 function initializeOptimization() {
     setupFormSubmission();
     setupCSRFToken();
@@ -224,7 +380,7 @@ async function submitOptimizationRequest(payload) {
     const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
     
     try {
-        const response = await fetch('/optimizer/optimize', {
+        const response = await fetch('/api/v1/optimizer/optimize', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -506,7 +662,6 @@ function toggleJobSection() {
         }, 300);
     }
 }
-
 /**
  * Setup job description character counter
  */
@@ -1429,7 +1584,7 @@ class ServiceMonitor {
     
     async checkServiceStatus() {
         try {
-            const response = await fetch('/optimizer/status', {
+            const response = await fetch('/api/v1/optimizer/status', {
                 method: 'GET',
                 headers: { 'Cache-Control': 'no-cache' }
             });
