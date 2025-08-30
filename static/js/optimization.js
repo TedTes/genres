@@ -91,11 +91,12 @@ function setupUploadHandlers() {
 }
 
 function updateValidation() {
+    const jobData = window.optimizationState.jobData;
+    const resumeData = window.optimizationState.resumeData;
     const hasResume = resumeData && 
         (resumeData.type === 'file' || 
          (resumeData.type === 'text' && resumeData.content.trim().length > 100));
-    
-    const hasJob = jobData.title.trim() || jobData.description.trim().length > 50;
+    const hasJob = jobData && jobData.title.trim() || jobData && jobData.description.trim().length > 50;
     
     // Update resume status
     const resumeStatus = document.getElementById('resume-status');
@@ -207,10 +208,12 @@ function showJobDescriptionSection() {
     addOptimizationButton();
     
     // Update continue button to show completion of step 1
-    const continueBtn = document.getElementById('continue-button');
-    continueBtn.innerHTML = '<i class="fas fa-check"></i> Resume Ready';
-    continueBtn.disabled = false;
-    continueBtn.classList.add('btn-success');
+    // const continueBtn = document.getElementById('continue-button');
+    // console.log("from this");
+    // console.log(continueBtn);
+    // continueBtn.innerHTML = '<i class="fas fa-check"></i> Resume Ready';
+    // continueBtn.disabled = false;
+    // continueBtn.classList.add('btn-success');
 }
 
 /**
