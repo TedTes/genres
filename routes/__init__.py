@@ -13,9 +13,5 @@ def register_routes(app: Flask):
     app.register_blueprint(auth_bp, url_prefix="/api/v1/auth")
     app.register_blueprint(payment_bp,url_prefix="/api/v1/payment")
     app.register_blueprint(root_bp)
- 
-
-
-
-    app.register_blueprint(optimizer_bp, url_prefix="/api/v1/resume/llm")
+    app.register_blueprint(optimizer_bp, url_prefix="/api/v1/optimizer")
     app.register_blueprint(error_bp, url_prefix="/api/v1/error")
