@@ -177,6 +177,28 @@ async function buildAPIPayload() {
     
     return payload;
 }
+/**
+ * Clear messages from any message container
+ */
+function clearMessages() {
+    // Clear upload messages
+    const uploadMessages = document.getElementById('upload-messages');
+    if (uploadMessages) {
+        uploadMessages.innerHTML = '';
+    }
+    
+    // Clear any other message containers
+    const messages = document.getElementById('messages');
+    if (messages) {
+        messages.innerHTML = '';
+    }
+    
+    // Remove retry button if it exists
+    const retryBtn = document.getElementById('retry-btn');
+    if (retryBtn) {
+        retryBtn.remove();
+    }
+}
 
 /**
  * Extract text content from uploaded file
@@ -369,7 +391,8 @@ function redirectToResults() {
     const resultId = Date.now().toString(36);
     
     // Redirect to results page
-    window.location.href = `/optimizer/results/${resultId}`;
+    // window.location.href = `/optimizer/results/${resultId}`;
+    window.location.href = '/optimizer/results';
 }
 
 /**
@@ -527,6 +550,49 @@ function setupFormSubmission() {
             }
         }
     });
+}
+
+function enhanceExistingFunctionality() {
+    // Hook into existing resume upload functionality
+    hookIntoResumeUpload();
+    console.log('Enhanced functionality loaded');
+}
+function hookIntoResumeUpload() {
+    // Connect to existing resume upload functionality
+    const originalHandleTextInput = window.handleTextInput;
+    if (originalHandleTextInput) {
+        window.handleTextInput = function(text) {
+            // Call original function
+            originalHandleTextInput(text);
+            
+            // Update our state
+            window.optimizationState.resumeData = {
+                type: 'text',
+                text: text
+            };
+            
+            // Show job description section
+            showJobDescriptionSection();
+        };
+    }
+    
+    // Hook into file upload
+    const originalHandleFileUpload = window.handleFileUpload;
+    if (originalHandleFileUpload) {
+        window.handleFileUpload = function(file) {
+            // Call original function
+            originalHandleFileUpload(file);
+            
+            // Update our state  
+            window.optimizationState.resumeData = {
+                type: 'file',
+                file: file
+            };
+            
+            // Show job description section
+            showJobDescriptionSection();
+        };
+    }
 }
 
 /**
