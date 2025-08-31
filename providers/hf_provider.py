@@ -15,11 +15,14 @@ from .base import Embedder, ChatModel, LLMProvider
 class HuggingFaceEmbedder(Embedder):
     """HuggingFace embeddings implementation."""
     
+
     def __init__(self, model_name: str, api_token: str):
         self.model_name = model_name
         self.api_token = api_token
         self.base_url = "https://api-inference.huggingface.co"
-        self.provider_name = "huggingface"
+        self.provider_name = "hf"
+
+
     @track_llm_request("embedding")   
     @retry(
         stop=stop_after_attempt(3),
@@ -46,7 +49,7 @@ class HuggingFaceEmbedder(Embedder):
         async with httpx.AsyncClient(timeout=30.0) as client:
             try:
                 response = await client.post(
-                    f"{self.base_url}/pipeline/feature-extraction/{self.model_name}",
+                    f"{self.base_url}/models/{self.model_name}",
                     headers=headers,
                     json=payload
                 )
@@ -80,7 +83,7 @@ class HuggingFaceChatModel(ChatModel):
         self.model_name = model_name
         self.api_token = api_token
         self.base_url = "https://api-inference.huggingface.co"
-        self.provider_name = "huggingface"
+        self.provider_name = "hf"
 
     @track_llm_request("chat")
     @retry(
