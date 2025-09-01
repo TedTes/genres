@@ -451,7 +451,6 @@ def optimization_status():
         status_data = {
             'status': 'available' if provider_test['status'] == 'success' else 'degraded',
             'timestamp': time.time(),
-            'mvp_testing_mode': MVP_TESTING_MODE,
             'provider_status': provider_test,
             'rate_limit_per_hour': current_app.config.get('RATE_LIMIT_PER_HOUR', 10),
             'max_file_size_mb': current_app.config.get('MAX_RESUME_SIZE_MB', 5)
