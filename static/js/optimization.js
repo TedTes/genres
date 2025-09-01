@@ -9,7 +9,10 @@ window.optimizationState = {
     resumeData: null,
     jobData: null,
     isProcessing: false,
-    results: null
+    results: null,
+    validationStatus: { resume: false, job: false },
+extractedContent: null, // Store extracted text content
+contentMetrics: { wordCount: 0, sectionCount: 0, hasContact: false }
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -67,8 +70,25 @@ function setupUploadHandlers() {
     // Text input handler
     if (resumeText) {
         resumeText.addEventListener('input', function() {
-            resumeData = { type: 'text', content: this.value };
-            document.getElementById('char-count').textContent = `${this.value.length} characters`;
+            const textContent = this.value.trim();
+            
+            // Store in optimizationState
+            window.optimizationState.resumeData = { 
+                type: 'text', 
+                content: textContent 
+            };
+            
+            // Analyze content quality in real-time
+            const contentAnalysis = analyzeResumeContent(textContent);
+            window.optimizationState.extractedContent = textContent;
+            window.optimizationState.contentMetrics = contentAnalysis;
+            
+            // Update character count with quality indicator
+            const charCount = document.getElementById('char-count');
+            if (charCount) {
+                charCount.innerHTML = `${textContent.length} characters ${getContentQualityIndicator(contentAnalysis)}`;
+            }
+            
             updateValidation();
         });
     }
@@ -76,23 +96,58 @@ function setupUploadHandlers() {
     // Job input handlers
     if (jobTitle) {
         jobTitle.addEventListener('input', function() {
-            jobData.title = this.value;
+            window.optimizationState.jobData.title = this.value;
             updateValidation();
         });
     }
     
     if (jobDescription) {
         jobDescription.addEventListener('input', function() {
-            jobData.description = this.value;
+            window.optimizationState.jobData.description = this.value;
             document.getElementById('job-char-count').textContent = `${this.value.length} characters`;
             updateValidation();
         });
     }
 }
+function handleFileUpload(file) {
+    // Validate file
+    if (file.size > 5 * 1024 * 1024) {
+        showMessage('File size must be less than 5MB', 'error');
+        return;
+    }
+    
+    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+    if (!allowedTypes.includes(file.type)) {
+        showMessage('Please upload PDF, DOCX, or TXT files only', 'error');
+        return;
+    }
+    
+    resumeData = { type: 'file', content: file };
+    // Show success state
+    document.getElementById('file-success').innerHTML = `
+        <div class="success-content">
+            <div class="success-info">
+                <i class="fas fa-check-circle"></i>
+                <div class="file-details">
+                    <strong>${file.name}</strong>
+                    <span>${(file.size/1024/1024).toFixed(1)} MB</span>
+                </div>
+            </div>
+            <button onclick="clearFile()" class="remove-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    document.getElementById('file-success').style.display = 'block';
+    
+    showMessage('Resume uploaded successfully!', 'success');
+    updateValidation();
+}
 
 function updateValidation() {
     const jobData = window.optimizationState.jobData;
     const resumeData = window.optimizationState.resumeData;
+
     const hasResume = resumeData && 
         (resumeData.type === 'file' || 
          (resumeData.type === 'text' && resumeData.content.trim().length > 100));
@@ -131,41 +186,6 @@ function updateValidation() {
     } else {
         ctaText.textContent = 'Upload Resume First';
     }
-}
-function handleFileUpload(file) {
-    // Validate file
-    if (file.size > 5 * 1024 * 1024) {
-        showMessage('File size must be less than 5MB', 'error');
-        return;
-    }
-    
-    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
-    if (!allowedTypes.includes(file.type)) {
-        showMessage('Please upload PDF, DOCX, or TXT files only', 'error');
-        return;
-    }
-    
-    resumeData = { type: 'file', content: file };
-    
-    // Show success state
-    document.getElementById('file-success').innerHTML = `
-        <div class="success-content">
-            <div class="success-info">
-                <i class="fas fa-check-circle"></i>
-                <div class="file-details">
-                    <strong>${file.name}</strong>
-                    <span>${(file.size/1024/1024).toFixed(1)} MB</span>
-                </div>
-            </div>
-            <button onclick="clearFile()" class="remove-btn">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    `;
-    document.getElementById('file-success').style.display = 'block';
-    
-    showMessage('Resume uploaded successfully!', 'success');
-    updateValidation();
 }
 function clearFile() {
     resumeData = null;
@@ -309,7 +329,6 @@ function collectJobDescriptionData() {
  */
 async function buildAPIPayload() {
     const { resumeData, jobData } = window.optimizationState;
-    
     const payload = {
         resume_input: {},
         job_description: {
@@ -448,7 +467,7 @@ function showLoadingState() {
 function addEnhancedLoadingOverlay() {
     const overlay = document.createElement('div');
     overlay.id = 'loading-overlay';
-    document.body.appendChild(overlay);
+   document.body.appendChild(overlay);
     
     // Show enhanced progress indicator
     showEnhancedProgressIndicator();
@@ -990,6 +1009,14 @@ const FILE_VALIDATION = {
         /javascript:/gi,
         /on\w+\s*=/gi,
         /data:text\/html/gi
+    ],
+    RESUME_PATTERNS: [
+        /experience|employment|work\s+history/i,
+        /education|degree|university|college/i, 
+        /skills|competencies|proficiencies/i,
+        /\b\d{4}\s*[-–]\s*(\d{4}|present|current)\b/i, // Date ranges
+        /@[\w\.-]+\.\w+/, // Email pattern
+        /\b\(\d{3}\)\s*\d{3}-\d{4}\b|\b\d{3}-\d{3}-\d{4}\b/ // Phone patterns
     ]
 };
 
