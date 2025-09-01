@@ -68,45 +68,54 @@ def optimize_resume():
         user_id = 999999
         
         # Validate request
-        if not request.is_json:
-            return jsonify({'error': 'Content-Type must be application/json'}), 400
-        
-        data = request.get_json()
-        print(f"📥 Received optimization request: {len(str(data))} characters")
-        
-        # Validate input schemas
-        try:
-            resume_input = ResumeInput(**data.get('resume_input', {}))
-            jd_input = JDInput(**data.get('job_description', {}))
-            options = OptimizationOptions(**data.get('options', {}))
+       
+            # Handle FormData instead of JSON
+        if request.content_type.startswith('multipart/form-data'):
+                # Extract form fields
+                job_data = {
+                    'text': request.form.get('job_description', ''),
+                    'title': request.form.get('job_title', ''),
+                    'company': request.form.get('job_company', '')
+                }
+                
+                options_data = {
+                    'tone': request.form.get('tone', 'professional-concise'),
+                    'locale': request.form.get('locale', 'en-US'),
+                    'include_pdf': request.form.get('include_pdf', 'true') == 'true'
+                }
+                
+                # Handle resume input
+                resume_type = request.form.get('resume_type')
+                if resume_type == 'file':
+                    # Get uploaded file
+                    resume_file = request.files.get('resume_file')
+                    if not resume_file:
+                        return jsonify({'error': 'No file uploaded'}), 400
+                    
+                    # Save file temporarily and create file URL
+                    temp_path = save_temp_file(resume_file)
+                    
+                    if resume_file.content_type == 'application/pdf':
+                        resume_input = ResumeInput(pdf_url=temp_path)
+                    elif resume_file.content_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                        resume_input = ResumeInput(docx_url=temp_path)
+                    else:
+                        # Handle as text
+                        content = resume_file.read().decode('utf-8')
+                        resume_input = ResumeInput(text=content)
+                        
+                else:
+                    # Text input
+                    resume_text = request.form.get('resume_text', '')
+                    resume_input = ResumeInput(text=resume_text)
             
-            # Debug logging for MVP
-            print(f"📄 Resume input type: {resume_input.input_type}")
-            print(f"📋 Job description length: {len(jd_input.text) if jd_input.text else 0} chars")
-            print(f"⚙️  Options: {options.tone}, PDF: {options.include_pdf}")
+                # Create schema objects
+                jd_input = JDInput(**job_data)
+                options = OptimizationOptions(**options_data)
             
-        except Exception as e:
-            print(f"❌ Input validation error: {str(e)}")
-            return jsonify({'error': f'Invalid input: {str(e)}'}), 400
-        
-        # Check if optimization is enabled
-        if not current_app.config.get('RESUME_OPTIMIZER_ENABLED', True):
-            return jsonify({'error': 'Resume optimization is currently disabled'}), 503
-        
-        # Rate limiting check (temporarily disabled for testing)
-        # rate_limit = current_app.config.get('RATE_LIMIT_PER_HOUR', 10)
-        # if not _check_rate_limit(user_id, rate_limit):
-        #     return jsonify({'error': 'Rate limit exceeded. Please try again later.'}), 429
-        
-        print(f"🚀 Starting resume optimization for user {user_id}")
-        
-        # Generate request hash for caching
-        resume_text = resume_input.text or "file_input"
-        request_hash = generate_resume_hash_sync(resume_text, jd_input.text, options.dict())
-        
         # Check cache first (optional for MVP)
         cache = get_enhanced_cache()
-     
+    
         
         # Process optimization pipeline
         try:
@@ -1094,3 +1103,23 @@ def safe_optimization_pipeline(
         # Re-raise for handling by route
         raise
 
+
+
+def save_temp_file(uploaded_file):
+    """Save uploaded file temporarily for processing."""
+    import tempfile
+    import os
+    
+    # Create temp file with proper extension
+    file_ext = '.pdf' if 'pdf' in uploaded_file.content_type else '.docx'
+    fd, temp_path = tempfile.mkstemp(suffix=file_ext)
+    
+    try:
+        with os.fdopen(fd, 'wb') as tmp_file:
+            uploaded_file.seek(0)  # Reset file pointer
+            tmp_file.write(uploaded_file.read())
+        
+        return temp_path
+    except Exception as e:
+        os.unlink(temp_path)  # Clean up on error
+        raise e
