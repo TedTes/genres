@@ -45,7 +45,7 @@ class RequestLogger:
         if error:
             print(f"🔴 LLM Request Failed: {json.dumps(log_data, indent=2)}")
         else:
-            print(f"🟢 LLM Request: {provider}/{model} | {latency_ms:.0f}ms | {tokens_in}→{tokens_out} tokens")
+            print(f"🟢 LLM Request: {model} | {latency_ms:.0f}ms | {tokens_in}→{tokens_out} tokens")
 
 
 def track_llm_request(request_type: str):

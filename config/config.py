@@ -25,18 +25,6 @@ class Config:
     PAYPAL_ANNUAL_PLAN_ID = os.environ.get('PAYPAL_ANNUAL_PLAN_ID')
     PAYPAL_WEBHOOK_ID = os.environ.get('PAYPAL_WEBHOOK_ID')
 
-    #base web urls
-    S_BUCK = os.environ.get('S_BUCK_BASE_URL')
-    T_HORT = os.environ.get('T_HORT_BASE_URL')
-    H_DEPO = os.environ.get('H_DEPO_BASE_URL')
-    W_MAR = os.environ.get('W_MAR_BASE_URL')
-
-
-    #selectors
-    S_BUCK_SELECTOR = os.environ.get('S_BUCK_SELECTOR')
-    T_HORT_SELECTOR = os.environ.get('T_HORT_SELECTOR')
-    H_DEPO_SELECTOR = os.environ.get('H_DEPO_SELECTOR')
-    W_MAR_SELECTOR = os.environ.get('W_MAR_SELECTOR')
 
 
     # LLM API keys
@@ -55,9 +43,15 @@ class Config:
 
 
     MODEL_PROVIDER = os.environ.get('MODEL_PROVIDER', 'hf')  # default to huggingface
-    LLM_MODEL = os.environ.get('LLM_MODEL', 'mistralai/Mistral-7B-Instruct-v0.3')
-    EMBED_MODEL = os.environ.get('EMBED_MODEL', 'BAAI/bge-large-en-v1.5')
     
+    if MODEL_PROVIDER == 'openai':
+       EMBED_MODEL = os.environ.get('OPENAI_EMBED_MODEL', 'text-embedding-3-small')
+       LLM_MODEL = os.environ.get('OPENAI_LLM_MODEL', 'gpt-4o-mini')
+    elif MODEL_PROVIDER == 'hf':
+       EMBED_MODEL = os.environ.get('HF_EMBED_MODEL', 'BAAI/bge-large-en-v1.5')
+       LLM_MODEL = os.environ.get('HF_LLM_MODEL', 'mistralai/Mistral-7B-Instruct-v0.3')
+    else:
+       EMBED_MODEL = os.environ.get('EMBED_MODEL', 'BAAI/bge-large-en-v1.5')
     #LLM API Keys
     HF_TOKEN = os.environ.get('HF_TOKEN')
     OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
