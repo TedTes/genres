@@ -284,13 +284,13 @@ async function startOptimization() {
         window.optimizationState.isProcessing = true;
         
         // Prepare API payload
-        const payload = await buildAPIPayload();
+        const formData = await buildFormDataPayload();
         
         // Use retry manager for robust submission
         const retryManager = new RetryManager(3, 2000); // 3 retries, 2s base delay
         
         const result = await retryManager.executeWithRetry(async () => {
-            return await submitOptimizationRequest(payload);
+            return await submitOptimizationRequest(formData);
         }, 'resume optimization');
         
         // Handle successful response
@@ -327,33 +327,30 @@ function collectJobDescriptionData() {
 /**
  * Build API payload from collected data
  */
-async function buildAPIPayload() {
+function buildFormDataPayload() {
     const { resumeData, jobData } = window.optimizationState;
-    const payload = {
-        resume_input: {},
-        job_description: {
-            text: jobData.text || '',
-            title: jobData.title || '',
-            company: jobData.company || ''
-        },
-        options: {
-            tone: 'professional-concise',
-            locale: 'en-US',
-            include_pdf: true
-        }
-    };
+    const formData = new FormData();
     
-    // Handle resume input based on type
+    // Add job description fields
+    formData.append('job_title', jobData.title || '');
+    formData.append('job_description', jobData.text || '');
+    formData.append('job_company', jobData.company || '');
+    
+    // Add options
+    formData.append('tone', 'professional-concise');
+    formData.append('locale', 'en-US');
+    formData.append('include_pdf', 'true');
+    
+    // Handle resume input
     if (resumeData.type === 'file') {
-        // For file uploads, we'll need to handle file processing
-        // For MVP, we can extract text content on frontend or send file directly
-        const fileText = await extractTextFromFile(resumeData.file);
-        payload.resume_input.text = fileText;
+        formData.append('resume_file', resumeData.content); // Actual File object
+        formData.append('resume_type', 'file');
     } else {
-        payload.resume_input.text = resumeData.text;
+        formData.append('resume_text', resumeData.content);
+        formData.append('resume_type', 'text');
     }
     
-    return payload;
+    return formData;
 }
 /**
  * Clear messages from any message container
@@ -397,7 +394,7 @@ async function extractTextFromFile(file) {
 /**
  * Enhanced API submission with better error handling
  */
-async function submitOptimizationRequest(payload) {
+async function submitOptimizationRequest(formData) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
     
@@ -405,10 +402,9 @@ async function submitOptimizationRequest(payload) {
         const response = await fetch('/api/v1/optimizer/optimize', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRFToken': window.csrfToken || ''
             },
-            body: JSON.stringify(payload),
+            body: formData,
             signal: controller.signal
         });
         
