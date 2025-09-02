@@ -4,7 +4,7 @@ Defines input/output formats and validation for the optimization pipeline.
 """
 
 from typing import List, Dict, Optional, Union, Any
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator,model_validator
 from datetime import datetime
 
 
@@ -14,19 +14,21 @@ class ResumeInput(BaseModel):
     text: Optional[str] = Field(None, description="Raw resume text")
     docx_url: Optional[str] = Field(None, description="URL or path to DOCX file")
     pdf_url: Optional[str] = Field(None, description="URL or path to PDF file")
-    
-    @validator('*', pre=True)
-    def validate_input(cls, v, values):
+
+    @model_validator(mode='after')
+    def validate_input(self):
         """Ensure exactly one input method is provided."""
-        inputs = [values.get('text'), values.get('docx_url'), values.get('pdf_url')]
-        provided = [inp for inp in inputs if inp is not None]
+        text = self.text
+        docx_url = self.docx_url
+        pdf_url = self.pdf_url
+        provided = [inp for inp in [text, docx_url, pdf_url] if inp is not None]
         
         if len(provided) == 0:
-            raise ValueError("One of 'text', 'docx_url', or 'pdf_url' must be provided")
+                raise ValueError("One of 'text', 'docx_url', or 'pdf_url' must be provided")
         elif len(provided) > 1:
-            raise ValueError("Only one input method should be provided")
-        
-        return v
+                raise ValueError("Only one input method should be provided")
+            
+        return self
     
     @property
     def input_type(self) -> str:
