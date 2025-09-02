@@ -5,7 +5,7 @@ Handles prompt engineering and resume optimization using language models.
 
 from typing import List, Dict, Any, Optional
 import json
-import asyncio
+
 
 from .schemas import OptimizedResume, ExperienceItem, validate_json_with_retry
 from .keywords import TechnicalSkills
@@ -316,5 +316,13 @@ class ResumeRewriter:
 # Sync wrapper
 def optimize_resume_sync(*args, **kwargs) -> OptimizedResume:
     """Synchronous wrapper for optimize_resume."""
-    rewriter = ResumeRewriter()
-    return asyncio.run(rewriter.optimize_resume(*args, **kwargs))
+    import asyncio
+    async def _optimize_with_cleanup():
+        rewriter = ResumeRewriter()
+        try:
+            return await rewriter.optimize_resume(*args, **kwargs)
+        finally:
+            # Force cleanup of any remaining async resources
+            await asyncio.sleep(0.1)  # Allow cleanup tasks to complete
+    
+    return asyncio.run(_optimize_with_cleanup())

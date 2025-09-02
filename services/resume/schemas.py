@@ -87,7 +87,7 @@ class OptimizationOptions(BaseModel):
     max_bullets_per_job: int = Field(4, description="Maximum bullets per job")
     include_skills_section: bool = Field(True, description="Include skills section")
     ats_optimize: bool = Field(True, description="Optimize for ATS systems")
-    
+    include_pdf: bool = Field(True, description="Generate PDF version")
     class Config:
         schema_extra = {
             "example": {
