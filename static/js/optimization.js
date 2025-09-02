@@ -122,7 +122,7 @@ function handleFileUpload(file) {
         return;
     }
     
-    resumeData = { type: 'file', content: file };
+    window.optimizationState.resumeData = {...window.optimizationStater, resumeData:{ type: 'file', content: file }};
     // Show success state
     document.getElementById('file-success').innerHTML = `
         <div class="success-content">
@@ -289,10 +289,10 @@ async function startOptimization() {
         // Use retry manager for robust submission
         const retryManager = new RetryManager(3, 2000); // 3 retries, 2s base delay
         
-        const result = await retryManager.executeWithRetry(async () => {
-            return await submitOptimizationRequest(formData);
-        }, 'resume optimization');
-        
+        // const result = await retryManager.executeWithRetry(async () => {
+        //     return await submitOptimizationRequest(formData);
+        // }, 'resume optimization');
+        const result = await submitOptimizationRequest(formData);
         // Handle successful response
         handleOptimizationSuccess(result);
         
@@ -343,7 +343,7 @@ function buildFormDataPayload() {
     
     // Handle resume input
     if (resumeData.type === 'file') {
-        formData.append('resume_file', resumeData.content); // Actual File object
+        formData.append('resume_file', resumeData.file); // Actual File object
         formData.append('resume_type', 'file');
     } else {
         formData.append('resume_text', resumeData.content);
@@ -1602,10 +1602,11 @@ class ServiceMonitor {
     }
     
     startPeriodicChecks() {
+        this.checkServiceStatus()
         // Check service every 30 seconds
-        this.checkInterval = setInterval(() => {
-            this.checkServiceStatus();
-        }, 30000);
+        // this.checkInterval = setInterval(() => {
+        //     this.checkServiceStatus();
+        // }, 30000);
     }
     
     async checkServiceStatus() {
