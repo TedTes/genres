@@ -16,7 +16,7 @@ class OpenAIEmbedder(Embedder):
     
     def __init__(self, model_name: str, api_key: str):
         self.model_name = model_name
-        self.client = openai.AsyncOpenAI(api_key=api_key)
+        self.client = openai.OpenAI(api_key=api_key)
         
     @retry(
         stop=stop_after_attempt(3),
@@ -27,7 +27,7 @@ class OpenAIEmbedder(Embedder):
         """Generate embeddings using OpenAI Embeddings API."""
         
         try:
-            response = await self.client.embeddings.create(
+            response =  self.client.embeddings.create(
                 model=self.model_name,
                 input=texts,
                 encoding_format="float"
@@ -53,7 +53,7 @@ class OpenAIChatModel(ChatModel):
     
     def __init__(self, model_name: str, api_key: str):
         self.model_name = model_name
-        self.client = openai.AsyncOpenAI(api_key=api_key)
+        self.client = openai.OpenAI(api_key=api_key)
         
     @retry(
         stop=stop_after_attempt(3),
@@ -79,7 +79,7 @@ class OpenAIChatModel(ChatModel):
         params.update(generation_options)
         
         try:
-            response = await self.client.chat.completions.create(**params)
+            response =  self.client.chat.completions.create(**params)
             
             # Extract the generated text
             if response.choices and len(response.choices) > 0:
