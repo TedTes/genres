@@ -57,7 +57,7 @@ def optimize_resume():
     """
     
     start_time = time.time()
-    
+
     try:
         # Authentication temporarily disabled for MVP testing
         # if not current_user.is_authenticated:
@@ -69,8 +69,10 @@ def optimize_resume():
         
         # Validate request
        
-            # Handle FormData instead of JSON
+        # Handle FormData instead of JSON
         if request.content_type.startswith('multipart/form-data'):
+               
+               
                 # Extract form fields
                 job_data = {
                     'text': request.form.get('job_description', ''),
@@ -86,6 +88,7 @@ def optimize_resume():
                 
                 # Handle resume input
                 resume_type = request.form.get('resume_type')
+              
                 if resume_type == 'file':
                     # Get uploaded file
                     resume_file = request.files.get('resume_file')
@@ -97,26 +100,35 @@ def optimize_resume():
                     
                     if resume_file.content_type == 'application/pdf':
                         resume_input = ResumeInput(pdf_url=temp_path)
+       
                     elif resume_file.content_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
                         resume_input = ResumeInput(docx_url=temp_path)
                     else:
                         # Handle as text
                         content = resume_file.read().decode('utf-8')
                         resume_input = ResumeInput(text=content)
-                        
+
                 else:
                     # Text input
                     resume_text = request.form.get('resume_text', '')
                     resume_input = ResumeInput(text=resume_text)
-            
-                # Create schema objects
-                jd_input = JDInput(**job_data)
-                options = OptimizationOptions(**options_data)
+
+        # Create schema objects
+        jd_input = JDInput(**job_data)
+        options = OptimizationOptions(**options_data)
+
+        # Generate request hash for caching and tracking
+        request_hash = generate_resume_hash_sync(
+            resume_text=resume_input.text if resume_input.text else "file_input",
+            jd_text=jd_input.text,
+            options=options.dict()
+        )
+
             
         # Check cache first (optional for MVP)
         cache = get_enhanced_cache()
     
-        
+      
         # Process optimization pipeline
         try:
             print("🔄 Running optimization pipeline...")
@@ -169,7 +181,8 @@ def _run_optimization_pipeline(
     resume_input: ResumeInput,
     jd_input: JDInput, 
     options: OptimizationOptions,
-    request_hash: str
+    request_hash: str,
+    user_id:str
 ) -> Dict[str, Any]:
     """
     Execute the complete optimization pipeline - simplified without user tracking.

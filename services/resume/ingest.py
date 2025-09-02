@@ -6,10 +6,9 @@ Handles DOCX, PDF, and text input for resume processing.
 import os
 import tempfile
 from typing import Any,Dict, List, Optional, Tuple
-import httpx
 import mammoth
 from pydantic import BaseModel
-
+import requests
 # For PDF support
 try:
     import pypdf
@@ -102,8 +101,7 @@ async def extract_text_from_docx(docx_path: str) -> str:
         # Handle URL vs local path
         if docx_path.startswith(('http://', 'https://')):
             # Download file
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(docx_path)
+                response = requests.get(docx_path, timeout=30)
                 response.raise_for_status()
                 
                 # Save to temporary file
@@ -149,14 +147,14 @@ async def extract_text_from_pdf(pdf_path: str) -> str:
         # Handle URL vs local path
         if pdf_path.startswith(('http://', 'https://')):
             # Download file
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(pdf_path)
-                response.raise_for_status()
-                
-                # Save to temporary file
-                with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as temp_file:
-                    temp_file.write(response.content)
-                    temp_path = temp_file.name
+          
+            response = requests.get(pdf_path, timeout=30)
+            response.raise_for_status()
+            
+            # Save to temporary file
+            with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as temp_file:
+                temp_file.write(response.content)
+                temp_path = temp_file.name
         else:
             temp_path = pdf_path
         

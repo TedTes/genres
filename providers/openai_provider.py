@@ -100,8 +100,8 @@ class OpenAIProvider(LLMProvider):
     
     def __init__(self):
         self.api_key = current_app.config.get('OPENAI_API_KEY')
-        self.llm_model = current_app.config.get('LLM_MODEL', 'gpt-4o-mini')
-        self.embed_model = current_app.config.get('EMBED_MODEL', 'text-embedding-3-small')
+        self.llm_model = current_app.config.get('OPENAI_LLM_MODEL', 'gpt-4o-mini')
+        self.embed_model = current_app.config.get('OPENAI_EMBED_MODEL', 'text-embedding-3-small')
         
         if not self.api_key:
             raise ValueError("OPENAI_API_KEY is required for OpenAI provider")

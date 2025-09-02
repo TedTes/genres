@@ -10,7 +10,7 @@ import asyncio
 from .schemas import Rationale, ChangeRationale, validate_json_with_retry
 from providers import get_models
 from .pipeline import OptimizedResume
-
+from .rewrite import ResumePrompts
 class ResumeDiffGenerator:
     """Generates detailed diffs between original and optimized resumes."""
     
