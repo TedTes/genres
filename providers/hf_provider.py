@@ -19,7 +19,6 @@ class HuggingFaceEmbedder(Embedder):
     def __init__(self, model_name: str, api_token: str):
         self.model_name = model_name
         self.api_token = api_token
-        self.provider_name = "hf"
         self.client = InferenceClient(token=api_token)
 
     @track_llm_request("embedding")   
@@ -72,7 +71,6 @@ class HuggingFaceChatModel(ChatModel):
     def __init__(self, model_name: str, api_token: str):
         self.model_name = model_name
         self.api_token = api_token
-        self.provider_name = "hf"
         # Use auto provider for best compatibility
         self.client = InferenceClient(token=api_token)
 
@@ -176,7 +174,6 @@ class HuggingFaceProvider(LLMProvider):
         self.api_token = current_app.config.get('HF_TOKEN')
         self.llm_model = current_app.config.get('LLM_MODEL')
         self.embed_model = current_app.config.get('EMBED_MODEL')
-        
         if not self.api_token:
             print("Warning: HF_TOKEN not set. Some models may not work.")
     
