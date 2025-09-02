@@ -11,7 +11,7 @@ from typing import Dict, Any, Optional, Tuple
 from datetime import datetime, timedelta
 from flask import current_app
 from botocore.exceptions import ClientError, NoCredentialsError
-
+import re
 from .schemas import OptimizedResume
 
 

@@ -413,8 +413,7 @@ class HTMLResumeFormatter:
         html_parts = ['<!DOCTYPE html>', '<html>', '<head>']
         html_parts.append('<meta charset="utf-8">')
         html_parts.append('<title>Resume</title>')
-        html_parts.append('</head>', '<body>')
-        
+        html_parts.extend(['</head>', '<body>'])
         # Header
         html_parts.append('<div class="header">')
         name = contact_info.get('name', 'Your Name')
