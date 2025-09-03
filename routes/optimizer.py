@@ -1,5 +1,4 @@
-from flask import Blueprint, request, jsonify,current_app,send_file, make_response,Response
-from services.llm_service import LLMService
+from flask import Blueprint, request, jsonify,current_app,send_file, make_response,Response,render_template
 from flask_login import login_required,current_user
 from werkzeug.exceptions import BadRequest
 import asyncio
@@ -28,7 +27,6 @@ from datetime import datetime
 
 
 optimizer_bp = Blueprint('optimizer_bp', __name__)
-llm_service = LLMService()
 
 # Resume AI enhancement endpoints
 
