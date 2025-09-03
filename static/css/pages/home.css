@@ -2,1206 +2,1094 @@
 ==============================================================================
 HOME PAGE STYLES - Landing Page Specific
 ==============================================================================
-Expected HTML hooks:
-- .hero, .hero-content, .hero-text, .hero-image, .hero-title, .hero-subtitle, .hero-cta
-- .stats-highlights, .highlight, .highlight-number, .highlight-text
-- .resume-counter, .counter-icon, .counter-text
-- .problem-section, .problem-grid, .problem-card, .problem-icon, .problem-content
-- .features (if needed for page-specific overrides)
-- .testimonials, .testimonials-grid, .testimonial-card, .testimonial-content, .testimonial-author
-- .author-avatar, .author-info, .stars, .rating, .rating-score, .rating-count
-- .cta, .cta-content, .cta-buttons
-- .trusted-by, .trusted-text, .mvp-notice, .notice-content, .beta-cta
-- .mvp-proof, .mvp-grid, .mvp-card, .mvp-icon
 */
 
 @layer pages {
   .page-home {
-  
     background: var(--background);
     color: var(--text);
   }
-    /* ==========================================================================
-       HERO SECTION
-       ========================================================================== */
-    
-    .page-home .hero {
-      padding: 6rem 0;
-      background: linear-gradient(135deg, var(--background) 0%, var(--light) 100%);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .page-home .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 50%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
-      z-index: 1;
-    }
-    
-    .page-home .hero-content {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
-      position: relative;
-      z-index: 2;
-    }
-    
-    .page-home .hero-text {
-      animation: fadeInUp 0.8s ease-out;
-    }
-    
-    .page-home .hero-title {
-      font-size: 3.5rem;
-      font-weight: 800;
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
-      color: var(--dark);
-    }
-    
-    .page-home .hero-title span {
-      background: linear-gradient(135deg, var(--primary), #7c3aed);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .page-home .hero-subtitle {
-      font-size: 1.25rem;
-      color: var(--text-light);
-      margin-bottom: 2.5rem;
-      line-height: 1.6;
-      max-width: 500px;
-    }
-    
-    .page-home .hero-cta {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-    }
-    
-    .page-home .hero-image {
-      position: relative;
-      animation: slideInFromRight 0.8s ease-out 0.2s both;
-    }
-    
-    .page-home .hero-image img {
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-lg);
-      transform: rotate(2deg);
-      max-height: 600px;
-      position: relative;
-      z-index: 2;
-      background-color: var(--light);
-      min-height: 400px;
-      transition: var(--transition);
-    }
-    
-    .page-home .hero-image img:hover {
-      transform: rotate(0deg) scale(1.02);
-      box-shadow: var(--shadow-xl);
-    }
-    
-    .page-home .hero-image-backdrop {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      right: -20px;
-      bottom: -20px;
-      background: linear-gradient(135deg, var(--primary), #7c3aed);
-      border-radius: var(--radius-lg);
-      z-index: 1;
-      opacity: 0.1;
-    }
-    
-    /* ==========================================================================
-       STATS HIGHLIGHTS
-       ========================================================================== */
-    
-    .page-home .stats-highlights {
-      display: flex;
-      gap: 1.5rem;
-      margin: 2rem 0;
-      flex-wrap: wrap;
-    }
-    
-    .page-home .highlight {
-      text-align: center;
-      padding: 1rem 1.5rem;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: var(--radius-lg);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      transition: var(--transition);
-      min-width: 120px;
-    }
-    
-    .page-home .highlight:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-lg);
-      background: rgba(255, 255, 255, 0.95);
-    }
-    
-    .page-home .highlight-number {
-      display: block;
-      font-size: 1.75rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--primary), #7c3aed);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 1;
-      margin-bottom: 0.25rem;
-    }
-    
-    .page-home .highlight-text {
-      font-size: 0.75rem;
-      color: var(--text-light);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: var(--letter-spacing-wide);
-    }
-    
-    /* ==========================================================================
-       TRUST INDICATORS
-       ========================================================================== */
-    
-    .page-home .resume-counter {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.75rem;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 1rem 1.5rem;
-      border-radius: var(--radius-xl);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      box-shadow: var(--shadow-md);
-      transition: var(--transition);
-    }
-    
-    .page-home .resume-counter:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
-    
-    .page-home .counter-icon i {
-      font-size: 1.25rem;
-    }
-    
-    .page-home .counter-text {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--text);
-    }
-    
-    /* ==========================================================================
-       PROBLEM SECTION
-       ========================================================================== */
-    
-    .page-home .problem-section {
-      padding: 6rem 0;
-      background: linear-gradient(135deg, #fef7f0 0%, #fef3ec 100%);
-      position: relative;
-    }
-    
-    .page-home .problem-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-    
-    .page-home .problem-card {
-      background: var(--white);
-      padding: 2.5rem 2rem;
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      border-left: 4px solid var(--danger);
-      transition: var(--transition);
-      animation: fadeInUp 0.6s ease-out;
-    }
-    
-    .page-home .problem-card:hover {
-      transform: translateY(-8px);
-      box-shadow: var(--shadow-xl);
-      border-left-color: var(--primary);
-    }
-    
-    .page-home .problem-icon {
-      font-size: 3rem;
-      margin-bottom: 1.5rem;
-      display: block;
-    }
-    
-    .page-home .problem-content h3 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--dark);
-      margin-bottom: 1rem;
-    }
-    
-    .page-home .problem-content p {
-      color: var(--text-light);
-      line-height: 1.6;
-      margin: 0;
-    }
-    
-    /* ==========================================================================
-       TESTIMONIALS SECTION
-       ========================================================================== */
-    
-    .page-home .testimonials {
-      padding: 6rem 0;
-      background: linear-gradient(135deg, var(--light) 0%, #f1f5f9 100%);
-    }
-    
-    .page-home .testimonials-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-    
-    .page-home .testimonial-card {
-      background: var(--white);
-      padding: 2rem;
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      position: relative;
-      transition: var(--transition);
-      animation: fadeInUp 0.6s ease-out;
-    }
-    
-    .page-home .testimonial-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-xl);
-    }
-    
-    .page-home .testimonial-card::before {
-      content: '"';
-      position: absolute;
-      top: -10px;
-      left: 20px;
-      font-size: 4rem;
-      color: var(--primary);
-      font-family: serif;
-      line-height: 1;
-      opacity: 0.3;
-    }
-    
-    .page-home .testimonial-content {
-      margin-bottom: 1.5rem;
-      font-style: italic;
-      color: var(--text);
-      line-height: 1.6;
-    }
-    
-    .page-home .testimonial-author {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    
-    .page-home .author-avatar {
-      width: 3rem;
-      height: 3rem;
-      background: linear-gradient(135deg, var(--primary), #7c3aed);
-      color: var(--white);
-      border-radius: var(--radius-full);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1.25rem;
-      flex-shrink: 0;
-    }
-    
-    .page-home .author-info h4 {
-      margin: 0;
-      color: var(--dark);
-      font-weight: 600;
-      font-size: 1rem;
-    }
-    
-    .page-home .author-info span {
-      color: var(--text-light);
-      font-size: 0.875rem;
-    }
-    
-    /* Rating stars */
-    .page-home .stars {
-      display: flex;
-      gap: 0.25rem;
-      align-items: center;
-      color: #fbbf24;
-      font-size: 1.125rem;
-      margin-top: 0.5rem;
-    }
-    
-    .page-home .rating-score {
-      font-weight: 700;
-      color: var(--text);
-      margin-left: 0.5rem;
-    }
-    
-    .page-home .rating-count {
-      color: var(--text-light);
-      font-size: 0.75rem;
-    }
-    
-    /* ==========================================================================
-       CTA SECTION
-       ========================================================================== */
-    
-    .page-home .cta {
-      padding: 6rem 0;
-      background: linear-gradient(135deg, var(--primary), #1d4ed8);
-      color: var(--white);
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .page-home .cta::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>') repeat;
-      background-size: 50px 50px;
-      animation: float 20s linear infinite;
-    }
-    
-    .page-home .cta-content {
-      position: relative;
-      z-index: 2;
-    }
-    
-    .page-home .cta-content h2 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 1rem;
-      color: var(--white);
-    }
-    
-    .page-home .cta-content p {
-      font-size: 1.25rem;
-      margin-bottom: 2.5rem;
-      opacity: 0.9;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    
-    .page-home .cta-buttons {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    
-    /* ==========================================================================
-       TRUSTED BY SECTION
-       ========================================================================== */
-    
-    .page-home .trusted-by {
-      padding: 3rem 0;
-      background: var(--white);
-      border-bottom: 1px solid var(--border);
-      text-align: center;
-    }
-    
-    .page-home .trusted-text {
-      color: var(--text-light);
-      font-size: 0.875rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: var(--letter-spacing-wider);
-      margin-bottom: 1rem;
-    }
-    
-    .page-home .rating {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    
-    /* ==========================================================================
-       MVP PROOF SECTION
-       ========================================================================== */
-    
-    .page-home .mvp-proof {
-      padding: 6rem 0;
-      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
-    }
-    
-    .page-home .mvp-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-    
-    .page-home .mvp-card {
-      background: var(--white);
-      padding: 2rem;
-      border-radius: var(--radius-xl);
-      text-align: center;
-      box-shadow: var(--shadow);
-      position: relative;
-      transition: var(--transition);
-      border-top: 4px solid var(--success);
-      animation: fadeInUp 0.6s ease-out;
-    }
-    
-    .page-home .mvp-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-xl);
-    }
-    
-    .page-home .mvp-icon {
-      width: 4rem;
-      height: 4rem;
-      background: linear-gradient(135deg, var(--success), var(--success-dark));
-      color: var(--white);
-      border-radius: var(--radius-full);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      margin: 0 auto 1.5rem;
-    }
-    
-    .page-home .mvp-card h3 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--dark);
-      margin-bottom: 1rem;
-    }
-    
-    .page-home .mvp-card p {
-      color: var(--text-light);
-      line-height: 1.6;
-      margin: 0;
-    }
-    
-    /* ==========================================================================
-       MVP NOTICE
-       ========================================================================== */
-    
-    .page-home .mvp-notice {
-      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-      border: 1px solid #7dd3fc;
-      border-radius: var(--radius-xl);
-      padding: 2rem;
-      margin-top: 3rem;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .page-home .mvp-notice::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--info), var(--primary));
-    }
-    
-    .page-home .notice-content {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-    }
-    
-    .page-home .notice-content i {
-      color: var(--info);
-      font-size: 1.5rem;
-      margin-top: 0.25rem;
-      flex-shrink: 0;
-    }
-    
-    .page-home .notice-content h4 {
-      color: #0c4a6e;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      margin-top: 0;
-    }
-    
-    .page-home .notice-content p {
-      color: #075985;
-      margin: 0;
-      line-height: 1.6;
-    }
-    
-    /* Beta CTA */
-    .page-home .beta-cta p {
-      font-style: italic;
-      opacity: 0.8;
-    }
-    
-    /* ==========================================================================
-       FLOATING ANIMATION
-       ========================================================================== */
-    
-    @keyframes float {
-      0% {
-        transform: translateY(0px);
-      }
-      50% {
-        transform: translateY(-10px);
-      }
-      100% {
-        transform: translateY(0px);
-      }
-    }
-    
-    /* ==========================================================================
-       RESPONSIVE DESIGN
-       ========================================================================== */
-    
-    @media (max-width: 1024px) {
-      .page-home .hero-content {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-        text-align: center;
-      }
-      
-      .page-home .hero-image {
-        order: -1;
-      }
-    }
-    
-    @media (max-width: 768px) {
-      .page-home .hero {
-        padding: 4rem 0;
-      }
-      
-      .page-home .hero-title {
-        font-size: 2.5rem;
-      }
-      
-      .page-home .hero-subtitle {
-        font-size: 1.125rem;
-      }
-      
-      .page-home .stats-highlights {
-        justify-content: center;
-        gap: 1rem;
-      }
-      
-      .page-home .highlight {
-        min-width: 100px;
-        padding: 0.75rem 1rem;
-      }
-      
-      .page-home .cta-content h2 {
-        font-size: 2rem;
-      }
-      
-      .page-home .cta-buttons {
-        flex-direction: column;
-        align-items: center;
-      }
-      
-      .page-home .cta-buttons .btn {
-        min-width: 250px;
-      }
-      
-      .page-home .mvp-grid,
-      .page-home .problem-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
-      
-      .page-home .notice-content {
-        flex-direction: column;
-        text-align: center;
-        align-items: center;
-      }
-    }
-    
-    @media (max-width: 640px) {
-      .page-home .hero-cta {
-        flex-direction: column;
-      }
-      
-      .page-home .hero-cta .btn {
-        width: 100%;
-        justify-content: center;
-      }
-      
-      .page-home .stats-highlights {
-        flex-direction: column;
-        align-items: center;
-      }
-    }
-    
-    /* ==========================================================================
-       REDUCED MOTION PREFERENCES
-       ========================================================================== */
-    
-    @media (prefers-reduced-motion: reduce) {
-      .page-home .hero-text,
-      .page-home .hero-image,
-      .page-home .problem-card,
-      .page-home .testimonial-card,
-      .page-home .mvp-card {
-        animation: none;
-      }
-      
-      .page-home .highlight:hover,
-      .page-home .problem-card:hover,
-      .page-home .testimonial-card:hover,
-      .page-home .mvp-card:hover,
-      .page-home .resume-counter:hover,
-      .page-home .hero-image img:hover {
-        transform: none;
-      }
-      
-      .page-home .cta::before {
-        animation: none;
-      }
-    }
+  /* ==========================================================================
+     HERO SECTION
+     ========================================================================== */
+  
+  .page-home .hero {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, var(--background) 0%, var(--light) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .page-home .hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+    z-index: 1;
+  }
+  
+  .page-home .hero-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .page-home .hero-text {
+    animation: fadeInUp 0.8s ease-out;
+  }
+  
+  .page-home .hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    color: var(--dark);
+  }
+  
+  .page-home .hero-title span {
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .page-home .hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+    max-width: 500px;
+  }
+  
+  .page-home .hero-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  
+  /* Helper text under hero CTA */
+  .page-home .cta-helper {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    font-weight: 500;
+    margin: 0;
+  }
 
+  /* ==========================================================================
+     MVP GRID & CARDS (VALUE SECTION)
+     ========================================================================== */
+  
+  .page-home .mvp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  
+  .page-home .mvp-card {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+    text-align: center;
+    box-shadow: var(--shadow);
+    position: relative;
+    transition: var(--transition);
+    border-top: 4px solid var(--success);
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  .page-home .mvp-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+  }
+  
+  .page-home .mvp-icon {
+    width: 4rem;
+    height: 4rem;
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
+    color: var(--white);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin: 0 auto 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+  }
+  
+  .page-home .mvp-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 1rem;
+  }
+  
+  .page-home .mvp-card p {
+    color: var(--text-light);
+    line-height: 1.6;
+    margin: 0 0 1.5rem 0;
+  }
 
-     /* ==========================================================================
-   PRICING SECTION 
-   ========================================================================== */
+  /* Hover effect for value card icons */
+  .page-home .mvp-card:hover .mvp-icon {
+    transform: scale(1.1);
+    box-shadow: 0 12px 30px rgba(59, 130, 246, 0.3);
+  }
 
-.page-home .pricing-section {
-  padding: 6rem 0;
-  background: var(--white);
-}
+  /* ==========================================================================
+     SECTION DESCRIPTION (under section titles)
+     ========================================================================== */
+  
+  .page-home .section-description {
+    font-size: 1.125rem;
+    color: var(--text-light);
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: var(--line-height-relaxed);
+  }
 
-.page-home .pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  max-width: 800px;
-  margin: 0 auto;
-  margin-top: 3rem;
-}
+  /* ==========================================================================
+     HOW IT WORKS SECTION
+     ========================================================================== */
+  
+  .page-home .how-it-works {
+    background: var(--light);
+    padding: 4rem 0;
+  }
+  
+  .page-home .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .page-home .step {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border);
+    transition: var(--transition);
+  }
+  
+  .page-home .step:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .page-home .step-icon {
+    width: 4rem;
+    height: 4rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--white);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+  }
+  
+  .page-home .step h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--dark);
+  }
+  
+  .page-home .step p {
+    font-size: 0.95rem;
+    color: var(--text-light);
+    margin: 0;
+    line-height: var(--line-height-normal);
+  }
 
-.page-home .pricing-card {
-  background: var(--white);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 2.5rem 2rem;
-  text-align: center;
-  transition: var(--transition);
-  position: relative;
-}
-
-.page-home .pricing-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--primary);
-}
-
-.page-home .pricing-card-featured {
-  border-color: var(--primary);
-  position: relative;
-}
-
-.page-home .pricing-card-featured::before {
-  content: 'Most Popular';
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--primary);
-  color: var(--white);
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius);
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-.page-home .pricing-header h3 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--dark);
-  margin-bottom: 1rem;
-}
-
-.page-home .pricing-amount {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 0.25rem;
-  margin-bottom: 1.5rem;
-}
-
-.page-home .pricing-amount .currency {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.page-home .pricing-amount .price {
-  font-size: 3rem;
-  font-weight: 800;
-  color: var(--dark);
-  line-height: 1;
-}
-
-.page-home .pricing-amount .period {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: var(--text-light);
-}
-
-.page-home .pricing-description {
-  margin-bottom: 2rem;
-}
-
-.page-home .pricing-description p {
-  color: var(--text-light);
-  font-size: 1rem;
-  line-height: 1.6;
-  margin: 0;
-}
-
-.page-home .pricing-cta {
-  margin-top: 2rem;
-}
-
-.page-home .pricing-cta .btn {
-  width: 100%;
-  justify-content: center;
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
+  /* ==========================================================================
+     PRICING SECTION
+     ========================================================================== */
+  
+  .page-home .pricing-section {
+    padding: 6rem 0;
+    background: var(--white);
+  }
+  
   .page-home .pricing-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
   }
   
   .page-home .pricing-card {
-    padding: 2rem 1.5rem;
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    transition: var(--transition);
+    position: relative;
+    max-width: 400px;
+    border: 2px solid var(--primary);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.1);
+  }
+  
+  .page-home .pricing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(59, 130, 246, 0.15);
+  }
+  
+  .page-home .pricing-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--dark);
+  }
+  
+  .page-home .pricing-amount {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.25rem;
+    margin-bottom: 2rem;
+  }
+  
+  .page-home .pricing-amount .currency {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    font-weight: 500;
   }
   
   .page-home .pricing-amount .price {
-    font-size: 2.5rem;
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1;
   }
-}
+  
+  .page-home .pricing-amount .period {
+    font-size: 1rem;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+  
+  .page-home .pricing-features {
+    list-style: none;
+    margin: 2rem 0;
+    padding: 0;
+    text-align: left;
+  }
+  
+  .page-home .pricing-features li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+  
+  .page-home .pricing-features i {
+    color: var(--success);
+    font-size: 0.875rem;
+    flex-shrink: 0;
+  }
 
-
-/* ==========================================================================
-   TRANSPARENCY SECTION
-   ========================================================================== */
-
-   .page-home .transparency-section {
-    padding: 3rem 0;
-    background: var(--light);
+  /* ==========================================================================
+     SECTION CTA STYLING
+     ========================================================================== */
+  
+  .page-home .section-cta {
+    text-align: center;
+    margin-top: 4rem;
+    padding-top: 3rem;
     border-top: 1px solid var(--border);
   }
   
-  .page-home .transparency-content {
+  .page-home .section-cta .btn {
+    min-width: 280px;
+  }
+
+  /* ==========================================================================
+     TRACKING SECTION & TRANSPARENCY
+     ========================================================================== */
+  
+  .page-home .tracking-section {
+    padding: 4rem 0;
+    background: var(--light);
+  }
+  
+  .page-home .tracking-content {
     text-align: center;
-    max-width: 800px;
+    max-width: 700px;
     margin: 0 auto;
   }
   
-  .page-home .transparency-note {
-    font-size: 1.125rem;
-    color: var(--text);
-    line-height: 1.6;
-    font-style: italic;
-    margin: 0;
-    opacity: 0.9;
+  .page-home .tracking-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 3rem 0;
   }
   
-  /* Mobile Responsiveness */
+  .page-home .tracking-feature {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border);
+  }
+  
+  .page-home .tracking-feature i {
+    color: var(--primary);
+    font-size: 1.125rem;
+    flex-shrink: 0;
+  }
+  
+  .page-home .tracking-feature span {
+    color: var(--text);
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  
+  .page-home .transparency-note {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: rgba(59, 130, 246, 0.05);
+    border-radius: var(--radius-lg);
+    border-left: 4px solid var(--primary);
+  }
+  
+  .page-home .transparency-note p {
+    font-size: 1rem;
+    color: var(--text);
+    line-height: var(--line-height-relaxed);
+    margin: 0;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* ==========================================================================
+     FINAL CTA SECTION
+     ========================================================================== */
+  
+  .page-home .final-cta {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--white);
+    text-align: center;
+  }
+  
+  .page-home .final-cta-content {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .page-home .final-cta-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: var(--white);
+  }
+  
+  .page-home .final-cta-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 2.5rem;
+    opacity: 0.95;
+    line-height: var(--line-height-relaxed);
+  }
+  
+  .page-home .final-cta-actions {
+    margin-bottom: 2rem;
+  }
+  
+  .page-home .cta-disclaimer {
+    font-size: 0.875rem;
+    opacity: 0.8;
+    font-style: italic;
+    line-height: var(--line-height-relaxed);
+    margin: 0;
+  }
+
+  /* ==========================================================================
+     BUTTON STYLING (Page-Specific Enhancements)
+     ========================================================================== */
+  
+  .page-home .btn-primary {
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
+    border: none;
+    color: var(--white);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .page-home .btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-dark), #6d28d9);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    color: var(--white);
+    text-decoration: none;
+  }
+  
+  .page-home .btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+    border-radius: var(--radius-lg);
+  }
+  
+  .page-home .btn i {
+    font-size: 0.875em;
+  }
+
+  /* ==========================================================================
+     RESPONSIVE DESIGN
+     ========================================================================== */
+  
+  @media (max-width: 1024px) {
+    .page-home .hero-content {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      text-align: center;
+    }
+    
+    .page-home .hero-image {
+      order: -1;
+    }
+    
+    .page-home .hero-cta {
+      align-items: center;
+    }
+    
+    .page-home .cta-helper {
+      text-align: center;
+    }
+  }
+  
   @media (max-width: 768px) {
-    .page-home .transparency-section {
-      padding: 2rem 0;
+    .page-home .hero {
+      padding: 4rem 0;
+    }
+    
+    .page-home .hero-title {
+      font-size: 2.5rem;
+    }
+    
+    .page-home .hero-subtitle {
+      font-size: 1.125rem;
+    }
+    
+    .page-home .steps {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    .page-home .step {
+      padding: 1.5rem;
+    }
+    
+    .page-home .step-icon {
+      width: 3.5rem;
+      height: 3.5rem;
+      font-size: 1.125rem;
+      margin-bottom: 1rem;
+    }
+    
+    .page-home .pricing-grid {
+      margin-top: 2rem;
+    }
+    
+    .page-home .pricing-card {
+      max-width: none;
+      margin: 0 auto;
+    }
+    
+    .page-home .tracking-features {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin: 2rem 0;
     }
     
     .page-home .transparency-note {
-      font-size: 1rem;
+      margin-top: 2rem;
+      padding: 1.5rem;
+    }
+    
+    .page-home .final-cta {
+      padding: 4rem 0;
+    }
+    
+    .page-home .final-cta-title {
+      font-size: 2rem;
+    }
+    
+    .page-home .final-cta-subtitle {
+      font-size: 1.125rem;
+    }
+    
+    .page-home .mvp-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    .page-home .mvp-icon {
+      width: 3.5rem;
+      height: 3.5rem;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .page-home .hero-cta {
+      flex-direction: column;
+    }
+    
+    .page-home .hero-cta .btn {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .page-home .section-cta .btn {
+      min-width: 100%;
+      width: 100%;
+    }
+    
+    .page-home .mvp-card .btn {
+      width: 100%;
+    }
+    
+    .page-home .pricing-cta .btn {
+      width: 100%;
     }
   }
 
+  /* ==========================================================================
+     REDUCED MOTION SUPPORT
+     ========================================================================== */
+  
+  @media (prefers-reduced-motion: reduce) {
+    .page-home .hero-text,
+    .page-home .mvp-card {
+      animation: none;
+    }
+    
+    .page-home .step:hover,
+    .page-home .mvp-card:hover,
+    .page-home .pricing-card:hover {
+      transform: none;
+    }
+    
+    .page-home .mvp-card:hover .mvp-icon {
+      transform: none;
+    }
+    
+    .page-home .step-icon,
+    .page-home .pricing-card,
+    .page-home .mvp-icon {
+      transition: none;
+    }
+  }
 
   /* ==========================================================================
-   VALUE CARD ICON ENHANCEMENTS - Add to static/css/pages/home.css
-   ========================================================================== */
-
-.page-home .value-section .mvp-icon {
-  width: 4rem;
-  height: 4rem;
-  background: linear-gradient(135deg, var(--primary), #7c3aed);
-  color: var(--white);
-  border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  margin: 0 auto 1.5rem;
-  position: relative;
-  overflow: hidden;
-  transition: var(--transition);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
-}
-
-/* Hover effect for value card icons */
-.page-home .value-section .mvp-card:hover .mvp-icon {
-  transform: scale(1.1);
-  box-shadow: 0 12px 30px rgba(59, 130, 246, 0.3);
-}
-
-/* Subtle shine effect on icon hover */
-.page-home .value-section .mvp-icon::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-full);
-  transform: translate(-50%, -50%);
-  transition: all 0.3s ease;
-}
-
-.page-home .value-section .mvp-card:hover .mvp-icon::before {
-  width: 100%;
-  height: 100%;
-}
-
-/* Specific icon styling for better visual clarity */
-.page-home .value-section .mvp-icon i {
-  font-weight: 400; /* Regular weight for FontAwesome icons */
-  line-height: 1;
-}
-
-/* Icon color overrides for specific icons to ensure visibility */
-.page-home .value-section .mvp-icon .fa-search,
-.page-home .value-section .mvp-icon .fa-clock,
-.page-home .value-section .mvp-icon .fa-comments {
-  color: var(--white);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-/* Mobile responsive adjustments for icons */
-@media (max-width: 768px) {
-  .page-home .value-section .mvp-icon {
-    width: 3.5rem;
-    height: 3.5rem;
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
-  }
-}
-
-/* Reduced motion preferences */
-@media (prefers-reduced-motion: reduce) {
-  .page-home .value-section .mvp-card:hover .mvp-icon {
-    transform: none;
+     FOCUS STATES FOR ACCESSIBILITY
+     ========================================================================== */
+  
+  .page-home .btn:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
   }
   
-  .page-home .value-section .mvp-icon::before {
-    transition: none;
+  .page-home .btn-outline:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
   }
 }
-
 
 /* ==========================================================================
-   CTA CONSISTENCY STYLING
+   PERFORMANCE & LAYOUT STABILITY OPTIMIZATIONS
    ========================================================================== */
 
-/* Section-level CTA styling */
-.page-home .section-cta {
-  text-align: center;
-  margin-top: 4rem;
-  padding-top: 3rem;
-  border-top: 1px solid var(--border);
-}
-
-.page-home .section-cta .btn {
-  min-width: 280px;
-}
-
-/* Secondary CTA styling for fallback options */
-.page-home .section-cta-secondary {
-  text-align: center;
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 1px solid rgba(var(--border-rgb), 0.5);
-}
-
-.page-home .cta-helper-text {
-  color: var(--text-light);
-  font-size: 1rem;
-  margin-bottom: 1rem;
-  font-style: italic;
-}
-
-.page-home .section-cta-secondary .btn {
-  min-width: 300px;
-}
-
-/* Ensure consistent button styling across all CTAs */
-.page-home .btn-primary {
-  background: linear-gradient(135deg, var(--primary), #7c3aed);
-  border: none;
-  color: var(--white);
-  font-weight: 600;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  display: inline-flex;
+/* Prevent layout shift in hero image */
+.page-home .hero-image {
+  min-height: 400px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
 }
 
-.page-home .btn-primary:hover {
-  background: linear-gradient(135deg, var(--primary-dark), #6d28d9);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
-  color: var(--white);
-  text-decoration: none;
+.page-home .hero-image img {
+  max-height: 500px;
+  width: auto;
+  height: auto;
 }
 
-.page-home .btn-outline {
-  background: transparent;
-  border: 2px solid var(--primary);
-  color: var(--primary);
-  font-weight: 600;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.page-home .btn-outline:hover {
-  background: var(--primary);
-  color: var(--white);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
-  text-decoration: none;
-}
-
-.page-home .btn-large {
-  padding: 1rem 2rem;
-  font-size: 1.125rem;
-  border-radius: var(--radius-lg);
-}
-
-.page-home .btn {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  border-radius: var(--radius);
-  cursor: pointer;
-  text-align: center;
-  line-height: 1;
-  font-family: inherit;
-}
-
-/* CTA icon styling */
-.page-home .btn i {
-  font-size: 0.875em;
-}
-
-/* Mobile responsive adjustments */
+/* Reduce expensive effects on mobile */
 @media (max-width: 768px) {
-  .page-home .section-cta,
-  .page-home .section-cta-secondary {
-    margin-top: 2.5rem;
-    padding-top: 2rem;
+  .page-home .hero::before {
+    display: none; /* Remove gradient overlay on mobile */
   }
   
-  .page-home .section-cta .btn,
-  .page-home .section-cta-secondary .btn {
-    min-width: 100%;
-    width: 100%;
+  .page-home .mvp-icon,
+  .page-home .step-icon {
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15); /* Lighter shadow */
   }
   
-  .page-home .mvp-card .btn {
-    width: 100%;
-  }
-  
-  .page-home .pricing-cta .btn {
-    width: 100%;
+  .page-home .mvp-card:hover,
+  .page-home .step:hover,
+  .page-home .pricing-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Reduced hover shadows */
   }
 }
 
-/* Focus states for accessibility */
-.page-home .btn:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-.page-home .btn-outline:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-  }
-
-
- 
-  /* ==========================================================================
-   AUTHENTIC CONTENT STYLING 
+/* ==========================================================================
+   RESPONSIVE BREAKPOINT REFINEMENTS
    ========================================================================== */
 
-/* Tracking Section - Replace fake testimonials */
+/* 1280px - Large Desktop */
+@media (min-width: 1280px) {
+  .page-home .hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .page-home .steps {
+    max-width: 1000px;
+  }
+}
+
+/* 1024px - Tablet Landscape */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .page-home .hero-title {
+    font-size: clamp(2.5rem, 4vw, 3rem);
+  }
+  
+  .page-home .steps {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .page-home .mvp-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* 640px and below - Small Mobile */
+@media (max-width: 640px) {
+  .page-home .hero-title {
+    font-size: clamp(1.75rem, 6vw, 2.25rem);
+    word-break: break-word;
+    hyphens: auto;
+  }
+  
+  .page-home .final-cta-title {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    word-break: break-word;
+  }
+  
+  /* Ensure buttons don't overflow */
+  .page-home .btn {
+    word-break: break-word;
+    white-space: normal;
+    min-height: 3rem; /* Consistent tap target */
+  }
+}
+
+/* ==========================================================================
+   SPACING NORMALIZATION TO 8/12/16/24/32 SCALE
+   ========================================================================== */
+
+/* Update inconsistent spacing to use design tokens */
+.page-home .hero {
+  padding: var(--space-24) 0; /* 96px = 6rem */
+}
+
+.page-home .how-it-works {
+  padding: var(--space-16) 0; /* 64px = 4rem */
+}
+
+.page-home .pricing-section {
+  padding: var(--space-24) 0; /* 96px = 6rem */
+}
+
 .page-home .tracking-section {
-  padding: 4rem 0;
-  background: var(--light);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  padding: var(--space-16) 0; /* 64px = 4rem */
 }
 
-.page-home .tracking-content {
-  text-align: center;
-  max-width: 600px;
-  margin: 0 auto;
+.page-home .final-cta {
+  padding: var(--space-20) 0; /* 80px = 5rem */
 }
 
-.page-home .tracking-content h3 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--dark);
-  margin-bottom: 1rem;
+.page-home .step {
+  padding: var(--space-8); /* 32px = 2rem */
 }
 
-.page-home .tracking-content p {
-  font-size: 1.125rem;
-  color: var(--text);
-  line-height: 1.6;
-  margin-bottom: 2rem;
+.page-home .mvp-card {
+  padding: var(--space-8); /* 32px = 2rem */
 }
 
-.page-home .tracking-features {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-width: 400px;
-  margin: 0 auto;
+.page-home .pricing-card {
+  padding: var(--space-10) var(--space-8); /* 40px 32px = 2.5rem 2rem */
 }
 
-.page-home .tracking-feature {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+.page-home .transparency-note {
+  padding: var(--space-8); /* 32px = 2rem */
 }
 
-.page-home .tracking-feature i {
-  color: var(--primary);
-  font-size: 1.125rem;
-  flex-shrink: 0;
+.page-home .hero-content {
+  gap: var(--space-16); /* 64px = 4rem */
+}
+
+.page-home .steps {
+  gap: var(--space-8); /* 32px = 2rem */
+  margin-top: var(--space-12); /* 48px = 3rem */
+}
+
+.page-home .mvp-grid {
+  gap: var(--space-8); /* 32px = 2rem */
+  margin-top: var(--space-12); /* 48px = 3rem */
+}
+
+.page-home .section-cta {
+  margin-top: var(--space-16); /* 64px = 4rem */
+  padding-top: var(--space-12); /* 48px = 3rem */
+}
+
+/* ==========================================================================
+   TYPOGRAPHY SIZE NORMALIZATION
+   ========================================================================== */
+
+/* Use existing typography tokens instead of one-off sizes */
+.page-home .step h3 {
+  font-size: var(--font-size-xl); /* 1.25rem - existing token */
+}
+
+.page-home .step p {
+  font-size: var(--font-size-base); /* 1rem - existing token */
+}
+
+.page-home .pricing-features li {
+  font-size: var(--font-size-base); /* 1rem - existing token */
 }
 
 .page-home .tracking-feature span {
-  color: var(--text);
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: var(--font-size-base); /* 1rem - existing token */
 }
 
-/* Authentic CTA styling */
-.page-home .cta {
-  padding: 5rem 0;
-  background: linear-gradient(135deg, var(--primary), #1d4ed8);
-  color: var(--white);
-  text-align: center;
+.page-home .cta-helper {
+  font-size: var(--font-size-sm); /* 0.875rem - existing token */
 }
 
-.page-home .cta-content h2 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 1rem;
-  color: var(--white);
+.page-home .section-description {
+  font-size: var(--font-size-lg); /* 1.125rem - existing token */
 }
 
-.page-home .cta-content p {
-  font-size: 1.25rem;
-  margin-bottom: 2.5rem;
-  opacity: 0.95;
-  max-width: 600px;
+/* ==========================================================================
+   CONTAINER WIDTH CONSISTENCY
+   ========================================================================== */
+
+/* Prevent content from getting too wide on large screens */
+.page-home .hero-content,
+.page-home .steps,
+.page-home .mvp-grid {
+  max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
 }
 
-.page-home .cta-buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
-}
-
-/* Honest disclaimer styling */
-.page-home .cta-disclaimer {
-  font-size: 0.875rem;
-  opacity: 0.8;
-  font-style: italic;
+.page-home .pricing-grid {
   max-width: 500px;
-  margin: 0 auto;
-  line-height: 1.5;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* Remove fake stats styling */
-.page-home .stats-highlights.fake,
-.page-home .testimonials.fake,
-.page-home .trusted-by.fake,
-.page-home .resume-counter.fake {
-  display: none !important;
-}
+/* ==========================================================================
+   MOBILE TAP TARGET OPTIMIZATION
+   ========================================================================== */
 
-/* Mobile responsive adjustments */
 @media (max-width: 768px) {
-  .page-home .tracking-section {
-    padding: 3rem 0;
+  .page-home .btn {
+    min-height: 3rem; /* 48px minimum tap target */
+    padding: var(--space-3) var(--space-6); /* 12px 24px */
   }
   
-  .page-home .tracking-content h3 {
-    font-size: 1.5rem;
+  .page-home .btn-large {
+    min-height: 3.5rem; /* 56px for primary CTAs */
+    padding: var(--space-4) var(--space-8); /* 16px 32px */
   }
   
-  .page-home .tracking-content p {
-    font-size: 1rem;
+  /* Increase spacing between stacked elements */
+  .page-home .mvp-grid {
+    gap: var(--space-6); /* 24px on mobile */
   }
   
-  .page-home .tracking-features {
-    max-width: 100%;
+  .page-home .steps {
+    gap: var(--space-6); /* 24px on mobile */
+  }
+}
+
+/* ==========================================================================
+   REDUCE MOTION PERFORMANCE
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .page-home * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================================================
+   FOCUS VISIBILITY - WCAG AA COMPLIANT
+   ========================================================================== */
+
+/* Enhanced focus states for all interactive elements */
+.page-home .btn:focus-visible,
+.page-home .btn-primary:focus-visible,
+.page-home .btn-outline:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 1px var(--white), 0 0 0 4px var(--primary);
+}
+
+.page-home .btn-outline:focus-visible {
+  outline-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--white), 0 0 0 4px var(--primary);
+}
+
+/* Focus states for interactive cards */
+.page-home .mvp-card:focus-within,
+.page-home .step:focus-within,
+.page-home .pricing-card:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Focus for card buttons specifically */
+.page-home .mvp-card .btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  box-shadow: none; /* Prevent double outline in card context */
+}
+
+/* ==========================================================================
+   CONTRAST IMPROVEMENTS FOR WCAG AA
+   ========================================================================== */
+
+/* Improve contrast for secondary text elements */
+.page-home .cta-helper {
+  color: var(--text); /* Changed from var(--text-light) for better contrast */
+  opacity: 0.8; /* Subtle dimming while maintaining AA contrast */
+}
+
+.page-home .section-description {
+  color: var(--text); /* Changed from var(--text-light) for better contrast */
+  opacity: 0.85; /* Subtle dimming while maintaining AA contrast */
+}
+
+.page-home .step p {
+  color: var(--text); /* Changed from var(--text-light) for better contrast */
+  opacity: 0.8; /* Subtle dimming while maintaining AA contrast */
+}
+
+.page-home .mvp-card p {
+  color: var(--text); /* Changed from var(--text-light) for better contrast */
+  opacity: 0.85; /* Subtle dimming while maintaining AA contrast */
+}
+
+.page-home .pricing-features li {
+  color: var(--text-dark); /* Ensure strong contrast for pricing features */
+}
+
+.page-home .tracking-feature span {
+  color: var(--text-dark); /* Ensure strong contrast for feature text */
+}
+
+.page-home .transparency-note p {
+  color: var(--text-dark); /* Ensure strong contrast in note section */
+}
+
+.page-home .hero-subtitle {
+  color: var(--text); /* Changed from var(--text-light) for better contrast */
+  opacity: 0.9; /* Subtle dimming while maintaining AA contrast */
+}
+
+.page-home .pricing-amount .currency,
+.page-home .pricing-amount .period {
+  color: var(--text); /* Improved contrast from var(--text-light) */
+  opacity: 0.85;
+}
+
+/* ==========================================================================
+   REDUCED MOTION ENHANCEMENTS
+   ========================================================================== */
+
+/* Comprehensive reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .page-home * {
+    animation: none !important;
+    transition: none !important;
   }
   
-  .page-home .cta {
-    padding: 4rem 0;
+  /* Keep essential focus transitions only */
+  .page-home .btn:focus-visible,
+  .page-home .btn-primary:focus-visible,
+  .page-home .btn-outline:focus-visible {
+    transition: outline-color 0.1s ease;
   }
   
-  .page-home .cta-content h2 {
-    font-size: 2rem;
+  /* Remove all hover transforms */
+  .page-home .step:hover,
+  .page-home .mvp-card:hover,
+  .page-home .pricing-card:hover,
+  .page-home .btn-primary:hover,
+  .page-home .btn-outline:hover {
+    transform: none !important;
   }
   
-  .page-home .cta-content p {
-    font-size: 1.125rem;
+  /* Keep shadows static */
+  .page-home .step:hover,
+  .page-home .mvp-card:hover,
+  .page-home .pricing-card:hover {
+    box-shadow: inherit;
   }
   
-  .page-home .cta-buttons {
-    flex-direction: column;
-    align-items: center;
+  /* Remove icon scaling effects */
+  .page-home .mvp-card:hover .mvp-icon {
+    transform: none !important;
+    box-shadow: inherit;
+  }
+}
+
+/* ==========================================================================
+   MOBILE TAP TARGET COMPLIANCE (44x44px minimum)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* Ensure all buttons meet 44px minimum */
+  .page-home .btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: var(--space-3) var(--space-6); /* 12px 24px */
   }
   
-  .page-home .cta-buttons .btn {
-    min-width: 250px;
+  .page-home .btn-large {
+    min-height: 48px; /* Generous tap target for primary CTAs */
+    padding: var(--space-4) var(--space-8); /* 16px 32px */
   }
+  
+  /* Ensure card buttons have adequate targets */
+  .page-home .mvp-card .btn,
+  .page-home .pricing-card .btn {
+    min-height: 44px;
+    width: 100%;
+    margin-top: var(--space-4); /* Add space above button */
+  }
+}
+
+/* ==========================================================================
+   KEYBOARD NAVIGATION ENHANCEMENTS
+   ========================================================================== */
+
+/* Ensure cards are focusable and navigable */
+.page-home .mvp-card,
+.page-home .step,
+.page-home .pricing-card {
+  position: relative;
+}
+
+/* Skip to main content support */
+.page-home .hero {
+  scroll-margin-top: 2rem; /* Account for sticky headers */
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .page-home .btn-primary {
+    border: 2px solid var(--primary);
+  }
+  
+  .page-home .btn-outline {
+    border-width: 3px; /* Thicker border for high contrast */
+  }
+  
+  .page-home .mvp-icon,
+  .page-home .step-icon {
+    border: 2px solid var(--white); /* Icon definition in high contrast */
+  }
+  
+  .page-home .hero-title span {
+    color: var(--primary); /* Fallback for gradient text in high contrast */
+    background: none;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: unset;
+  }
+}
+
+/* ==========================================================================
+   MOTION SENSITIVITY REFINEMENTS
+   ========================================================================== */
+
+/* Gentle motion for users who don't prefer reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  .page-home .btn {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, outline-color 0.1s ease;
+  }
+  
+  .page-home .mvp-card,
+  .page-home .step,
+  .page-home .pricing-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  
+  .page-home .mvp-icon,
+  .page-home .step-icon {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+}
+
+/* ==========================================================================
+   SCREEN READER OPTIMIZATIONS
+   ========================================================================== */
+
+/* Ensure decorative elements don't interfere with screen readers */
+.page-home .hero::before,
+.page-home .mvp-icon::before {
+  speak: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Better focus management for screen readers */
+.page-home .section-header {
+  scroll-margin-top: 1rem;
 }
