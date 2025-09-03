@@ -22,7 +22,7 @@ def home():
 @root_bp.route('/dashboard')
 @login_required
 def dashboard():
-   pass
+   return render_template('dashboard.html')
 
 
 @root_bp.route('/optimize', methods=['GET'])

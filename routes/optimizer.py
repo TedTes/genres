@@ -26,19 +26,24 @@ from datetime import datetime
 
 
 
-optimizer_bp = Blueprint('optimizer_bp', __name__)
+optimizer_bp = Blueprint('optimizer', __name__)
 
 # Resume AI enhancement endpoints
-
-
 """
 Resume LLM optimization routes.
 Handles AI-powered resume optimization API endpoints.
 """
 
+
+@optimizer_bp.route('/optimize', methods=['GET'])
+@login_required
+def optimize_page():
+    return render_template('optimize.html')
+
+    
 # Update the optimize_resume endpoint decorator
 @optimizer_bp.route('/optimize', methods=['POST'])
-# @login_required  # Temporarily commented for MVP testing
+@login_required 
 def optimize_resume():
     """
     Main resume optimization endpoint.
@@ -53,17 +58,10 @@ def optimize_resume():
     Returns:
         OptimizationResult with optimized resume and analytics
     """
-    
-    start_time = time.time()
 
     try:
         # Authentication temporarily disabled for MVP testing
-        # if not current_user.is_authenticated:
-        #     return jsonify({'error': 'Authentication required'}), 401
-        # user_id = current_user.id
-        
-        # Use temporary user ID for MVP testing
-        user_id = 999999
+        user_id = current_user.id
         
         # Validate request
        
@@ -172,7 +170,6 @@ def optimize_resume():
             'error': 'Request processing failed',
             'details': str(e)  # Show details for debugging
         }), 500
-
 
 
 def _run_optimization_pipeline(

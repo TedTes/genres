@@ -9,6 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from datetime import datetime
 from flask_mail import Mail, Message
+from db import db
 auth_bp = Blueprint("auth", __name__)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
@@ -158,7 +159,7 @@ def register():
 
             # Create verification URL
             verification_url = url_for(
-                'verify_email',
+                'auth.verify_email',
                 token=token,
                 _external=True
             )
@@ -166,7 +167,7 @@ def register():
             msg = Message(
                 subject='Verify Your ResumeMatch Account',
                 recipients=[new_user.email],
-                html=render_template('email/verify_email.html', verification_url=verification_url, user=new_user),
+                html=render_template('verify_email.html', verification_url=verification_url, user=new_user),
                 sender=current_app.config.get('MAIL_DEFAULT_SENDER', 'noreply@resumematch.com')
             )
             mail.send(msg)
@@ -217,7 +218,7 @@ def process_resend_verification():
     msg = Message(
         subject='Verify Your ResumeMatch Account',
         recipients=[user.email],
-        html=render_template('email/verify_email.html', verification_url=verification_url, user=user),
+        html=render_template('verify_email.html', verification_url=verification_url, user=user),
         sender=current_app.config.get('MAIL_DEFAULT_SENDER', 'noreply@resumematch.com')
     )
     mail.send(msg)

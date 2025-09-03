@@ -19,12 +19,12 @@
                         AI-powered resume optimization that beats ATS filters while preserving your authentic timeline and experience.
                     </p>
                     
-                    <!-- Primary CTA: Upload Resume → /optimize -->
+                    <!-- Primary CTA -->
                     <div class="hero-cta">
-                        <a href="{{url_for('optimizer_bp.optimize_resume')}}" class="btn btn-primary btn-large">
-                            <i class="fas fa-upload" aria-hidden="true"></i> Optimize My Resume
+                        <a href="{{ url_for('optimizer.optimize_page') }}" class="btn btn-primary btn-large">
+                            <i class="fas fa-upload" aria-hidden="true"></i> Start Free Preview
                         </a>
-                        <p class="cta-helper">Free preview — no card required</p>
+                        <p class="cta-helper">Login required — no card needed</p>
                     </div>
                 </div>
                 
@@ -39,7 +39,7 @@
     </section>
 
     <!-- What It Does Section -->
-    <section class="value-section section-xl">
+    <section id="what-we-optimize" class="value-section section-xl">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">What We Optimize</h2>
@@ -54,7 +54,7 @@
                     </div>
                     <h3>Match to the Job</h3>
                     <p>Surface the critical keywords and skills that recruiters and ATS systems are actively searching for in your target role.</p>
-                    <a href="{{url_for('optimizer_bp.optimize_resume')}}" class="btn btn-primary">Start Optimization</a>
+                    <a href="#how-it-works" class="link-learn">Learn more</a>
                 </div>
                 
                 <!-- Value Card 2: ATS-Proof Formatting -->
@@ -64,7 +64,7 @@
                     </div>
                     <h3>ATS-Proof Formatting</h3>
                     <p>Fix formatting and timeline presentation issues that screening software often misreads—ensuring your qualifications are properly parsed.</p>
-                    <a href="{{url_for('optimizer_bp.optimize_resume')}}" class="btn btn-primary">Fix Formatting Issues</a>
+                    <a href="#how-it-works" class="link-learn">Learn more</a>
                 </div>
                 
                 <!-- Value Card 3: Clear Reasons for Every Edit -->
@@ -74,14 +74,14 @@
                     </div>
                     <h3>Clear Reasons for Every Edit</h3>
                     <p>Every suggestion comes with a transparent explanation—whether for clarity, relevance, or ATS parsing—keeping you in control of your narrative.</p>
-                    <a href="{{url_for('optimizer_bp.optimize_resume')}}" class="btn btn-primary">See Sample Explanations</a>
+                    <a href="#how-it-works" class="link-learn">Learn more</a>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- How It Works Section -->
-    <section class="how-it-works section-md">
+    <section id="how-it-works" class="how-it-works section-md">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">How It Works</h2>
@@ -112,13 +112,11 @@
                     <p>Download optimized resume with explanations</p>
                 </div>
             </div>
-            
-            <!-- Section CTA -->
-            <div class="section-cta">
-                <a href="{{url_for('optimizer_bp.optimize_resume')}}" class="btn btn-primary btn-large">
-                    <i class="fas fa-rocket" aria-hidden="true"></i> Start Free Preview
-                </a>
-            </div>
+
+            <!-- Keep action available but not dominant -->
+            <p class="inline-cta">
+                Ready? <a href="{{ url_for('optimizer.optimize_page') }}" class="link-inline">Start your free preview</a>
+            </p>
         </div>
     </section>
 
@@ -149,9 +147,10 @@
                         </ul>
                     </div>
                     <div class="pricing-cta">
-                        <a href="/checkout?plan=single" class="btn btn-primary btn-large">
-                            Optimize for $5
+                        <a href="/checkout?plan=single" class="btn btn-secondary btn-large">
+                            Continue
                         </a>
+                        <p class="cta-note">You can upgrade after your free preview.</p>
                     </div>
                 </div>
             </div>
@@ -196,7 +195,7 @@
                 <h2 class="final-cta-title">Ready to Beat the Resume Filters?</h2>
                 <p class="final-cta-subtitle">Upload your resume and see how AI optimization can improve your ATS success rate</p>
                 <div class="final-cta-actions">
-                    <a href="{{url_for('optimizer_bp.optimize_resume')}}" class="btn btn-primary btn-large">
+                    <a href="{{ url_for('optimizer.optimize_page') }}" class="btn btn-primary btn-large">
                         <i class="fas fa-upload" aria-hidden="true"></i> Start Free Preview
                     </a>
                 </div>

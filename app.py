@@ -12,14 +12,11 @@ import spacy
 from datetime import datetime
 from supabase import create_client, Client
 from db import db
-from models import  User,Resume
+from models import  User
 from flask_wtf.csrf import CSRFProtect, CSRFError
 
-from helpers.resume_helper import generate_resume
 from config.config import Config
 
-import services
-import providers
 
 os.environ['DYLD_LIBRARY_PATH'] = '/opt/homebrew/lib:' + os.environ.get('DYLD_LIBRARY_PATH', '')
 
@@ -34,7 +31,12 @@ app.config.from_object(Config)
 def before_request():
     g.app = app
 
-
+@app.context_processor
+def inject_current_year():
+    """Inject current year into all templates"""
+    return {
+        'current_year': datetime.now().year
+    }
 # Register all routes
 from routes import register_routes 
 register_routes(app)
