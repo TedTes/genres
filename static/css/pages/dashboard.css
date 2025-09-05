@@ -1,0 +1,1013 @@
+/* 
+==============================================================================
+DASHBOARD PAGE STYLES - Side-by-Side A4 Document Interface
+==============================================================================
+*/
+
+@layer pages {
+
+  /* ==========================================================================
+     DASHBOARD PAGE LAYOUT
+     ========================================================================== */
+  
+  .page-dashboard {
+    background: var(--background-light);
+    min-height: calc(100vh - 70px);
+  }
+  
+  .optimization-widget {
+    padding: var(--space-8) 0;
+  }
+  
+  .widget-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-4);
+  }
+  
+  /* ==========================================================================
+     UPLOAD INTERFACE CONTAINER
+     ========================================================================== */
+  
+  .upload-interface {
+    background: var(--white);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-10);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-light);
+  }
+  
+  .interface-header {
+    text-align: center;
+    margin-bottom: var(--space-10);
+  }
+  
+  .interface-header h2 {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-dark);
+    margin: 0 0 var(--space-3) 0;
+  }
+  
+  .interface-header p {
+    font-size: var(--font-size-lg);
+    color: var(--text-light);
+    margin: 0;
+    line-height: var(--line-height-relaxed);
+  }
+  
+  /* ==========================================================================
+     SIDE-BY-SIDE DOCUMENTS CONTAINER
+     ========================================================================== */
+  
+  .documents-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: var(--space-8);
+    margin-bottom: var(--space-8);
+    align-items: start;
+  }
+  
+  /* ==========================================================================
+     DOCUMENT SECTIONS
+     ========================================================================== */
+  
+  .document-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+  }
+  
+  .section-header h3 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-dark);
+    margin: 0;
+  }
+  
+  .section-status {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    padding: var(--space-1) var(--space-3);
+    background: var(--light);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-light);
+  }
+  
+  .section-status.completed {
+    color: var(--success);
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--success);
+  }
+  
+  /* ==========================================================================
+     A4 RESUME DOCUMENT (LEFT SIDE)
+     ========================================================================== */
+  
+  .document-area {
+    position: relative;
+  }
+  
+  .a4-document {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .a4-document:hover {
+    transform: translateY(-3px);
+  }
+  
+  .a4-paper {
+    width: 280px;
+    height: 396px; /* A4 ratio */
+    background: var(--white);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .a4-document:hover .a4-paper {
+    border-color: var(--primary);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+  }
+  
+  .document-shadow {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 280px;
+    height: 396px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: var(--radius-lg);
+    z-index: -1;
+    transition: all 0.3s ease;
+  }
+  
+  .a4-document:hover .document-shadow {
+    transform: translate(-3px, -3px);
+    background: rgba(59, 130, 246, 0.15);
+  }
+  
+  /* Paper Content */
+  .paper-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-6);
+    height: 100%;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .upload-icon {
+    width: 80px;
+    height: 80px;
+    border: 3px dashed var(--primary);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-6);
+    transition: all 0.3s ease;
+  }
+  
+  .upload-icon i {
+    font-size: var(--font-size-3xl);
+    color: var(--primary);
+    transition: all 0.3s ease;
+  }
+  
+  .a4-document:hover .upload-icon {
+    border-color: var(--primary-dark);
+    background: rgba(59, 130, 246, 0.05);
+    transform: rotate(45deg);
+  }
+  
+  .a4-document:hover .upload-icon i {
+    color: var(--primary-dark);
+    transform: rotate(-45deg);
+  }
+  
+  .upload-text h4 {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-dark);
+    margin: 0 0 var(--space-2) 0;
+  }
+  
+  .upload-text p {
+    font-size: var(--font-size-base);
+    color: var(--text-light);
+    margin: 0 0 var(--space-4) 0;
+  }
+  
+  .file-types {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+  
+  .type {
+    background: var(--light);
+    color: var(--text);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    border: 1px solid var(--border-light);
+  }
+  
+  .size-info {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    font-weight: var(--font-weight-medium);
+  }
+  
+  /* Paper Texture */
+  .paper-texture {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(59, 130, 246, 0.02) 20%,
+      transparent 21%,
+      transparent 40%,
+      rgba(59, 130, 246, 0.02) 41%,
+      transparent 42%,
+      transparent 60%,
+      rgba(59, 130, 246, 0.02) 61%,
+      transparent 62%,
+      transparent 80%,
+      rgba(59, 130, 246, 0.02) 81%,
+      transparent 82%
+    );
+    z-index: 1;
+  }
+  
+  /* ==========================================================================
+     UPLOADED STATE (RESUME)
+     ========================================================================== */
+  
+  .a4-document.uploaded {
+    cursor: default;
+  }
+  
+  .paper-content.uploaded {
+    padding: var(--space-4);
+  }
+  
+  .file-icon {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-4);
+    color: var(--white);
+    font-size: var(--font-size-2xl);
+  }
+  
+  .file-type-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: var(--success);
+    color: var(--white);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius);
+    text-transform: uppercase;
+  }
+  
+  .file-details {
+    text-align: center;
+    width: 100%;
+  }
+  
+  .file-name {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-dark);
+    margin-bottom: var(--space-1);
+    word-break: break-word;
+  }
+  
+  .file-size {
+    font-size: var(--font-size-sm);
+    color: var(--text-light);
+    margin-bottom: var(--space-3);
+  }
+  
+  .upload-status {
+    font-size: var(--font-size-sm);
+    color: var(--success);
+    font-weight: var(--font-weight-medium);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+  }
+  
+  .remove-btn {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    width: 32px;
+    height: 32px;
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    border: none;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .remove-btn:hover {
+    background: var(--danger);
+    color: var(--white);
+    transform: scale(1.1);
+  }
+  
+  /* ==========================================================================
+     JOB DESCRIPTION DOCUMENT (RIGHT SIDE) - REDUCED HEIGHT
+     ========================================================================== */
+  
+  .job-document {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .job-paper {
+    position: relative;
+    width: 100%;
+    height: 400px; /* Reduced from 500px */
+    background: var(--white);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .job-paper:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+  
+  .job-textarea {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    padding: var(--space-6);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    background: transparent;
+    color: var(--text-dark);
+    z-index: 2;
+    position: relative;
+  }
+  
+  .job-textarea::placeholder {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+  
+  .textarea-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(249, 250, 251, 0.8);
+    backdrop-filter: blur(2px);
+    transition: all 0.3s ease;
+    z-index: 3;
+    pointer-events: none;
+  }
+  
+  .job-textarea:focus + .textarea-overlay,
+  .job-textarea:not(:placeholder-shown) + .textarea-overlay {
+    opacity: 0;
+    visibility: hidden;
+  }
+  
+  .overlay-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--text-light);
+  }
+  
+  .overlay-content i {
+    font-size: var(--font-size-3xl);
+    color: var(--primary);
+  }
+  
+  .overlay-content span {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+  }
+  
+  /* ==========================================================================
+     UPLOAD ALTERNATIVE
+     ========================================================================== */
+  
+  .upload-alternative {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+  
+  .alternative-divider {
+    position: relative;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .alternative-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border);
+  }
+  
+  .alternative-divider span {
+    background: var(--white);
+    padding: 0 var(--space-4);
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    position: relative;
+    z-index: 1;
+  }
+  
+  .file-upload-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    background: var(--light);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .file-upload-btn:hover {
+    background: var(--primary);
+    color: var(--white);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+  }
+  
+  /* ==========================================================================
+     ACTION BAR - ENHANCED
+     ========================================================================== */
+  
+  .action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-8);
+    background: linear-gradient(135deg, var(--light) 0%, rgba(59, 130, 246, 0.05) 100%);
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .validation-status {
+    display: flex;
+    gap: var(--space-6);
+  }
+  
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+  }
+  
+  .status-item i {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+  }
+  
+  .status-item.valid i {
+    color: var(--success);
+  }
+  
+  .status-item span {
+    color: var(--text-light);
+  }
+  
+  .status-item.valid span {
+    color: var(--text-dark);
+  }
+  
+  /* ==========================================================================
+     OPTIMIZE BUTTON - ENHANCED AND PROMINENT
+     ========================================================================== */
+  
+  .optimize-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-5) var(--space-10);
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-xl);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    min-width: 250px;
+    min-height: 64px;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  }
+  
+  .optimize-btn:disabled {
+    background: var(--border);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .optimize-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  }
+  
+  .btn-content {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  
+  .btn-loader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid var(--white);
+    border-radius: var(--radius-full);
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* ==========================================================================
+     PROGRESS SECTION - NEW
+     ========================================================================== */
+  
+  .progress-section {
+    margin-top: var(--space-8);
+    padding: var(--space-8);
+    background: linear-gradient(135deg, var(--light) 0%, rgba(59, 130, 246, 0.05) 100%);
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--border-light);
+    animation: slideInUp 0.5s ease-out;
+  }
+  
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .progress-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+  }
+  
+  .progress-header h3 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-dark);
+    margin: 0 0 var(--space-2) 0;
+  }
+  
+  .progress-header p {
+    font-size: var(--font-size-base);
+    color: var(--text-light);
+    margin: 0;
+  }
+  
+  .progress-steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-8);
+    position: relative;
+  }
+  
+  .progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: var(--border);
+    z-index: 1;
+  }
+  
+  .progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    position: relative;
+    z-index: 2;
+    opacity: 0.4;
+    transition: all 0.3s ease;
+  }
+  
+  .progress-step.active {
+    opacity: 1;
+  }
+  
+  .progress-step.completed {
+    opacity: 1;
+  }
+  
+  .step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--white);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .progress-step.active .step-circle {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--white);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  
+  .progress-step.completed .step-circle {
+    background: var(--success);
+    border-color: var(--success);
+    color: var(--white);
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+    }
+  }
+  
+  .step-circle i {
+    font-size: var(--font-size-base);
+    color: var(--text-muted);
+  }
+  
+  .progress-step.active .step-circle i,
+  .progress-step.completed .step-circle i {
+    color: var(--white);
+  }
+  
+  .step-text {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-muted);
+    text-align: center;
+    white-space: nowrap;
+  }
+  
+  .progress-step.active .step-text {
+    color: var(--primary);
+    font-weight: var(--font-weight-semibold);
+  }
+  
+  .progress-step.completed .step-text {
+    color: var(--success);
+    font-weight: var(--font-weight-semibold);
+  }
+  
+  .progress-bar-outer {
+    width: 100%;
+    height: 8px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-bottom: var(--space-4);
+  }
+  
+  .progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    border-radius: var(--radius-full);
+    width: 0%;
+    transition: width 0.5s ease;
+    position: relative;
+  }
+  
+  .progress-bar-inner::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s ease-in-out infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  
+  .progress-message {
+    text-align: center;
+  }
+  
+  .progress-message span {
+    font-size: var(--font-size-base);
+    color: var(--primary);
+    font-weight: var(--font-weight-medium);
+  }
+  
+  /* ==========================================================================
+     RESPONSIVE DESIGN - UPDATED
+     ========================================================================== */
+  
+  @media (max-width: 1024px) {
+    .documents-container {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+    
+    .a4-paper {
+      width: 250px;
+      height: 354px;
+      margin: 0 auto;
+    }
+    
+    .document-shadow {
+      width: 250px;
+      height: 354px;
+    }
+    
+    .job-paper {
+      height: 350px;
+    }
+    
+    .action-bar {
+      flex-direction: column;
+      gap: var(--space-4);
+      text-align: center;
+    }
+    
+    .progress-steps {
+      flex-wrap: wrap;
+      gap: var(--space-6);
+      justify-content: center;
+    }
+    
+    .progress-steps::before {
+      display: none;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .upload-interface {
+      padding: var(--space-6);
+    }
+    
+    .interface-header h2 {
+      font-size: var(--font-size-2xl);
+    }
+    
+    .a4-paper {
+      width: 220px;
+      height: 311px;
+    }
+    
+    .document-shadow {
+      width: 220px;
+      height: 311px;
+    }
+    
+    .upload-icon {
+      width: 60px;
+      height: 60px;
+    }
+    
+    .upload-icon i {
+      font-size: var(--font-size-2xl);
+    }
+    
+    .job-paper {
+      height: 300px;
+    }
+    
+    .job-textarea {
+      padding: var(--space-4);
+      font-size: var(--font-size-sm);
+    }
+    
+    .validation-status {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    
+    .optimize-btn {
+      font-size: var(--font-size-lg);
+      min-width: 200px;
+      min-height: 56px;
+    }
+    
+    .progress-section {
+      padding: var(--space-6);
+    }
+    
+    .step-text {
+      font-size: var(--font-size-xs);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .widget-container {
+      padding: 0 var(--space-2);
+    }
+    
+    .upload-interface {
+      padding: var(--space-4);
+    }
+    
+    .a4-paper {
+      width: 180px;
+      height: 255px;
+    }
+    
+    .document-shadow {
+      width: 180px;
+      height: 255px;
+    }
+    
+    .paper-content {
+      padding: var(--space-4);
+    }
+    
+    .upload-icon {
+      width: 50px;
+      height: 50px;
+    }
+    
+    .upload-icon i {
+      font-size: var(--font-size-xl);
+    }
+    
+    .job-paper {
+      height: 250px;
+    }
+    
+    .optimize-btn {
+      width: 100%;
+      min-width: auto;
+      font-size: var(--font-size-base);
+    }
+    
+    .progress-steps {
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    
+    .step-text {
+      display: none;
+    }
+  }
+  
+  /* ==========================================================================
+     ACCESSIBILITY & REDUCED MOTION
+     ========================================================================== */
+  
+  @media (prefers-reduced-motion: reduce) {
+    .a4-document,
+    .document-shadow,
+    .a4-paper,
+    .job-paper,
+    .upload-icon,
+    .file-upload-btn,
+    .optimize-btn,
+    .remove-btn,
+    .textarea-overlay,
+    .progress-section,
+    .progress-step,
+    .step-circle {
+      transition: none;
+    }
+    
+    .a4-document:hover,
+    .optimize-btn:hover:not(:disabled),
+    .file-upload-btn:hover,
+    .remove-btn:hover {
+      transform: none;
+    }
+    
+    .spinner,
+    .progress-step.active .step-circle {
+      animation: none;
+    }
+    
+    .progress-bar-inner::after {
+      animation: none;
+    }
+  }
+  
+  /* ==========================================================================
+     HIGH CONTRAST MODE SUPPORT
+     ========================================================================== */
+  
+  @media (prefers-contrast: high) {
+    .a4-paper,
+    .job-paper {
+      border-width: 3px;
+    }
+    
+    .upload-interface {
+      border-width: 2px;
+    }
+    
+    .action-bar,
+    .progress-section {
+      border-width: 2px;
+    }
+    
+    .step-circle {
+      border-width: 3px;
+    }
+  }
+  
+  } /* End @layer pages */

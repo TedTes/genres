@@ -1,0 +1,198 @@
+{% extends "partials/base.html" %}
+{% block title %}Dashboard - AI Resume Coach{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block body_class %}dashboard{% endblock %}
+
+{% block content %}
+<section class="optimization-widget">
+    <div class="container">
+        <div class="widget-container">
+            <!-- Main Upload Interface -->
+            <div class="upload-interface">
+              
+                <!-- Side-by-Side Documents -->
+                <div class="documents-container">
+                    <!-- Resume Document (Left) -->
+                    <div class="document-section resume-section">
+                        <div class="section-header">
+                            <h3>Your Resume</h3>
+                            <span class="section-status" id="resumeStatus">Required</span>
+                        </div>
+                        
+                        <div class="document-area">
+                            <!-- Upload State -->
+                            <div class="a4-document resume-doc" id="resumeUpload" onclick="document.getElementById('resumeFile').click()">
+                                <div class="a4-paper">
+                                    <div class="paper-content">
+                                        <div class="upload-icon">
+                                            <i class="fas fa-plus"></i>
+                                        </div>
+                                        <div class="upload-text">
+                                            <h4>Drop resume here</h4>
+                                            <p>or click to browse</p>
+                                        </div>
+                                        <div class="file-types">
+                                            <span class="type">PDF</span>
+                                            <span class="type">DOCX</span>
+                                            <span class="type">TXT</span>
+                                        </div>
+                                        <div class="size-info">Max 5MB</div>
+                                    </div>
+                                    <div class="paper-texture"></div>
+                                </div>
+                                <div class="document-shadow"></div>
+                            </div>
+                            
+                            <!-- Uploaded State -->
+                            <div class="a4-document resume-doc uploaded" id="resumeUploaded" style="display: none;">
+                                <div class="a4-paper">
+                                    <div class="paper-content uploaded">
+                                        <div class="file-icon">
+                                            <i class="fas fa-file-alt"></i>
+                                            <span class="file-type-badge">PDF</span>
+                                        </div>
+                                        <div class="file-details">
+                                            <div class="file-name"></div>
+                                            <div class="file-size"></div>
+                                            <div class="upload-status">
+                                                <i class="fas fa-check-circle"></i>
+                                                Ready to analyze
+                                            </div>
+                                        </div>
+                                        <button class="remove-btn" onclick="removeFile('resume')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="document-shadow"></div>
+                            </div>
+                            
+                            <input type="file" id="resumeFile" accept=".pdf,.docx,.txt" hidden>
+                        </div>
+                    </div>
+
+                    <!-- Job Description Document (Right) -->
+                    <div class="document-section job-section">
+                        <div class="section-header">
+                            <h3>Job Description</h3>
+                            <span class="section-status" id="jobStatus">Required</span>
+                        </div>
+                        
+                        <div class="document-area">
+                            <!-- Text Input State -->
+                            <div class="job-document text-mode" id="jobTextMode">
+                                <div class="job-paper">
+                                    <textarea 
+                                        class="job-textarea" 
+                                        id="jobText" 
+                                        placeholder="Paste the job description here..."
+                                        rows="24"
+                                    ></textarea>
+                                    <div class="textarea-overlay">
+                                        <div class="overlay-content">
+                                            <i class="fas fa-edit"></i>
+                                            <span>Click to add job description</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="document-shadow"></div>
+                            </div>
+                            
+                            <!-- Alternative: File Upload -->
+                            <div class="upload-alternative">
+                                <div class="alternative-divider">
+                                    <span>or</span>
+                                </div>
+                                <button class="file-upload-btn" onclick="document.getElementById('jobFile').click()">
+                                    <i class="fas fa-upload"></i>
+                                    Upload file instead
+                                </button>
+                                <input type="file" id="jobFile" accept=".pdf,.docx,.txt" hidden>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="action-bar">
+                    <div class="validation-status">
+                        <div class="status-item" id="resumeValidation">
+                            <i class="fas fa-circle"></i>
+                            <span>Resume pending</span>
+                        </div>
+                        <div class="status-item" id="jobValidation">
+                            <i class="fas fa-circle"></i>
+                            <span>Job description pending</span>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="optimize-btn" id="optimizeBtn" disabled>
+                        <span class="btn-content">
+                            <i class="fas fa-magic"></i>
+                            <span>Optimize Resume</span>
+                        </span>
+                        <div class="btn-loader" style="display: none;">
+                            <div class="spinner"></div>
+                            <span>Analyzing...</span>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Progress Section -->
+                <div class="progress-section" id="progressSection" style="display: none;">
+                    <div class="progress-header">
+                        <h3>Processing your optimization...</h3>
+                        <p>This usually takes 30-60 seconds</p>
+                    </div>
+                    
+                    <div class="progress-steps">
+                        <div class="progress-step active" id="step1">
+                            <div class="step-circle">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <span class="step-text">Uploading files</span>
+                        </div>
+                        
+                        <div class="progress-step" id="step2">
+                            <div class="step-circle">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <span class="step-text">Analyzing content</span>
+                        </div>
+                        
+                        <div class="progress-step" id="step3">
+                            <div class="step-circle">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <span class="step-text">AI optimization</span>
+                        </div>
+                        
+                        <div class="progress-step" id="step4">
+                            <div class="step-circle">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span class="step-text">Generating results</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-bar-outer">
+                        <div class="progress-bar-inner" id="progressBar"></div>
+                    </div>
+                    
+                    <div class="progress-message" id="progressMessage">
+                        <span>Starting analysis...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}
