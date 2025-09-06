@@ -356,7 +356,7 @@
     function bindOptimizeButton(root) {
         const optimizeBtn = elements.optimizeBtn;
         if (!optimizeBtn) return;
-
+    
         optimizeBtn.addEventListener('click', (e) => {
             e.preventDefault();
             
@@ -371,20 +371,43 @@
                 announce(`Cannot proceed: ${validation.reasons.join(' ')}`);
                 return;
             }
-
-            const endpoint = root.querySelector('.upload-interface')?.dataset?.endpoint || 
-                           root.querySelector('[data-endpoint]')?.dataset?.endpoint;
-            
-            if (!endpoint) {
-                console.error('No endpoint found for form submission');
-                announce('Configuration error. Please refresh the page.');
-                return;
-            }
-
-            submitOptimization(root, endpoint);
+    
+            // Integrate with optimization.js workflow
+            integrateWithOptimizationWorkflow(root);
         });
     }
-
+    function integrateWithOptimizationWorkflow(root) {
+        if (typeof window.optimizationState !== 'undefined') {
+            // Set resume data from our state
+            if (state.selectedFile) {
+                window.optimizationState.resumeData = {
+                    type: 'file',
+                    content: state.selectedFile,
+                    file: state.selectedFile
+                };
+            }
+    
+            // Set job data from form fields
+            window.optimizationState.jobData = {
+                title: elements.jobTitle?.value?.trim() || '',
+                text: elements.jobText?.value?.trim() || '',
+                description: elements.jobText?.value?.trim() || ''
+            };
+    
+            // Call optimization.js startOptimization function
+            if (typeof window.startOptimization === 'function') {
+                window.startOptimization();
+            } else {
+                console.error('startOptimization function not found in optimization.js');
+                // Fallback to our internal submission
+                submitOptimization(root, '/api/v1/optimizer/optimize');
+            }
+        } else {
+            console.error('optimizationState not found. Using fallback submission.');
+            // Fallback to our internal submission
+            submitOptimization(root, '/api/v1/optimizer/optimize');
+        }
+    }
     async function submitOptimization(root, endpoint) {
         if (state.isSubmitting) return;
 
@@ -437,10 +460,15 @@
         const formData = new FormData();
         
         // Resume file
-        formData.append('resume_type', 'file');
-        formData.append('resume_file', state.selectedFile);
+        if (state.selectedFile) {
+            formData.append('resume_type', 'file');
+            formData.append('resume_file', state.selectedFile);
+        } else {
+            console.error('No file selected for optimization');
+            return null;
+        }
         
-        // Job description fields
+        // Job description fields (optional)
         if (elements.jobTitle?.value.trim()) {
             formData.append('job_title', elements.jobTitle.value.trim());
         }
@@ -451,6 +479,7 @@
         
         if (elements.jobLink?.value.trim()) {
             formData.append('job_url', elements.jobLink.value.trim());
+            formData.append('job_company', elements.jobLink.value.trim()); // optimization.js expects this
         }
 
         // Check for existing hidden inputs with defaults
@@ -461,7 +490,7 @@
             }
         });
 
-        // Add defaults if not present
+        // Add defaults that optimization.js expects
         if (!formData.has('tone')) {
             formData.append('tone', 'professional-concise');
         }
