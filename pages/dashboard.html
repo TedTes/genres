@@ -79,40 +79,35 @@
                     <div class="document-section job-section">
                         <div class="section-header">
                             <h3>Job Description</h3>
-                            <span class="section-status" id="jobStatus">Required</span>
+                            <span class="section-status" id="jobStatus">Optional</span>
                         </div>
                         
                         <div class="document-area">
-                            <!-- Text Input State -->
-                            <div class="job-document text-mode" id="jobTextMode">
-                                <div class="job-paper">
-                                    <textarea 
-                                        class="job-textarea" 
-                                        id="jobText" 
-                                        placeholder="Paste the job description here..."
-                                        rows="24"
-                                    ></textarea>
-                                    <div class="textarea-overlay">
-                                        <div class="overlay-content">
-                                            <i class="fas fa-edit"></i>
-                                            <span>Click to add job description</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="document-shadow"></div>
-                            </div>
+                            <!-- Job Title -->
+                            <input 
+                                type="text" 
+                                id="jobTitle" 
+                                class="job-title-input"
+                                placeholder="Job Title"
+                                maxlength="100"
+                            >
+
+                            <!-- Job Description -->
+                            <textarea 
+                                class="job-textarea" 
+                                id="jobText" 
+                                placeholder="Paste the job description here..."
+                                rows="24"
+                            ></textarea>
                             
-                            <!-- Alternative: File Upload -->
-                            <div class="upload-alternative">
-                                <div class="alternative-divider">
-                                    <span>or</span>
-                                </div>
-                                <button class="file-upload-btn" onclick="document.getElementById('jobFile').click()">
-                                    <i class="fas fa-upload"></i>
-                                    Upload file instead
-                                </button>
-                                <input type="file" id="jobFile" accept=".pdf,.docx,.txt" hidden>
-                            </div>
+                            <!-- Job Link -->
+                            <input 
+                                type="url" 
+                                id="jobLink" 
+                                class="job-link-input"
+                                placeholder="Job posting URL (optional)"
+                                maxlength="500"
+                            >
                         </div>
                     </div>
                 </div>
@@ -120,24 +115,24 @@
                 <!-- Action Bar -->
                 <div class="action-bar">
                     <div class="validation-status">
-                        <div class="status-item" id="resumeValidation">
+                        <div class="status-item" id="resumeStatusItem">
                             <i class="fas fa-circle"></i>
-                            <span>Resume pending</span>
+                            <span>Resume</span>
                         </div>
-                        <div class="status-item" id="jobValidation">
+                        <div class="status-item" id="jobStatusItem">
                             <i class="fas fa-circle"></i>
-                            <span>Job description pending</span>
+                            <span>Job Description</span>
                         </div>
                     </div>
                     
-                    <button type="button" class="optimize-btn" id="optimizeBtn" disabled>
-                        <span class="btn-content">
-                            <i class="fas fa-magic"></i>
-                            <span>Optimize Resume</span>
-                        </span>
+                    <button class="optimize-btn" id="optimizeBtn" disabled>
+                        <div class="btn-content">
+                            <i class="fas fa-rocket"></i>
+                            <span>Optimize My Resume</span>
+                        </div>
                         <div class="btn-loader" style="display: none;">
                             <div class="spinner"></div>
-                            <span>Analyzing...</span>
+                            <span>Processing...</span>
                         </div>
                     </button>
                 </div>
