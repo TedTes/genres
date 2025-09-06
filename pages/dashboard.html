@@ -25,11 +25,11 @@
                         
                         <div class="document-area">
                             <!-- Upload State -->
-                            <div class="a4-document resume-doc" id="resumeUpload" onclick="document.getElementById('resumeFile').click()">
+                            <div class="a4-document resume-doc" id="resumeUpload">
                                 <div class="a4-paper">
                                     <div class="paper-content">
                                         <div class="upload-icon">
-                                            <i class="fas fa-plus"></i>
+                                            <i class="fas fa-cloud-upload-alt"></i>
                                         </div>
                                         <div class="upload-text">
                                             <h4>Drop resume here</h4>
@@ -190,4 +190,5 @@
 
 {% block extra_js %}
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/optimization.js') }}"></script>
 {% endblock %}
