@@ -426,17 +426,6 @@
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
-            const result = await response.json();
-            
-            if (result.result_id || result.request_hash) {
-                const redirectId = result.result_id || result.request_hash;
-                announce('Optimization complete! Redirecting to results...');
-                window.location.href = `/optimizer/results/${redirectId}`;
-            } else {
-                console.log('Optimization response:', result);
-                announce('Optimization completed successfully');
-            }
-
         } catch (error) {
             console.error('Optimization error:', error);
             handleSubmissionError(error, root);

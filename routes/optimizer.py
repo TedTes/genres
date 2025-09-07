@@ -64,7 +64,7 @@ def optimize_resume():
         user_id = current_user.id
         
         # Validate request
-       
+        resume_input = None
         # Handle FormData instead of JSON
         if request.content_type.startswith('multipart/form-data'):
                
@@ -141,9 +141,19 @@ def optimize_resume():
             #     model_info=_get_model_info(),
             #     ttl=24*60*60  # 24 hours
             # ))
-            
-            # Add processing metadata
             total_time = (time.time() - request_start_time) * 1000
+            # Save to database
+            model_provider = current_app.config.get('MODEL_PROVIDER', 'unknown')
+            result_id = save_optimization_to_db(
+                user_id=user_id,
+                resume_input=resume_input,
+                jd_input=jd_input,
+                optimization_result=result,
+                processing_time_ms=total_time,
+                model_provider=model_provider
+            )
+            # Add processing metadata
+            
             result['processing_time_ms'] = round(total_time, 2)
             result['cache_hit'] = False
             result['request_hash'] = request_hash
@@ -152,24 +162,18 @@ def optimize_resume():
             print(f"📊 Match score: {result.get('match_score', 'N/A')}%")
             print(f"🔧 Missing keywords: {len(result.get('missing_keywords', []))}")
             
-            return jsonify(result), 200
+            # SERVER-SIDE REDIRECT to results page
+            return redirect(url_for('optimizer.show_results', result_id=result_id))
             
-        except ValueError as e:
-            print(f"❌ Validation error: {str(e)}")
-            return jsonify({'error': str(e)}), 400
         except Exception as e:
             print(f"❌ Optimization pipeline failed: {str(e)}")
-            return jsonify({
-                'error': 'Internal processing error',
-                'details': str(e)  # Show details for debugging
-            }), 500
+            flash(f'Optimization failed: {str(e)}', 'error')
+            return redirect(url_for('root.dashboard'))
     
     except Exception as e:
         print(f"❌ Request processing failed: {str(e)}")
-        return jsonify({
-            'error': 'Request processing failed',
-            'details': str(e)  # Show details for debugging
-        }), 500
+        flash(f'Request processing failed: {str(e)}', 'error')
+        return redirect(url_for('root.dashboard'))
 
 
 def _run_optimization_pipeline(
@@ -531,21 +535,62 @@ def handle_internal_error(error):
 
 
 @optimizer_bp.route('/results/<result_id>', methods=['GET'])
+@login_required
 def show_results(result_id):
     """
-    Display optimization results page.
-    
-    Args:
-        result_id: The optimization result identifier
+    Display optimization results page with data from database.
     """
     try:
-        # For MVP, we'll pass result_id through URL and handle in frontend
-        # Later this can load from database when auth is re-enabled
-        return render_template('results.html', result_id=result_id)
+        # Get optimization from database
+        optimization = ResumeOptimization.query.filter_by(
+            id=int(result_id),
+            user_id=current_user.id
+        ).first()
+        
+        if not optimization:
+            flash('Optimization results not found or you do not have permission to view them.', 'error')
+            return redirect(url_for('root.dashboard'))
+        
+        # Prepare data for template
+        optimization_data = {
+            'id': optimization.id,
+            'match_score': optimization.match_score_after,
+            'original_match_score': optimization.match_score_before,
+            'missing_keywords': optimization.missing_keywords or [],
+            'added_keywords': optimization.added_keywords or [],
+            'processing_time_ms': optimization.processing_time_ms,
+            'model_provider': optimization.model_provider,
+            'created_at': optimization.created_at,
+            
+            # Job info
+            'job_title': optimization.job_title,
+            'job_description': optimization.job_description,
+            'company_name': optimization.company_name,
+            
+            # Optimized content
+            'sections': optimization.optimized_resume_data.get('sections', {}),
+            'experience': optimization.optimized_resume_data.get('experience', []),
+            'skills_to_add': optimization.optimized_resume_data.get('skills_added', []),
+            'explanations': optimization.optimized_resume_data.get('explanations', []),
+            'gap_analysis': optimization.optimized_resume_data.get('gap_analysis', {}),
+            
+            # Files
+            'docx_url': optimization.docx_url,
+            'pdf_url': optimization.pdf_url,
+            
+            # Metadata
+            'optimization_style': optimization.optimization_style,
+        }
+        
+        # Render results template with data
+        return render_template('results.html', 
+                             result_id=result_id,
+                             optimization_data=optimization_data)
         
     except Exception as e:
         print(f"Error displaying results: {e}")
-        return redirect(url_for('root.optimize_page'))
+        flash('Error loading optimization results.', 'error')
+        return redirect(url_for('root.dashboard'))
 
 @optimizer_bp.route('/results', methods=['GET'])  
 def show_results_direct():
@@ -1131,3 +1176,102 @@ def save_temp_file(uploaded_file):
     except Exception as e:
         os.unlink(temp_path)  # Clean up on error
         raise e
+
+
+
+
+
+# #######################################
+###utils
+####################
+
+def save_optimization_to_db(
+    user_id: int,
+    resume_input: ResumeInput,
+    jd_input: JDInput,
+    optimization_result: dict,
+    processing_time_ms: float,
+    model_provider: str
+) -> str:
+    """Save optimization results to database and return the ID."""
+    
+    try:
+        # Create resume record
+        resume_record = Resume(
+            user_id=user_id,
+            title=f"Optimized Resume - {jd_input.title or 'Untitled Job'}",
+            resume_data={
+                'original_text': resume_input.text[:5000] if resume_input.text else None,
+                'file_type': 'pdf' if resume_input.pdf_url else 'docx' if resume_input.docx_url else 'text',
+                'optimization_date': datetime.utcnow().isoformat()
+            },
+            template="optimized_standard",
+            is_optimized=True,
+            last_optimized_at=datetime.utcnow()
+        )
+        
+        db.session.add(resume_record)
+        db.session.flush()  # Get ID without committing
+        
+        # Create optimization record
+        optimization = ResumeOptimization(
+            user_id=user_id,
+            resume_id=resume_record.id,
+            
+            # Input data
+            original_resume_data={
+                'text_preview': resume_input.text[:1000] if resume_input.text else None,
+                'input_type': getattr(resume_input, 'input_type', 'unknown'),
+                'file_info': {
+                    'has_pdf': bool(resume_input.pdf_url),
+                    'has_docx': bool(resume_input.docx_url),
+                    'has_text': bool(resume_input.text)
+                }
+            },
+            job_description=jd_input.text[:5000] if jd_input.text else None,
+            job_title=jd_input.title[:200] if jd_input.title else None,
+            company_name=jd_input.company[:200] if jd_input.company else None,
+            
+            # Optimization settings
+            optimization_style=optimization_result.get('optimization_focus', 'professional-concise'),
+            
+            # Results
+            optimized_resume_data={
+                'sections': optimization_result.get('sections', {}),
+                'experience': optimization_result.get('experience', []),
+                'skills_added': optimization_result.get('skills_to_add', []),
+                'explanations': optimization_result.get('explanations', [])[:10],
+                'gap_analysis': optimization_result.get('gap_analysis', {})
+            },
+            match_score_before=optimization_result.get('original_match_score', 0.0),
+            match_score_after=optimization_result.get('match_score', 0.0),
+            missing_keywords=optimization_result.get('missing_keywords', [])[:50],
+            added_keywords=optimization_result.get('added_keywords', [])[:50],
+            
+            # Files
+            docx_url=optimization_result.get('artifacts', {}).get('docx_url'),
+            pdf_url=optimization_result.get('artifacts', {}).get('pdf_url'),
+            
+            # Processing info
+            processing_time_ms=processing_time_ms,
+            model_provider=model_provider,
+            created_at=datetime.utcnow()
+        )
+        
+        db.session.add(optimization)
+        db.session.commit()
+        
+        # Update user stats
+        user = User.query.get(user_id)
+        if user:
+            user.optimization_count = (user.optimization_count or 0) + 1
+            user.last_optimization_at = datetime.utcnow()
+            db.session.commit()
+        
+        print(f"✅ Optimization saved to DB with ID: {optimization.id}")
+        return str(optimization.id)
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Failed to save optimization to DB: {str(e)}")
+        raise
