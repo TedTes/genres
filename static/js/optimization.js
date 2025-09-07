@@ -11,192 +11,17 @@ window.optimizationState = {
     isProcessing: false,
     results: null,
     validationStatus: { resume: false, job: false },
-extractedContent: null, // Store extracted text content
-contentMetrics: { wordCount: 0, sectionCount: 0, hasContact: false }
+    extractedContent: null,
+    contentMetrics: { wordCount: 0, sectionCount: 0, hasContact: false }
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-    setupUploadHandlers();
-    updateValidation();
     initializeOptimization();
 });
 
-
-function setupUploadHandlers() {
-    const dropZone = document.getElementById('drop-zone');
-    const fileInput = document.getElementById('file-input');
-    const browseBtn = document.getElementById('browse-btn');
-    const resumeText = document.getElementById('resume-text');
-    const jobTitle = document.getElementById('job-title');
-    const jobDescription = document.getElementById('job-description');
-    
-    // File upload handlers
-    if (browseBtn) {
-        browseBtn.addEventListener('click', () => fileInput.click());
-    }
-    
-    if (dropZone) {
-        dropZone.addEventListener('click', (e) => {
-            if (e.target !== browseBtn) fileInput.click();
-        });
-        
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('drag-over');
-        });
-        
-        dropZone.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('drag-over');
-        });
-        
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('drag-over');
-            if (e.dataTransfer.files[0]) {
-                handleFileUpload(e.dataTransfer.files[0]);
-            }
-        });
-    }
-    
-    if (fileInput) {
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files[0]) {
-                handleFileUpload(e.target.files[0]);
-            }
-        });
-    }
-    
-    // Text input handler
-    if (resumeText) {
-        resumeText.addEventListener('input', function() {
-            const textContent = this.value.trim();
-            
-            // Store in optimizationState
-            window.optimizationState.resumeData = { 
-                type: 'text', 
-                content: textContent 
-            };
-            
-            // Analyze content quality in real-time
-            const contentAnalysis = analyzeResumeContent(textContent);
-            window.optimizationState.extractedContent = textContent;
-            window.optimizationState.contentMetrics = contentAnalysis;
-            
-            // Update character count with quality indicator
-            const charCount = document.getElementById('char-count');
-            if (charCount) {
-                charCount.innerHTML = `${textContent.length} characters ${getContentQualityIndicator(contentAnalysis)}`;
-            }
-            
-            updateValidation();
-        });
-    }
-    
-    // Job input handlers
-    if (jobTitle) {
-        jobTitle.addEventListener('input', function() {
-            window.optimizationState.jobData.title = this.value;
-            updateValidation();
-        });
-    }
-    
-    if (jobDescription) {
-        jobDescription.addEventListener('input', function() {
-            window.optimizationState.jobData.description = this.value;
-            document.getElementById('job-char-count').textContent = `${this.value.length} characters`;
-            updateValidation();
-        });
-    }
-}
-function handleFileUpload(file) {
-    // Validate file
-    if (file.size > 5 * 1024 * 1024) {
-        showMessage('File size must be less than 5MB', 'error');
-        return;
-    }
-    
-    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
-    if (!allowedTypes.includes(file.type)) {
-        showMessage('Please upload PDF, DOCX, or TXT files only', 'error');
-        return;
-    }
-    
-    window.optimizationState.resumeData = {...window.optimizationStater, resumeData:{ type: 'file', content: file }};
-    // Show success state
-    document.getElementById('file-success').innerHTML = `
-        <div class="success-content">
-            <div class="success-info">
-                <i class="fas fa-check-circle"></i>
-                <div class="file-details">
-                    <strong>${file.name}</strong>
-                    <span>${(file.size/1024/1024).toFixed(1)} MB</span>
-                </div>
-            </div>
-            <button onclick="clearFile()" class="remove-btn">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    `;
-    document.getElementById('file-success').style.display = 'block';
-    
-    showMessage('Resume uploaded successfully!', 'success');
-    updateValidation();
-}
-
-function updateValidation() {
-    const jobData = window.optimizationState.jobData;
-    const resumeData = window.optimizationState.resumeData;
-
-    const hasResume = resumeData && 
-        (resumeData.type === 'file' || 
-         (resumeData.type === 'text' && resumeData.content.trim().length > 100));
-    const hasJob = jobData && jobData.title.trim() || jobData && jobData.description.trim().length > 50;
-    
-    // Update resume status
-    const resumeStatus = document.getElementById('resume-status');
-    if (hasResume) {
-        resumeStatus.innerHTML = '<i class="fas fa-check-circle"></i>';
-        resumeStatus.classList.add('completed');
-    } else {
-        resumeStatus.innerHTML = '<i class="fas fa-circle"></i>';
-        resumeStatus.classList.remove('completed');
-    }
-    
-    // Update job status
-    const jobStatus = document.getElementById('job-status');
-    if (hasJob) {
-        jobStatus.innerHTML = '<i class="fas fa-check-circle"></i>';
-        jobStatus.classList.add('completed');
-    } else {
-        jobStatus.innerHTML = '<span class="optional-label">Optional</span>';
-        jobStatus.classList.remove('completed');
-    }
-    
-    // Update CTA button
-    const analyzeBtn = document.getElementById('analyze-btn');
-    const ctaText = document.getElementById('cta-text');
-    
-    analyzeBtn.disabled = !hasResume;
-    
-    if (hasResume && hasJob) {
-        ctaText.textContent = 'Analyze Resume Against Job';
-    } else if (hasResume) {
-        ctaText.textContent = 'Analyze My Resume';
-    } else {
-        ctaText.textContent = 'Upload Resume First';
-    }
-}
-function clearFile() {
-    resumeData = null;
-    document.getElementById('file-success').style.display = 'none';
-    document.getElementById('file-input').value = '';
-    updateValidation();
-}
 function initializeOptimization() {
-    setupFormSubmission();
     setupCSRFToken();
-    enhanceExistingFunctionality();
+    console.log('Optimization.js initialized for dashboard.html');
 }
 
 /**
@@ -209,60 +34,9 @@ function setupCSRFToken() {
     }
 }
 
-
-
-/**
- * Show job description section and add optimization button
- */
-function showJobDescriptionSection() {
-    // Expand job section if not already visible
-    const jobContent = document.getElementById('job-content');
-    const expandIcon = document.getElementById('expand-icon');
-    
-    if (jobContent.style.display === 'none') {
-        jobContent.style.display = 'block';
-        expandIcon.innerHTML = '<i class="fas fa-minus"></i>';
-    }
-    
-    // Add optimization button if not already present
-    addOptimizationButton();
-    
-    // Update continue button to show completion of step 1
-    // const continueBtn = document.getElementById('continue-button');
-    // console.log("from this");
-    // console.log(continueBtn);
-    // continueBtn.innerHTML = '<i class="fas fa-check"></i> Resume Ready';
-    // continueBtn.disabled = false;
-    // continueBtn.classList.add('btn-success');
-}
-
-/**
- * Add the main optimization submit button
- */
-function addOptimizationButton() {
-    // Check if button already exists
-    if (document.getElementById('optimize-submit-btn')) {
-        return;
-    }
-    
-    const jobContent = document.getElementById('job-content');
-    const optimizeButton = document.createElement('div');
-    optimizeButton.className = 'upload-actions';
-    optimizeButton.innerHTML = `
-        <button type="button" class="btn btn-primary btn-lg" id="optimize-submit-btn" onclick="startOptimization()">
-            <i class="fas fa-magic"></i>
-            Optimize My Resume
-        </button>
-        <p class="help-text" style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-light);">
-            <i class="fas fa-clock"></i> Processing typically takes 30-60 seconds
-        </p>
-    `;
-    
-    jobContent.appendChild(optimizeButton);
-}
-
 /**
  * Enhanced optimization flow with validation and error handling
+ * Now works with dashboard.html elements
  */
 async function startOptimization() {
     if (window.optimizationState.isProcessing) {
@@ -276,8 +50,8 @@ async function startOptimization() {
             return;
         }
         
-        // Collect job description data
-        collectJobDescriptionData();
+        // Collect data from dashboard elements
+        collectDashboardData();
         
         // Show loading state
         showLoadingState();
@@ -286,13 +60,9 @@ async function startOptimization() {
         // Prepare API payload
         const formData = await buildFormDataPayload();
         
-        // Use retry manager for robust submission
-        const retryManager = new RetryManager(3, 2000); // 3 retries, 2s base delay
-        
-        // const result = await retryManager.executeWithRetry(async () => {
-        //     return await submitOptimizationRequest(formData);
-        // }, 'resume optimization');
+        // Submit optimization request
         const result = await submitOptimizationRequest(formData);
+        
         // Handle successful response
         handleOptimizationSuccess(result);
         
@@ -304,23 +74,29 @@ async function startOptimization() {
         hideLoadingState();
     }
 }
+
 /**
- * Collect job description data from form
+ * Collect data from dashboard.html form elements
  */
-function collectJobDescriptionData() {
-    const jobTitle = document.getElementById('job-title')?.value?.trim() || '';
-    const jobDescription = document.getElementById('job-description')?.value?.trim() || '';
+function collectDashboardData() {
+    // Get elements using dashboard.html IDs
+    const jobTitle = document.getElementById('jobTitle')?.value?.trim() || '';
+    const jobText = document.getElementById('jobText')?.value?.trim() || '';
+    const jobLink = document.getElementById('jobLink')?.value?.trim() || '';
     
     window.optimizationState.jobData = {
         title: jobTitle,
-        text: jobDescription,
-        company: '' // Can be added later if needed
+        text: jobText,
+        description: jobText, // alias for compatibility
+        company: '',
+        url: jobLink
     };
     
-    console.log('Job data collected:', {
+    console.log('Dashboard data collected:', {
         hasTitle: !!jobTitle,
-        hasDescription: !!jobDescription,
-        descriptionLength: jobDescription.length
+        hasDescription: !!jobText,
+        hasLink: !!jobLink,
+        descriptionLength: jobText.length
     });
 }
 
@@ -335,6 +111,7 @@ function buildFormDataPayload() {
     formData.append('job_title', jobData.title || '');
     formData.append('job_description', jobData.text || '');
     formData.append('job_company', jobData.company || '');
+    formData.append('job_url', jobData.url || '');
     
     // Add options
     formData.append('tone', 'professional-concise');
@@ -342,54 +119,16 @@ function buildFormDataPayload() {
     formData.append('include_pdf', 'true');
     
     // Handle resume input
-    if (resumeData.type === 'file') {
+    if (resumeData && resumeData.type === 'file') {
         formData.append('resume_file', resumeData.file); // Actual File object
         formData.append('resume_type', 'file');
-    } else {
+    } else if (resumeData && resumeData.type === 'text') {
         formData.append('resume_text', resumeData.content);
         formData.append('resume_type', 'text');
     }
     
     return formData;
 }
-/**
- * Clear messages from any message container
- */
-function clearMessages() {
-    // Clear upload messages
-    const uploadMessages = document.getElementById('upload-messages');
-    if (uploadMessages) {
-        uploadMessages.innerHTML = '';
-    }
-    
-    // Clear any other message containers
-    const messages = document.getElementById('messages');
-    if (messages) {
-        messages.innerHTML = '';
-    }
-    
-    // Remove retry button if it exists
-    const retryBtn = document.getElementById('retry-btn');
-    if (retryBtn) {
-        retryBtn.remove();
-    }
-}
-
-/**
- * Extract text content from uploaded file
- */
-async function extractTextFromFile(file) {
-    if (file.type === 'text/plain') {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = e => resolve(e.target.result);
-        reader.onerror = () => reject(new Error('Failed to read file'));
-        reader.readAsText(file);
-      });
-    }
-    // Non-text: let backend handle it
-    return '[FILE_UPLOAD]';
-  }
 
 /**
  * Enhanced API submission with better error handling
@@ -439,37 +178,276 @@ async function submitOptimizationRequest(formData) {
         throw error;
     }
 }
+
 /**
  * Show loading state during API processing
+ * Updated to work with dashboard.html elements
  */
-
 function showLoadingState() {
-    const submitBtn = document.getElementById('optimize-submit-btn');
+    const submitBtn = document.getElementById('optimizeBtn');
     
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `
-            <div class="loading-content">
-                <div class="loading-spinner"></div>
-                Processing Your Resume...
-            </div>
-        `;
-        submitBtn.classList.add('loading');
+        const btnContent = submitBtn.querySelector('.btn-content');
+        const btnLoader = submitBtn.querySelector('.btn-loader');
+        
+        if (btnContent) btnContent.style.display = 'none';
+        if (btnLoader) btnLoader.style.display = 'flex';
+        
+        submitBtn.classList.add('is-loading');
+    }
+    
+    // Show progress section if it exists
+    const progressSection = document.getElementById('progressSection');
+    if (progressSection) {
+        progressSection.style.display = 'block';
     }
     
     // Add enhanced loading overlay
     addEnhancedLoadingOverlay();
 }
+
+/**
+ * Hide loading state
+ */
+function hideLoadingState() {
+    const submitBtn = document.getElementById('optimizeBtn');
+    const overlay = document.getElementById('loading-overlay');
+    
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('is-loading');
+        const btnContent = submitBtn.querySelector('.btn-content');
+        const btnLoader = submitBtn.querySelector('.btn-loader');
+        
+        if (btnContent) btnContent.style.display = 'flex';
+        if (btnLoader) btnLoader.style.display = 'none';
+    }
+    
+    if (overlay) overlay.remove();
+    
+    // Clear progress timers
+    if (window.progressTimers) {
+        window.progressTimers.forEach(id => clearTimeout(id));
+        window.progressTimers = [];
+    }
+}
+
 function addEnhancedLoadingOverlay() {
     const overlay = document.createElement('div');
     overlay.id = 'loading-overlay';
-   document.body.appendChild(overlay);
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        backdrop-filter: blur(2px);
+    `;
+    document.body.appendChild(overlay);
     
     // Show enhanced progress indicator
     showEnhancedProgressIndicator();
 }
 
+/**
+ * Enhanced processing steps with real-time progress
+ */
+function showEnhancedProgressIndicator() {
+    const overlay = document.getElementById('loading-overlay');
+    if (!overlay) return;
+    
+    overlay.innerHTML = `
+        <div class="loading-content" style="
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+        ">
+            <div class="progress-header" style="margin-bottom: 2rem;">
+                <h3 style="margin: 0 0 0.5rem 0; color: #1f2937;">AI is optimizing your resume...</h3>
+                <div class="estimated-time" style="color: #6b7280; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <i class="fas fa-clock"></i>
+                    <span id="time-remaining">Estimated: 45-60 seconds</span>
+                </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="progress-bar-container" style="margin-bottom: 2rem;">
+                <div class="progress-bar" style="
+                    width: 100%;
+                    height: 8px;
+                    background: #e5e7eb;
+                    border-radius: 4px;
+                    overflow: hidden;
+                    margin-bottom: 0.5rem;
+                ">
+                    <div class="progress-fill" id="progress-fill" style="
+                        width: 0%;
+                        height: 100%;
+                        background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+                        border-radius: 4px;
+                        transition: width 0.5s ease;
+                    "></div>
+                </div>
+                <div class="progress-percentage" id="progress-percentage" style="
+                    font-size: 0.875rem;
+                    color: #6b7280;
+                    text-align: right;
+                ">0%</div>
+            </div>
+            
+            <!-- Step Indicators -->
+            <div class="processing-steps-enhanced" id="processing-steps-enhanced" style="
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+            ">
+                <div class="step-item" data-step="1" style="
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    padding: 0.5rem;
+                    border-radius: 8px;
+                    transition: all 0.3s ease;
+                ">
+                    <div class="step-icon" style="color: #3b82f6;"><i class="fas fa-file-text"></i></div>
+                    <div class="step-text" style="flex: 1; text-align: left; color: #374151;">Parsing resume content</div>
+                    <div class="step-status pending" style="color: #6b7280;">⏳</div>
+                </div>
+                <div class="step-item" data-step="2" style="
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    padding: 0.5rem;
+                    border-radius: 8px;
+                    transition: all 0.3s ease;
+                ">
+                    <div class="step-icon" style="color: #3b82f6;"><i class="fas fa-search"></i></div>
+                    <div class="step-text" style="flex: 1; text-align: left; color: #374151;">Analyzing skill gaps</div>
+                    <div class="step-status pending" style="color: #6b7280;">⏳</div>
+                </div>
+                <div class="step-item" data-step="3" style="
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    padding: 0.5rem;
+                    border-radius: 8px;
+                    transition: all 0.3s ease;
+                ">
+                    <div class="step-icon" style="color: #3b82f6;"><i class="fas fa-brain"></i></div>
+                    <div class="step-text" style="flex: 1; text-align: left; color: #374151;">AI optimization</div>
+                    <div class="step-status pending" style="color: #6b7280;">⏳</div>
+                </div>
+                <div class="step-item" data-step="4" style="
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    padding: 0.5rem;
+                    border-radius: 8px;
+                    transition: all 0.3s ease;
+                ">
+                    <div class="step-icon" style="color: #3b82f6;"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="step-text" style="flex: 1; text-align: left; color: #374151;">Generating explanations</div>
+                    <div class="step-status pending" style="color: #6b7280;">⏳</div>
+                </div>
+                <div class="step-item" data-step="5" style="
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    padding: 0.5rem;
+                    border-radius: 8px;
+                    transition: all 0.3s ease;
+                ">
+                    <div class="step-icon" style="color: #3b82f6;"><i class="fas fa-shield-alt"></i></div>
+                    <div class="step-text" style="flex: 1; text-align: left; color: #374151;">Applying guardrails</div>
+                    <div class="step-status pending" style="color: #6b7280;">⏳</div>
+                </div>
+                <div class="step-item" data-step="6" style="
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    padding: 0.5rem;
+                    border-radius: 8px;
+                    transition: all 0.3s ease;
+                ">
+                    <div class="step-icon" style="color: #3b82f6;"><i class="fas fa-file-pdf"></i></div>
+                    <div class="step-text" style="flex: 1; text-align: left; color: #374151;">Creating documents</div>
+                    <div class="step-status pending" style="color: #6b7280;">⏳</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Start progress simulation
+    simulateProgressUpdates();
+}
 
+/**
+ * Simulate progress updates based on typical processing times
+ */
+function simulateProgressUpdates() {
+    const steps = [
+        { step: 1, delay: 2000, progress: 15, text: "Resume parsed successfully" },
+        { step: 2, delay: 8000, progress: 35, text: "Gap analysis complete" },
+        { step: 3, delay: 25000, progress: 70, text: "AI optimization in progress" },
+        { step: 4, delay: 35000, progress: 85, text: "Generating explanations" },
+        { step: 5, delay: 40000, progress: 95, text: "Applying final checks" },
+        { step: 6, delay: 45000, progress: 100, text: "Documents ready" }
+    ];
+    
+    // Clear existing timers
+    if (window.progressTimers) {
+        window.progressTimers.forEach(id => clearTimeout(id));
+    }
+    window.progressTimers = [];
+    
+    steps.forEach(({ step, delay, progress, text }) => {
+        const id = setTimeout(() => updateProgressStep(step, progress, text), delay);
+        window.progressTimers.push(id);
+    });
+}
+
+/**
+ * Update individual progress step
+ */
+function updateProgressStep(stepNumber, progressPercent, statusText) {
+    const stepItem = document.querySelector(`[data-step="${stepNumber}"]`);
+    const progressFill = document.getElementById('progress-fill');
+    const progressPercentage = document.getElementById('progress-percentage');
+    const timeRemaining = document.getElementById('time-remaining');
+    
+    if (stepItem) {
+        const statusElement = stepItem.querySelector('.step-status');
+        statusElement.textContent = '✅';
+        statusElement.className = 'step-status complete';
+        statusElement.style.color = '#10b981';
+        stepItem.style.background = 'rgba(16, 185, 129, 0.1)';
+    }
+    
+    if (progressFill) {
+        progressFill.style.width = `${progressPercent}%`;
+    }
+    
+    if (progressPercentage) {
+        progressPercentage.textContent = `${progressPercent}%`;
+    }
+    
+    if (timeRemaining && progressPercent < 100) {
+        const remainingSeconds = Math.max(5, Math.floor((100 - progressPercent) / 2));
+        timeRemaining.innerHTML = `<i class="fas fa-clock"></i> ${remainingSeconds} seconds remaining`;
+    } else if (timeRemaining && progressPercent === 100) {
+        timeRemaining.innerHTML = `<i class="fas fa-check"></i> Complete!`;
+    }
+}
 
 /**
  * Handle successful optimization response
@@ -485,7 +463,7 @@ function handleOptimizationSuccess(result) {
         localStorage.setItem('optimizationSuccess', JSON.stringify({
             ...result,
             timestamp: Date.now(),
-            original_resume: window.optimizationState.resumeData.text || '[Uploaded File]'
+            original_resume: window.optimizationState.resumeData?.text || '[Uploaded File]'
         }));
     } catch (e) {
         console.warn('Could not store results in localStorage:', e);
@@ -502,25 +480,74 @@ function showOptimizationCompleteAndRedirect(result) {
     const overlay = document.getElementById('loading-overlay');
     if (overlay) {
         overlay.innerHTML = `
-            <div class="success-content">
-                <div class="success-icon">
-                    <i class="fas fa-check-circle"></i>
+            <div class="success-content" style="
+                text-align: center;
+                padding: 3rem;
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                max-width: 500px;
+                width: 90%;
+            ">
+                <div class="success-icon" style="
+                    width: 80px;
+                    height: 80px;
+                    background: linear-gradient(135deg, #10b981, #059669);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto 1.5rem auto;
+                ">
+                    <i class="fas fa-check-circle" style="font-size: 2.5rem; color: white;"></i>
                 </div>
-                <h3>Resume Optimized Successfully!</h3>
-                <div class="result-preview">
-                    <p><strong>Match Score:</strong> <span class="score-highlight">${Math.round(result.match_score || 0)}%</span></p>
-                    <p><strong>Keywords Added:</strong> ${result.missing_keywords?.length || 0}</p>
-                    <p><strong>Processing Time:</strong> ${result.processing_time_ms ? Math.round(result.processing_time_ms / 1000) : 'N/A'} seconds</p>
+                <h3 style="margin: 0 0 1.5rem 0; color: #1f2937;">Resume Optimized Successfully!</h3>
+                <div class="result-preview" style="
+                    background: #f9fafb;
+                    padding: 1.5rem;
+                    border-radius: 12px;
+                    margin-bottom: 2rem;
+                    text-align: left;
+                ">
+                    <p style="margin: 0 0 0.5rem 0;"><strong>Match Score:</strong> <span class="score-highlight" style="color: #10b981; font-weight: bold;">${Math.round(result.match_score || 0)}%</span></p>
+                    <p style="margin: 0 0 0.5rem 0;"><strong>Keywords Added:</strong> ${result.missing_keywords?.length || 0}</p>
+                    <p style="margin: 0;"><strong>Processing Time:</strong> ${result.processing_time_ms ? Math.round(result.processing_time_ms / 1000) : 'N/A'} seconds</p>
                 </div>
-                <div class="success-actions">
-                    <button class="btn btn-primary" onclick="redirectToResults()">
+                <div class="success-actions" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <button class="btn btn-primary" onclick="redirectToResults()" style="
+                        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+                        color: white;
+                        border: none;
+                        padding: 0.75rem 1.5rem;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.5rem;
+                    ">
                         <i class="fas fa-eye"></i> View Detailed Results
                     </button>
-                    <button class="btn btn-outline" onclick="startOver()">
+                    <button class="btn btn-outline" onclick="startOver()" style="
+                        background: transparent;
+                        color: #6b7280;
+                        border: 1px solid #d1d5db;
+                        padding: 0.75rem 1.5rem;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.5rem;
+                    ">
                         <i class="fas fa-redo"></i> Start Over
                     </button>
                 </div>
-                <p class="auto-redirect">Redirecting to results in <span id="redirect-countdown">5</span> seconds...</p>
+                <p class="auto-redirect" style="margin: 1.5rem 0 0 0; color: #6b7280; font-size: 0.875rem;">
+                    Redirecting to results in <span id="redirect-countdown">5</span> seconds...
+                </p>
             </div>
         `;
         
@@ -565,7 +592,6 @@ function redirectToResults() {
     const resultId = Date.now().toString(36);
     
     // Redirect to results page
-    // window.location.href = `/optimizer/results/${resultId}`;
     window.location.href = '/optimizer/results';
 }
 
@@ -592,635 +618,62 @@ async function validateBeforeOptimization() {
     return true;
 }
 
-let progressTimers = [];
-function simulateProgressUpdates() {
-  const steps = [
-    { step: 1, delay: 2000,  progress: 15,  text: "Resume parsed successfully" },
-    { step: 2, delay: 8000,  progress: 35,  text: "Gap analysis complete" },
-    { step: 3, delay: 25000, progress: 70,  text: "AI optimization in progress" },
-    { step: 4, delay: 35000, progress: 85,  text: "Generating explanations" },
-    { step: 5, delay: 40000, progress: 95,  text: "Applying final checks" },
-    { step: 6, delay: 45000, progress: 100, text: "Documents ready" }
-  ];
-  // clear existing
-  progressTimers.forEach(id => clearTimeout(id));
-  progressTimers = [];
-  steps.forEach(({ step, delay, progress, text }) => {
-    const id = setTimeout(() => updateProgressStep(step, progress, text), delay);
-    progressTimers.push(id);
-  });
-}
-function hideLoadingState() {
-  const submitBtn = document.getElementById('optimize-submit-btn');
-  const overlay = document.getElementById('loading-overlay');
-  if (submitBtn) {
-    submitBtn.disabled = false;
-    submitBtn.classList.remove('loading');
-    submitBtn.innerHTML = '<i class="fas fa-magic"></i> Optimize My Resume';
-  }
-  if (overlay) overlay.remove();
-  if (window.processingStepInterval) clearInterval(window.processingStepInterval);
-  progressTimers.forEach(id => clearTimeout(id));
-  progressTimers = [];
-}
-
-
 /**
- * Custom API Error class
+ * Pre-submit validation for entire optimization request
  */
-class APIError extends Error {
-    constructor(message, status, details = null) {
-        super(message);
-        this.name = 'APIError';
-        this.status = status;
-        this.details = details;
-    }
-}
-
-
-/**
- * Add retry button for failed optimizations
- */
-function addRetryButton() {
-    const messagesContainer = document.getElementById('upload-messages');
-    if (messagesContainer && !document.getElementById('retry-btn')) {
-        const retryButton = document.createElement('button');
-        retryButton.id = 'retry-btn';
-        retryButton.className = 'btn btn-outline btn-sm';
-        retryButton.style.marginTop = '1rem';
-        retryButton.innerHTML = '<i class="fas fa-redo"></i> Try Again';
-        retryButton.onclick = () => {
-            retryButton.remove();
-            clearMessages();
-            startOptimization();
-        };
-        
-        messagesContainer.appendChild(retryButton);
-    }
-}
-
-/**
- * Enhanced toggle function for job section with state tracking
- */
-function toggleJobSection() {
-    const jobContent = document.getElementById('job-content');
-    const expandIcon = document.getElementById('expand-icon');
-    const isVisible = jobContent.style.display !== 'none';
+function validateOptimizationRequest() {
+    const errors = [];
+    const warnings = [];
     
-    if (isVisible) {
-        jobContent.style.display = 'none';
-        expandIcon.innerHTML = '<i class="fas fa-plus"></i>';
+    // Validate resume data
+    if (!window.optimizationState.resumeData) {
+        errors.push('No resume data found. Please upload a resume or paste resume text.');
+        return { isValid: false, errors, warnings };
+    }
+    
+    const { resumeData, jobData } = window.optimizationState;
+    
+    // Validate job description (if provided)
+    if (jobData && jobData.text) {
+        if (jobData.text.length < 50) {
+            warnings.push('Job description seems very brief. More detailed descriptions produce better optimization results.');
+        }
     } else {
-        jobContent.style.display = 'block';
-        expandIcon.innerHTML = '<i class="fas fa-minus"></i>';
-        
-        // Focus on job title field when opened
-        setTimeout(() => {
-            document.getElementById('job-title')?.focus();
-        }, 300);
-    }
-}
-/**
- * Setup job description character counter
- */
-function setupJobDescriptionCounter() {
-    const jobTextarea = document.getElementById('job-description');
-    const charCount = document.getElementById('job-char-count');
-    
-    if (jobTextarea && charCount) {
-        jobTextarea.addEventListener('input', function() {
-            const count = this.value.length;
-            charCount.textContent = `${count.toLocaleString()} characters`;
-            
-            // Visual feedback for job description length
-            if (count > 500) {
-                charCount.style.color = 'var(--success)';
-            } else if (count > 100) {
-                charCount.style.color = 'var(--warning)';
-            } else {
-                charCount.style.color = 'var(--text-light)';
-            }
-        });
-    }
-}
-
-/**
- * Setup form submission handling
- */
-function setupFormSubmission() {
-    // Add character counter for job description
-    setupJobDescriptionCounter();
-    
-    // Prevent form submission on Enter key in textareas
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && e.target.tagName.toLowerCase() === 'textarea') {
-            if (e.ctrlKey || e.metaKey) {
-                // Ctrl/Cmd + Enter should trigger optimization if ready
-                e.preventDefault();
-                if (window.optimizationState.currentStep === 2) {
-                    startOptimization();
-                }
-            }
-        }
-    });
-}
-
-function enhanceExistingFunctionality() {
-    // Hook into existing resume upload functionality
-    hookIntoResumeUpload();
-    console.log('Enhanced functionality loaded');
-}
-function hookIntoResumeUpload() {
-    // Connect to existing resume upload functionality
-    const originalHandleTextInput = window.handleTextInput;
-    if (originalHandleTextInput) {
-        window.handleTextInput = function(text) {
-            // Call original function
-            originalHandleTextInput(text);
-            
-            // Update our state
-            window.optimizationState.resumeData = {
-                type: 'text',
-                text: text
-            };
-            
-            // Show job description section
-            showJobDescriptionSection();
-        };
-    }
-    
-    // Hook into file upload
-    const originalHandleFileUpload = window.handleFileUpload;
-    if (originalHandleFileUpload) {
-        window.handleFileUpload = function(file) {
-            // Call original function
-            originalHandleFileUpload(file);
-            
-            // Update our state  
-            window.optimizationState.resumeData = {
-                type: 'file',
-                file: file
-            };
-            
-            // Show job description section
-            showJobDescriptionSection();
-        };
-    }
-}
-
-/**
- * Temporary functions for handling results (will be replaced by COMMIT 5)
- */
-function viewResults() {
-    // This will be replaced by proper results page in COMMIT 5
-    alert('Results page will be implemented in COMMIT 5. For now, check console for results data.');
-    console.log('Optimization Results:', window.optimizationState.results);
-    
-    // Hide overlay
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) overlay.remove();
-}
-
-function startOver() {
-    // Reset all state
-    window.optimizationState = {
-        currentStep: 1,
-        resumeData: null,
-        jobData: null,
-        isProcessing: false,
-        results: null
-    };
-    
-    // Reset form
-    if (window.resetInputs) {
-        window.resetInputs();
-    }
-    
-    // Hide job section
-    const jobContent = document.getElementById('job-content');
-    const expandIcon = document.getElementById('expand-icon');
-    if (jobContent) jobContent.style.display = 'none';
-    if (expandIcon) expandIcon.innerHTML = '<i class="fas fa-plus"></i>';
-    
-    // Reset continue button
-    const continueBtn = document.getElementById('continue-button');
-    if (continueBtn) {
-        continueBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue to Job Description';
-        continueBtn.disabled = true;
-        continueBtn.classList.remove('btn-success');
-    }
-    
-    // Remove optimization button
-    const optimizeBtn = document.getElementById('optimize-submit-btn');
-    if (optimizeBtn && optimizeBtn.parentElement) {
-        optimizeBtn.parentElement.remove();
-    }
-    
-    // Hide overlay
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) overlay.remove();
-    
-    // Clear messages
-    if (window.clearMessages) {
-        window.clearMessages();
-    }
-}
-
-function showMessage(text, type = 'info', duration = null, containerId = 'messages') {
-    const icons = { success: 'check-circle', error: 'exclamation-triangle', warning: 'info-circle', info: 'info-circle' };
-    const container = document.getElementById(containerId);
-  
-    // Fallback if container not found
-    if (!container) {
-      const label = (type || 'info').toUpperCase();
-      (type === 'error' ? console.error : console.log)(`${label}: ${text}`);
-      if (duration) setTimeout(() => window.clearMessages?.(), duration);
-      return;
-    }
-  
-    // Build DOM safely (avoid innerHTML injection on text)
-    const wrapper = document.createElement('div');
-    wrapper.className = `message ${type}`;
-  
-    const iconEl = document.createElement('i');
-    iconEl.className = `fas fa-${icons[type] || icons.info}`;
-  
-    const textEl = document.createElement('span');
-    textEl.textContent = String(text);
-  
-    wrapper.append(iconEl, textEl);
-  
-    // Replace existing content
-    container.innerHTML = '';
-    container.appendChild(wrapper);
-  
-    // Auto clear
-    const auto = duration ?? (type === 'success' ? 4000 : null);
-    if (auto) setTimeout(() => { if (container.firstChild === wrapper) container.innerHTML = ''; }, auto);
-  }
-/**
- * Debug function for development
- */
-function debugOptimizationState() {
-    console.log('Current Optimization State:', window.optimizationState);
-    console.log('Resume Data Valid:', !!window.optimizationState.resumeData);
-    console.log('Job Data Valid:', !!window.optimizationState.jobData);
-    console.log('Current Step:', window.optimizationState.currentStep);
-}
-
-/**
- * Enhanced processing steps with real-time progress
- */
-function showEnhancedProgressIndicator() {
-    const overlay = document.getElementById('loading-overlay');
-    if (!overlay) return;
-    
-    overlay.innerHTML = `
-        <div class="loading-content">
-            <div class="progress-header">
-                <h3>AI is optimizing your resume...</h3>
-                <div class="estimated-time">
-                    <i class="fas fa-clock"></i>
-                    <span id="time-remaining">Estimated: 45-60 seconds</span>
-                </div>
-            </div>
-            
-            <!-- Progress Bar -->
-            <div class="progress-bar-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
-                </div>
-                <div class="progress-percentage" id="progress-percentage">0%</div>
-            </div>
-            
-            <!-- Step Indicators -->
-            <div class="processing-steps-enhanced" id="processing-steps-enhanced">
-                <div class="step-item" data-step="1">
-                    <div class="step-icon"><i class="fas fa-file-text"></i></div>
-                    <div class="step-text">Parsing resume content</div>
-                    <div class="step-status pending">⏳</div>
-                </div>
-                <div class="step-item" data-step="2">
-                    <div class="step-icon"><i class="fas fa-search"></i></div>
-                    <div class="step-text">Analyzing skill gaps</div>
-                    <div class="step-status pending">⏳</div>
-                </div>
-                <div class="step-item" data-step="3">
-                    <div class="step-icon"><i class="fas fa-brain"></i></div>
-                    <div class="step-text">AI optimization</div>
-                    <div class="step-status pending">⏳</div>
-                </div>
-                <div class="step-item" data-step="4">
-                    <div class="step-icon"><i class="fas fa-clipboard-list"></i></div>
-                    <div class="step-text">Generating explanations</div>
-                    <div class="step-status pending">⏳</div>
-                </div>
-                <div class="step-item" data-step="5">
-                    <div class="step-icon"><i class="fas fa-shield-alt"></i></div>
-                    <div class="step-text">Applying guardrails</div>
-                    <div class="step-status pending">⏳</div>
-                </div>
-                <div class="step-item" data-step="6">
-                    <div class="step-icon"><i class="fas fa-file-pdf"></i></div>
-                    <div class="step-text">Creating documents</div>
-                    <div class="step-status pending">⏳</div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Start progress simulation
-    simulateProgressUpdates();
-}
-
-/**
- * Simulate progress updates based on typical processing times
- */
-function simulateProgressUpdates() {
-    const steps = [
-        { step: 1, delay: 2000, progress: 15, text: "Resume parsed successfully" },
-        { step: 2, delay: 8000, progress: 35, text: "Gap analysis complete" },
-        { step: 3, delay: 25000, progress: 70, text: "AI optimization in progress" },
-        { step: 4, delay: 35000, progress: 85, text: "Generating explanations" },
-        { step: 5, delay: 40000, progress: 95, text: "Applying final checks" },
-        { step: 6, delay: 45000, progress: 100, text: "Documents ready" }
-    ];
-    
-    steps.forEach(({ step, delay, progress, text }) => {
-        setTimeout(() => {
-            updateProgressStep(step, progress, text);
-        }, delay);
-    });
-}
-
-/**
- * Update individual progress step
- */
-function updateProgressStep(stepNumber, progressPercent, statusText) {
-    const stepItem = document.querySelector(`[data-step="${stepNumber}"]`);
-    const progressFill = document.getElementById('progress-fill');
-    const progressPercentage = document.getElementById('progress-percentage');
-    const timeRemaining = document.getElementById('time-remaining');
-    
-    if (stepItem) {
-        const statusElement = stepItem.querySelector('.step-status');
-        statusElement.textContent = '✅';
-        statusElement.className = 'step-status complete';
-        stepItem.classList.add('completed');
-    }
-    
-    if (progressFill) {
-        progressFill.style.width = `${progressPercent}%`;
-    }
-    
-    if (progressPercentage) {
-        progressPercentage.textContent = `${progressPercent}%`;
-    }
-    
-    if (timeRemaining && progressPercent < 100) {
-        const remainingSeconds = Math.max(5, Math.floor((100 - progressPercent) / 2));
-        timeRemaining.innerHTML = `<i class="fas fa-clock"></i> ${remainingSeconds} seconds remaining`;
-    } else if (timeRemaining && progressPercent === 100) {
-        timeRemaining.innerHTML = `<i class="fas fa-check"></i> Complete!`;
-    }
-}
-
-
-
-
-
-
-// File validation constants
-const FILE_VALIDATION = {
-    MAX_SIZE: 5 * 1024 * 1024, // 5MB
-    MIN_TEXT_LENGTH: 100,
-    MAX_TEXT_LENGTH: 50000,
-    ALLOWED_TYPES: {
-        'application/pdf': 'PDF',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word Document',
-        'text/plain': 'Text File'
-    },
-    MALICIOUS_PATTERNS: [
-        /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-        /javascript:/gi,
-        /on\w+\s*=/gi,
-        /data:text\/html/gi
-    ],
-    RESUME_PATTERNS: [
-        /experience|employment|work\s+history/i,
-        /education|degree|university|college/i, 
-        /skills|competencies|proficiencies/i,
-        /\b\d{4}\s*[-–]\s*(\d{4}|present|current)\b/i, // Date ranges
-        /@[\w\.-]+\.\w+/, // Email pattern
-        /\b\(\d{3}\)\s*\d{3}-\d{4}\b|\b\d{3}-\d{3}-\d{4}\b/ // Phone patterns
-    ]
-};
-
-/**
- * Enhanced file validation with detailed error messages
- */
-function validateFileUpload(file) {
-    const errors = [];
-    const warnings = [];
-    
-    // Check file size
-    if (file.size === 0) {
-        errors.push('File appears to be empty. Please select a valid resume file.');
-        return { isValid: false, errors, warnings };
-    }
-    
-    if (file.size > FILE_VALIDATION.MAX_SIZE) {
-        errors.push(`File size (${formatFileSize(file.size)}) exceeds the 5MB limit. Please compress your file or use a smaller version.`);
-    }
-    
-    // Check file type
-    if (!FILE_VALIDATION.ALLOWED_TYPES[file.type]) {
-        errors.push(`File type "${file.type}" is not supported. Please upload PDF, DOCX, or TXT files only.`);
-        return { isValid: false, errors, warnings };
-    }
-    
-    // Check filename for suspicious content
-    if (containsSuspiciousPatterns(file.name)) {
-        errors.push('Filename contains invalid characters. Please rename your file and try again.');
-    }
-    
-    // Size warnings
-    if (file.size < 1024) {
-        warnings.push('File seems very small. Make sure it contains your complete resume.');
-    }
-    
-    if (file.size > 2 * 1024 * 1024) {
-        warnings.push('Large file detected. Processing may take longer than usual.');
+        warnings.push('No job description provided. Adding one significantly improves optimization quality.');
     }
     
     return {
         isValid: errors.length === 0,
         errors,
-        warnings,
-        fileInfo: {
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            typeDisplay: FILE_VALIDATION.ALLOWED_TYPES[file.type]
-        }
+        warnings
     };
 }
 
 /**
- * Enhanced text validation
+ * Clear messages from any message container
  */
-function validateTextInput(text) {
-    const errors = [];
-    const warnings = [];
-    const cleanText = text.trim();
-    
-    // Length validation
-    if (cleanText.length < FILE_VALIDATION.MIN_TEXT_LENGTH) {
-        errors.push(`Resume text is too short (${cleanText.length} characters). Please provide at least ${FILE_VALIDATION.MIN_TEXT_LENGTH} characters.`);
-        return { isValid: false, errors, warnings };
+function clearMessages() {
+    // Clear upload messages
+    const uploadMessages = document.getElementById('upload-messages');
+    if (uploadMessages) {
+        uploadMessages.innerHTML = '';
     }
     
-    if (cleanText.length > FILE_VALIDATION.MAX_TEXT_LENGTH) {
-        errors.push(`Resume text is too long (${cleanText.length} characters). Please limit to ${FILE_VALIDATION.MAX_TEXT_LENGTH} characters.`);
+    // Clear any other message containers
+    const messages = document.getElementById('messages');
+    if (messages) {
+        messages.innerHTML = '';
     }
     
-    // Content validation
-    if (!containsResumeKeywords(cleanText)) {
-        warnings.push('Text doesn\'t appear to contain typical resume content. Please ensure you\'ve pasted your complete resume.');
+    // Remove retry button if it exists
+    const retryBtn = document.getElementById('retry-btn');
+    if (retryBtn) {
+        retryBtn.remove();
     }
-    
-    // Security validation
-    if (containsMaliciousContent(cleanText)) {
-        errors.push('Text contains potentially harmful content. Please remove any scripts or suspicious code.');
-    }
-    
-    // Quality checks
-    const wordCount = cleanText.split(/\s+/).length;
-    if (wordCount < 50) {
-        warnings.push('Resume seems very brief. Consider adding more details about your experience and skills.');
-    }
-    
-    if (!containsContactInfo(cleanText)) {
-        warnings.push('No contact information detected. Make sure to include your name and email address.');
-    }
-    
-    return {
-        isValid: errors.length === 0,
-        errors,
-        warnings,
-        textInfo: {
-            length: cleanText.length,
-            wordCount: wordCount,
-            hasContactInfo: containsContactInfo(cleanText),
-            hasExperience: containsExperienceSection(cleanText)
-        }
-    };
 }
 
 /**
- * Job description validation
- */
-function validateJobDescription(text, title = '') {
-    const errors = [];
-    const warnings = [];
-    const cleanText = text.trim();
-    
-    // Length validation (more lenient for JD)
-    if (cleanText.length > 0 && cleanText.length < 50) {
-        warnings.push('Job description seems very brief. More detailed descriptions produce better optimization results.');
-    }
-    
-    if (cleanText.length > 20000) {
-        warnings.push('Very long job description. We\'ll focus on the most relevant parts for optimization.');
-    }
-    
-    // Content quality checks
-    if (cleanText.length > 0) {
-        if (!containsJobKeywords(cleanText)) {
-            warnings.push('Text doesn\'t appear to be a typical job description. Please paste the complete job posting.');
-        }
-        
-        if (containsMaliciousContent(cleanText)) {
-            errors.push('Job description contains potentially harmful content.');
-        }
-    }
-    
-    return {
-        isValid: errors.length === 0,
-        errors,
-        warnings,
-        jdInfo: {
-            length: cleanText.length,
-            wordCount: cleanText.split(/\s+/).length,
-            hasTitle: title.trim().length > 0,
-            hasRequirements: /requirements?|qualifications?|skills?/i.test(cleanText)
-        }
-    };
-}
-
-/**
- * Helper functions for content validation
- */
-function containsResumeKeywords(text) {
-    const resumePatterns = [
-        /experience|employment|work history/i,
-        /skills|proficient|expertise/i,
-        /education|degree|university|college/i,
-        /@[\w.-]+\.\w+/, // Email pattern
-        /\(\d{3}\)|\d{3}[-.\s]\d{3}[-.\s]\d{4}/ // Phone pattern
-    ];
-    
-    return resumePatterns.some(pattern => pattern.test(text));
-}
-
-function containsJobKeywords(text) {
-    const jobPatterns = [
-        /responsibilities|duties|requirements/i,
-        /qualifications|experience|skills/i,
-        /seeking|looking for|hiring/i,
-        /position|role|opportunity/i
-    ];
-    
-    return jobPatterns.some(pattern => pattern.test(text));
-}
-
-function containsContactInfo(text) {
-    const emailPattern = /@[\w.-]+\.\w+/;
-    const phonePattern = /\(\d{3}\)|\d{3}[-.\s]\d{3}[-.\s]\d{4}/;
-    
-    return emailPattern.test(text) || phonePattern.test(text);
-}
-
-function containsExperienceSection(text) {
-    const experiencePatterns = [
-        /experience|employment|work\s+history/i,
-        /\d{4}\s*[-–]\s*\d{4}/, // Date ranges
-        /\d{4}\s*[-–]\s*(present|current)/i
-    ];
-    
-    return experiencePatterns.some(pattern => pattern.test(text));
-}
-
-function containsSuspiciousPatterns(text) {
-    return FILE_VALIDATION.MALICIOUS_PATTERNS.some(pattern => pattern.test(text));
-}
-
-function containsMaliciousContent(text) {
-    return containsSuspiciousPatterns(text);
-}
-
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-}
-
-/**
- * Enhanced error display with categorization
+ * Show validation results
  */
 function showValidationResults(validation, containerId = 'upload-messages') {
     const container = document.getElementById(containerId);
@@ -1257,62 +710,18 @@ function showValidationResults(validation, containerId = 'upload-messages') {
     }
     
     container.innerHTML = html;
-    
-    // Auto-clear warnings after 8 seconds
-    if (validation.warnings && validation.warnings.length > 0 && validation.errors.length === 0) {
-        setTimeout(() => {
-            const warningMessages = container.querySelectorAll('.message.warning');
-            warningMessages.forEach(msg => {
-                msg.style.animation = 'fadeOut 0.3s ease';
-                setTimeout(() => msg.remove(), 300);
-            });
-        }, 8000);
-    }
 }
 
 /**
- * Pre-submit validation for entire optimization request
+ * Custom API Error class
  */
-function validateOptimizationRequest() {
-    const errors = [];
-    const warnings = [];
-    
-    // Validate resume data
-    if (!window.optimizationState.resumeData) {
-        errors.push('No resume data found. Please upload a resume or paste resume text.');
-        return { isValid: false, errors, warnings };
+class APIError extends Error {
+    constructor(message, status, details = null) {
+        super(message);
+        this.name = 'APIError';
+        this.status = status;
+        this.details = details;
     }
-    
-    const { resumeData, jobData } = window.optimizationState;
-    
-    // Validate resume content
-    if (resumeData.type === 'text') {
-        const textValidation = validateTextInput(resumeData.text || '');
-        errors.push(...textValidation.errors);
-        warnings.push(...textValidation.warnings);
-    }
-    
-    // Validate job description (if provided)
-    if (jobData && jobData.text) {
-        const jdValidation = validateJobDescription(jobData.text, jobData.title);
-        errors.push(...jdValidation.errors);
-        warnings.push(...jdValidation.warnings);
-    } else {
-        warnings.push('No job description provided. Adding one significantly improves optimization quality.');
-    }
-    
-    // Check for potential issues
-    if (resumeData.type === 'file' && resumeData.file) {
-        const fileValidation = validateFileUpload(resumeData.file);
-        errors.push(...fileValidation.errors);
-        warnings.push(...fileValidation.warnings);
-    }
-    
-    return {
-        isValid: errors.length === 0,
-        errors,
-        warnings
-    };
 }
 
 /**
@@ -1382,313 +791,105 @@ function handleAPIError(response, responseData) {
 }
 
 /**
- * Enhanced error message display with actions
- */
-function showEnhancedError(errorInfo, containerId = 'upload-messages') {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    
-    const actionsHtml = errorInfo.canRetry ? `
-        <div class="error-actions">
-            ${getErrorActionButton(errorInfo.suggestedAction)}
-            <button class="btn btn-outline btn-sm" onclick="clearMessages()">
-                <i class="fas fa-times"></i> Dismiss
-            </button>
-        </div>
-    ` : '';
-    
-    container.innerHTML = `
-        <div class="message error enhanced">
-            <div class="message-icon">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div class="message-content">
-                <div class="error-message">${errorInfo.message}</div>
-                ${errorInfo.details ? `<div class="error-details">${errorInfo.details}</div>` : ''}
-                ${actionsHtml}
-            </div>
-        </div>
-    `;
-}
-
-/**
- * Get appropriate action button for error type
- */
-function getErrorActionButton(actionType) {
-    switch (actionType) {
-        case 'verify_input':
-            return `
-                <button class="btn btn-primary btn-sm" onclick="showInputValidationHelp()">
-                    <i class="fas fa-question-circle"></i> Check Input Format
-                </button>
-            `;
-        case 'refresh_page':
-            return `
-                <button class="btn btn-primary btn-sm" onclick="window.location.reload()">
-                    <i class="fas fa-sync"></i> Refresh Page
-                </button>
-            `;
-        case 'reduce_file_size':
-            return `
-                <button class="btn btn-primary btn-sm" onclick="showFileSizeHelp()">
-                    <i class="fas fa-compress"></i> File Size Help
-                </button>
-            `;
-        case 'wait_and_retry':
-            return `
-                <button class="btn btn-primary btn-sm" onclick="scheduleRetry()">
-                    <i class="fas fa-clock"></i> Retry in 30s
-                </button>
-            `;
-        case 'contact_support':
-            return `
-                <button class="btn btn-primary btn-sm" onclick="showSupportOptions()">
-                    <i class="fas fa-life-ring"></i> Get Help
-                </button>
-            `;
-        default:
-            return `
-                <button class="btn btn-primary btn-sm" onclick="startOptimization()">
-                    <i class="fas fa-redo"></i> Try Again
-                </button>
-            `;
-    }
-}
-
-/**
- * Help functions for specific error types
- */
-function showInputValidationHelp() {
-    alert(`Resume Format Help:
-
-Your resume should include:
-✓ Your name and contact information
-✓ Work experience with dates
-✓ Skills and qualifications
-✓ Education background
-
-Example format:
-John Smith
-Email: john@email.com | Phone: (555) 123-4567
-
-EXPERIENCE
-Software Developer | TechCorp | 2020-2023
-• Built web applications...
-
-SKILLS
-Python, JavaScript, SQL...`);
-}
-
-function showFileSizeHelp() {
-    alert(`File Size Help:
-
-To reduce file size:
-• Save as PDF instead of Word document
-• Remove unnecessary images or graphics
-• Use "Save as Web Quality" option in Word
-• Compress images before inserting
-• Keep resume to 1-2 pages maximum
-
-If you need help, try converting to plain text first.`);
-}
-
-function scheduleRetry() {
-    let countdown = 30;
-    const container = document.getElementById('upload-messages');
-    
-    const interval = setInterval(() => {
-        countdown--;
-        container.querySelector('.btn').innerHTML = `
-            <i class="fas fa-clock"></i> Retry in ${countdown}s
-        `;
-        
-        if (countdown <= 0) {
-            clearInterval(interval);
-            startOptimization();
-        }
-    }, 1000);
-}
-
-function showSupportOptions() {
-    alert(`Get Help:
-
-If you continue experiencing issues:
-
-1. Try using plain text instead of file upload
-2. Ensure your resume is in a standard format
-3. Check that your internet connection is stable
-4. Contact our support team with error details
-
-For technical support, include:
-• Error message details
-• File type and size
-• Browser and operating system`);
-}
-
-/**
- * Enhanced retry mechanism with exponential backoff
- */
-class RetryManager {
-    constructor(maxRetries = 3, baseDelay = 1000) {
-        this.maxRetries = maxRetries;
-        this.baseDelay = baseDelay;
-        this.currentRetry = 0;
-    }
-    
-    async executeWithRetry(asyncFunction, context = 'operation') {
-        this.currentRetry = 0;
-        
-        while (this.currentRetry <= this.maxRetries) {
-            try {
-                return await asyncFunction();
-            } catch (error) {
-                this.currentRetry++;
-                
-                if (this.currentRetry > this.maxRetries) {
-                    throw new Error(`${context} failed after ${this.maxRetries} retries: ${error.message}`);
-                }
-                
-                const delay = this.baseDelay * Math.pow(2, this.currentRetry - 1);
-                console.log(`Retry ${this.currentRetry}/${this.maxRetries} in ${delay}ms...`);
-                
-                await this.delay(delay);
-            }
-        }
-    }
-    
-    delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    
-    reset() {
-        this.currentRetry = 0;
-    }
-}
-
-
-/**
- * Connection and service status monitoring
- */
-class ServiceMonitor {
-    constructor() {
-        this.isOnline = navigator.onLine;
-        this.lastCheckTime = Date.now();
-        this.checkInterval = null;
-        this.statusElement = null;
-        
-        this.init();
-    }
-    
-    init() {
-        this.createStatusIndicator();
-        this.setupEventListeners();
-        this.startPeriodicChecks();
-        this.checkServiceStatus();
-    }
-    
-    createStatusIndicator() {
-        this.statusElement = document.createElement('div');
-        this.statusElement.className = 'connection-status checking';
-        this.statusElement.innerHTML = `
-            <div class="status-dot"></div>
-            <span>Checking...</span>
-        `;
-        document.body.appendChild(this.statusElement);
-    }
-    
-    setupEventListeners() {
-        window.addEventListener('online', () => this.updateConnectionStatus(true));
-        window.addEventListener('offline', () => this.updateConnectionStatus(false));
-    }
-    
-    startPeriodicChecks() {
-        this.checkServiceStatus()
-        // Check service every 30 seconds
-        // this.checkInterval = setInterval(() => {
-        //     this.checkServiceStatus();
-        // }, 30000);
-    }
-    
-    async checkServiceStatus() {
-        try {
-            const response = await fetch('/api/v1/optimizer/status', {
-                method: 'GET',
-                headers: { 'Cache-Control': 'no-cache' }
-            });
-            
-            const status = await response.json();
-            this.updateServiceStatus(status);
-            
-        } catch (error) {
-            console.warn('Service status check failed:', error);
-            this.updateServiceStatus({ status: 'error' });
-        }
-    }
-    
-    updateConnectionStatus(isOnline) {
-        this.isOnline = isOnline;
-        
-        if (this.statusElement) {
-            this.statusElement.className = `connection-status ${isOnline ? 'online' : 'offline'}`;
-            this.statusElement.innerHTML = `
-                <div class="status-dot"></div>
-                <span>${isOnline ? 'Connected' : 'Offline'}</span>
-            `;
-        }
-    }
-    
-    updateServiceStatus(status) {
-        if (!this.statusElement) return;
-        
-        const isAvailable = status.status === 'available';
-        const className = isAvailable ? 'online' : (status.status === 'degraded' ? 'checking' : 'offline');
-        const text = isAvailable ? 'Service Ready' : (status.status === 'degraded' ? 'Service Slow' : 'Service Down');
-        
-        this.statusElement.className = `connection-status ${className}`;
-        this.statusElement.innerHTML = `
-            <div class="status-dot"></div>
-            <span>${text}</span>
-        `;
-        
-        // Auto-hide when service is working
-        if (isAvailable) {
-            setTimeout(() => {
-                if (this.statusElement) {
-                    this.statusElement.style.opacity = '0.7';
-                }
-            }, 3000);
-        }
-    }
-    
-    destroy() {
-        if (this.checkInterval) {
-            clearInterval(this.checkInterval);
-        }
-        if (this.statusElement) {
-            this.statusElement.remove();
-        }
-    }
-}
-
-// Initialize service monitor when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    window.serviceMonitor = new ServiceMonitor();
-});
-
-/**
- optimization error handler with retry logic
+ * Optimization error handler with retry logic
  */
 function handleOptimizationError(error) {
     // APIError or generic Error
     const isApi = error instanceof APIError;
     const message = isApi ? error.message : (error?.message || 'Optimization failed. Please try again.');
-    const suggestedAction = isApi ? error.details?.suggestedAction : null;
-    const canRetry = isApi ? error.details?.canRetry ?? true : true;
+    
+    console.error('Optimization error:', error);
+    
+    // Show error in dashboard UI
+    showMessage(message, 'error', null, 'upload-messages');
+}
+
+/**
+ * Show message in dashboard UI
+ */
+function showMessage(text, type = 'info', duration = null, containerId = 'messages') {
+    const icons = { success: 'check-circle', error: 'exclamation-triangle', warning: 'info-circle', info: 'info-circle' };
+    const container = document.getElementById(containerId);
   
-    showEnhancedError({
-      message,
-      canRetry,
-      suggestedAction,
-      details: isApi ? (error.details?.details ?? null) : null
-    });
-  }
+    // Fallback if container not found
+    if (!container) {
+        const label = (type || 'info').toUpperCase();
+        (type === 'error' ? console.error : console.log)(`${label}: ${text}`);
+        return;
+    }
+  
+    // Build DOM safely
+    const wrapper = document.createElement('div');
+    wrapper.className = `message ${type}`;
+  
+    const iconEl = document.createElement('i');
+    iconEl.className = `fas fa-${icons[type] || icons.info}`;
+  
+    const textEl = document.createElement('span');
+    textEl.textContent = String(text);
+  
+    wrapper.append(iconEl, textEl);
+  
+    // Replace existing content
+    container.innerHTML = '';
+    container.appendChild(wrapper);
+  
+    // Auto clear
+    const auto = duration ?? (type === 'success' ? 4000 : null);
+    if (auto) setTimeout(() => { if (container.firstChild === wrapper) container.innerHTML = ''; }, auto);
+}
+
+/**
+ * Start over function
+ */
+function startOver() {
+    // Reset all state
+    window.optimizationState = {
+        currentStep: 1,
+        resumeData: null,
+        jobData: null,
+        isProcessing: false,
+        results: null,
+        validationStatus: { resume: false, job: false },
+        extractedContent: null,
+        contentMetrics: { wordCount: 0, sectionCount: 0, hasContact: false }
+    };
+    
+    // Reset dashboard form elements
+    const jobTitle = document.getElementById('jobTitle');
+    const jobText = document.getElementById('jobText');
+    const jobLink = document.getElementById('jobLink');
+    
+    if (jobTitle) jobTitle.value = '';
+    if (jobText) jobText.value = '';
+    if (jobLink) jobLink.value = '';
+    
+    // Reset button state
+    const optimizeBtn = document.getElementById('optimizeBtn');
+    if (optimizeBtn) {
+        optimizeBtn.disabled = true;
+        optimizeBtn.classList.remove('is-loading');
+    }
+    
+    // Hide overlay
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) overlay.remove();
+    
+    // Clear messages
+    clearMessages();
+    
+    // Trigger dashboard.js to reset file upload state if available
+    if (typeof window.removeFile === 'function') {
+        window.removeFile('resume');
+    }
+}
+
+/**
+ * Debug function for development
+ */
+function debugOptimizationState() {
+    console.log('Current Optimization State:', window.optimizationState);
+    console.log('Resume Data Valid:', !!window.optimizationState.resumeData);
+    console.log('Job Data Valid:', !!window.optimizationState.jobData);
+    console.log('Current Step:', window.optimizationState.currentStep);
+}

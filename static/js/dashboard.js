@@ -377,34 +377,21 @@
         });
     }
     function integrateWithOptimizationWorkflow(root) {
-        if (typeof window.optimizationState !== 'undefined') {
-            // Set resume data from our state
-            if (state.selectedFile) {
-                window.optimizationState.resumeData = {
-                    type: 'file',
-                    content: state.selectedFile,
-                    file: state.selectedFile
-                };
-            }
-    
-            // Set job data from form fields
-            window.optimizationState.jobData = {
-                title: elements.jobTitle?.value?.trim() || '',
-                text: elements.jobText?.value?.trim() || '',
-                description: elements.jobText?.value?.trim() || ''
+        // Set resume data in optimization state
+        if (state.selectedFile) {
+            window.optimizationState.resumeData = {
+                type: 'file',
+                content: state.selectedFile,
+                file: state.selectedFile
             };
-    
-            // Call optimization.js startOptimization function
-            if (typeof window.startOptimization === 'function') {
-                window.startOptimization();
-            } else {
-                console.error('startOptimization function not found in optimization.js');
-                // Fallback to our internal submission
-                submitOptimization(root, '/api/v1/optimizer/optimize');
-            }
+        }
+        
+        // Call the refactored optimization.js function
+        if (typeof window.startOptimization === 'function') {
+            window.startOptimization();
         } else {
-            console.error('optimizationState not found. Using fallback submission.');
-            // Fallback to our internal submission
+            console.error('startOptimization function not found');
+            // Fallback to internal submission
             submitOptimization(root, '/api/v1/optimizer/optimize');
         }
     }
