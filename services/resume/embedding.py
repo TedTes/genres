@@ -219,7 +219,20 @@ async def analyze_semantic_gaps(
     Returns:
         Gap analysis with similarity metrics
     """
-    
+    # Validate inputs
+    if not resume_chunks:
+        raise ValueError("No resume chunks provided for gap analysis")
+    if not jd_text or not jd_text.strip():
+        print("⚠️ No job description provided - skipping semantic gap analysis")
+        return {
+            'semantic_similarity': 0.0,
+            'strong_matches': [],
+            'weak_matches': [],
+            'section_similarities': {},
+            'total_chunks_analyzed': len(resume_chunks),
+            'embedding_dimension': 0,
+            'skipped_reason': 'No job description provided'
+        }
     embedder = ResumeEmbedder()
     
     # Generate embeddings
