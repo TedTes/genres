@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify,current_app,send_file, make_response,Response,render_template
+from flask import Blueprint, request, jsonify,current_app,send_file, make_response,Response,render_template,flash,redirect,url_for
 from flask_login import login_required,current_user
 from werkzeug.exceptions import BadRequest
 import asyncio
@@ -20,7 +20,8 @@ from services.resume.formatting import create_docx_sync, create_pdf_sync
 from services.resume.storage import store_resume_files_sync, generate_resume_hash_sync
 from services.resume.cache import get_enhanced_cache
 from providers import get_models, test_provider_connection
-
+from models import Resume,ResumeOptimization,User
+from db import db
 import traceback
 from datetime import datetime
 
@@ -144,6 +145,7 @@ def optimize_resume():
             total_time = (time.time() - request_start_time) * 1000
             # Save to database
             model_provider = current_app.config.get('MODEL_PROVIDER', 'unknown')
+            
             result_id = save_optimization_to_db(
                 user_id=user_id,
                 resume_input=resume_input,
