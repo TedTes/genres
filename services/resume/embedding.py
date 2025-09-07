@@ -90,16 +90,22 @@ class ResumeEmbedder:
         Returns:
             EmbeddingResult for the job description
         """
-        
+        if not jd_text or not jd_text.strip():
+          raise ValueError("Job description text cannot be empty for embedding generation")
+
+        clean_text = jd_text.strip()
+
+        if len(clean_text) < 10:  # Minimum meaningful content
+          raise ValueError("Job description too short for meaningful embedding generation")
         print(f"🎯 Generating job description embedding...")
         
         try:
-            embeddings = await self.embedder.embed([jd_text])
+            embeddings = await self.embedder.embed([clean_text])
             
             result = EmbeddingResult(
-                text=jd_text,
+                text=clean_text,
                 embedding=embeddings[0],
-                token_count=len(jd_text.split())
+                token_count=len(clean_text.split())
             )
             
             print(f"✅ Generated JD embedding (dim: {len(embeddings[0])})")
