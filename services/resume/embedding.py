@@ -90,16 +90,22 @@ class ResumeEmbedder:
         Returns:
             EmbeddingResult for the job description
         """
-        
+        if not jd_text or not jd_text.strip():
+          raise ValueError("Job description text cannot be empty for embedding generation")
+
+        clean_text = jd_text.strip()
+
+        if len(clean_text) < 10:  # Minimum meaningful content
+          raise ValueError("Job description too short for meaningful embedding generation")
         print(f"🎯 Generating job description embedding...")
         
         try:
-            embeddings = await self.embedder.embed([jd_text])
+            embeddings = await self.embedder.embed([clean_text])
             
             result = EmbeddingResult(
-                text=jd_text,
+                text=clean_text,
                 embedding=embeddings[0],
-                token_count=len(jd_text.split())
+                token_count=len(clean_text.split())
             )
             
             print(f"✅ Generated JD embedding (dim: {len(embeddings[0])})")
@@ -213,7 +219,20 @@ async def analyze_semantic_gaps(
     Returns:
         Gap analysis with similarity metrics
     """
-    
+    # Validate inputs
+    if not resume_chunks:
+        raise ValueError("No resume chunks provided for gap analysis")
+    if not jd_text or not jd_text.strip():
+        print("⚠️ No job description provided - skipping semantic gap analysis")
+        return {
+            'semantic_similarity': 0.0,
+            'strong_matches': [],
+            'weak_matches': [],
+            'section_similarities': {},
+            'total_chunks_analyzed': len(resume_chunks),
+            'embedding_dimension': 0,
+            'skipped_reason': 'No job description provided'
+        }
     embedder = ResumeEmbedder()
     
     # Generate embeddings
