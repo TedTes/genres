@@ -2,7 +2,7 @@
 {% block title %}Resume Optimizer - AI Resume Coach{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/dashboard.css') }}">
 {% endblock %}
 
 {% block body_class %}page-dashboard{% endblock %}
@@ -84,6 +84,55 @@
                            accept=".pdf,.docx,.txt" 
                            hidden 
                            required>
+                           <div class="upload-settings">
+                            <div class="settings-header">
+                                <h3>
+                                    <i class="fas fa-cog"></i>
+                                    Optimization Settings
+                                </h3>
+                            </div>
+                            
+                            <div class="settings-content">
+                                <!-- Tone Selection -->
+                                <div class="setting-group">
+                                    <label class="setting-label">Writing Style</label>
+                                    <div class="tone-options">
+                                        <label class="tone-option active">
+                                            <input type="radio" name="tone" value="professional-concise" checked>
+                                            <span class="tone-name">Professional</span>
+                                            <span class="tone-desc">Clean and ATS-friendly</span>
+                                        </label>
+                                        <label class="tone-option">
+                                            <input type="radio" name="tone" value="creative">
+                                            <span class="tone-name">Creative</span>
+                                            <span class="tone-desc">Engaging and dynamic</span>
+                                        </label>
+                                        <label class="tone-option">
+                                            <input type="radio" name="tone" value="technical">
+                                            <span class="tone-name">Technical</span>
+                                            <span class="tone-desc">Detailed and skill-focused</span>
+                                        </label>
+                                    </div>
+                                </div>
+    
+                                <!-- Output Formats -->
+                                <div class="setting-group inline">
+                                    <label class="setting-label">Download Formats</label>
+                                    <div class="format-options">
+                                        <label class="format-option active">
+                                            <input type="checkbox" name="include_pdf" value="true" checked>
+                                            <i class="fas fa-file-pdf"></i>
+                                            <span>PDF</span>
+                                        </label>
+                                        <label class="format-option active">
+                                            <input type="checkbox" name="include_docx" value="true" checked>
+                                            <i class="fas fa-file-word"></i>
+                                            <span>DOCX</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>   
                 </div>
 
                 <!-- Right Column: Job Description -->
