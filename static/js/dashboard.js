@@ -25,6 +25,7 @@
     function initDashboard(root = document) {
         // Cache DOM elements
         elements = {
+            form: root.querySelector('#optimizationForm'),
             dropzone: root.querySelector('#resumeUpload'),
             fileInput: root.querySelector('#resumeFile'),
             uploadState: root.querySelector('#resumeUpload'),
@@ -43,7 +44,7 @@
         statusElement = root.querySelector('[aria-live]') || createStatusElement(root);
 
         // Validate required elements
-        if (!elements.dropzone || !elements.fileInput || !elements.optimizeBtn) {
+        if (!elements.dropzone || !elements.fileInput || !elements.optimizeBtn || !elements.form) {
             console.error('Required DOM elements missing for dashboard initialization');
             return false;
         }
@@ -51,7 +52,7 @@
         // Initialize components
         bindDropzone(root);
         bindJobDescriptionInputs(root);
-        bindOptimizeButton(root);
+        bindFormSubmission(root);
         
         // Initial state update
         updateOptimizeState(root);
@@ -174,19 +175,13 @@
 
         // Store file and update UI
         state.selectedFile = file;
-        elements.fileInput.files = createFileList(file);
+
         
         showFileSuccess(file, root);
         state.validationState.resume = true;
         updateOptimizeState(root);
         
         announce(`Resume file ${file.name} uploaded successfully`);
-    }
-
-    function createFileList(file) {
-        const dt = new DataTransfer();
-        dt.items.add(file);
-        return dt.files;
     }
 
     function showFileSuccess(file, root) {
@@ -350,161 +345,70 @@
     }
 
     // =============================================================================
-    // FORM SUBMISSION
+    // FORM SUBMISSION HANDLING
     // =============================================================================
 
-    function bindOptimizeButton(root) {
+    function bindFormSubmission(root) {
+        const form = elements.form;
         const optimizeBtn = elements.optimizeBtn;
-        if (!optimizeBtn) return;
-    
-        optimizeBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            if (state.isSubmitting) return;
-            
+        
+        if (!form) return;
+
+        // Handle form submission
+        form.addEventListener('submit', (e) => {
+            // Validate before submitting
             const validation = validateState(root);
             if (!validation.valid) {
+                e.preventDefault();
+                
                 // Focus first invalid control
                 if (!state.validationState.resume) {
                     elements.fileInput.focus();
                 }
                 announce(`Cannot proceed: ${validation.reasons.join(' ')}`);
-                return;
+                return false;
             }
-    
-            // Integrate with optimization.js workflow
-            integrateWithOptimizationWorkflow(root);
-        });
-    }
-    function integrateWithOptimizationWorkflow(root) {
-        // Set resume data in optimization state
-        if (state.selectedFile) {
-            window.optimizationState.resumeData = {
-                type: 'file',
-                content: state.selectedFile,
-                file: state.selectedFile
-            };
-        }
-        
-        // Call the refactored optimization.js function
-        if (typeof window.startOptimization === 'function') {
-            window.startOptimization();
-        } else {
-            console.error('startOptimization function not found');
-            // Fallback to internal submission
-            submitOptimization(root, '/api/v1/optimizer/optimize');
-        }
-    }
-    async function submitOptimization(root, endpoint) {
-        if (state.isSubmitting) return;
 
+            // Show loading state but let form submit naturally
+            showSubmissionLoading();
+            
+            // Don't prevent default - let the form submit to the server
+            announce('Starting optimization...');
+        });
+
+        // Handle button click for additional validation
+        if (optimizeBtn) {
+            optimizeBtn.addEventListener('click', (e) => {
+                if (state.isSubmitting) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                const validation = validateState(root);
+                if (!validation.valid) {
+                    e.preventDefault();
+                    announce(`Cannot proceed: ${validation.reasons.join(' ')}`);
+                    return false;
+                }
+            });
+        }
+    }
+
+    function showSimpleLoading() {
         state.isSubmitting = true;
         
-        // Update UI to loading state
         const optimizeBtn = elements.optimizeBtn;
         const btnContent = optimizeBtn.querySelector('.btn-content');
         const btnLoader = optimizeBtn.querySelector('.btn-loader');
         
-        optimizeBtn.classList.add('is-loading');
+        // Update button state
         optimizeBtn.disabled = true;
+        optimizeBtn.classList.add('is-loading');
         
         if (btnContent) btnContent.style.display = 'none';
         if (btnLoader) btnLoader.style.display = 'flex';
-
-        try {
-            const formData = buildFormData(root);
-            
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': getCSRFToken()
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-        } catch (error) {
-            console.error('Optimization error:', error);
-            handleSubmissionError(error, root);
-        }
-    }
-
-    function buildFormData(root) {
-        const formData = new FormData();
         
-        // Resume file
-        if (state.selectedFile) {
-            formData.append('resume_type', 'file');
-            formData.append('resume_file', state.selectedFile);
-        } else {
-            console.error('No file selected for optimization');
-            return null;
-        }
-        
-        // Job description fields (optional)
-        if (elements.jobTitle?.value.trim()) {
-            formData.append('job_title', elements.jobTitle.value.trim());
-        }
-        
-        if (elements.jobText?.value.trim()) {
-            formData.append('job_description', elements.jobText.value.trim());
-        }
-        
-        if (elements.jobLink?.value.trim()) {
-            formData.append('job_url', elements.jobLink.value.trim());
-            formData.append('job_company', elements.jobLink.value.trim()); // optimization.js expects this
-        }
-
-        // Check for existing hidden inputs with defaults
-        const hiddenInputs = root.querySelectorAll('input[type="hidden"]');
-        hiddenInputs.forEach(input => {
-            if (input.name && input.value) {
-                formData.append(input.name, input.value);
-            }
-        });
-
-        // Add defaults that optimization.js expects
-        if (!formData.has('tone')) {
-            formData.append('tone', 'professional-concise');
-        }
-        if (!formData.has('locale')) {
-            formData.append('locale', 'en-US');
-        }
-        if (!formData.has('include_pdf')) {
-            formData.append('include_pdf', 'true');
-        }
-
-        return formData;
-    }
-
-    function handleSubmissionError(error, root) {
-        state.isSubmitting = false;
-        
-        // Reset button state
-        const optimizeBtn = elements.optimizeBtn;
-        const btnContent = optimizeBtn.querySelector('.btn-content');
-        const btnLoader = optimizeBtn.querySelector('.btn-loader');
-        
-        optimizeBtn.classList.remove('is-loading');
-        optimizeBtn.disabled = false;
-        
-        if (btnContent) btnContent.style.display = 'flex';
-        if (btnLoader) btnLoader.style.display = 'none';
-
-        // Mark relevant inputs as invalid
-        if (error.message.includes('file') || error.message.includes('resume')) {
-            elements.fileInput.setAttribute('aria-invalid', 'true');
-            elements.fileInput.focus();
-        }
-
-        // Announce error
-        const errorMessage = error.message || 'An error occurred while processing your request';
-        announce(`Error: ${errorMessage}`);
-        
-        updateOptimizeState(root);
+        announce('Processing your resume optimization...');
     }
 
     // =============================================================================
@@ -518,10 +422,6 @@
                 statusElement.textContent = message;
             }, 100);
         }
-    }
-
-    function bytesToMB(bytes) {
-        return (bytes / (1024 * 1024)).toFixed(2);
     }
 
     function formatFileSize(bytes) {
@@ -539,11 +439,6 @@
             'text/plain': 'txt'
         };
         return extMap[mimeType] || 'file';
-    }
-
-    function getCSRFToken() {
-        const meta = document.querySelector('meta[name="csrf-token"]');
-        return meta ? meta.content : '';
     }
 
     function debounce(func, wait) {
@@ -598,17 +493,10 @@
 
     // Prevent double-submit on form submission
     document.addEventListener('submit', (e) => {
-        if (state.isSubmitting) {
+        if (state.isSubmitting && e.target.id === 'optimizationForm') {
             e.preventDefault();
+            announce('Optimization already in progress...');
             return false;
-        }
-    });
-
-    // Global error handling
-    window.addEventListener('error', (e) => {
-        if (state.isSubmitting) {
-            console.error('Error during submission:', e.error);
-            handleSubmissionError(e.error, document);
         }
     });
 
