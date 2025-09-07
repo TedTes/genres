@@ -58,7 +58,7 @@ def optimize_resume():
     Returns:
         OptimizationResult with optimized resume and analytics
     """
-
+    request_start_time = time.time()
     try:
         # Authentication temporarily disabled for MVP testing
         user_id = current_user.id
@@ -143,7 +143,7 @@ def optimize_resume():
             # ))
             
             # Add processing metadata
-            total_time = (time.time() - start_time) * 1000
+            total_time = (time.time() - request_start_time) * 1000
             result['processing_time_ms'] = round(total_time, 2)
             result['cache_hit'] = False
             result['request_hash'] = request_hash
