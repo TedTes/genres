@@ -1214,7 +1214,11 @@ def save_optimization_to_db(
         
         db.session.add(resume_record)
         db.session.flush()  # Get ID without committing
-        
+        explanations = optimization_result.get('explanations', [])
+        if hasattr(explanations, 'dict'):  # Pydantic model
+            explanations_list = [explanations.dict()]
+        else:
+            explanations_list = list(explanations) if explanations else []
         # Create optimization record
         optimization = ResumeOptimization(
             user_id=user_id,
@@ -1237,18 +1241,20 @@ def save_optimization_to_db(
             # Optimization settings
             optimization_style=optimization_result.get('optimization_focus', 'professional-concise'),
             
+
+            
             # Results
             optimized_resume_data={
                 'sections': optimization_result.get('sections', {}),
                 'experience': optimization_result.get('experience', []),
                 'skills_added': optimization_result.get('skills_to_add', []),
-                'explanations': optimization_result.get('explanations', [])[:10],
+                'explanations': explanations_list[:10],
                 'gap_analysis': optimization_result.get('gap_analysis', {})
             },
-            match_score_before=optimization_result.get('original_match_score', 0.0),
-            match_score_after=optimization_result.get('match_score', 0.0),
-            missing_keywords=optimization_result.get('missing_keywords', [])[:50],
-            added_keywords=optimization_result.get('added_keywords', [])[:50],
+            match_score_before=float(optimization_result.get('original_match_score', 0.0)),
+            match_score_after=float(optimization_result.get('match_score', 0.0)),
+            missing_keywords=list(optimization_result.get('missing_keywords', [])[:50]),
+            added_keywords=list(optimization_result.get('added_keywords', [])[:50]),
             
             # Files
             docx_url=optimization_result.get('artifacts', {}).get('docx_url'),
