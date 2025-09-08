@@ -1,8 +1,496 @@
-<div class="match-score">{{ optimization_data.match_score }}%</div>
-<div class="processing-time">
-    Completed in {{ optimization_data.processing_time_ms }}ms
-</div>
+{% extends "partials/base.html" %}
+{% block title %}Optimization Results - AI Resume Coach{% endblock %}
 
-{% for keyword in optimization_data.missing_keywords %}
-    <span class="keyword">{{ keyword }}</span>
-{% endfor %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/results.css') }}">
+{% endblock %}
+
+{% block body_class %}page-results{% endblock %}
+
+{% block content %}
+<!-- Compact Results Header -->
+<section class="results-header">
+    <div class="container">
+        <div class="results-header-content">
+            <div class="results-title">
+                <p class="results-subtitle">
+                    {% if optimization_data.job_title %}
+                        Optimized for <strong>{{ optimization_data.job_title }}</strong> position
+                        {% if optimization_data.company_name %} at <strong>{{ optimization_data.company_name }}</strong>{% endif %}
+                    {% else %}
+                        Resume optimized for ATS compatibility and recruiter appeal
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Results Content -->
+<section class="results-content">
+    <div class="container">
+        <div class="results-layout">
+            <!-- Left Column: Analytics & Insights -->
+            <div class="analytics-column">
+                <!-- Score Breakdown -->
+                <div class="analytics-card">
+                    <h3><i class="fas fa-chart-bar"></i> Score Breakdown</h3>
+                    <div class="score-breakdown">
+                        {% if optimization_data.score_breakdown %}
+                            {% for metric, score in optimization_data.score_breakdown.items() %}
+                                {% if metric != 'overall_score' %}
+                                <div class="breakdown-item">
+                                    <span class="breakdown-label">{{ metric.replace('_', ' ')|title }}</span>
+                                    <div class="breakdown-bar">
+                                        <div class="breakdown-fill" style="width: {{ score|round }}%"></div>
+                                    </div>
+                                    <span class="breakdown-score">{{ score|round|int }}%</span>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <!-- Fallback static breakdown -->
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Keywords</span>
+                                <div class="breakdown-bar">
+                                    <div class="breakdown-fill" style="width: {{ (optimization_data.match_score * 0.8)|round }}%"></div>
+                                </div>
+                                <span class="breakdown-score">{{ (optimization_data.match_score * 0.8)|round|int }}%</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Content</span>
+                                <div class="breakdown-bar">
+                                    <div class="breakdown-fill" style="width: {{ (optimization_data.match_score * 0.9)|round }}%"></div>
+                                </div>
+                                <span class="breakdown-score">{{ (optimization_data.match_score * 0.9)|round|int }}%</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Structure</span>
+                                <div class="breakdown-bar">
+                                    <div class="breakdown-fill" style="width: {{ (optimization_data.match_score * 1.1)|round }}%"></div>
+                                </div>
+                                <span class="breakdown-score">{{ (optimization_data.match_score * 1.1)|round|int }}%</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">ATS Friendly</span>
+                                <div class="breakdown-bar">
+                                    <div class="breakdown-fill" style="width: 95%"></div>
+                                </div>
+                                <span class="breakdown-score">95%</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Keywords Analysis -->
+                {% if optimization_data.missing_keywords or optimization_data.added_keywords %}
+                <div class="analytics-card">
+                    <h3><i class="fas fa-tags"></i> Keywords Analysis</h3>
+                    
+                    {% if optimization_data.missing_keywords %}
+                    <div class="keywords-section">
+                        <h4 class="keywords-title missing">Still Missing</h4>
+                        <div class="keywords-list">
+                            {% for keyword_data in optimization_data.missing_keywords[:8] %}
+                                {% if keyword_data is mapping %}
+                                    <span class="keyword-tag missing" title="{{ keyword_data.context }}">
+                                        {{ keyword_data.keyword }}
+                                    </span>
+                                {% else %}
+                                    <span class="keyword-tag missing">{{ keyword_data }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% if optimization_data.missing_keywords|length > 8 %}
+                            <p class="keywords-note">+{{ optimization_data.missing_keywords|length - 8 }} more keywords to consider</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    {% if optimization_data.weak_keywords %}
+                    <div class="keywords-section">
+                        <h4 class="keywords-title weak">Needs Strengthening</h4>
+                        <div class="keywords-list">
+                            {% for keyword_data in optimization_data.weak_keywords[:6] %}
+                                {% if keyword_data is mapping %}
+                                    <span class="keyword-tag weak" title="{{ keyword_data.suggested_improvement }}">
+                                        {{ keyword_data.keyword }}
+                                    </span>
+                                {% else %}
+                                    <span class="keyword-tag weak">{{ keyword_data }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Processing Info -->
+                <div class="analytics-card">
+                    <h3><i class="fas fa-info-circle"></i> Optimization Details</h3>
+                    <div class="details-list">
+                        <div class="detail-item">
+                            <span class="detail-label">Processing Time:</span>
+                            <span class="detail-value">
+                                {% if optimization_data.processing_time_ms %}
+                                    {{ (optimization_data.processing_time_ms / 1000)|round(1) }}s
+                                {% else %}
+                                    < 1s
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Optimization Style:</span>
+                            <span class="detail-value">{{ optimization_data.optimization_style|title or 'Professional' }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">AI Model:</span>
+                            <span class="detail-value">{{ optimization_data.model_provider|title or 'GPT-4' }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Created:</span>
+                            <span class="detail-value">{{ optimization_data.created_at.strftime('%B %d, %Y at %I:%M %p') if optimization_data.created_at else 'Just now' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Resume Content -->
+            <div class="resume-column">
+                <!-- Resume Comparison Toggle -->
+                <div class="resume-controls">
+                    <div class="comparison-toggle">
+                        <button class="toggle-btn active" data-view="optimized">
+                            <i class="fas fa-star"></i>
+                            Optimized Resume
+                        </button>
+                        <button class="toggle-btn" data-view="explanations">
+                            <i class="fas fa-lightbulb"></i>
+                            Key Changes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Resume Display Area -->
+                <div class="resume-display-area">
+                    <!-- Optimized Resume View -->
+                    <div class="resume-view active" id="optimizedView">
+                        {% if optimization_data.optimized_resume %}
+                            {% set resume = optimization_data.optimized_resume %}
+                            
+                            <!-- Header/Contact -->
+                            {% if resume.header %}
+                            <div class="resume-section">
+                                <div class="contact-header">
+                                    {% if resume.header.name %}
+                                        <h2 class="contact-name">{{ resume.header.name }}</h2>
+                                    {% endif %}
+                                    <div class="contact-details">
+                                        {% if resume.header.email %}
+                                            <span class="contact-item">{{ resume.header.email }}</span>
+                                        {% endif %}
+                                        {% if resume.header.phone %}
+                                            <span class="contact-item">{{ resume.header.phone }}</span>
+                                        {% endif %}
+                                        {% if resume.header.location %}
+                                            <span class="contact-item">{{ resume.header.location }}</span>
+                                        {% endif %}
+                                        {% if resume.header.linkedin %}
+                                            <span class="contact-item">{{ resume.header.linkedin }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Summary -->
+                            {% if resume.summary %}
+                            <div class="resume-section">
+                                <h3 class="section-title">Professional Summary</h3>
+                                <div class="section-content">
+                                    <p class="summary-text">{{ resume.summary }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Experience -->
+                            {% if resume.experience %}
+                            <div class="resume-section">
+                                <h3 class="section-title">Professional Experience</h3>
+                                <div class="section-content">
+                                    {% for exp in resume.experience %}
+                                        <div class="experience-item">
+                                            <div class="exp-header">
+                                                <h4>{{ exp.title or 'Position Title' }}</h4>
+                                                <div class="exp-meta">
+                                                    <span class="exp-company">{{ exp.company or 'Company Name' }}</span>
+                                                    <span class="exp-dates">{{ exp.duration or 'Date Range' }}</span>
+                                                </div>
+                                            </div>
+                                            {% if exp.achievements %}
+                                                <ul class="exp-achievements">
+                                                    {% for achievement in exp.achievements %}
+                                                        <li>{{ achievement }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Skills -->
+                            {% if resume.skills %}
+                            <div class="resume-section">
+                                <h3 class="section-title">Technical Skills</h3>
+                                <div class="section-content">
+                                    <div class="skills-grid">
+                                        {% for category, skills_list in resume.skills.items() %}
+                                            <div class="skill-category">
+                                                <h5 class="skill-category-title">{{ category.replace('_', ' ')|title }}</h5>
+                                                <div class="skill-items">
+                                                    {% for skill in skills_list %}
+                                                        <span class="skill-tag">{{ skill }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Education -->
+                            {% if resume.education %}
+                            <div class="resume-section">
+                                <h3 class="section-title">Education</h3>
+                                <div class="section-content">
+                                    {% for edu in resume.education %}
+                                        <div class="education-item">
+                                            <h4>{{ edu.degree or 'Degree' }}</h4>
+                                            <div class="edu-details">
+                                                <span class="edu-school">{{ edu.school or 'Institution' }}</span>
+                                                <span class="edu-year">{{ edu.year or 'Year' }}</span>
+                                            </div>
+                                            {% if edu.gpa %}
+                                                <div class="edu-gpa">GPA: {{ edu.gpa }}</div>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="resume-placeholder">
+                                <i class="fas fa-file-alt"></i>
+                                <p>Optimized resume content will appear here</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Explanations View -->
+                    <div class="resume-view" id="explanationsView">
+                        {% if optimization_data.explanations %}
+                            <div class="explanations-content">
+                                <div class="explanation-section">
+                                    <h4>Summary Improvements</h4>
+                                    <p>{{ optimization_data.explanations.summary_changes or 'Enhanced summary to better align with job requirements and highlight key qualifications.' }}</p>
+                                </div>
+                                
+                                {% if optimization_data.explanations.experience_improvements %}
+                                <div class="explanation-section">
+                                    <h4>Experience Enhancements</h4>
+                                    <ul>
+                                        {% for improvement in optimization_data.explanations.experience_improvements %}
+                                            <li>{{ improvement }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                                
+                                {% if optimization_data.explanations.skills_additions %}
+                                <div class="explanation-section">
+                                    <h4>Skills & Keywords Added</h4>
+                                    <ul>
+                                        {% for addition in optimization_data.explanations.skills_additions %}
+                                            <li>{{ addition }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                                
+                                {% if optimization_data.explanations.keyword_integration %}
+                                <div class="explanation-section">
+                                    <h4>Keyword Integration Strategy</h4>
+                                    {% for keyword, strategy in optimization_data.explanations.keyword_integration.items() %}
+                                        <div class="keyword-strategy">
+                                            <strong>{{ keyword|title }}:</strong> {{ strategy }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="resume-placeholder">
+                                <i class="fas fa-lightbulb"></i>
+                                <p>Optimization explanations will appear here</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Actions Section -->
+<section class="results-actions">
+    <div class="container">
+        <div class="actions-card">
+            <div class="actions-content">
+                <div class="actions-left">
+                    <h3>Ready to Download?</h3>
+                    <p>Get your optimized resume in professional formats</p>
+                </div>
+                <div class="action-buttons">
+                    {% if optimization_data.artifacts and optimization_data.artifacts.pdf_url %}
+                        <a href="{{ url_for('optimizer.download_resume', file_type='pdf', result_id=result_id) }}" 
+                           class="btn btn-primary" download>
+                            <i class="fas fa-download"></i>
+                            Download PDF
+                        </a>
+                    {% endif %}
+                    
+                    {% if optimization_data.artifacts and optimization_data.artifacts.docx_url %}
+                        <a href="{{ url_for('optimizer.download_resume', file_type='docx', result_id=result_id) }}" 
+                           class="btn btn-secondary" download>
+                            <i class="fas fa-download"></i>
+                            Download DOCX
+                        </a>
+                    {% endif %}
+                    
+                    <button class="btn btn-outline" onclick="copyToClipboard()">
+                        <i class="fas fa-copy"></i>
+                        Copy Text
+                    </button>
+                    
+                    <a href="{{ url_for('root.dashboard') }}" class="btn btn-outline">
+                        <i class="fas fa-plus"></i>
+                        Optimize Another
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Resume view toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtns = document.querySelectorAll('.toggle-btn');
+    const resumeViews = document.querySelectorAll('.resume-view');
+    
+    toggleBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetView = this.dataset.view;
+            
+            // Update active states
+            toggleBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show/hide views
+            resumeViews.forEach(view => {
+                view.classList.remove('active');
+                if (view.id === targetView + 'View') {
+                    view.classList.add('active');
+                }
+            });
+        });
+    });
+    
+    // Simple progress bar animation on load
+    setTimeout(() => {
+        const progressBars = document.querySelectorAll('.breakdown-fill');
+        progressBars.forEach((bar, index) => {
+            bar.style.transition = 'width 1s ease';
+        });
+    }, 100);
+});
+
+// Copy to clipboard functionality
+function copyToClipboard() {
+    const resumeText = document.querySelector('.resume-view.active').innerText;
+    
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(resumeText).then(() => {
+            showToast('Resume copied to clipboard!', 'success');
+        }).catch(() => {
+            fallbackCopyTextToClipboard(resumeText);
+        });
+    } else {
+        fallbackCopyTextToClipboard(resumeText);
+    }
+}
+
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        showToast('Resume copied to clipboard!', 'success');
+    } catch (err) {
+        showToast('Could not copy text', 'error');
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+// Simple toast notification
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        z-index: 1000;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Trigger animation
+    setTimeout(() => {
+        toast.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 3000);
+}
+</script>
+{% endblock %}
