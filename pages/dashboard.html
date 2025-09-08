@@ -18,7 +18,6 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             
             <!-- Hidden fields for form data -->
-            <input type="hidden" name="tone" value="professional-concise">
             <input type="hidden" name="locale" value="en-US">
             <input type="hidden" name="include_pdf" value="true">
             <input type="hidden" name="resume_type" value="file">
@@ -209,11 +208,11 @@
             <!-- Action Bar -->
             <div class="action-bar">
                 <div class="validation-status">
-                    <div class="status-indicator" id="resumeIndicator">
+                    <div class="status-indicator" id="resumeStatusItem">
                         <i class="fas fa-circle"></i>
                         <span>Resume uploaded</span>
                     </div>
-                    <div class="status-indicator" id="jobIndicator">
+                    <div class="status-indicator" id="jobStatusItem">
                         <i class="fas fa-circle"></i>
                         <span>Job details added</span>
                     </div>
