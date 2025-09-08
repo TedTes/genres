@@ -32,11 +32,6 @@ Handles AI-powered resume optimization API endpoints.
 """
 
 
-@optimizer_bp.route('/optimize', methods=['GET'])
-@login_required
-def optimize_page():
-    return render_template('optimize.html')
-
     
 # Update the optimize_resume endpoint decorator
 @optimizer_bp.route('/optimize', methods=['POST'])
