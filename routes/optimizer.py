@@ -12,14 +12,9 @@ from services.resume.schemas import (
     validate_json_with_retry_sync
 )
 from services.resume.ingest import ingest_resume_sync
-from services.resume.embedding import perform_gap_analysis_sync
-from services.resume.rewrite import optimize_resume_sync
-from services.resume.explain import generate_explanations_sync
-from services.resume.policy import apply_guardrails_sync, score_resume_match
 from services.resume.formatting import create_docx_sync, create_pdf_sync
-from services.resume.storage import store_resume_files_sync, generate_resume_hash_sync
 from services.resume.cache import get_enhanced_cache
-from helpers.resume_helper import save_optimization_to_db,save_temp_file,_get_cached_optimization_result,_serve_local_file,_proxy_remote_file
+from helpers.resume_helper import save_optimization_to_db,save_temp_file,_get_cached_optimization_result,_serve_local_file,_proxy_remote_file,_run_optimization_pipeline
 from providers import get_models, test_provider_connection
 from models import ResumeOptimization
 from db import db
@@ -96,44 +91,34 @@ def optimize_resume():
                     # Save file temporarily and create file URL
                     temp_path = save_temp_file(resume_file)
                     
+
                     if resume_file.content_type == 'application/pdf':
                         resume_input = ResumeInput(pdf_url=temp_path)
-       
+    
                     elif resume_file.content_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
                         resume_input = ResumeInput(docx_url=temp_path)
                     else:
-                        # Handle as text
                         content = resume_file.read().decode('utf-8')
                         resume_input = ResumeInput(text=content)
 
                 else:
                     # Text input
-                    resume_text = request.form.get('resume_text', '')
-                    resume_input = ResumeInput(text=resume_text)
+                    resume_input = ResumeInput(text=request.form.get('resume_text', ''))
 
         # Create schema objects
         jd_input = JDInput(**job_data)
-        options = OptimizationOptions(**options_data)
-
-        # Generate request hash for caching and tracking
-        request_hash = generate_resume_hash_sync(
-            resume_text=resume_input.text if resume_input.text else "file_input",
-            jd_text=jd_input.text,
-            options=options.dict()
-        )
-
-            
-        # Check cache first (optional for MVP)
-        cache = get_enhanced_cache()
-    
-      
+        options = OptimizationOptions(**options_data) 
         # Process optimization pipeline
         try:
             print("🔄 Running optimization pipeline...")
             result = _run_optimization_pipeline(
-                resume_input, jd_input, options, request_hash, user_id
+                resume_input, jd_input, options,  user_id
             )
             
+          
+
+            # Check cache first (optional for MVP)
+            cache = get_enhanced_cache()
             # Cache the result (temporarily disabled for testing)
             # asyncio.run(cache.cache_result(
             #     resume_text=resume_text,
@@ -159,7 +144,7 @@ def optimize_resume():
             
             result['processing_time_ms'] = round(total_time, 2)
             result['cache_hit'] = False
-            result['request_hash'] = request_hash
+            
             
             print(f"✅ Optimization complete in {total_time:.0f}ms")
             print(f"📊 Match score: {result.get('match_score', 'N/A')}%")

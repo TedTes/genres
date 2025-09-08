@@ -16,6 +16,13 @@ import asyncio
 from models import Resume , ResumeOptimization,User
 from datetime import datetime
 from services.resume.cache import get_enhanced_cache
+from services.resume.ingest import ingest_resume_sync
+from services.resume.storage import store_resume_files_sync, generate_resume_hash_sync
+from services.resume.embedding import perform_gap_analysis_sync
+from services.resume.rewrite import optimize_resume_sync
+from services.resume.explain import generate_explanations_sync
+from services.resume.policy import apply_guardrails_sync, score_resume_match
+from services.resume.formatting import create_docx_sync, create_pdf_sync
 def calculate_resume_completeness(resume_data):
     """
     Calculate completeness percentage of a resume based on filled sections
@@ -367,7 +374,6 @@ def _run_optimization_pipeline(
     resume_input: ResumeInput,
     jd_input: JDInput, 
     options: OptimizationOptions,
-    request_hash: str,
     user_id:str
 ) -> Dict[str, Any]:
     """
@@ -382,89 +388,102 @@ def _run_optimization_pipeline(
     Returns:
         Complete optimization result
     """
-    
-    # Step 1: Ingest and parse resume
-    print("📄 Step 1: Ingesting resume...")
-    parsed_resume = ingest_resume_sync(
-        text=resume_input.text,
-        docx_url=resume_input.docx_url,
-        pdf_url=resume_input.pdf_url
-    )
-    
-    # Step 2: Perform gap analysis
-    print("🔍 Step 2: Analyzing gaps...")
-    gap_analysis = perform_gap_analysis_sync(
-        resume_chunks=parsed_resume.chunks,
-        jd_text=jd_input.text,
-        jd_title=jd_input.title
-    )
-    
-    # Step 3: Optimize resume with LLM
-    print("🤖 Step 3: Optimizing with LLM...")
-    optimized_resume = optimize_resume_sync(
-        resume_sections=parsed_resume.sections,
-        experience_items=parsed_resume.experience_items,
-        jd_text=jd_input.text,
-        missing_keywords=gap_analysis['missing_keywords'],
-        weak_keywords=gap_analysis['weak_keywords'],
-        optimization_focus=options.tone
-    )
-    
-    # Step 4: Generate explanations
-    print("📋 Step 4: Generating explanations...")
-    explanations = generate_explanations_sync(
-        original_resume=parsed_resume.dict(),
-        optimized_resume=optimized_resume,
-        missing_keywords=gap_analysis['missing_keywords'],
-        gap_analysis=gap_analysis
-    )
-    
-    # Step 5: Apply guardrails
-    print("🛡️  Step 5: Applying guardrails...")
-    clean_resume, policy_violations = apply_guardrails_sync(optimized_resume)
-    
-    # Step 6: Calculate final score
-    print("📊 Step 6: Calculating scores...")
-    score_breakdown = score_resume_match(
-        keyword_analysis=gap_analysis['keyword_analysis'],
-        semantic_analysis=gap_analysis['semantic_analysis'],
-        gap_analysis=gap_analysis,
-        resume_sections=parsed_resume.sections
-    )
-    
-    # Step 7: Generate documents (simplified - no user storage)
-    print("📄 Step 7: Generating documents...")
-    contact_info = _extract_contact_info(parsed_resume.sections.get('header', ''))
-    
-    docx_bytes = create_docx_sync(clean_resume, contact_info)
-    pdf_bytes = create_pdf_sync(clean_resume, contact_info) if options.include_pdf else None
-    
-    # Step 8: Store files temporarily (simplified)
-    print("💾 Step 8: Storing files...")
-    file_urls = store_resume_files_sync(
-        docx_bytes=docx_bytes,
-        pdf_bytes=pdf_bytes,
-        user_id="anonymous",  # Simplified - no user tracking
-        resume_hash=request_hash,
-        contact_info=contact_info
-    )
-    
-    # Compile final result
-    result = {
-        'match_score': score_breakdown['overall_score'],
-        'score_breakdown': score_breakdown,
-        'missing_keywords': gap_analysis['missing_keywords'],
-        'weak_keywords': gap_analysis['weak_keywords'],
-        'optimized_resume': clean_resume.dict(),
-        'explanations': explanations.dict(),
-        'artifacts': file_urls,
-        'model_info': _get_model_info(),
-        'policy_violations': [v.__dict__ for v in policy_violations],
-        'input_type': resume_input.input_type,
-        'processing_steps': 8
-    }
-    
-    return result
+    try:
+        # Step 1: Ingest and parse resume
+        print("📄 Step 1: Ingesting resume...")
+        parsed_resume = ingest_resume_sync(
+            text=resume_input.text,
+            docx_url=resume_input.docx_url,
+            pdf_url=resume_input.pdf_url
+        )
+        
+        # Generate request hash for caching and tracking
+        print("🔍 Step 2: Generating request hash...")
+        request_hash = generate_resume_hash_sync(
+            resume_text=resume_input.text ,
+            jd_text=jd_input.text,
+            options=options.dict()
+        )
+        # Step 2: Perform gap analysis
+        print("🔍 Step 3: Analyzing gaps...")
+        gap_analysis = perform_gap_analysis_sync(
+            resume_chunks=parsed_resume.chunks,
+            jd_text=jd_input.text,
+            jd_title=jd_input.title
+        )
+        
+        # Step 3: Optimize resume with LLM
+        print("🤖 Step 4: Optimizing with LLM...")
+        optimized_resume = optimize_resume_sync(
+            resume_sections=parsed_resume.sections,
+            experience_items=parsed_resume.experience_items,
+            jd_text=jd_input.text,
+            missing_keywords=gap_analysis['missing_keywords'],
+            weak_keywords=gap_analysis['weak_keywords'],
+            optimization_focus=options.tone
+        )
+        
+        # Step 4: Generate explanations
+        print("📋 Step 5: Generating explanations...")
+        explanations = generate_explanations_sync(
+            original_resume=parsed_resume.dict(),
+            optimized_resume=optimized_resume,
+            missing_keywords=gap_analysis['missing_keywords'],
+            gap_analysis=gap_analysis
+        )
+        
+        # Step 5: Apply guardrails
+        print("🛡️  Step 6: Applying guardrails...")
+        clean_resume, policy_violations = apply_guardrails_sync(optimized_resume)
+        
+        # Step 6: Calculate final score
+        print("📊 Step 7: Calculating scores...")
+        score_breakdown = score_resume_match(
+            keyword_analysis=gap_analysis['keyword_analysis'],
+            semantic_analysis=gap_analysis['semantic_analysis'],
+            gap_analysis=gap_analysis,
+            resume_sections=parsed_resume.sections
+        )
+        
+        # Step 7: Generate documents (simplified - no user storage)
+        print("📄 Step 8: Generating documents...")
+        contact_info = _extract_contact_info(parsed_resume.sections.get('header', ''))
+        
+        docx_bytes = create_docx_sync(clean_resume, contact_info)
+        pdf_bytes = create_pdf_sync(clean_resume, contact_info) if options.include_pdf else None
+        
+        # Step 8: Store files temporarily (simplified)
+        print("💾 Step 9: Storing files...")
+        file_urls = store_resume_files_sync(
+            docx_bytes=docx_bytes,
+            pdf_bytes=pdf_bytes,
+            user_id="anonymous",  # Simplified - no user tracking
+            resume_hash=request_hash,
+            contact_info=contact_info
+        )
+        
+        # Compile final result
+        result = {
+            'match_score': score_breakdown['overall_score'],
+            'score_breakdown': score_breakdown,
+            'request_hash' : request_hash,
+            'missing_keywords': gap_analysis['missing_keywords'],
+            'weak_keywords': gap_analysis['weak_keywords'],
+            'optimized_resume': clean_resume.dict(),
+            'explanations': explanations.dict(),
+            'artifacts': file_urls,
+            'model_info': _get_model_info(),
+            'policy_violations': [v.__dict__ for v in policy_violations],
+            'input_type': resume_input.input_type,
+            'processing_steps': 8
+        }
+        
+        return result
+    finally:
+        # Clean up temp files
+        for url in [resume_input.pdf_url, resume_input.docx_url]:
+            if url and os.path.exists(url):
+                os.unlink(url)
 
 
 
