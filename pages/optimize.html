@@ -1,0 +1,290 @@
+{% extends "partials/base.html" %}
+{% block title %}Resume Optimizer - AI Resume Coach{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/optimize.css') }}">
+{% endblock %}
+
+{% block body_class %}page-optimize{% endblock %}
+
+{% block content %}
+<!-- Optimization Interface -->
+<section class="optimization-interface">
+    <div class="container">
+
+
+        <form method="POST" action="{{ url_for('optimizer.optimize_resume') }}" enctype="multipart/form-data" id="optimizationForm">
+            <!-- CSRF Token -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <!-- Hidden fields for form data -->
+            <input type="hidden" name="locale" value="en-US">
+            <input type="hidden" name="include_pdf" value="true">
+            <input type="hidden" name="resume_type" value="file">
+
+            <!-- Main Upload Interface -->
+            <div class="upload-container">
+                <!-- Left Column: Resume Upload -->
+                <div class="upload-section">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-file-upload"></i>
+                            Upload Resume
+                        </h2>
+                        <span class="section-status" id="resumeStatus">Required</span>
+                    </div>
+
+                    <!-- Upload Dropzone -->
+                    <div class="upload-dropzone" id="resumeUpload">
+                        <div class="dropzone-content">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-text">
+                                <h3>Drop resume here</h3>
+                                <p>or <span class="upload-link">click to browse</span></p>
+                            </div>
+                            <div class="file-info">
+                                <div class="file-types">
+                                    <span class="file-type">PDF</span>
+                                    <span class="file-type">DOCX</span>
+                                    <span class="file-type">TXT</span>
+                                </div>
+                                <div class="size-limit">Max 5MB</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Uploaded State -->
+                    <div class="uploaded-state" id="resumeUploaded" style="display: none;">
+                        <div class="uploaded-file">
+                            <div class="file-icon">
+                                <i class="fas fa-file-alt"></i>
+                                <span class="file-type-badge">PDF</span>
+                            </div>
+                            <div class="file-details">
+                                <div class="file-name"></div>
+                                <div class="file-size"></div>
+                                <div class="file-status">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Ready for optimization</span>
+                                </div>
+                            </div>
+                            <button type="button" class="remove-file-btn" onclick="removeFile('resume')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- File Input -->
+                    <input type="file" 
+                           id="resumeFile" 
+                           name="resume_file" 
+                           accept=".pdf,.docx,.txt" 
+                           hidden 
+                           required>
+                           <div class="upload-settings">
+                            <div class="settings-header">
+                                <h3>
+                                    <i class="fas fa-cog"></i>
+                                    Optimization Settings
+                                </h3>
+                            </div>
+                            
+                            <div class="settings-content">
+                                <!-- Tone Selection -->
+                                <div class="setting-group">
+                                    <label class="setting-label">Writing Style</label>
+                                    <div class="tone-options">
+                                        <label class="tone-option active">
+                                            <input type="radio" name="tone" value="professional-concise" checked>
+                                            <span class="tone-name">Professional</span>
+                                            <span class="tone-desc">Clean and ATS-friendly</span>
+                                        </label>
+                                        <label class="tone-option">
+                                            <input type="radio" name="tone" value="creative">
+                                            <span class="tone-name">Creative</span>
+                                            <span class="tone-desc">Engaging and dynamic</span>
+                                        </label>
+                                        <label class="tone-option">
+                                            <input type="radio" name="tone" value="technical">
+                                            <span class="tone-name">Technical</span>
+                                            <span class="tone-desc">Detailed and skill-focused</span>
+                                        </label>
+                                    </div>
+                                </div>
+    
+                                <!-- Output Formats -->
+                                <div class="setting-group inline">
+                                    <label class="setting-label">Download Formats</label>
+                                    <div class="format-options">
+                                        <label class="format-option active">
+                                            <input type="checkbox" name="include_pdf" value="true" checked>
+                                            <i class="fas fa-file-pdf"></i>
+                                            <span>PDF</span>
+                                        </label>
+                                        <label class="format-option active">
+                                            <input type="checkbox" name="include_docx" value="true" checked>
+                                            <i class="fas fa-file-word"></i>
+                                            <span>DOCX</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>   
+                </div>
+
+                <!-- Right Column: Job Description -->
+                <div class="job-section">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-briefcase"></i>
+                            Job Details
+                        </h2>
+                        <span class="section-status optional" id="jobStatus">Optional</span>
+                    </div>
+
+                    <div class="job-inputs">
+                        <!-- Job Title -->
+                        <div class="input-group">
+                            <label for="jobTitle" class="input-label">Job Title</label>
+                            <input 
+                                type="text" 
+                                id="jobTitle" 
+                                name="job_title"
+                                class="form-input"
+                                placeholder="e.g. Senior Software Engineer"
+                                maxlength="100"
+                            >
+                        </div>
+
+                        <!-- Company Name -->
+                        <div class="input-group">
+                            <label for="companyName" class="input-label">Company Name</label>
+                            <input 
+                                type="text" 
+                                id="companyName" 
+                                name="job_company"
+                                class="form-input"
+                                placeholder="e.g. Google, Microsoft"
+                                maxlength="100"
+                            >
+                        </div>
+
+                        <!-- Job Description -->
+                        <div class="input-group">
+                            <label for="jobText" class="input-label">
+                                Job Description
+                                <span class="label-note">Paste the full job posting for best results</span>
+                            </label>
+                            <textarea 
+                                class="form-textarea" 
+                                id="jobText" 
+                                name="job_description"
+                                placeholder="Paste the complete job description here. Include requirements, responsibilities, and qualifications..."
+                                rows="8"
+                            ></textarea>
+                            <div class="textarea-footer">
+                                <span class="char-count" id="jobTextCount">0 characters</span>
+                            </div>
+                        </div>
+
+                        <!-- Job URL -->
+                        <div class="input-group">
+                            <label for="jobLink" class="input-label">Job Posting URL</label>
+                            <input 
+                                type="url" 
+                                id="jobLink" 
+                                name="job_url"
+                                class="form-input"
+                                placeholder="https://company.com/careers/job-posting"
+                                maxlength="500"
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="action-bar">
+                <div class="validation-status">
+                    <div class="status-indicator" id="resumeStatusItem">
+                        <i class="fas fa-circle"></i>
+                        <span>Resume uploaded</span>
+                    </div>
+                    <div class="status-indicator" id="jobStatusItem">
+                        <i class="fas fa-circle"></i>
+                        <span>Job details added</span>
+                    </div>
+                </div>
+                
+                <button type="submit" class="optimize-button" id="optimizeBtn" disabled>
+                    <div class="btn-content">
+                        <i class="fas fa-rocket"></i>
+                        <span>Optimize Resume</span>
+                    </div>
+                    <div class="btn-loader" style="display: none;">
+                        <div class="spinner"></div>
+                        <span>Processing...</span>
+                    </div>
+                </button>
+            </div>
+        </form>
+
+        <!-- Progress Section (Hidden by default) -->
+        <div class="progress-overlay" id="progressSection" style="display: none;">
+            <div class="progress-container">
+                <div class="progress-header">
+                    <h3>Optimizing Your Resume</h3>
+                    <p>Our AI is analyzing and enhancing your resume</p>
+                </div>
+                
+                <div class="progress-steps">
+                    <div class="progress-step active" id="progressStep1">
+                        <div class="step-circle">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <span class="step-text">Uploading</span>
+                    </div>
+                    
+                    <div class="progress-step" id="progressStep2">
+                        <div class="step-circle">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <span class="step-text">Analyzing</span>
+                    </div>
+                    
+                    <div class="progress-step" id="progressStep3">
+                        <div class="step-circle">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <span class="step-text">Optimizing</span>
+                    </div>
+                    
+                    <div class="progress-step" id="progressStep4">
+                        <div class="step-circle">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span class="step-text">Complete</span>
+                    </div>
+                </div>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar"></div>
+                    </div>
+                    <div class="progress-percentage" id="progressPercentage">0%</div>
+                </div>
+                
+                <div class="progress-message" id="progressMessage">
+                    <span>Preparing optimization...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{{ url_for('static', filename='js/optimize.js') }}"></script>
+{% endblock %}

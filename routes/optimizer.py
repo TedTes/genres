@@ -30,7 +30,10 @@ optimizer_bp = Blueprint('optimizer', __name__)
 Resume LLM optimization routes.
 Handles AI-powered resume optimization API endpoints.
 """
-
+@optimizer_bp.route('/optimize', methods=['GET'])
+@login_required 
+def optimize_page():
+    return render_template('optimize.html')
 
     
 # Update the optimize_resume endpoint decorator
