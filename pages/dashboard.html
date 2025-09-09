@@ -1,5 +1,5 @@
 {% extends "partials/base.html" %}
-{% block title %}Resume Optimizer - AI Resume Coach{% endblock %}
+{% block title %}Dashboard - Resume Optimizer{% endblock %}
 
 {% block extra_css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/dashboard.css') }}">
@@ -8,281 +8,397 @@
 {% block body_class %}page-dashboard{% endblock %}
 
 {% block content %}
-<!-- Optimization Interface -->
-<section class="optimization-interface">
+<!-- Dashboard Header -->
+<section class="dashboard-header">
     <div class="container">
+        <div class="header-content">
+            <div class="header-text">
+                <h1>Welcome back, {{ current_user.first_name or 'there' }}!</h1>
+                <p>Your career advancement hub. Track progress, manage resumes, and land your next opportunity.</p>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('optimizer.optimize_resume') }}" class="btn btn-primary">
+                    <i class="fas fa-magic"></i>
+                    Optimize New Resume
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
 
-
-        <form method="POST" action="{{ url_for('optimizer.optimize_resume') }}" enctype="multipart/form-data" id="optimizationForm">
-            <!-- CSRF Token -->
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<!-- Dashboard Stats -->
+<section class="dashboard-stats">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number" id="totalOptimizations">{{ user_stats.total_optimizations or 0 }}</div>
+                    <div class="stat-label">Resumes Optimized</div>
+                </div>
+            </div>
             
-            <!-- Hidden fields for form data -->
-            <input type="hidden" name="locale" value="en-US">
-            <input type="hidden" name="include_pdf" value="true">
-            <input type="hidden" name="resume_type" value="file">
-
-            <!-- Main Upload Interface -->
-            <div class="upload-container">
-                <!-- Left Column: Resume Upload -->
-                <div class="upload-section">
-                    <div class="section-header">
-                        <h2>
-                            <i class="fas fa-file-upload"></i>
-                            Upload Resume
-                        </h2>
-                        <span class="section-status" id="resumeStatus">Required</span>
-                    </div>
-
-                    <!-- Upload Dropzone -->
-                    <div class="upload-dropzone" id="resumeUpload">
-                        <div class="dropzone-content">
-                            <div class="upload-icon">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                            </div>
-                            <div class="upload-text">
-                                <h3>Drop resume here</h3>
-                                <p>or <span class="upload-link">click to browse</span></p>
-                            </div>
-                            <div class="file-info">
-                                <div class="file-types">
-                                    <span class="file-type">PDF</span>
-                                    <span class="file-type">DOCX</span>
-                                    <span class="file-type">TXT</span>
-                                </div>
-                                <div class="size-limit">Max 5MB</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Uploaded State -->
-                    <div class="uploaded-state" id="resumeUploaded" style="display: none;">
-                        <div class="uploaded-file">
-                            <div class="file-icon">
-                                <i class="fas fa-file-alt"></i>
-                                <span class="file-type-badge">PDF</span>
-                            </div>
-                            <div class="file-details">
-                                <div class="file-name"></div>
-                                <div class="file-size"></div>
-                                <div class="file-status">
-                                    <i class="fas fa-check-circle"></i>
-                                    <span>Ready for optimization</span>
-                                </div>
-                            </div>
-                            <button type="button" class="remove-file-btn" onclick="removeFile('resume')">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- File Input -->
-                    <input type="file" 
-                           id="resumeFile" 
-                           name="resume_file" 
-                           accept=".pdf,.docx,.txt" 
-                           hidden 
-                           required>
-                           <div class="upload-settings">
-                            <div class="settings-header">
-                                <h3>
-                                    <i class="fas fa-cog"></i>
-                                    Optimization Settings
-                                </h3>
-                            </div>
-                            
-                            <div class="settings-content">
-                                <!-- Tone Selection -->
-                                <div class="setting-group">
-                                    <label class="setting-label">Writing Style</label>
-                                    <div class="tone-options">
-                                        <label class="tone-option active">
-                                            <input type="radio" name="tone" value="professional-concise" checked>
-                                            <span class="tone-name">Professional</span>
-                                            <span class="tone-desc">Clean and ATS-friendly</span>
-                                        </label>
-                                        <label class="tone-option">
-                                            <input type="radio" name="tone" value="creative">
-                                            <span class="tone-name">Creative</span>
-                                            <span class="tone-desc">Engaging and dynamic</span>
-                                        </label>
-                                        <label class="tone-option">
-                                            <input type="radio" name="tone" value="technical">
-                                            <span class="tone-name">Technical</span>
-                                            <span class="tone-desc">Detailed and skill-focused</span>
-                                        </label>
-                                    </div>
-                                </div>
-    
-                                <!-- Output Formats -->
-                                <div class="setting-group inline">
-                                    <label class="setting-label">Download Formats</label>
-                                    <div class="format-options">
-                                        <label class="format-option active">
-                                            <input type="checkbox" name="include_pdf" value="true" checked>
-                                            <i class="fas fa-file-pdf"></i>
-                                            <span>PDF</span>
-                                        </label>
-                                        <label class="format-option active">
-                                            <input type="checkbox" name="include_docx" value="true" checked>
-                                            <i class="fas fa-file-word"></i>
-                                            <span>DOCX</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>   
+            <div class="stat-card">
+                <div class="stat-icon success">
+                    <i class="fas fa-chart-line"></i>
                 </div>
-
-                <!-- Right Column: Job Description -->
-                <div class="job-section">
-                    <div class="section-header">
-                        <h2>
-                            <i class="fas fa-briefcase"></i>
-                            Job Details
-                        </h2>
-                        <span class="section-status optional" id="jobStatus">Optional</span>
-                    </div>
-
-                    <div class="job-inputs">
-                        <!-- Job Title -->
-                        <div class="input-group">
-                            <label for="jobTitle" class="input-label">Job Title</label>
-                            <input 
-                                type="text" 
-                                id="jobTitle" 
-                                name="job_title"
-                                class="form-input"
-                                placeholder="e.g. Senior Software Engineer"
-                                maxlength="100"
-                            >
-                        </div>
-
-                        <!-- Company Name -->
-                        <div class="input-group">
-                            <label for="companyName" class="input-label">Company Name</label>
-                            <input 
-                                type="text" 
-                                id="companyName" 
-                                name="job_company"
-                                class="form-input"
-                                placeholder="e.g. Google, Microsoft"
-                                maxlength="100"
-                            >
-                        </div>
-
-                        <!-- Job Description -->
-                        <div class="input-group">
-                            <label for="jobText" class="input-label">
-                                Job Description
-                                <span class="label-note">Paste the full job posting for best results</span>
-                            </label>
-                            <textarea 
-                                class="form-textarea" 
-                                id="jobText" 
-                                name="job_description"
-                                placeholder="Paste the complete job description here. Include requirements, responsibilities, and qualifications..."
-                                rows="8"
-                            ></textarea>
-                            <div class="textarea-footer">
-                                <span class="char-count" id="jobTextCount">0 characters</span>
-                            </div>
-                        </div>
-
-                        <!-- Job URL -->
-                        <div class="input-group">
-                            <label for="jobLink" class="input-label">Job Posting URL</label>
-                            <input 
-                                type="url" 
-                                id="jobLink" 
-                                name="job_url"
-                                class="form-input"
-                                placeholder="https://company.com/careers/job-posting"
-                                maxlength="500"
-                            >
-                        </div>
-                    </div>
+                <div class="stat-content">
+                    <div class="stat-number" id="averageMatch">{{ user_stats.average_match_score or 0 }}%</div>
+                    <div class="stat-label">Avg Match Score</div>
                 </div>
             </div>
-
-            <!-- Action Bar -->
-            <div class="action-bar">
-                <div class="validation-status">
-                    <div class="status-indicator" id="resumeStatusItem">
-                        <i class="fas fa-circle"></i>
-                        <span>Resume uploaded</span>
-                    </div>
-                    <div class="status-indicator" id="jobStatusItem">
-                        <i class="fas fa-circle"></i>
-                        <span>Job details added</span>
-                    </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon warning">
+                    <i class="fas fa-briefcase"></i>
                 </div>
-                
-                <button type="submit" class="optimize-button" id="optimizeBtn" disabled>
-                    <div class="btn-content">
-                        <i class="fas fa-rocket"></i>
-                        <span>Optimize Resume</span>
-                    </div>
-                    <div class="btn-loader" style="display: none;">
-                        <div class="spinner"></div>
-                        <span>Processing...</span>
-                    </div>
-                </button>
+                <div class="stat-content">
+                    <div class="stat-number" id="activeApplications">{{ user_stats.active_applications or 0 }}</div>
+                    <div class="stat-label">Active Applications</div>
+                </div>
             </div>
-        </form>
-
-        <!-- Progress Section (Hidden by default) -->
-        <div class="progress-overlay" id="progressSection" style="display: none;">
-            <div class="progress-container">
-                <div class="progress-header">
-                    <h3>Optimizing Your Resume</h3>
-                    <p>Our AI is analyzing and enhancing your resume</p>
+            
+            <div class="stat-card">
+                <div class="stat-icon info">
+                    <i class="fas fa-calendar-check"></i>
                 </div>
-                
-                <div class="progress-steps">
-                    <div class="progress-step active" id="progressStep1">
-                        <div class="step-circle">
-                            <i class="fas fa-upload"></i>
-                        </div>
-                        <span class="step-text">Uploading</span>
-                    </div>
-                    
-                    <div class="progress-step" id="progressStep2">
-                        <div class="step-circle">
-                            <i class="fas fa-search"></i>
-                        </div>
-                        <span class="step-text">Analyzing</span>
-                    </div>
-                    
-                    <div class="progress-step" id="progressStep3">
-                        <div class="step-circle">
-                            <i class="fas fa-brain"></i>
-                        </div>
-                        <span class="step-text">Optimizing</span>
-                    </div>
-                    
-                    <div class="progress-step" id="progressStep4">
-                        <div class="step-circle">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <span class="step-text">Complete</span>
-                    </div>
-                </div>
-                
-                <div class="progress-bar-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressBar"></div>
-                    </div>
-                    <div class="progress-percentage" id="progressPercentage">0%</div>
-                </div>
-                
-                <div class="progress-message" id="progressMessage">
-                    <span>Preparing optimization...</span>
+                <div class="stat-content">
+                    <div class="stat-number" id="upcomingFollowups">{{ user_stats.upcoming_followups or 0 }}</div>
+                    <div class="stat-label">Follow-ups Due</div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- Main Dashboard Content -->
+<section class="dashboard-main">
+    <div class="container">
+        <div class="dashboard-grid">
+            
+            <!-- Left Column: Primary Content -->
+            <div class="dashboard-primary">
+                
+                <!-- Recent Optimizations -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-history"></i>
+                            <span>Recent Optimizations</span>
+                        </div>
+                        <a href="#" class="view-all-link">View All</a>
+                    </div>
+                    
+                    <div class="optimizations-list" id="recentOptimizations">
+                        {% if optimizations %}
+                            {% for optimization in optimizations %}
+                            <div class="optimization-item" data-id="{{ optimization.id }}">
+                                <div class="optimization-icon">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="optimization-content">
+                                    <div class="optimization-title">{{ optimization.job_title or 'Resume Optimization' }}</div>
+                                    <div class="optimization-details">
+                                        <span class="optimization-date">{{ optimization.created_at.strftime('%b %d, %Y') }}</span>
+                                        <span class="optimization-score">{{ optimization.match_score }}% match</span>
+                                        {% if optimization.company %}
+                                        <span class="optimization-company">{{ optimization.company }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="optimization-actions">
+                                    <button class="action-btn" onclick="downloadResume('{{ optimization.id }}')">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button class="action-btn" onclick="viewOptimization('{{ optimization.id }}')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn" onclick="duplicateOptimization('{{ optimization.id }}')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="empty-text">
+                                <h3>No optimizations yet</h3>
+                                <p>Start by optimizing your first resume to see it here.</p>
+                            </div>
+                            <a href="{{ url_for('optimizer.optimize_resume') }}" class="btn btn-primary">
+                                <i class="fas fa-magic"></i>
+                                Optimize First Resume
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Resume Library -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-folder"></i>
+                            <span>Resume Library</span>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="uploadNewResume()">
+                            <i class="fas fa-plus"></i>
+                            Add Resume
+                        </button>
+                    </div>
+                    
+                    <div class="resume-library" id="resumeLibrary">
+                        {% if saved_resumes %}
+                            <div class="resume-grid">
+                                {% for resume in saved_resumes %}
+                                <div class="resume-card" data-id="{{ resume.id }}">
+                                    <div class="resume-preview">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div class="resume-info">
+                                        <div class="resume-name">{{ resume.name or 'Resume' }}</div>
+                                        <div class="resume-meta">
+                                            <span class="resume-date">Updated {{ resume.updated_at.strftime('%b %d') }}</span>
+                                            <span class="resume-type">{{ resume.type or 'General' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="resume-actions">
+                                        <button class="action-btn" onclick="editResume('{{ resume.id }}')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn" onclick="optimizeResume('{{ resume.id }}')">
+                                            <i class="fas fa-magic"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                        <div class="empty-state small">
+                            <div class="empty-icon">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <div class="empty-text">
+                                <h4>No saved resumes</h4>
+                                <p>Upload and save resume versions for different job types.</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Secondary Content -->
+            <div class="dashboard-secondary">
+                
+                <!-- Subscription Status -->
+                <div class="dashboard-card subscription-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-crown"></i>
+                            <span>Subscription</span>
+                        </div>
+                    </div>
+                    
+                    <div class="subscription-content">
+                        {% if current_user.is_premium %}
+                        <div class="subscription-status premium">
+                            <div class="status-badge">Premium Active</div>
+                            <div class="subscription-details">
+                                <div class="plan-name">{{ current_user.subscription_plan or 'Premium Plan' }}</div>
+                                <div class="plan-expiry">Renews {{ current_user.subscription_expires.strftime('%b %d, %Y') if current_user.subscription_expires else 'Monthly' }}</div>
+                            </div>
+                        </div>
+                        <div class="subscription-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check"></i>
+                                <span>Unlimited optimizations</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check"></i>
+                                <span>Advanced analytics</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check"></i>
+                                <span>Priority support</span>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="subscription-status free">
+                            <div class="status-badge">Free Plan</div>
+                            <div class="usage-progress">
+                                <div class="usage-bar">
+                                    <div class="usage-fill" style="width: {{ (user_stats.free_optimizations_used / 1 * 100) if user_stats.free_optimizations_used else 0 }}%"></div>
+                                </div>
+                                <div class="usage-text">{{ user_stats.free_optimizations_used or 0 }}/1 free optimization used</div>
+                            </div>
+                        </div>
+                        <div class="upgrade-prompt">
+                            <p>Upgrade for unlimited optimizations and advanced features.</p>
+                            <a href="{{ url_for('payment.checkout', plan_id='3month') }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-crown"></i>
+                                Upgrade Now
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Job Application Tracker -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-briefcase"></i>
+                            <span>Application Tracker</span>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="addApplication()">
+                            <i class="fas fa-plus"></i>
+                            Add Application
+                        </button>
+                    </div>
+                    
+                    <div class="applications-list" id="applicationsList">
+                        {% if applications %}
+                            {% for application in applications %}
+                            <div class="application-item" data-id="{{ application.id }}">
+                                <div class="application-header">
+                                    <div class="company-name">{{ application.company }}</div>
+                                    <div class="status-badge status-{{ application.status }}">{{ application.status|title }}</div>
+                                </div>
+                                <div class="application-details">
+                                    <div class="job-title">{{ application.job_title }}</div>
+                                    <div class="application-date">Applied {{ application.applied_date.strftime('%b %d') }}</div>
+                                </div>
+                                {% if application.next_followup %}
+                                <div class="followup-reminder">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Follow up {{ application.next_followup.strftime('%b %d') }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="empty-state small">
+                            <div class="empty-icon">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <div class="empty-text">
+                                <h4>No applications tracked</h4>
+                                <p>Start tracking your job applications to stay organized.</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-bolt"></i>
+                            <span>Quick Actions</span>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <a href="{{ url_for('optimizer.optimize_resume') }}" class="quick-action">
+                            <div class="action-icon">
+                                <i class="fas fa-magic"></i>
+                            </div>
+                            <div class="action-text">
+                                <div class="action-title">Optimize Resume</div>
+                                <div class="action-desc">AI-powered resume enhancement</div>
+                            </div>
+                        </a>
+                        
+                        <a href="#" onclick="generateCoverLetter()" class="quick-action">
+                            <div class="action-icon">
+                                <i class="fas fa-file-text"></i>
+                            </div>
+                            <div class="action-text">
+                                <div class="action-title">Cover Letter</div>
+                                <div class="action-desc">Generate personalized letters</div>
+                            </div>
+                        </a>
+                        
+                        <a href="#" onclick="scheduleInterview()" class="quick-action">
+                            <div class="action-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="action-text">
+                                <div class="action-title">Interview Prep</div>
+                                <div class="action-desc">AI-generated practice questions</div>
+                            </div>
+                        </a>
+                        
+                        <a href="#" onclick="skillGapAnalysis()" class="quick-action">
+                            <div class="action-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="action-text">
+                                <div class="action-title">Skill Analysis</div>
+                                <div class="action-desc">Identify skill gaps and trends</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modals and Overlays -->
+<div id="modalOverlay" class="modal-overlay" style="display: none;">
+    <!-- Application Form Modal -->
+    <div id="applicationModal" class="modal-content">
+        <div class="modal-header">
+            <h3>Add Job Application</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="applicationForm">
+                <div class="form-group">
+                    <label for="applicationCompany">Company</label>
+                    <input type="text" id="applicationCompany" name="company" required>
+                </div>
+                <div class="form-group">
+                    <label for="applicationJobTitle">Job Title</label>
+                    <input type="text" id="applicationJobTitle" name="job_title" required>
+                </div>
+                <div class="form-group">
+                    <label for="applicationStatus">Status</label>
+                    <select id="applicationStatus" name="status">
+                        <option value="applied">Applied</option>
+                        <option value="interviewing">Interviewing</option>
+                        <option value="waiting">Waiting for Response</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="offered">Offered</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="applicationDate">Application Date</label>
+                    <input type="date" id="applicationDate" name="applied_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="applicationNotes">Notes (optional)</label>
+                    <textarea id="applicationNotes" name="notes" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
