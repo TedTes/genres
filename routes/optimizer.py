@@ -11,11 +11,11 @@ from services.resume.schemas import (
     ResumeInput, JDInput, OptimizationOptions, OptimizationResult,
     validate_json_with_retry_sync
 )
-from services.resume.ingest import ingest_resume_sync
+
 from services.resume.formatting import create_docx_sync, create_pdf_sync
 from services.resume.cache import get_enhanced_cache
 from helpers.resume_helper import save_optimization_to_db,save_temp_file,_get_cached_optimization_result,_serve_local_file,_proxy_remote_file,_run_optimization_pipeline
-from providers import get_models, test_provider_connection
+from providers import  test_provider_connection
 from models import ResumeOptimization
 from db import db
 import traceback

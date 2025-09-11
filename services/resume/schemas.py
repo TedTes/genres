@@ -463,7 +463,7 @@ def extract_json_from_response(response: str) -> str:
     return response
 
 
-def create_json_prompt(system_message: str, user_content: str, schema_class: BaseModel) -> List[Dict[str, str]]:
+def create_json_prompt(system_message: str, user_content: str) -> List[Dict[str, str]]:
     """
     Create a standardized prompt for JSON generation.
     
@@ -476,14 +476,7 @@ def create_json_prompt(system_message: str, user_content: str, schema_class: Bas
         Formatted messages for LLM
     """
     
-    schema_example = schema_class.Config.schema_extra.get('example', {})
-    
     enhanced_system = f"""{system_message}
-
-CRITICAL: You must respond with ONLY valid JSON that matches this exact schema structure:
-
-{json.dumps(schema_example, indent=2)}
-
 Rules:
 - Return ONLY JSON, no explanations or markdown
 - All required fields must be present
