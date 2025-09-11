@@ -11,7 +11,7 @@ from .schemas import (
     ResumeInput, JDInput, OptimizationOptions, OptimizationResult,
     OptimizedResume, Rationale
 )
-from .ingest import ingest_resume_sync
+from .document_processor import DocumentProcessor
 from .embedding import perform_gap_analysis_sync
 from .rewrite import optimize_resume_sync
 from .explain import generate_explanations_sync
@@ -118,7 +118,7 @@ class ResumeOptimizer:
         step_start = time.time()
         print("📄 Step 1: Ingesting and parsing resume...")
         
-        parsed_resume = ingest_resume_sync(
+        parsed_resume = DocumentProcessor().process_document(
             text=resume_input.text,
             docx_url=resume_input.docx_url,
             pdf_url=resume_input.pdf_url

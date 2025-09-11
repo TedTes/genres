@@ -8,7 +8,7 @@ from typing import Any,List, Dict, Tuple, Optional
 from dataclasses import dataclass
 import asyncio
 
-from .ingest import DocumentChunk
+from .document_processor import DocumentChunk
 from .keywords import KeywordMatch, extract_keywords_from_text
 from providers import get_models
 
