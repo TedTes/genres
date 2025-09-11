@@ -339,6 +339,205 @@ class SupportedFormats:
 
 
 
+class ContactInformation(BaseModel):
+    """Contact information section."""
+    name: str = Field(..., description="Full name")
+    email: Optional[str] = Field(None, description="Email address")
+    phone: Optional[str] = Field(None, description="Phone number")
+    location: Optional[str] = Field(None, description="Location (city, state/province, country)")
+    website: Optional[str] = Field(None, description="Personal website")
+    linkedin: Optional[str] = Field(None, description="LinkedIn profile")
+    github: Optional[str] = Field(None, description="GitHub profile")
+    portfolio: Optional[str] = Field(None, description="Portfolio URL")
+    other_profiles: Optional[Dict[str, str]] = Field(None, description="Other social/professional profiles")
+
+class WorkExperienceItem(BaseModel):
+    """Single work experience entry."""
+    job_title: str = Field(..., description="Job title/role")
+    company: str = Field(..., description="Company name")
+    start_date: Optional[str] = Field(None, description="Start date (normalized format)")
+    end_date: Optional[str] = Field(None, description="End date (normalized format or 'Present')")
+    location: Optional[str] = Field(None, description="Job location")
+    responsibilities: List[str] = Field(default=[], description="List of responsibilities/achievements")
+    technologies: Optional[List[str]] = Field(None, description="Technologies used in this role")
+    metrics: Optional[List[str]] = Field(None, description="Quantifiable achievements")
+
+class EducationItem(BaseModel):
+    """Single education entry."""
+    degree: Optional[str] = Field(None, description="Degree type (e.g., Bachelor's, Master's)")
+    field_of_study: Optional[str] = Field(None, description="Major/field of study")
+    institution: str = Field(..., description="School/university name")
+    graduation_date: Optional[str] = Field(None, description="Graduation date")
+    location: Optional[str] = Field(None, description="Institution location")
+    gpa: Optional[str] = Field(None, description="GPA if mentioned")
+    honors: Optional[List[str]] = Field(None, description="Honors, awards, distinctions")
+    relevant_coursework: Optional[List[str]] = Field(None, description="Relevant courses")
+
+class SkillsSection(BaseModel):
+    """Skills section with categorization."""
+    technical_skills: Optional[List[str]] = Field(None, description="Technical/hard skills")
+    soft_skills: Optional[List[str]] = Field(None, description="Soft skills")
+    programming_languages: Optional[List[str]] = Field(None, description="Programming languages")
+    frameworks: Optional[List[str]] = Field(None, description="Frameworks and libraries")
+    tools: Optional[List[str]] = Field(None, description="Tools and software")
+    databases: Optional[List[str]] = Field(None, description="Database technologies")
+    cloud_platforms: Optional[List[str]] = Field(None, description="Cloud platforms")
+    certifications: Optional[List[str]] = Field(None, description="Certifications mentioned in skills")
+    languages: Optional[List[str]] = Field(None, description="Spoken languages")
+    other_skills: Optional[List[str]] = Field(None, description="Other uncategorized skills")
+
+class CertificationItem(BaseModel):
+    """Single certification entry."""
+    name: str = Field(..., description="Certification name")
+    issuing_organization: Optional[str] = Field(None, description="Issuing organization")
+    issue_date: Optional[str] = Field(None, description="Issue date")
+    expiration_date: Optional[str] = Field(None, description="Expiration date")
+    credential_id: Optional[str] = Field(None, description="Credential ID")
+    credential_url: Optional[str] = Field(None, description="Verification URL")
+
+class ProjectItem(BaseModel):
+    """Single project entry."""
+    name: str = Field(..., description="Project name")
+    description: Optional[str] = Field(None, description="Project description")
+    technologies: Optional[List[str]] = Field(None, description="Technologies used")
+    start_date: Optional[str] = Field(None, description="Start date")
+    end_date: Optional[str] = Field(None, description="End date")
+    url: Optional[str] = Field(None, description="Project URL")
+    github_url: Optional[str] = Field(None, description="GitHub repository")
+    key_achievements: Optional[List[str]] = Field(None, description="Key achievements/features")
+
+class AdditionalSection(BaseModel):
+    """Flexible section for non-standard resume sections."""
+    section_title: str = Field(..., description="Section title as it appears in resume")
+    section_type: str = Field(..., description="Type hint (e.g., 'awards', 'publications', 'volunteer')")
+    content: Dict[str, Any] = Field(..., description="Flexible content structure")
+    order: Optional[int] = Field(None, description="Display order in resume")
+
+class NormalizedResume(BaseModel):
+    """
+    Complete normalized resume structure.
+    Handles both standard sections and flexible additional content.
+    """
+    
+    # Core required sections
+    contact_information: ContactInformation = Field(..., description="Contact details")
+    
+    # Common standard sections
+    work_experience: Optional[List[WorkExperienceItem]] = Field(None, description="Work history")
+    education: Optional[List[EducationItem]] = Field(None, description="Education history")
+    skills: Optional[SkillsSection] = Field(None, description="Skills and competencies")
+    
+    # Optional standard sections
+    professional_summary: Optional[str] = Field(None, description="Professional summary/objective")
+    certifications: Optional[List[CertificationItem]] = Field(None, description="Certifications")
+    projects: Optional[List[ProjectItem]] = Field(None, description="Projects")
+    
+    # Flexible sections for edge cases
+    additional_sections: Optional[List[AdditionalSection]] = Field(
+        default=[], 
+        description="Non-standard sections like Patents, Publications, Awards, Volunteer Work, etc."
+    )
+    
+    # Metadata
+    parsed_date: Optional[str] = Field(None, description="When this resume was parsed")
+    source_format: Optional[str] = Field(None, description="Original file format (pdf/docx/text)")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "contact_information": {
+                    "name": "John Smith",
+                    "email": "john.smith@email.com",
+                    "phone": "+1-555-123-4567",
+                    "location": "San Francisco, CA",
+                    "linkedin": "linkedin.com/in/johnsmith",
+                    "github": "github.com/johnsmith"
+                },
+                "professional_summary": "Senior Software Engineer with 5+ years of experience building scalable web applications...",
+                "work_experience": [
+                    {
+                        "job_title": "Senior Software Engineer",
+                        "company": "TechCorp Inc.",
+                        "start_date": "01/2021",
+                        "end_date": "Present",
+                        "location": "San Francisco, CA",
+                        "responsibilities": [
+                            "Built microservices architecture serving 1M+ daily users",
+                            "Led team of 4 developers on critical product features",
+                            "Reduced API response time by 60% through optimization"
+                        ],
+                        "technologies": ["Python", "Django", "PostgreSQL", "AWS"]
+                    }
+                ],
+                "education": [
+                    {
+                        "degree": "Bachelor of Science",
+                        "field_of_study": "Computer Science",
+                        "institution": "University of California, Berkeley",
+                        "graduation_date": "05/2018",
+                        "gpa": "3.8"
+                    }
+                ],
+                "skills": {
+                    "programming_languages": ["Python", "JavaScript", "Java"],
+                    "frameworks": ["Django", "React", "Spring Boot"],
+                    "databases": ["PostgreSQL", "MongoDB", "Redis"],
+                    "cloud_platforms": ["AWS", "GCP"],
+                    "tools": ["Docker", "Kubernetes", "Jenkins"]
+                },
+                "certifications": [
+                    {
+                        "name": "AWS Certified Solutions Architect",
+                        "issuing_organization": "Amazon Web Services",
+                        "issue_date": "03/2023",
+                        "expiration_date": "03/2026"
+                    }
+                ],
+                "projects": [
+                    {
+                        "name": "E-commerce Platform",
+                        "description": "Full-stack e-commerce application with payment processing",
+                        "technologies": ["React", "Node.js", "Stripe API"],
+                        "github_url": "github.com/johnsmith/ecommerce"
+                    }
+                ],
+                "additional_sections": [
+                    {
+                        "section_title": "Publications",
+                        "section_type": "publications",
+                        "content": {
+                            "papers": [
+                                {
+                                    "title": "Machine Learning in Web Development",
+                                    "journal": "Tech Journal",
+                                    "date": "2023",
+                                    "url": "example.com/paper"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "section_title": "Volunteer Experience",
+                        "section_type": "volunteer",
+                        "content": {
+                            "organizations": [
+                                {
+                                    "name": "Code for Good",
+                                    "role": "Technical Mentor",
+                                    "duration": "2022-Present",
+                                    "description": "Mentoring junior developers in open source projects"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    
+    def dict(self, **kwargs):
+        """Convert to dictionary for JSON serialization."""
+        return super().dict(**kwargs)
+
 async def validate_json_with_retry(
     json_str: str, 
     schema_class: BaseModel, 
