@@ -7,14 +7,10 @@ from typing import Dict,Any,Optional,Tuple,List
 import io
 import tempfile
 import os
-from services.resume.schemas import (
-    ResumeInput, JDInput, OptimizationOptions, OptimizationResult,
-    validate_json_with_retry_sync
+from schemas import (
+    ResumeInput, JDInput, OptimizationOptions, OptimizationResult
 )
-
-from services.resume.formatting import create_docx_sync, create_pdf_sync
-from services.resume.cache import get_enhanced_cache
-from helpers.resume_helper import save_optimization_to_db,save_temp_file,_get_cached_optimization_result,_serve_local_file,_proxy_remote_file,_run_optimization_pipeline
+from services import ResumeOptimizationPipeline,create_docx_sync, create_pdf_sync,get_enhanced_cache
 from providers import  test_provider_connection
 from models import ResumeOptimization
 from db import db
@@ -24,7 +20,7 @@ from datetime import datetime
 
 
 optimizer_bp = Blueprint('optimizer', __name__)
-
+resume_optimization_instance = ResumeOptimizationPipeline()
 # Resume AI enhancement endpoints
 """
 Resume LLM optimization routes.
@@ -87,7 +83,7 @@ def optimize_resume():
                         return jsonify({'error': 'No file uploaded'}), 400
                     
                     # Save file temporarily and create file URL
-                    temp_path = save_temp_file(resume_file)
+                    temp_path = resume_optimization_instance.save_temp_file(resume_file)
                     
 
                     if resume_file.content_type == 'application/pdf':
@@ -109,7 +105,7 @@ def optimize_resume():
         # Process optimization pipeline
         try:
             print("🔄 Running optimization pipeline...")
-            result = _run_optimization_pipeline(
+            result = resume_optimization_instance._run_optimization_pipeline(
                 resume_input, jd_input, options,  user_id
             )
             
@@ -130,7 +126,7 @@ def optimize_resume():
             # Save to database
             model_provider = current_app.config.get('MODEL_PROVIDER', 'unknown')
             
-            result_id = save_optimization_to_db(
+            result_id = resume_optimization_instance.save_optimization_to_db(
                 user_id=user_id,
                 resume_input=resume_input,
                 jd_input=jd_input,
@@ -250,7 +246,7 @@ Requirements:
         options = OptimizationOptions()
         
         # Run optimization
-        result = _run_optimization_pipeline(
+        result = resume_optimization_instance._run_optimization_pipeline(
             resume_input, jd_input, options, 
             "test_" + str(int(time.time())), 
             current_user.id
@@ -387,7 +383,7 @@ def download_resume(file_type, result_id):
         
         # Try to get results from a temporary storage mechanism
         # This is a simplified approach for MVP
-        result_data = _get_cached_optimization_result(result_id)
+        result_data = resume_optimization_instance._get_cached_optimization_result(result_id)
         
         if not result_data:
             return jsonify({'error': 'Optimization result not found or expired'}), 404
@@ -402,10 +398,10 @@ def download_resume(file_type, result_id):
         # For local files, serve directly
         if file_url.startswith('/download/resume/'):
             filename = file_url.split('/')[-1]
-            return _serve_local_file(filename, file_type)
+            return resume_optimization_instance._serve_local_file(filename, file_type)
         
         # For S3/remote files, proxy the download
-        return _proxy_remote_file(file_url, file_type, result_data)
+        return resume_optimization_instance._proxy_remote_file(file_url, file_type, result_data)
         
     except Exception as e:
         print(f"❌ Download error: {str(e)}")
@@ -427,7 +423,7 @@ def generate_download_files(result_id):
     
     try:
         # Get the optimization result
-        result_data = _get_cached_optimization_result(result_id)
+        result_data = resume_optimization_instance._get_cached_optimization_result(result_id)
         
         if not result_data:
             return jsonify({'error': 'Optimization result not found'}), 404
@@ -436,7 +432,7 @@ def generate_download_files(result_id):
         optimized_resume_data = result_data.get('optimized_resume', {})
         
         # Convert dict back to OptimizedResume object
-        from services.resume.schemas import OptimizedResume
+        from schemas import OptimizedResume
         optimized_resume = OptimizedResume(**optimized_resume_data)
         
         # Get contact info (stored in result or extract from original)

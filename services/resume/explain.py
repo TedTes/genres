@@ -7,9 +7,9 @@ from typing import List, Dict, Any, Tuple
 import difflib
 import asyncio
 
-from .schemas import Rationale, ChangeRationale, validate_json_with_retry
+from schemas import Rationale, ChangeRationale,OptimizedResume
+from helpers import validate_json_with_retry
 from providers import get_models
-from .pipeline import OptimizedResume
 from .rewrite import ResumePrompts
 class ResumeDiffGenerator:
     """Generates detailed diffs between original and optimized resumes."""

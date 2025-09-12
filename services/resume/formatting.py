@@ -12,7 +12,7 @@ from docx.enum.style import WD_STYLE_TYPE
 from docx.oxml.shared import OxmlElement, qn
 import asyncio
 
-from .schemas import OptimizedResume, ExperienceItem
+from schemas import OptimizedResume, ExperienceItem
 
 
 class ModernResumeFormatter:

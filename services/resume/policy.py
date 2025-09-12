@@ -8,7 +8,7 @@ from typing import List, Dict, Any, Tuple, Optional
 from datetime import datetime
 from dataclasses import dataclass
 
-from .schemas import OptimizedResume, ExperienceItem
+from schemas import OptimizedResume, ExperienceItem
 
 
 @dataclass

@@ -8,10 +8,9 @@ from typing import Any,List, Dict, Tuple, Optional
 from dataclasses import dataclass
 import asyncio
 
-from .document_processor import DocumentChunk
 from .keywords import KeywordMatch, extract_keywords_from_text
 from providers import get_models
-
+from schemas  import DocumentChunk
 
 @dataclass
 class EmbeddingResult:

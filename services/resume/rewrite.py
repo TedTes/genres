@@ -7,7 +7,8 @@ from typing import List, Dict, Any, Optional
 import json
 
 
-from .schemas import OptimizedResume, ExperienceItem, validate_json_with_retry
+from schemas import OptimizedResume, ExperienceItem
+from helpers import  validate_json_with_retry
 from .keywords import TechnicalSkills
 from providers import get_models
 
