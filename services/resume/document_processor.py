@@ -9,8 +9,13 @@ from typing import Any,Dict, List, Optional, Tuple
 import mammoth
 from pydantic import BaseModel
 from providers import get_models
-from .schemas import create_json_prompt
+from utils import create_json_prompt
+from helpers import validate_json_with_retry
+from schemas import NormalizedResumeSchema
+from utils import create_normalization_prompt
 import requests
+import json
+from datetime import datetime
 # For PDF support
 try:
     import pypdf
@@ -19,27 +24,6 @@ except ImportError:
     PDF_SUPPORT = False
     print("Warning: pypdf not installed. PDF support disabled.")
 
-
-class DocumentChunk(BaseModel):
-    """Represents a chunk of resume text with metadata."""
-    
-    text: str
-    section: str  # 'summary', 'experience', 'education', 'skills'
-    chunk_index: int
-    token_count: Optional[int] = None
-    metadata: Dict[str, Any] = {}
-
-
-class ParsedResume(BaseModel):
-    """Structured representation of a parsed resume."""
-    
-    raw_text: str
-    sections: Dict[str, str] = {}
-    experience_items: List[Dict[str, Any]] = []
-    education_items: List[Dict[str, str]] = []
-    skills: List[str] = []
-    contact_info: Dict[str, str] = {}
-    chunks: List[DocumentChunk] = []
 
 
 class DocumentProcessor:
@@ -53,7 +37,7 @@ class DocumentProcessor:
             text: Optional[str] = None,
             docx_url: Optional[str] = None, 
             pdf_url: Optional[str] = None
-        ) -> ParsedResume :
+        ) :
             """
                 Main docuemnt processor function that handles all resume input types.
                 
@@ -210,7 +194,7 @@ class DocumentProcessor:
             # Validate against schema with auto-retry
             validated_resume = await validate_json_with_retry(
                 response, 
-                NormalizedResume, 
+                NormalizedResumeSchema, 
                 self.chat_model,
                 max_retries=2
             )
@@ -220,84 +204,6 @@ class DocumentProcessor:
 
 
 
-      def create_normalization_prompt(raw_text: str, file_type: str) -> tuple[str, str]:
-        """
-        Create system and user messages for resume normalization with explicit schema.
-        
-        Args:
-            raw_text: Raw extracted text from document
-            file_type: Source file type for context
-            
-        Returns:
-            Tuple of (system_message, user_message)
-        """
-        
-        # Get the schema example from NormalizedResume
-        schema_example = NormalizedResume.Config.schema_extra["example"]
-        
-        system_message = f"""You are an expert resume parser and data extraction specialist. Your task is to extract and normalize resume information from raw text that may contain formatting issues or OCR errors.
 
-        CRITICAL INSTRUCTIONS:
-        1. Extract ALL available information accurately
-        2. Normalize dates to consistent format (YYYY-YYYY or MM/YYYY-MM/YYYY)
-        3. Clean up garbled text and fix obvious OCR errors
-        4. Structure work experience chronologically (most recent first)
-        5. Separate and categorize all skills appropriately
-        6. Extract contact information comprehensively
-        7. Preserve all quantifiable achievements and metrics
-        8. If information is unclear or missing, use null or empty arrays
-        9. Return ONLY valid JSON matching the EXACT schema below
-
-        REQUIRED JSON SCHEMA - You MUST follow this structure exactly:
-
-        {json.dumps(schema_example, indent=2)}
-
-        SCHEMA RULES:
-        - contact_information: REQUIRED - extract name, email, phone, location, social profiles
-        - work_experience: Array of jobs, most recent first, with detailed responsibilities
-        - education: Array of educational background with degrees, institutions, dates
-        - skills: Categorize into technical_skills, programming_languages, frameworks, tools, etc.
-        - professional_summary: Extract or infer from objective/summary sections
-        - certifications: Professional certifications with issuing organizations
-        - projects: Personal/side projects mentioned
-        - additional_sections: For non-standard sections like Patents, Publications, Awards, Volunteer Work
-
-        FIELD MAPPING GUIDANCE:
-        - Put programming languages in "programming_languages", not "technical_skills"
-        - Separate frameworks/libraries from core programming languages  
-        - Cloud platforms (AWS, GCP, Azure) go in "cloud_platforms"
-        - Databases get their own "databases" category
-        - Soft skills like "communication" go in "soft_skills"
-        - Put unusual sections (Patents, Publications, Speaking, Military, etc.) in "additional_sections"
-
-        ADDITIONAL SECTIONS FORMAT:
-        For any non-standard sections, use this structure:
-        {{
-        "section_title": "exact title from resume",
-        "section_type": "category like 'publications', 'awards', 'volunteer'", 
-        "content": {{ flexible structure preserving all information }}
-        }}
-
-        Return ONLY the JSON object, no explanations or markdown formatting."""
-
-        user_message = f"""Parse and normalize this resume text extracted from a {file_type} file:
-
-        RAW TEXT:
-        {raw_text}
-
-        SPECIFIC EXTRACTION REQUIREMENTS:
-        - Fix obvious formatting and OCR errors
-        - Extract complete contact information (name, email, phone, location, all social profiles)
-        - Structure work experience with normalized date formats and detailed responsibilities
-        - Categorize skills into appropriate technical subcategories
-        - Capture education with degrees, institutions, graduation dates, honors
-        - Extract certifications with issuing organizations and dates
-        - Identify projects with technologies and descriptions
-        - Preserve ALL quantifiable metrics and achievements exactly as stated
-        - Map unusual sections (Patents, Publications, Awards, etc.) to additional_sections
-
-        Return the complete structured JSON following the exact schema provided:"""
-
-        return system_message, user_message
 
 
