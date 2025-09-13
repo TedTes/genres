@@ -2,7 +2,7 @@
 from schemas import NormalizedResumeSchema
 import json
 from typing import List,Dict
-def create_normalization_prompt(raw_text: str, file_type: str) -> tuple[str, str]:
+def get_normalization_prompt(raw_text: str, file_type: str) -> tuple[str, str]:
     """
     Create system and user messages for resume normalization with explicit schema.
 
@@ -15,7 +15,7 @@ def create_normalization_prompt(raw_text: str, file_type: str) -> tuple[str, str
     """
 
     # Get the schema example from NormalizedResumeSchema
-    schema_example = NormalizedResumeSchema.Config.schema_extra["example"]
+    schema_example = NormalizedResumeSchema.Config.schema_extra["examples"]
 
     system_message = f"""You are an expert resume parser and data extraction specialist. Your task is to extract and normalize resume information from raw text that may contain formatting issues or OCR errors.
 
@@ -84,7 +84,7 @@ def create_normalization_prompt(raw_text: str, file_type: str) -> tuple[str, str
 
 
 
-def create_json_prompt(system_message: str, user_content: str) -> List[Dict[str, str]]:
+def get_json_prompt(system_message: str, user_content: str) -> List[Dict[str, str]]:
     """
     Create a standardized prompt for JSON generation.
 

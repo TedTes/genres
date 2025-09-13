@@ -21,7 +21,6 @@ except ImportError:
     print("Warning: redis not installed. Using in-memory cache fallback.")
 
 from schemas import OptimizedResume, GapReport, OptimizationResult
-from .storage import generate_resume_hash_sync
 
 
 class CacheKeyGenerator:
