@@ -1,7 +1,7 @@
 import json
 from typing import Dict, Any
 
-def optimization_prompt(
+def get_optimization_prompt(
     normalized_resume: Dict[str, Any],
     jd_text: str,
     jd_title: str = None,
