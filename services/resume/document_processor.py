@@ -9,13 +9,12 @@ from typing import Any,Dict, List, Optional, Tuple
 import mammoth
 from pydantic import BaseModel
 from providers import get_models
-from utils import create_json_prompt
 from helpers import validate_json_with_retry
 from schemas import NormalizedResumeSchema
-from utils import create_normalization_prompt
 import requests
 import json
 from datetime import datetime
+from utils import get_optimization_prompt,extract_json_from_response,get_normalization_prompt,get_json_prompt
 # For PDF support
 try:
     import pypdf
@@ -67,8 +66,11 @@ class DocumentProcessor:
             print(f"📄 Processing resume from {input_type} ({len(raw_text)} characters)")
 
 
+            print("normalized raw text.....")
             # Parse the text into structured format
             parsed = await self._normalize_with_llm(raw_text,input_type)
+            print("normalizing raw text done")
+            
             return parsed
       def process_document_sync(self, *args, **kwargs):
             # Sync wrappers for non-async code
@@ -183,9 +185,8 @@ class DocumentProcessor:
             """
             
             
-            system_message, user_message = self.create_normalization_prompt(raw_text, file_type)
-            messages = create_json_prompt(system_message, user_message)
-            
+            system_message, user_message = get_normalization_prompt(raw_text, file_type)
+            messages = get_json_prompt(system_message, user_message)
             response = await self.chat_model.chat(
                 messages,
                 temperature=0.1,  # Low temperature for accuracy
@@ -202,6 +203,70 @@ class DocumentProcessor:
             validated_resume.source_format = file_type
             return validated_resume.dict()
 
+      async def analyze_and_optimize(
+            self,
+            normalized_resume: Dict[str, Any],
+            jd_text: str,
+            jd_title: Optional[str] = None,
+            optimization_focus: str = "professional-concise"
+      ):
+        """
+        Perform comprehensive gap analysis and resume optimization in one LLM call.
+        
+        Args:
+            normalized_resume: MultiNicheResume dictionary structure
+            jd_text: Job description text
+            jd_title: Optional job title
+            optimization_focus: Optimization tone/style
+            
+        Returns:
+            ComprehensiveOptimizationResult with gap analysis and optimized resume
+        """
+        
+        print(f"🔍🤖 Starting comprehensive gap analysis + optimization...")
+        print(f"📊 Resume industry context: {normalized_resume.get('industry_context', {}).get('primary_industry', 'Unknown')}")
+        
+        try:
+            # Create the comprehensive prompt
+            system_message, user_message = get_optimization_prompt(
+                normalized_resume, jd_text, jd_title, optimization_focus
+            )
+            
+            messages = [
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": user_message}
+            ]
+            
+            # Execute LLM call with optimized parameters
+            response = await self.chat_model.chat(
+                messages=messages,
+                temperature=0.2,  # Low temperature for consistency and accuracy
+                max_tokens=8000,  # Large response needed for comprehensive output
+                top_p=0.9
+            )
+            
+            print(f"📝 Generated comprehensive analysis ({len(response)} chars)")
+            
+            # Extract and validate JSON response
+            json_response = extract_json_from_response(response)
+            
+            # Validate against schema with retry capability
+            validated_result = await validate_json_with_retry(
+                json_str=json_response,
+                schema_class=ComprehensiveOptimizationResult,
+                chat_model=self.chat_model,
+                max_retries=2
+            )
+            
+            print(f"✅ Gap analysis + optimization complete")
+            print(f"📈 Match score: {validated_result.gap_analysis.get('overall_match_score', 'N/A')}")
+            print(f"🔧 Total changes: {validated_result.optimization_metadata.get('total_changes', 'N/A')}")
+            
+            return validated_result
+            
+        except Exception as e:
+            print(f"❌ LLM gap analysis + optimization failed: {str(e)}")
+            raise ValueError(f"Failed to analyze and optimize resume: {str(e)}")
 
 
 
