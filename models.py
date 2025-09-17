@@ -69,6 +69,20 @@ class ResumeOptimization(db.Model):
     
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    def to_dict(self):
+        out = {}
+        for col in self.__table__.columns:
+            val = getattr(self, col.name)
+            # Handle JSON stored as text (fallback)
+            if isinstance(val, str):
+                if (val.startswith("{") and val.endswith("}")) or (val.startswith("[") and val.endswith("]")):
+                    try:
+                        val = json.loads(val)
+                    except Exception:
+                        pass
+            out[col.name] = val
+        return out
+
 class Resume(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
