@@ -2,84 +2,40 @@
 from schemas import NormalizedResumeSchema
 import json
 from typing import List,Dict
-def get_normalization_prompt(raw_text: str, file_type: str) -> tuple[str, str]:
-    """
-    Create system and user messages for resume normalization with explicit schema.
+def get_normalization_prompt(raw_text: str, file_type: str):
+    import json
+    # Schema extraction (v2 then v1)
+    try:
+        schema_obj = NormalizedResumeSchema.model_json_schema()  # Pydantic v2
+    except Exception:
+        schema_obj = NormalizedResumeSchema.schema()              # Pydantic v1
 
-    Args:
-    raw_text: Raw extracted text from document
-    file_type: Source file type for context
+    schema_json = json.dumps(schema_obj, separators=(",", ":"))
 
-    Returns:
-    Tuple of (system_message, user_message)
-    """
+    system_message = (
+        "You are an expert resume parser. Output MUST be a single valid JSON object that "
+        "conforms to the provided JSON Schema. No prose/markdown/comments.\n\n"
+        "Rules:\n"
+        "- Extract all available info.\n"
+        "- Dates: use 'YYYY', 'YYYY-MM', or 'MM/YYYY'; use 'Present' for ongoing roles; if unclear, use null.\n"
+        "- Reverse-chronological work_experience.\n"
+        "- Deduplicate skills; keep canonical casing (Node.js, AWS).\n"
+        "- If data is missing, emit null or [] per schema; never invent.\n"
+        "- One JSON object only."
+    )
 
-    # Get the schema example from NormalizedResumeSchema
-    schema_example = NormalizedResumeSchema.Config.schema_extra["examples"]
-
-    system_message = f"""You are an expert resume parser and data extraction specialist. Your task is to extract and normalize resume information from raw text that may contain formatting issues or OCR errors.
-
-    CRITICAL INSTRUCTIONS:
-    1. Extract ALL available information accurately
-    2. Normalize dates to consistent format (YYYY-YYYY or MM/YYYY-MM/YYYY)
-    3. Clean up garbled text and fix obvious OCR errors
-    4. Structure work experience chronologically (most recent first)
-    5. Separate and categorize all skills appropriately
-    6. Extract contact information comprehensively
-    7. Preserve all quantifiable achievements and metrics
-    8. If information is unclear or missing, use null or empty arrays
-    9. Return ONLY valid JSON matching the EXACT schema below
-
-    REQUIRED JSON SCHEMA - You MUST follow this structure exactly:
-
-    {json.dumps(schema_example, indent=2)}
-
-    SCHEMA RULES:
-    - contact_information: REQUIRED - extract name, email, phone, location, social profiles
-    - work_experience: Array of jobs, most recent first, with detailed responsibilities
-    - education: Array of educational background with degrees, institutions, dates
-    - skills: Categorize into technical_skills, programming_languages, frameworks, tools, etc.
-    - professional_summary: Extract or infer from objective/summary sections
-    - certifications: Professional certifications with issuing organizations
-    - projects: Personal/side projects mentioned
-    - additional_sections: For non-standard sections like Patents, Publications, Awards, Volunteer Work
-
-    FIELD MAPPING GUIDANCE:
-    - Put programming languages in "programming_languages", not "technical_skills"
-    - Separate frameworks/libraries from core programming languages  
-    - Cloud platforms (AWS, GCP, Azure) go in "cloud_platforms"
-    - Databases get their own "databases" category
-    - Soft skills like "communication" go in "soft_skills"
-    - Put unusual sections (Patents, Publications, Speaking, Military, etc.) in "additional_sections"
-
-    ADDITIONAL SECTIONS FORMAT:
-    For any non-standard sections, use this structure:
-    {{
-    "section_title": "exact title from resume",
-    "section_type": "category like 'publications', 'awards', 'volunteer'", 
-    "content": {{ flexible structure preserving all information }}
-    }}
-
-    Return ONLY the JSON object, no explanations or markdown formatting."""
-
-    user_message = f"""Parse and normalize this resume text extracted from a {file_type} file:
-
-    RAW TEXT:
-    {raw_text}
-
-    SPECIFIC EXTRACTION REQUIREMENTS:
-    - Fix obvious formatting and OCR errors
-    - Extract complete contact information (name, email, phone, location, all social profiles)
-    - Structure work experience with normalized date formats and detailed responsibilities
-    - Categorize skills into appropriate technical subcategories
-    - Capture education with degrees, institutions, graduation dates, honors
-    - Extract certifications with issuing organizations and dates
-    - Identify projects with technologies and descriptions
-    - Preserve ALL quantifiable metrics and achievements exactly as stated
-    - Map unusual sections (Patents, Publications, Awards, etc.) to additional_sections
-
-    Return the complete structured JSON following the exact schema provided:"""
-
+    user_message = (
+        "JSON_SCHEMA:\n<<<SCHEMA_START>>>\n"
+        f"{schema_json}\n"
+        "<<<SCHEMA_END>>>\n\n"
+        f"SOURCE_FILE_TYPE:\n{file_type}\n\n"
+        "RAW_RESUME_TEXT (verbatim):\n<<<RESUME_START>>>\n"
+        f"{raw_text}\n"
+        "<<<RESUME_END>>>\n\n"
+        "Task: Parse and normalize into a JSON object that VALIDATES against JSON_SCHEMA.\n"
+        "Strict output: JSON object only; no markdown; use null/[] for missing fields; "
+        "apply the date rules and ordering."
+    )
     return system_message, user_message
 
 
