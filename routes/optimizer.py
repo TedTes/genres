@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify,current_app,send_file, make_respon
 from flask_login import login_required,current_user
 from werkzeug.exceptions import BadRequest
 import asyncio
+import json
 import time
 from typing import Dict,Any,Optional,Tuple,List
 import io
@@ -49,7 +50,7 @@ def optimize_resume():
     Returns:
         OptimizationResult with optimized resume and analytics
     """
-    request_start_time = time.time()
+    
     try:
         # Authentication temporarily disabled for MVP testing
         user_id = current_user.id
@@ -105,14 +106,14 @@ def optimize_resume():
         # Process optimization pipeline
         try:
             print("🔄 Running optimization pipeline...")
-            result = resume_optimization_instance._run_optimization_pipeline(
+            result = resume_optimization_instance._run_optimization_pipeline_sync(
                 resume_input, jd_input, options,  user_id
             )
             
           
 
             # Check cache first (optional for MVP)
-            cache = get_enhanced_cache()
+            # cache = get_enhanced_cache()
             # Cache the result (temporarily disabled for testing)
             # asyncio.run(cache.cache_result(
             #     resume_text=resume_text,
@@ -122,30 +123,19 @@ def optimize_resume():
             #     model_info=_get_model_info(),
             #     ttl=24*60*60  # 24 hours
             # ))
-            total_time = (time.time() - request_start_time) * 1000
-            # Save to database
-            model_provider = current_app.config.get('MODEL_PROVIDER', 'unknown')
             
-            result_id = resume_optimization_instance.save_optimization_to_db(
-                user_id=user_id,
-                resume_input=resume_input,
-                jd_input=jd_input,
-                optimization_result=result,
-                processing_time_ms=total_time,
-                model_provider=model_provider
-            )
             # Add processing metadata
             
-            result['processing_time_ms'] = round(total_time, 2)
+            
             result['cache_hit'] = False
             
             
-            print(f"✅ Optimization complete in {total_time:.0f}ms")
+          
             print(f"📊 Match score: {result.get('match_score', 'N/A')}%")
             print(f"🔧 Missing keywords: {len(result.get('missing_keywords', []))}")
             
             # SERVER-SIDE REDIRECT to results page
-            return redirect(url_for('optimizer.show_results', result_id=result_id))
+            return redirect(url_for('optimizer.show_results', result_id=result.get('result_id')))
             
         except Exception as e:
             print(f"❌ Optimization pipeline failed: {str(e)}")
@@ -298,57 +288,164 @@ def optimization_status():
 @optimizer_bp.route('/results/<result_id>', methods=['GET'])
 @login_required
 def show_results(result_id):
-    """
-    Display optimization results page with data from database.
-    """
-    try:
-        # Get optimization from database
-        optimization = ResumeOptimization.query.filter_by(
-            id=int(result_id),
-            user_id=current_user.id
-        ).first()
-        
-        if not optimization:
-            flash('Optimization results not found or you do not have permission to view them.', 'error')
-            return redirect(url_for('root.dashboard'))
-        
-        # Prepare data for template
+     # """Display optimization results page with data from database."""
+     try:
+ 
+        import json
+        from math import isnan
+
+        def _as_pct(x, default=0.0):
+            try:
+                v = float(x)
+                if isnan(v):
+                    return default
+                return v * 100.0
+            except Exception:
+              return default
+
+        def _ci(d):
+            """contact_information dict safely."""
+            return (d or {}).get('contact_information', {}) if isinstance(d, dict) else {}
+
+        def _profiles_ci(ci):
+            prof = (ci.get('professional_profiles') or {}) if isinstance(ci, dict) else {}
+            # case-insensitive lookup for 'linkedin'
+            for k, v in prof.items():
+                if isinstance(k, str) and k.lower() == 'linkedin':
+                    return v
+                return None
+
+        # ---- inside your route after you fetch `optimization` ----
+        optimized_resume_data = optimization.optimized_resume_data or {}
+        if isinstance(optimized_resume_data, str):
+         try:
+           optimized_resume_data = json.loads(optimized_resume_data)
+         except Exception:
+           optimized_resume_data = {}
+
+        optimized_resume = optimized_resume_data.get('optimized_resume') or {}
+        gap_analysis = optimized_resume_data.get('gap_analysis') or {}
+        optimization_changes = optimized_resume_data.get('optimization_changes') or {}
+        optimization_meta = optimized_resume_data.get('optimization_metadata') or {}
+
+        print("optimized resume"); print(optimized_resume)
+        print("gap analysis"); print(gap_analysis)
+
+        # Header fields (case-insensitive profiles)
+        ci = _ci(optimized_resume)
+        linkedin_url = _profiles_ci(ci)
+
+        # Build skills output:
+        skills_obj = optimized_resume.get('skills') or {}
+        specialized = {
+            ( (c.get('category_name') or '').strip().lower().replace(' ', '_') ):
+              (c.get('skills') or [])
+            for c in (skills_obj.get('specialized_skills') or [])
+              if isinstance(c, dict)
+        }
+        skills_out = {
+            'core_competencies': skills_obj.get('core_competencies', []),
+            'tools_and_software': skills_obj.get('tools_and_software', []),
+            'methodologies': skills_obj.get('methodologies', []),
+            'soft_skills': skills_obj.get('soft_skills', []),
+            'languages': skills_obj.get('languages', []),
+            **specialized,  # flatten categories into top-level keys if you want
+        }
+
+        # Experience list
+        exp_list = []
+        for exp in (optimized_resume.get('work_experience') or []):
+            if not isinstance(exp, dict):
+              continue
+            start = exp.get('start_date')
+            end = exp.get('end_date')
+            duration = " - ".join([v for v in [start, end] if v])
+            exp_list.append({
+                'title': exp.get('job_title'),
+                'company': exp.get('company'),
+                'duration': duration,
+                'achievements': exp.get('responsibilities', []),
+            })
+
+        # Education list
+        edu_list = []
+        for edu in (optimized_resume.get('education') or []):
+            if not isinstance(edu, dict):
+              continue
+            edu_list.append({
+                'degree': edu.get('degree'),
+                'school': edu.get('institution'),
+                'year': edu.get('completion_date'),
+                'gpa': edu.get('grade'),
+            })
+
+        # Experience improvements (nested changes)
+        exp_improvements = []
+        for ec in (optimization_changes.get('experience_changes') or []):
+          for ch in (ec.get('changes') or []):
+            r = ch.get('rationale')
+            if r:
+              exp_improvements.append(r)
+
         optimization_data = {
             'id': optimization.id,
-            'match_score': optimization.match_score_after,
-            'original_match_score': optimization.match_score_before,
+            'match_score': _as_pct(optimization.match_score_after),
+            'original_match_score': _as_pct(optimization.match_score_before),
             'missing_keywords': optimization.missing_keywords or [],
             'added_keywords': optimization.added_keywords or [],
+            'weak_keywords': (gap_analysis.get('keyword_analysis') or {}).get('weak_mentions', []),
             'processing_time_ms': optimization.processing_time_ms,
             'model_provider': optimization.model_provider,
             'created_at': optimization.created_at,
-            
-            # Job info
+
             'job_title': optimization.job_title,
             'job_description': optimization.job_description,
             'company_name': optimization.company_name,
-            
-            # Optimized content
-            'sections': optimization.optimized_resume_data.get('sections', {}),
-            'experience': optimization.optimized_resume_data.get('experience', []),
-            'skills_to_add': optimization.optimized_resume_data.get('skills_added', []),
-            'explanations': optimization.optimized_resume_data.get('explanations', []),
-            'gap_analysis': optimization.optimized_resume_data.get('gap_analysis', {}),
-            
-            # Files
-            'docx_url': optimization.docx_url,
-            'pdf_url': optimization.pdf_url,
-            
-            # Metadata
             'optimization_style': optimization.optimization_style,
+
+            'score_breakdown': {
+                'overall_score': _as_pct(gap_analysis.get('overall_match_score', 0)),
+                # This “*10” heuristic is arbitrary; keep if it makes sense for your UI.
+                'keyword_match': len((gap_analysis.get('keyword_analysis') or {}).get('well_covered', [])) * 10,
+                'content_quality': _as_pct((gap_analysis.get('experience_analysis') or {}).get('relevance_score', 0)),
+                'ats_friendly': _as_pct(optimization_meta.get('ats_optimization_score', 0)),
+            },
+
+            'optimized_resume': {
+            'header': {
+                'name': ci.get('name'),
+                'email': ci.get('email'),
+                'phone': ci.get('phone'),
+                'location': ci.get('location'),
+                'linkedin': linkedin_url,
+            },
+            'summary': optimized_resume.get('professional_summary'),
+            'experience': exp_list,
+            'skills': skills_out,
+            'education': edu_list,
+            },
+
+            'explanations': {
+                'summary_changes': (
+                    (optimization_changes.get('summary_changes') or [{}])[0].get('rationale')
+                    if optimization_changes.get('summary_changes') else None
+                ),
+                'experience_improvements': exp_improvements,
+                'skills_additions': (optimization_changes.get('skills_changes') or {}).get('additions', []),
+                'keyword_integration': {},  # optional: derive from experience_changes if you like
+            },
+
+            'artifacts': {
+                'pdf_url': optimization.pdf_url,
+                'docx_url': optimization.docx_url,
+            }
         }
-        
-        # Render results template with data
+
         return render_template('results.html', 
                              result_id=result_id,
                              optimization_data=optimization_data)
         
-    except Exception as e:
+     except Exception as e:
         print(f"Error displaying results: {e}")
         flash('Error loading optimization results.', 'error')
         return redirect(url_for('root.dashboard'))
