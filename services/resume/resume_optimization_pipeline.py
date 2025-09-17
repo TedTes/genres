@@ -5,6 +5,7 @@ from flask import Flask,request,render_template,jsonify,current_app
 from io import BytesIO
 from weasyprint import HTML, CSS
 import os
+import time
 from db import db
 from typing import Dict, Any,Optional,Tuple,List
 from schemas import (
@@ -22,10 +23,17 @@ from services.resume.explain import generate_explanations_sync
 from services.resume.policy import apply_guardrails_sync, score_resume_match
 from services.resume.formatting import create_docx_sync, create_pdf_sync
 
-
 class ResumeOptimizationPipeline:
-    
-    def _run_optimization_pipeline(
+
+    def __init__(self):
+       self._document_processor = None
+
+    @property
+    def document_processor(self):
+        if self._document_processor is None:
+            self._document_processor = DocumentProcessor()
+        return self._document_processor
+    async def _run_optimization_pipeline(
         self,
         resume_input: ResumeInput,
         jd_input: JDInput, 
@@ -45,9 +53,12 @@ class ResumeOptimizationPipeline:
             Complete optimization result
         """
         try:
+            request_start_time = time.time()
             # Step 1: Ingest and parse resume
             print("📄 Step 1: Ingesting resume...")
-            parsed_resume = DocumentProcessor().process_document_sync(
+            document_processor_instance = self.document_processor
+    
+            parsed_resume = await document_processor_instance.process_document(
                 text=resume_input.text,
                 docx_url=resume_input.docx_url,
                 pdf_url=resume_input.pdf_url
@@ -62,32 +73,36 @@ class ResumeOptimizationPipeline:
                 options=options.dict()
             )
         
-            print("🔍 Step 3: Analyzing gaps...")
-            gap_analysis = perform_gap_analysis_sync(
-                resume_chunks=parsed_resume.chunks,
+            print("🔍 Step 3: Analyzing gaps and optimizing...")
+            comprehensive_result = await self._document_processor.analyze_and_optimize(
+                normalized_resume=parsed_resume,  # NormalizedResumeSchema structure
                 jd_text=jd_input.text,
-                jd_title=jd_input.title
+                jd_title=jd_input.title,
+                optimization_focus=options.tone
             )
             
-        
-            # print("🤖 Step 4: Optimizing with LLM...")
-            # optimized_resume = optimize_resume_sync(
-            #     resume_sections=parsed_resume.sections,
-            #     experience_items=parsed_resume.experience_items,
-            #     jd_text=jd_input.text,
-            #     missing_keywords=gap_analysis['missing_keywords'],
-            #     weak_keywords=gap_analysis['weak_keywords'],
-            #     optimization_focus=options.tone
-            # )
+            model_provider = current_app.config.get('MODEL_PROVIDER', 'unknown')
             
-        
-            # print("📋 Step 5: Generating explanations...")
-            # explanations = generate_explanations_sync(
-            #     original_resume=parsed_resume.dict(),
-            #     optimized_resume=optimized_resume,
-            #     missing_keywords=gap_analysis['missing_keywords'],
-            #     gap_analysis=gap_analysis
-            # )
+            total_time = (time.time() - request_start_time) * 1000
+            # Save to database
+            print("saving to database....")
+            result_id = self.save_optimization_to_db(
+                user_id=user_id,
+                resume_input_metadata=resume_input,
+                processed_resume=parsed_resume,
+                jd_input=jd_input,
+                optimization_result=comprehensive_result,
+                processing_time_ms=total_time,
+                model_provider=model_provider
+            )
+            print("saving to database done.")
+
+            
+            comprehensive_result['processing_time_ms'] = round(total_time, 2)
+            print(f"✅ Optimization complete in {total_time:.0f}ms")
+            # gap_analysis = extract_gap_analysis(comprehensive_result)
+            # optimized_resume = extract_optimized_resume(comprehensive_result)
+            # explanations = extract_explanations(comprehensive_result)
             
         
             # print("🛡️  Step 6: Applying guardrails...")
@@ -117,179 +132,22 @@ class ResumeOptimizationPipeline:
             #     contact_info=contact_info
             # )
         
-            # result = {
-            #     'match_score': score_breakdown['overall_score'],
-            #     'score_breakdown': score_breakdown,
-            #     'request_hash' : request_hash,
-            #     'missing_keywords': gap_analysis['missing_keywords'],
-            #     'weak_keywords': gap_analysis['weak_keywords'],
-            #     'optimized_resume': clean_resume.dict(),
-            #     'explanations': explanations.dict(),
-            #     'artifacts': file_urls,
-            #     'model_info': _get_model_info(),
-            #     # 'policy_violations': [v.__dict__ for v in policy_violations],
-            #     'input_type': resume_input.input_type,
-            #     'processing_steps': 8
-            # }
             result = {
-                    'match_score': 87.3,
-                    'score_breakdown': {
-                        'overall_score': 87.3,
-                        'keyword_match': 82.5,
-                        'semantic_similarity': 91.2,
-                        'experience_relevance': 89.1,
-                        'skills_alignment': 85.7,
-                        'education_match': 88.0,
-                        'format_quality': 92.3
-                    },
-                    'missing_keywords': [
-                        {
-                            'keyword': 'machine learning',
-                            'importance': 'high',
-                            'frequency_in_jd': 3,
-                            'context': 'Experience with machine learning algorithms and frameworks'
-                        },
-                        {
-                            'keyword': 'kubernetes',
-                            'importance': 'medium', 
-                            'frequency_in_jd': 2,
-                            'context': 'Container orchestration with Kubernetes'
-                        },
-                        {
-                            'keyword': 'microservices',
-                            'importance': 'high',
-                            'frequency_in_jd': 4,
-                            'context': 'Design and implement microservices architecture'
-                        },
-                        {
-                            'keyword': 'terraform',
-                            'importance': 'low',
-                            'frequency_in_jd': 1,
-                            'context': 'Infrastructure as code using Terraform'
-                        }
-                    ],
-                    'weak_keywords': [
-                        {
-                            'keyword': 'python',
-                            'current_strength': 'weak',
-                            'suggested_improvement': 'Add specific Python frameworks and libraries used',
-                            'examples': ['Django', 'FastAPI', 'pandas', 'scikit-learn']
-                        },
-                        {
-                            'keyword': 'cloud computing',
-                            'current_strength': 'moderate',
-                            'suggested_improvement': 'Specify cloud platforms and services',
-                            'examples': ['AWS EC2', 'Lambda', 'S3', 'RDS']
-                        }
-                    ],
-                    'optimized_resume': {
-                        'header': {
-                            'name': 'John Doe',
-                            'email': 'john.doe@email.com',
-                            'phone': '(555) 123-4567',
-                            'location': 'San Francisco, CA',
-                            'linkedin': 'linkedin.com/in/johndoe'
-                        },
-                        'summary': 'Senior Software Engineer with 8+ years of experience building scalable microservices and machine learning solutions. Expert in Python, cloud computing (AWS), and container orchestration with Kubernetes. Proven track record of designing and implementing high-performance systems serving millions of users.',
-                        'experience': [
-                            {
-                                'title': 'Senior Software Engineer',
-                                'company': 'Tech Solutions Inc.',
-                                'duration': '2021 - Present',
-                                'achievements': [
-                                    'Led development of microservices architecture serving 10M+ daily users',
-                                    'Implemented machine learning pipeline using Python and scikit-learn, improving recommendation accuracy by 25%',
-                                    'Designed and deployed Kubernetes clusters on AWS, reducing infrastructure costs by 30%',
-                                    'Built CI/CD pipelines using Terraform for infrastructure as code'
-                                ]
-                            },
-                            {
-                                'title': 'Software Engineer',
-                                'company': 'StartupCorp',
-                                'duration': '2019 - 2021', 
-                                'achievements': [
-                                    'Developed Python-based web applications using Django and FastAPI',
-                                    'Optimized cloud computing infrastructure on AWS (EC2, Lambda, S3, RDS)',
-                                    'Collaborated with data science team on machine learning model deployment',
-                                    'Implemented automated testing and monitoring for microservices'
-                                ]
-                            }
-                        ],
-                        'skills': {
-                            'programming': ['Python', 'JavaScript', 'Java', 'Go'],
-                            'frameworks': ['Django', 'FastAPI', 'React', 'Spring Boot'],
-                            'cloud_platforms': ['AWS', 'Google Cloud Platform'],
-                            'tools': ['Kubernetes', 'Docker', 'Terraform', 'Jenkins'],
-                            'databases': ['PostgreSQL', 'MongoDB', 'Redis'],
-                            'machine_learning': ['scikit-learn', 'TensorFlow', 'pandas', 'numpy']
-                        },
-                        'education': [
-                            {
-                                'degree': 'Bachelor of Science in Computer Science',
-                                'school': 'University of California, Berkeley',
-                                'year': '2016',
-                                'gpa': '3.7/4.0'
-                            }
-                        ]
-                    },
-                    'explanations': {
-                        'summary_changes': 'Enhanced summary to emphasize microservices, machine learning, and Kubernetes experience to better align with job requirements.',
-                        'experience_improvements': [
-                            'Added specific metrics and quantifiable achievements',
-                            'Incorporated missing keywords: microservices, machine learning, Kubernetes',
-                            'Emphasized cloud computing and Python expertise',
-                            'Added Terraform experience to match infrastructure requirements'
-                        ],
-                        'skills_additions': [
-                            'Added machine learning frameworks (scikit-learn, TensorFlow)',
-                            'Specified Python frameworks (Django, FastAPI)',
-                            'Included container orchestration tools (Kubernetes, Docker)',
-                            'Added infrastructure as code tools (Terraform)'
-                        ],
-                        'keyword_integration': {
-                            'machine_learning': 'Integrated throughout experience section with specific examples and frameworks',
-                            'microservices': 'Emphasized in current role with user scale metrics',
-                            'kubernetes': 'Added as key infrastructure skill with cost savings metric',
-                            'python': 'Strengthened with specific frameworks and use cases'
-                        }
-                    },
-                    'artifacts': {
-                        'docx_url': 'https://storage.example.com/resumes/optimized_resume_abc123.docx',
-                        'pdf_url': 'https://storage.example.com/resumes/optimized_resume_abc123.pdf',
-                        'download_expires': '2025-09-15T10:30:00Z'
-                    },
-                    'model_info': {
-                        'provider': 'openai',
-                        'llm_model': 'gpt-4-turbo',
-                        'embed_model': 'text-embedding-ada-002', 
-                        'optimization_version': 'v1.0'
-                    },
-                    'policy_violations': [
-                        {
-                            'type': 'potential_hallucination',
-                            'severity': 'low',
-                            'description': 'Added specific metric (25% improvement) - verify accuracy',
-                            'location': 'experience.achievements[1]',
-                            'suggestion': 'Replace with actual metric if available'
-                        }
-                    ],
-                    'input_type': 'text',
-                    'processing_steps': 8,
-                    'processing_time_ms': 15420,
-                    'tokens_used': {
-                        'input_tokens': 2847,
-                        'output_tokens': 1923,
-                        'total_tokens': 4770
-                    },
-                    'metadata': {
-                        'request_hash': 'abc123def456',
-                        'optimization_timestamp': '2025-09-08T14:30:00Z',
-                        'user_id': 'user_12345',
-                        'job_title': 'Senior Software Engineer',
-                        'company': 'Google',
-                        'optimization_focus': 'professional-concise'
-                    }
+                'result_id':result_id,
+                # 'match_score': score_breakdown['overall_score'],
+                # 'score_breakdown': score_breakdown,
+                'request_hash' : request_hash,
+                # 'missing_keywords': gap_analysis['missing_keywords'],
+                # 'weak_keywords': gap_analysis['weak_keywords'],
+                'optimized_resume': comprehensive_result,
+                # 'explanations': explanations.dict(),
+                # 'artifacts': file_urls,
+                # 'model_info': _get_model_info(),
+                # 'policy_violations': [v.__dict__ for v in policy_violations],
+                'input_type': resume_input.input_type,
+             
             }
+        
 
             return result
         finally:
@@ -299,8 +157,11 @@ class ResumeOptimizationPipeline:
                     os.unlink(url)
 
 
+    def _run_optimization_pipeline_sync(self, *args, **kwargs):
+       import asyncio
+       return  asyncio.run(self._run_optimization_pipeline(*args, **kwargs))
 
-    def calculate_resume_completeness(resume_data):
+    def calculate_resume_completeness(self,resume_data):
         """
         Calculate completeness percentage of a resume based on filled sections
         """
@@ -320,7 +181,7 @@ class ResumeOptimizationPipeline:
 
 
 
-    def calculate_skill_match(user_skills, job_skills):
+    def calculate_skill_match(self,user_skills, job_skills):
         """
         Calculate the match percentage between user skills and job skills.
         
@@ -385,23 +246,26 @@ class ResumeOptimizationPipeline:
 
 
     def save_optimization_to_db(
+        self,
         user_id: int,
-        resume_input: ResumeInput,
+        resume_input_metadata: ResumeInput,
+        processed_resume: dict,
         jd_input: JDInput,
         optimization_result: dict,
         processing_time_ms: float,
         model_provider: str
     ) -> str:
         """Save optimization results to database and return the ID."""
-        
+
         try:
-            # Create resume record
+            # Create resume record using processed resume data
             resume_record = Resume(
                 user_id=user_id,
                 title=f"Optimized Resume - {jd_input.title or 'Untitled Job'}",
                 resume_data={
-                    'original_text': resume_input.text[:5000] if resume_input.text else None,
-                    'file_type': 'pdf' if resume_input.pdf_url else 'docx' if resume_input.docx_url else 'text',
+                    'processed_resume': processed_resume,  # Store the full normalized resume
+                    'original_input_type': resume_input_metadata.input_type,
+                    'file_type': resume_input_metadata.input_type,
                     'optimization_date': datetime.utcnow().isoformat()
                 },
                 template="optimized_standard",
@@ -411,24 +275,30 @@ class ResumeOptimizationPipeline:
             
             db.session.add(resume_record)
             db.session.flush()  # Get ID without committing
-            explanations = optimization_result.get('explanations', [])
-            if hasattr(explanations, 'dict'):  # Pydantic model
-                explanations_list = [explanations.dict()]
-            else:
-                explanations_list = list(explanations) if explanations else []
+            
+            # Extract data for optimization record
+            gap_analysis = optimization_result.get('gap_analysis', {})
+            optimized_resume = optimization_result.get('optimized_resume', {})
+            optimization_changes = optimization_result.get('optimization_changes', {})
+            optimization_metadata = optimization_result.get('optimization_metadata', {})
             # Create optimization record
             optimization = ResumeOptimization(
                 user_id=user_id,
                 resume_id=resume_record.id,
                 
-                # Input data
+                # Input data - use processed resume for meaningful preview
                 original_resume_data={
-                    'text_preview': resume_input.text[:1000] if resume_input.text else None,
-                    'input_type': getattr(resume_input, 'input_type', 'unknown'),
-                    'file_info': {
-                        'has_pdf': bool(resume_input.pdf_url),
-                        'has_docx': bool(resume_input.docx_url),
-                        'has_text': bool(resume_input.text)
+                    'processed_resume_preview': {
+                        'professional_summary': processed_resume.get('professional_summary', '')[:500],
+                        'contact_name': processed_resume.get('contact_information', {}).get('name', ''),
+                        'experience_count': len(processed_resume.get('work_experience', [])),
+                        'skills_count': len(processed_resume.get('skills', {}).get('specialized_skills', []))
+                    },
+                    'input_metadata': {
+                        'input_type': resume_input_metadata.input_type,
+                        'has_pdf': bool(resume_input_metadata.pdf_url),
+                        'has_docx': bool(resume_input_metadata.docx_url),
+                        'has_text': bool(resume_input_metadata.text)
                     }
                 },
                 job_description=jd_input.text[:5000] if jd_input.text else None,
@@ -436,26 +306,23 @@ class ResumeOptimizationPipeline:
                 company_name=jd_input.company[:200] if jd_input.company else None,
                 
                 # Optimization settings
-                optimization_style=optimization_result.get('optimization_focus', 'professional-concise'),
+                optimization_style=optimization_metadata.get('optimization_focus', 'professional-concise'),
                 
-
-                
-                # Results
+                # Results - store the actual optimized resume
                 optimized_resume_data={
-                    'sections': optimization_result.get('sections', {}),
-                    'experience': optimization_result.get('experience', []),
-                    'skills_added': optimization_result.get('skills_to_add', []),
-                    'explanations': explanations_list[:10],
-                    'gap_analysis': optimization_result.get('gap_analysis', {})
+                    'optimized_resume': optimized_resume,
+                    'gap_analysis': gap_analysis,
+                    'optimization_changes': optimization_changes,
+                    'optimization_metadata': optimization_metadata
                 },
-                match_score_before=float(optimization_result.get('original_match_score', 0.0)),
-                match_score_after=float(optimization_result.get('match_score', 0.0)),
-                missing_keywords=list(optimization_result.get('missing_keywords', [])[:50]),
-                added_keywords=list(optimization_result.get('added_keywords', [])[:50]),
+                match_score_before=0.0,  # You don't have original score
+                match_score_after=float(gap_analysis.get('overall_match_score', 0.0)),
+                missing_keywords=gap_analysis.get('keyword_analysis', {}).get('missing_critical', [])[:50],
+                added_keywords=optimization_changes.get('skills_changes', {}).get('additions', [])[:50],
                 
-                # Files
-                docx_url=optimization_result.get('artifacts', {}).get('docx_url'),
-                pdf_url=optimization_result.get('artifacts', {}).get('pdf_url'),
+                # Files - these would be generated later in your pipeline
+                docx_url=None,  # To be updated after file generation
+                pdf_url=None,   # To be updated after file generation
                 
                 # Processing info
                 processing_time_ms=processing_time_ms,
@@ -483,7 +350,7 @@ class ResumeOptimizationPipeline:
 
 
 
-    def save_temp_file(uploaded_file):
+    def save_temp_file(self,uploaded_file):
         """Save uploaded file temporarily for processing."""
         import tempfile
         import os
@@ -504,6 +371,7 @@ class ResumeOptimizationPipeline:
 
 
     def safe_optimization_pipeline(
+        self,
         resume_input: 'ResumeInput',
         jd_input: 'JDInput',
         options: 'OptimizationOptions',
@@ -553,6 +421,7 @@ class ResumeOptimizationPipeline:
 
 
     def log_optimization_attempt(
+        self,
         user_id: int,
         resume_input: 'ResumeInput',
         jd_input: 'JDInput',
@@ -594,7 +463,7 @@ class ResumeOptimizationPipeline:
             print(f"❌ Logging failed: {str(e)}")
 
 
-    def _extract_contact_info(header_text: str) -> Dict[str, str]:
+    def _extract_contact_info(self,header_text: str) -> Dict[str, str]:
         """Extract contact information from resume header."""
         
         import re
@@ -621,7 +490,7 @@ class ResumeOptimizationPipeline:
         return contact_info
 
 
-    def _get_model_info() -> Dict[str, str]:
+    def _get_model_info(self) -> Dict[str, str]:
         """Get current model configuration info."""
         
         return {
@@ -632,40 +501,10 @@ class ResumeOptimizationPipeline:
         }
 
 
-    def _check_rate_limit(user_id: int, limit_per_hour: int) -> bool:
-        """
-        Basic rate limiting check.
-        
-        Args:
-            user_id: User ID
-            limit_per_hour: Maximum requests per hour
-            
-        Returns:
-            True if within limit, False if exceeded
-        """
-        
-        # For MVP, simple implementation
-        # In production, use Redis for distributed rate limiting
-        
-        cache_key = f"rate_limit:user:{user_id}:{int(time.time() // 3600)}"  # Hour bucket
-        
-        try:
-            cache = get_enhanced_cache()
-            current_count = asyncio.run(cache.cache.get(cache_key)) or 0
-            
-            if current_count >= limit_per_hour:
-                return False
-            
-            # Increment counter
-            asyncio.run(cache.cache.set(cache_key, current_count + 1, ttl=3600))
-            return True
-            
-        except:
-            # If rate limiting fails, allow the request (fail open)
-            return True
+    
     
 
-    def _get_cached_optimization_result(result_id: str) -> Optional[Dict]:
+    def _get_cached_optimization_result(self,result_id: str) -> Optional[Dict]:
         """
         Get cached optimization result by ID.
         For MVP, this uses a simple approach.
@@ -683,7 +522,7 @@ class ResumeOptimizationPipeline:
             return None
 
 
-    def _serve_local_file(filename: str, file_type: str) -> Response:
+    def _serve_local_file(self,filename: str, file_type: str) -> Response:
         """
         Serve file from local storage.
         
@@ -719,7 +558,7 @@ class ResumeOptimizationPipeline:
 
 
 
-    def _proxy_remote_file(file_url: str, file_type: str, result_data: Dict) -> Response:
+    def _proxy_remote_file(self, file_url: str, file_type: str, result_data: Dict) -> Response:
         """
         Proxy download from remote storage (S3, etc.).
         
@@ -764,7 +603,7 @@ class ResumeOptimizationPipeline:
 
 
 
-    def _store_temp_files(docx_bytes: bytes, pdf_bytes: bytes, result_id: str) -> Dict[str, str]:
+    def _store_temp_files(self, docx_bytes: bytes, pdf_bytes: bytes, result_id: str) -> Dict[str, str]:
         """
         Store files temporarily for download.
         

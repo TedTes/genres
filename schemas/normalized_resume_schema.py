@@ -1,214 +1,100 @@
-from typing import Dict, List, Optional, Any, Union
-from pydantic import BaseModel, Field
-from datetime import datetime
-from enum import Enum
+from typing import Dict, List, Optional, Any
+from pydantic import BaseModel, Field,field_validator
+
+# Optional: light date pattern docstring; 
+DATE_HINT = "Use one of: YYYY, YYYY-MM, or MM/YYYY; use 'Present' for ongoing roles"
 
 class ContactInformation(BaseModel):
-    """Universal contact information."""
     name: str = Field(..., description="Full name")
     email: Optional[str] = Field(None, description="Email address")
     phone: Optional[str] = Field(None, description="Phone number")
     location: Optional[str] = Field(None, description="Location (city, state/province, country)")
     website: Optional[str] = Field(None, description="Personal website")
-    professional_profiles: Optional[Dict[str, str]] = Field(
-        None, 
-        description="Professional profiles (LinkedIn, GitHub, Behance, Medical License, etc.)"
+    professional_profiles: Dict[str, str] = Field(
+        default_factory=dict,
+        description="Profiles like LinkedIn, GitHub, portfolio, etc."
     )
 
 class WorkExperienceItem(BaseModel):
-    """Universal work experience structure."""
     job_title: str = Field(..., description="Job title/role")
     company: str = Field(..., description="Company/organization name")
-    start_date: Optional[str] = Field(None, description="Start date (normalized format)")
-    end_date: Optional[str] = Field(None, description="End date (normalized format or 'Present')")
+    start_date: Optional[str] = Field(None, description=f"Start date. {DATE_HINT}")
+    end_date: Optional[str] = Field(None, description=f"End date or 'Present'. {DATE_HINT}")
     location: Optional[str] = Field(None, description="Job location")
-    
-    # Core experience content
-    responsibilities: List[str] = Field(default=[], description="Key responsibilities and achievements")
-    
-    # Flexible skill/tool mentions
-    tools_used: Optional[List[str]] = Field(None, description="Tools, software, technologies, equipment used")
-    
-    # Quantifiable results (universal across industries)
-    metrics_achieved: Optional[List[str]] = Field(None, description="Quantifiable achievements and results")
-    
-    # Industry-specific context
-    industry_context: Optional[Dict[str, Any]] = Field(
-        None, 
-        description="Industry-specific details (e.g., patient load, revenue managed, team size)"
-    )
-
+    responsibilities: List[str] = Field(default_factory=list, description="Key responsibilities and achievements")
+    tools_used: List[str] = Field(default_factory=list, description="Tools, software, technologies used")
+    metrics_achieved: List[str] = Field(default_factory=list, description="Quantifiable achievements/results")
+    industry_context: Dict[str, Any] = Field(default_factory=dict, description="Optional industry specifics")
+    @field_validator('industry_context', mode='before')
+    @classmethod
+    def coerce_none_to_empty_dict(cls, v):
+        return {} if v in (None, "", []) else v
 class EducationItem(BaseModel):
-    """Universal education structure."""
-    degree: Optional[str] = Field(None, description="Degree type or education level")
-    field_of_study: Optional[str] = Field(None, description="Major/field of study/specialization")
+    degree: Optional[str] = Field(None, description="Degree type/education level")
+    field_of_study: Optional[str] = Field(None, description="Major/field/specialization")
     institution: str = Field(..., description="School/university/training institution")
-    completion_date: Optional[str] = Field(None, description="Graduation/completion date")
+    completion_date: Optional[str] = Field(None, description=f"Graduation/completion date. {DATE_HINT}")
     location: Optional[str] = Field(None, description="Institution location")
-    grade: Optional[str] = Field(None, description="GPA, grade, or class rank if mentioned")
-    achievements: Optional[List[str]] = Field(None, description="Honors, awards, distinctions, relevant coursework")
+    grade: Optional[str] = Field(None, description="GPA/grade/class rank")
+    achievements: List[str] = Field(default_factory=list, description="Honors/awards/coursework")
 
 class SkillCategory(BaseModel):
-    """Flexible skill category that adapts to any industry."""
     category_name: str = Field(..., description="Name of skill category")
-    skills: List[str] = Field(..., description="List of skills in this category")
+    skills: List[str] = Field(default_factory=list, description="Skills in this category")
     proficiency_level: Optional[str] = Field(None, description="Overall proficiency if mentioned")
 
 class UniversalSkills(BaseModel):
-    """Industry-agnostic skills structure."""
-    # Core categories that apply to most roles
-    core_competencies: Optional[List[str]] = Field(None, description="Primary professional skills")
-    tools_and_software: Optional[List[str]] = Field(None, description="Software, platforms, equipment")
-    methodologies: Optional[List[str]] = Field(None, description="Processes, frameworks, methodologies")
-    soft_skills: Optional[List[str]] = Field(None, description="Interpersonal and communication skills")
-    languages: Optional[List[str]] = Field(None, description="Spoken/written languages")
-    
-    # Flexible categories for industry-specific skills
-    specialized_skills: Optional[List[SkillCategory]] = Field(
-        None, 
-        description="Industry-specific skill categories (e.g., Programming Languages, Medical Procedures, Sales Techniques)"
+    core_competencies: List[str] = Field(default_factory=list, description="Primary professional skills")
+    tools_and_software: List[str] = Field(default_factory=list, description="Software/platforms/equipment")
+    methodologies: List[str] = Field(default_factory=list, description="Processes/frameworks/methodologies")
+    soft_skills: List[str] = Field(default_factory=list, description="Interpersonal/communication skills")
+    languages: List[str] = Field(default_factory=list, description="Spoken/written languages")
+    specialized_skills: List[SkillCategory] = Field(
+        default_factory=list,
+        description="Industry-specific skill categories (e.g., Programming Languages, Medical Procedures)"
     )
 
 class CertificationItem(BaseModel):
-    """Universal certification/license structure."""
     name: str = Field(..., description="Certification/license name")
     issuing_organization: Optional[str] = Field(None, description="Issuing organization")
-    issue_date: Optional[str] = Field(None, description="Issue/earned date")
-    expiration_date: Optional[str] = Field(None, description="Expiration date")
-    credential_id: Optional[str] = Field(None, description="Credential ID or license number")
+    issue_date: Optional[str] = Field(None, description=f"Issue/earned date. {DATE_HINT}")
+    expiration_date: Optional[str] = Field(None, description=f"Expiration date. {DATE_HINT}")
+    credential_id: Optional[str] = Field(None, description="Credential/License number")
     credential_url: Optional[str] = Field(None, description="Verification URL")
-    status: Optional[str] = Field(None, description="Current status (active, expired, pending)")
+    status: Optional[str] = Field(None, description="Status (active, expired, pending)")
 
 class ProjectItem(BaseModel):
-    """Universal project/portfolio structure."""
     name: str = Field(..., description="Project/portfolio item name")
     description: Optional[str] = Field(None, description="Project description")
-    role: Optional[str] = Field(None, description="Your role in the project")
-    start_date: Optional[str] = Field(None, description="Start date")
-    end_date: Optional[str] = Field(None, description="End date")
-    tools_used: Optional[List[str]] = Field(None, description="Tools, technologies, or methods used")
-    outcomes: Optional[List[str]] = Field(None, description="Results, impact, or key achievements")
-    links: Optional[Dict[str, str]] = Field(None, description="URLs (portfolio, GitHub, demo, etc.)")
+    role: Optional[str] = Field(None, description="Your role")
+    start_date: Optional[str] = Field(None, description=f"Start date. {DATE_HINT}")
+    end_date: Optional[str] = Field(None, description=f"End date. {DATE_HINT}")
+    tools_used: List[str] = Field(default_factory=list, description="Tools/technologies used")
+    outcomes: List[str] = Field(default_factory=list, description="Results/impact/achievements")
+    links: Dict[str, str] = Field(default_factory=dict, description="URLs (portfolio, GitHub, demo, etc.)")
 
 class AdditionalSection(BaseModel):
-    """Flexible section for industry-specific content."""
-    section_title: str = Field(..., description="Section title as it appears in resume")
-    section_type: str = Field(..., description="Category hint (awards, publications, volunteer, licenses)")
-    content: Dict[str, Any] = Field(..., description="Flexible content structure")
-    relevance_keywords: Optional[List[str]] = Field(
-        None, 
-        description="Keywords that indicate relevance to job roles"
-    )
+    section_title: str = Field(..., description="Section title as in resume")
+    section_type: str = Field(..., description="Category (awards, publications, volunteer, licenses)")
+    content: Dict[str, Any] = Field(..., description="Flexible content")
+    relevance_keywords: List[str] = Field(default_factory=list, description="Keywords indicating role relevance")
 
 class IndustryHints(BaseModel):
-    """Detected industry context from resume content."""
-    primary_industry: Optional[str] = Field(None, description="Primary industry (detected or inferred)")
-    secondary_industries: Optional[List[str]] = Field(None, description="Secondary industries")
+    primary_industry: Optional[str] = Field(None, description="Primary industry")
+    secondary_industries: List[str] = Field(default_factory=list, description="Secondary industries")
     role_level: Optional[str] = Field(None, description="Role level (entry, mid, senior, executive)")
-    specializations: Optional[List[str]] = Field(None, description="Specific specializations within industry")
+    specializations: List[str] = Field(default_factory=list, description="Specializations within industry")
 
 class NormalizedResumeSchema(BaseModel):
-    
-    """
-    Universal resume structure that adapts to any industry.
-    Focuses on flexible, semantic content rather than rigid categories.
-    """
-    
-    # Core required sections (universal)
     contact_information: ContactInformation = Field(..., description="Contact details")
-    
-    # Standard sections with flexible content
     professional_summary: Optional[str] = Field(None, description="Professional summary/objective")
-    work_experience: Optional[List[WorkExperienceItem]] = Field(None, description="Work history")
-    education: Optional[List[EducationItem]] = Field(None, description="Education and training")
-    
-    # Flexible skills structure
+    work_experience: List[WorkExperienceItem] = Field(default_factory=list, description="Work history")
+    education: List[EducationItem] = Field(default_factory=list, description="Education and training")
     skills: Optional[UniversalSkills] = Field(None, description="Skills and competencies")
-    
-    # Common optional sections
-    certifications_and_licenses: Optional[List[CertificationItem]] = Field(
-        None, 
-        description="Professional certifications, licenses, credentials"
-    )
-    projects_and_portfolio: Optional[List[ProjectItem]] = Field(
-        None, 
-        description="Projects, portfolio items, significant work"
-    )
-    
-    # Industry-specific or unique sections
-    additional_sections: Optional[List[AdditionalSection]] = Field(
-        default=[], 
-        description="Industry-specific sections (Publications, Patents, Awards, Military Service, etc.)"
-    )
-    
-    # Context and metadata
-    industry_context: Optional[IndustryHints] = Field(
-        None, 
-        description="Detected industry and role context"
-    )
-    
-    # System metadata
-    parsed_date: Optional[str] = Field(None, description="When this resume was parsed")
+    certifications_and_licenses: List[CertificationItem] = Field(default_factory=list, description="Certs/licenses")
+    projects_and_portfolio: List[ProjectItem] = Field(default_factory=list, description="Projects/portfolio")
+    additional_sections: List[AdditionalSection] = Field(default_factory=list, description="Other sections")
+    industry_context: Optional[IndustryHints] = Field(None, description="Detected industry and role context")
+    parsed_date: Optional[str] = Field(None, description="When this resume was parsed (ISO-8601 preferred)")
     source_format: Optional[str] = Field(None, description="Original file format")
-    
-    class Config:
-        schema_extra = {
-            "examples": {
-                "software_engineer": {
-                    "contact_information": {
-                        "name": "Sarah Chen",
-                        "email": "sarah.chen@email.com",
-                        "phone": "+1-555-123-4567",
-                        "location": "Seattle, WA",
-                        "professional_profiles": {
-                            "linkedin": "linkedin.com/in/sarahchen",
-                            "github": "github.com/sarahchen",
-                            "portfolio": "sarahchen.dev"
-                        }
-                    },
-                    "professional_summary": "Full-stack software engineer with 5+ years building scalable web applications...",
-                    "work_experience": [
-                        {
-                            "job_title": "Senior Software Engineer",
-                            "company": "TechCorp",
-                            "start_date": "01/2021",
-                            "end_date": "Present",
-                            "responsibilities": [
-                                "Led development of microservices architecture serving 1M+ users",
-                                "Mentored team of 4 junior developers"
-                            ],
-                            "tools_used": ["Python", "React", "PostgreSQL", "AWS"],
-                            "metrics_achieved": ["Reduced API response time by 60%", "Increased test coverage to 95%"]
-                        }
-                    ],
-                    "skills": {
-                        "core_competencies": ["Full-stack Development", "System Architecture", "Team Leadership"],
-                        "tools_and_software": ["Git", "Docker", "Jenkins", "Jira"],
-                        "methodologies": ["Agile", "Test-Driven Development", "CI/CD"],
-                        "specialized_skills": [
-                            {
-                                "category_name": "Programming Languages",
-                                "skills": ["Python", "JavaScript", "Java", "TypeScript"]
-                            },
-                            {
-                                "category_name": "Frameworks",
-                                "skills": ["React", "Django", "Flask", "Node.js"]
-                            },
-                            {
-                                "category_name": "Cloud Platforms",
-                                "skills": ["AWS", "GCP", "Azure"]
-                            }
-                        ]
-                    },
-                    "industry_context": {
-                        "primary_industry": "Technology",
-                        "role_level": "Senior",
-                        "specializations": ["Web Development", "Backend Systems"]
-                    }
-                } 
-            }
-        }
-    
-    def dict(self, **kwargs):
-        """Convert to dictionary for JSON serialization."""
-        return super().dict(**kwargs)
+
