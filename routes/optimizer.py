@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify,current_app,send_file, make_response,Response,render_template,flash,redirect,url_for
 from flask_login import login_required,current_user
 from werkzeug.exceptions import BadRequest
+from math import isnan
 import asyncio
 import json
 import time
@@ -290,9 +291,15 @@ def optimization_status():
 def show_results(result_id):
      # """Display optimization results page with data from database."""
      try:
- 
-        import json
-        from math import isnan
+        
+        optimization = ResumeOptimization.query.filter_by(
+            id=int(result_id),
+            user_id=current_user.id
+        ).first()
+        if not optimization:
+            flash('Optimization results not found.', 'error')
+            return redirect(url_for('root.dashboard'))
+       
 
         def _as_pct(x, default=0.0):
             try:

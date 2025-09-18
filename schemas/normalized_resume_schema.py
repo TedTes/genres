@@ -14,6 +14,41 @@ class ContactInformation(BaseModel):
         default_factory=dict,
         description="Profiles like LinkedIn, GitHub, portfolio, etc."
     )
+    
+    @field_validator("professional_profiles", mode="before")
+    @classmethod
+    def clean_profiles(cls, v: Any) -> Dict[str, str]:
+        """
+        Accept dict-ish input, drop keys with falsy/non-string values,
+        and normalize common keys.
+        """
+        if v is None:
+            return {}
+        if not isinstance(v, dict):
+            # if someone sent a list/string, just ignore
+            return {}
+
+        normalized = {}
+        for k, val in v.items():
+            if not val:
+                continue  # drop None/empty
+            # stringify non-strings safely
+            if not isinstance(val, str):
+                try:
+                    val = str(val)
+                except Exception:
+                    continue
+            key = (k or "").strip()
+            if not key:
+                continue
+            # optional: canonicalize common keys
+            kl = key.lower()
+            if kl in {"linkedin", "linked_in"}:
+                key = "LinkedIn"
+            elif kl in {"github", "git_hub"}:
+                key = "GitHub"
+            normalized[key] = val.strip()
+        return normalized
 
 class WorkExperienceItem(BaseModel):
     job_title: str = Field(..., description="Job title/role")

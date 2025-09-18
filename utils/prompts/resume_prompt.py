@@ -21,7 +21,8 @@ def get_normalization_prompt(raw_text: str, file_type: str):
         "- Reverse-chronological work_experience.\n"
         "- Deduplicate skills; keep canonical casing (Node.js, AWS).\n"
         "- If data is missing, emit null or [] per schema; never invent.\n"
-        "- One JSON object only."
+        "- One JSON object only.",
+        "- omit empty values"
     )
 
     user_message = (
