@@ -12,6 +12,7 @@ import os
 from schemas import (
     ResumeInput, JDInput, OptimizationOptions, OptimizationResult
 )
+from utils import _to_safe_dict, _to_safe_list 
 from services import ResumeOptimizationPipeline,create_docx_sync, create_pdf_sync,get_enhanced_cache
 from providers import  test_provider_connection
 from models import ResumeOptimization
@@ -111,11 +112,7 @@ def optimize_resume():
                 resume_input, jd_input, options,  user_id
             )
             
-          
-
-            # Check cache first (optional for MVP)
             # cache = get_enhanced_cache()
-            # Cache the result (temporarily disabled for testing)
             # asyncio.run(cache.cache_result(
             #     resume_text=resume_text,
             #     jd_text=jd_input.text,
@@ -245,8 +242,7 @@ Requirements:
         
         return jsonify({
             'status': 'success',
-            'message': 'Test optimization completed',
-            'result': result
+            'message': 'Test optimization completed'
         }), 200
         
     except Exception as e:
@@ -291,7 +287,6 @@ def optimization_status():
 def show_results(result_id):
      # """Display optimization results page with data from database."""
      try:
-        
         optimization = ResumeOptimization.query.filter_by(
             id=int(result_id),
             user_id=current_user.id
@@ -316,11 +311,10 @@ def show_results(result_id):
 
         def _profiles_ci(ci):
             prof = (ci.get('professional_profiles') or {}) if isinstance(ci, dict) else {}
-            # case-insensitive lookup for 'linkedin'
             for k, v in prof.items():
                 if isinstance(k, str) and k.lower() == 'linkedin':
                     return v
-                return None
+            return None
 
         # ---- inside your route after you fetch `optimization` ----
         optimized_resume_data = optimization.optimized_resume_data or {}
@@ -330,14 +324,15 @@ def show_results(result_id):
          except Exception:
            optimized_resume_data = {}
 
-        optimized_resume = optimized_resume_data.get('optimized_resume') or {}
-        gap_analysis = optimized_resume_data.get('gap_analysis') or {}
-        optimization_changes = optimized_resume_data.get('optimization_changes') or {}
-        optimization_meta = optimized_resume_data.get('optimization_metadata') or {}
+        optimized_resume     = _to_safe_dict(optimized_resume_data.get('optimized_resume'))
+        gap_analysis         = _to_safe_dict(optimized_resume_data.get('gap_analysis'))
+        optimization_changes = _to_safe_dict(optimized_resume_data.get('optimization_changes'))
+        optimization_meta    = _to_safe_dict(optimized_resume_data.get('optimization_metadata'))
 
-        print("optimized resume"); print(optimized_resume)
-        print("gap analysis"); print(gap_analysis)
-
+        # keyword analysis lists
+        ka = _to_safe_dict(gap_analysis.get('keyword_analysis'))
+        weak_mentions = _to_safe_list(ka.get('weak_mentions'))
+        well_covered  = _to_safe_list(ka.get('well_covered'))
         # Header fields (case-insensitive profiles)
         ci = _ci(optimized_resume)
         linkedin_url = _profiles_ci(ci)
@@ -388,9 +383,9 @@ def show_results(result_id):
 
         # Experience improvements (nested changes)
         exp_improvements = []
-        for ec in (optimization_changes.get('experience_changes') or []):
-          for ch in (ec.get('changes') or []):
-            r = ch.get('rationale')
+        for ec in _to_safe_list(optimization_changes.get('experience_changes') or []):
+          for ch in _to_safe_list(ec.get('changes') or []):
+            r = (ch or {}).get('rationale')
             if r:
               exp_improvements.append(r)
 
@@ -400,7 +395,7 @@ def show_results(result_id):
             'original_match_score': _as_pct(optimization.match_score_before),
             'missing_keywords': optimization.missing_keywords or [],
             'added_keywords': optimization.added_keywords or [],
-            'weak_keywords': (gap_analysis.get('keyword_analysis') or {}).get('weak_mentions', []),
+            'weak_keywords': weak_mentions,
             'processing_time_ms': optimization.processing_time_ms,
             'model_provider': optimization.model_provider,
             'created_at': optimization.created_at,
@@ -413,8 +408,8 @@ def show_results(result_id):
             'score_breakdown': {
                 'overall_score': _as_pct(gap_analysis.get('overall_match_score', 0)),
                 # This “*10” heuristic is arbitrary; keep if it makes sense for your UI.
-                'keyword_match': len((gap_analysis.get('keyword_analysis') or {}).get('well_covered', [])) * 10,
-                'content_quality': _as_pct((gap_analysis.get('experience_analysis') or {}).get('relevance_score', 0)),
+                'keyword_match': len(well_covered) * 10,
+                'content_quality': _as_pct(_to_safe_dict(gap_analysis.get('experience_analysis')).get('relevance_score', 0)),
                 'ats_friendly': _as_pct(optimization_meta.get('ats_optimization_score', 0)),
             },
 

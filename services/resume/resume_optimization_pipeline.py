@@ -22,7 +22,7 @@ from services.resume.rewrite import optimize_resume_sync
 from services.resume.explain import generate_explanations_sync
 from services.resume.policy import apply_guardrails_sync, score_resume_match
 from services.resume.formatting import create_docx_sync, create_pdf_sync
-
+from utils import _to_safe_float , _to_safe_list, _to_safe_dict, _to_safe_string
 class ResumeOptimizationPipeline:
 
     def __init__(self):
@@ -63,8 +63,7 @@ class ResumeOptimizationPipeline:
                 docx_url=resume_input.docx_url,
                 pdf_url=resume_input.pdf_url
             )
-            # print("parsed _resuem")
-            # print(parsed_resume)
+   
             # Generate request hash for caching and tracking
             print("🔍 Step 2: Generating request hash...")
             request_hash = generate_resume_hash_sync(
@@ -100,56 +99,15 @@ class ResumeOptimizationPipeline:
             
             comprehensive_result['processing_time_ms'] = round(total_time, 2)
             print(f"✅ Optimization complete in {total_time:.0f}ms")
-            # gap_analysis = extract_gap_analysis(comprehensive_result)
-            # optimized_resume = extract_optimized_resume(comprehensive_result)
-            # explanations = extract_explanations(comprehensive_result)
-            
-        
             # print("🛡️  Step 6: Applying guardrails...")
             # clean_resume, policy_violations = apply_guardrails_sync(optimized_resume)
-            
-        
-            # print("📊 Step 7: Calculating scores...")
-            # score_breakdown = score_resume_match(
-            #     keyword_analysis=gap_analysis['keyword_analysis'],
-            #     semantic_analysis=gap_analysis['semantic_analysis'],
-            #     gap_analysis=gap_analysis,
-            #     resume_sections=parsed_resume.sections
-            # )
             
             # print("📄 Step 8: Generating documents...")
             # contact_info = parsed_resume.contact_information
         
             # docx_bytes = create_docx_sync(optimized_resume, contact_info)
             # pdf_bytes = create_pdf_sync(optimized_resume, contact_info) if options.include_pdf else None
-            
-            # print("💾 Step 9: Storing files...")
-            # file_urls = store_resume_files_sync(
-            #     docx_bytes=docx_bytes,
-            #     pdf_bytes=pdf_bytes,
-            #     user_id="anonymous",  # Simplified - no user tracking
-            #     resume_hash=request_hash,
-            #     contact_info=contact_info
-            # )
-        
-            result = {
-                'result_id':result_id,
-                # 'match_score': score_breakdown['overall_score'],
-                # 'score_breakdown': score_breakdown,
-                'request_hash' : request_hash,
-                # 'missing_keywords': gap_analysis['missing_keywords'],
-                # 'weak_keywords': gap_analysis['weak_keywords'],
-                'optimized_resume': comprehensive_result,
-                # 'explanations': explanations.dict(),
-                # 'artifacts': file_urls,
-                # 'model_info': _get_model_info(),
-                # 'policy_violations': [v.__dict__ for v in policy_violations],
-                'input_type': resume_input.input_type,
-             
-            }
-        
-
-            return result
+            return 200
         finally:
             # Clean up temp files
             for url in [resume_input.pdf_url, resume_input.docx_url]:
@@ -258,6 +216,24 @@ class ResumeOptimizationPipeline:
         """Save optimization results to database and return the ID."""
 
         try:
+            if isinstance(processed_resume, str):
+                try:
+                    processed_resume = json.loads(processed_resume)
+                except Exception:
+                    processed_resume = {}
+
+            # If optimization_result might be a JSON string:
+            if isinstance(optimization_result, str):
+                try:
+                    optimization_result = json.loads(optimization_result)
+                except Exception:
+                    optimization_result = {}
+            # Extract data for optimization record
+            gap_analysis          = _to_safe_dict(optimization_result.get('gap_analysis'))
+            optimized_resume      = _to_safe_dict(optimization_result.get('optimized_resume'))
+            optimization_changes  = _to_safe_dict(optimization_result.get('optimization_changes'))
+            optimization_metadata = _to_safe_dict(optimization_result.get('optimization_metadata'))
+
             # Create resume record using processed resume data
             resume_record = Resume(
                 user_id=user_id,
@@ -276,11 +252,12 @@ class ResumeOptimizationPipeline:
             db.session.add(resume_record)
             db.session.flush()  # Get ID without committing
             
-            # Extract data for optimization record
-            gap_analysis = optimization_result.get('gap_analysis', {})
-            optimized_resume = optimization_result.get('optimized_resume', {})
-            optimization_changes = optimization_result.get('optimization_changes', {})
-            optimization_metadata = optimization_result.get('optimization_metadata', {})
+            original_preview = {
+                'professional_summary': _to_safe_string(processed_resume.get('professional_summary'))[:500],
+                'contact_name': _to_safe_dict(processed_resume.get('contact_information')).get('name', '') or '',
+                'experience_count': len(_to_safe_list(processed_resume.get('work_experience'))),
+                'skills_count': len(_to_safe_list(_to_safe_dict(processed_resume.get('skills')).get('specialized_skills')))
+            }
             # Create optimization record
             optimization = ResumeOptimization(
                 user_id=user_id,
@@ -288,25 +265,20 @@ class ResumeOptimizationPipeline:
                 
                 # Input data - use processed resume for meaningful preview
                 original_resume_data={
-                    'processed_resume_preview': {
-                        'professional_summary': processed_resume.get('professional_summary', '')[:500],
-                        'contact_name': processed_resume.get('contact_information', {}).get('name', ''),
-                        'experience_count': len(processed_resume.get('work_experience', [])),
-                        'skills_count': len(processed_resume.get('skills', {}).get('specialized_skills', []))
-                    },
+                    'processed_resume_preview': original_preview,
                     'input_metadata': {
                         'input_type': resume_input_metadata.input_type,
-                        'has_pdf': bool(resume_input_metadata.pdf_url),
-                        'has_docx': bool(resume_input_metadata.docx_url),
-                        'has_text': bool(resume_input_metadata.text)
+                        'has_pdf': bool(getattr(resume_input_metadata, "pdf_url", None)),
+                        'has_docx': bool(getattr(resume_input_metadata, "docx_url", None)),
+                        'has_text': bool(getattr(resume_input_metadata, "text", None)),
                     }
                 },
-                job_description=jd_input.text[:5000] if jd_input.text else None,
-                job_title=jd_input.title[:200] if jd_input.title else None,
-                company_name=jd_input.company[:200] if jd_input.company else None,
+                job_description=(jd_input.text or "")[:5000] if jd_input.text else None,
+                job_title=(jd_input.title or "")[:200] if jd_input.title else None,
+                company_name=(jd_input.company or "")[:200] if jd_input.company else None,
                 
                 # Optimization settings
-                optimization_style=optimization_metadata.get('optimization_focus', 'professional-concise'),
+                optimization_style=_to_safe_dict(optimization_metadata).get('optimization_focus', 'professional-concise'),
                 
                 # Results - store the actual optimized resume
                 optimized_resume_data={
@@ -316,9 +288,10 @@ class ResumeOptimizationPipeline:
                     'optimization_metadata': optimization_metadata
                 },
                 match_score_before=0.0,  # You don't have original score
-                match_score_after=float(gap_analysis.get('overall_match_score', 0.0)),
-                missing_keywords=gap_analysis.get('keyword_analysis', {}).get('missing_critical', [])[:50],
-                added_keywords=optimization_changes.get('skills_changes', {}).get('additions', [])[:50],
+                match_score_after=_to_safe_float(_to_safe_dict(gap_analysis).get('overall_match_score'), 0.0),
+
+                missing_keywords=_to_safe_list(_to_safe_dict(_to_safe_dict(gap_analysis).get('keyword_analysis')).get('missing_critical'))[:50],
+                added_keywords=_to_safe_list(_to_safe_dict(_to_safe_dict(optimization_changes).get('skills_changes')).get('additions'))[:50],
                 
                 # Files - these would be generated later in your pipeline
                 docx_url=None,  # To be updated after file generation
