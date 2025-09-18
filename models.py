@@ -3,6 +3,7 @@ from flask_login import UserMixin
 from datetime import datetime
 from db import db
 from sqlalchemy.dialects.postgresql import ARRAY,JSONB
+from sqlalchemy.ext.mutable import MutableDict, MutableList
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -44,7 +45,7 @@ class ResumeOptimization(db.Model):
     resume_id = db.Column(db.Integer, db.ForeignKey('resume.id'), nullable=False)
     
     # Input data
-    original_resume_data = db.Column(db.JSON)
+    original_resume_data = db.Column(MutableDict.as_mutable(JSONB))
     job_description = db.Column(db.Text)
     job_title = db.Column(db.String(200))
     company_name = db.Column(db.String(200))
@@ -53,11 +54,11 @@ class ResumeOptimization(db.Model):
     optimization_style = db.Column(db.String(50), default='balanced')
     
     # Results
-    optimized_resume_data = db.Column(db.JSON)
+    optimized_resume_data = db.Column(MutableDict.as_mutable(JSONB))
     match_score_before = db.Column(db.Float)
     match_score_after = db.Column(db.Float)
-    missing_keywords = db.Column(db.JSON)
-    added_keywords = db.Column(db.JSON)
+    missing_keywords = db.Column(MutableList.as_mutable(JSONB))
+    added_keywords = db.Column(MutableList.as_mutable(JSONB))
     
     # Files
     docx_url = db.Column(db.String(500))
@@ -87,7 +88,7 @@ class Resume(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     title = db.Column(db.String(200), nullable=False, default="Untitled Resume")
-    resume_data = db.Column(db.JSON)
+    resume_data = db.Column(MutableDict.as_mutable(JSONB))
     template = db.Column(db.String(50), default="professional_classic")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
