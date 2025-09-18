@@ -10,11 +10,13 @@ import mammoth
 from pydantic import BaseModel
 from providers import get_models
 from helpers import validate_json_with_retry
-from schemas import NormalizedResumeSchema
+from schemas import NormalizedResumeSchema,OptimizationResult
 import requests
 import json
 from datetime import datetime
-from utils import get_optimization_prompt,extract_json_from_response,get_normalization_prompt,get_json_prompt
+from utils import get_optimization_prompt,get_normalization_prompt,get_json_prompt,parse_and_validate_normalized_resume,extract_json_from_response
+
+
 # For PDF support
 try:
     import pypdf
@@ -72,11 +74,7 @@ class DocumentProcessor:
             print("normalizing raw text done")
             
             return parsed
-      def process_document_sync(self, *args, **kwargs):
-            # Sync wrappers for non-async code
-            """Synchronous wrapper for ingest_resume."""
-            import asyncio
-            return asyncio.run(self.process_document(*args, **kwargs))
+
       async def extract_text_from_docx(self, docx_path: str) -> str:
             """
             Extract text from DOCX file using mammoth.
@@ -192,17 +190,14 @@ class DocumentProcessor:
                 temperature=0.1,  # Low temperature for accuracy
                 max_tokens=8000
             )
-            # Validate against schema with auto-retry
-            validated_resume = await validate_json_with_retry(
-                response, 
-                NormalizedResumeSchema, 
-                self.chat_model,
-                max_retries=2
-            )
-            validated_resume.parsed_date = datetime.now().isoformat()
-            validated_resume.source_format = file_type
-            return validated_resume.dict()
-
+        
+            # If client returns an object, ensure  extracted the text:
+            response_text = response if isinstance(response, str) else getattr(response, "content", str(response))
+            # Parse → validate → coerce
+            model = parse_and_validate_normalized_resume(response_text, file_type)
+            
+            resume_dict = model.model_dump() if hasattr(model, "model_dump") else model.dict()
+            return resume_dict
       async def analyze_and_optimize(
             self,
             normalized_resume: Dict[str, Any],
@@ -214,17 +209,16 @@ class DocumentProcessor:
         Perform comprehensive gap analysis and resume optimization in one LLM call.
         
         Args:
-            normalized_resume: MultiNicheResume dictionary structure
+            normalized_resume: NormalizedResumeSchema dictionary structure
             jd_text: Job description text
             jd_title: Optional job title
             optimization_focus: Optimization tone/style
             
         Returns:
-            ComprehensiveOptimizationResult with gap analysis and optimized resume
+            Comprehensive Optimization Result with gap analysis and optimized resume
         """
         
         print(f"🔍🤖 Starting comprehensive gap analysis + optimization...")
-        print(f"📊 Resume industry context: {normalized_resume.get('industry_context', {}).get('primary_industry', 'Unknown')}")
         
         try:
             # Create the comprehensive prompt
@@ -246,23 +240,10 @@ class DocumentProcessor:
             )
             
             print(f"📝 Generated comprehensive analysis ({len(response)} chars)")
-            
             # Extract and validate JSON response
             json_response = extract_json_from_response(response)
-            
-            # Validate against schema with retry capability
-            validated_result = await validate_json_with_retry(
-                json_str=json_response,
-                schema_class=ComprehensiveOptimizationResult,
-                chat_model=self.chat_model,
-                max_retries=2
-            )
-            
-            print(f"✅ Gap analysis + optimization complete")
-            print(f"📈 Match score: {validated_result.gap_analysis.get('overall_match_score', 'N/A')}")
-            print(f"🔧 Total changes: {validated_result.optimization_metadata.get('total_changes', 'N/A')}")
-            
-            return validated_result
+
+            return json_response
             
         except Exception as e:
             print(f"❌ LLM gap analysis + optimization failed: {str(e)}")
