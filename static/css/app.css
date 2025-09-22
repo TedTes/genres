@@ -12,3 +12,5 @@
 @import url('./pages/auth.css') layer(pages);
 @import url('./pages/results.css') layer(pages);
 @import url('./pages/dashboard.css') layer(pages);
+
+@import url('./pages/resumes.css') layer(pages);
