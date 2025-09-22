@@ -439,10 +439,10 @@
                         <a href="{{ url_for('root.dashboard') }}" class="nav-link {{ 'active' if request.endpoint == 'root.dashboard' }}">
                             Dashboard
                         </a>
-                        <a href="#" class="nav-link {{ 'active' if request.endpoint.startswith('resume.') and 'templates' not in request.endpoint }}">
+                        <a href="{{ url_for('root.my_resumes') }}" class="nav-link {{ 'active' if request.endpoint.startswith('resume.') and 'templates' not in request.endpoint }}">
                             My Resumes
                         </a>
-                        <a href="#" class="nav-link {{ 'active' if 'templates' in request.endpoint }}">
+                        <a href="{{ url_for('root.templates') }}" class="nav-link {{ 'active' if 'templates' in request.endpoint }}">
                             Templates
                         </a>
                     </div>
