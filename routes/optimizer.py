@@ -108,10 +108,12 @@ def optimize_resume():
         # Process optimization pipeline
         try:
             print("🔄 Running optimization pipeline...")
-            result = resume_optimization_instance._run_optimization_pipeline_sync(
+            result_id = resume_optimization_instance._run_optimization_pipeline_sync(
                 resume_input, jd_input, options,  user_id
             )
-            
+            if not result_id:
+                flash('Optimization failed to save results', 'error')
+                return redirect(url_for('root.dashboard'))
             # cache = get_enhanced_cache()
             # asyncio.run(cache.cache_result(
             #     resume_text=resume_text,
@@ -125,15 +127,15 @@ def optimize_resume():
             # Add processing metadata
             
             
-            result['cache_hit'] = False
+            # result['cache_hit'] = False
             
             
           
-            print(f"📊 Match score: {result.get('match_score', 'N/A')}%")
-            print(f"🔧 Missing keywords: {len(result.get('missing_keywords', []))}")
+            # print(f"📊 Match score: {result.get('match_score', 'N/A')}%")
+            # print(f"🔧 Missing keywords: {len(result.get('missing_keywords', []))}")
             
             # SERVER-SIDE REDIRECT to results page
-            return redirect(url_for('optimizer.show_results', result_id=result.get('result_id')))
+            return redirect(url_for('optimizer.show_results', result_id=result_id))
             
         except Exception as e:
             print(f"❌ Optimization pipeline failed: {str(e)}")
@@ -144,113 +146,6 @@ def optimize_resume():
         print(f"❌ Request processing failed: {str(e)}")
         flash(f'Request processing failed: {str(e)}', 'error')
         return redirect(url_for('root.dashboard'))
-
-
-
-@optimizer_bp.route('/health', methods=['GET'])
-def health_check():
-    """
-    Health check endpoint for resume optimization service.
-    
-    Returns:
-        Service health status and configuration
-    """
-    
-    try:
-        # Test provider connection
-        provider_test = test_provider_connection()
-        
-        # Get cache stats
-        cache = get_enhanced_cache()
-        cache_stats = asyncio.run(cache.get_performance_report())
-        
-        # System info
-        health_data = {
-            'status': 'healthy' if provider_test['status'] == 'success' else 'degraded',
-            'timestamp': time.time(),
-            'service': 'resume-optimizer',
-            'version': 'v1.0-mvp',
-            'provider_status': provider_test,
-            'cache_performance': cache_stats,
-            'configuration': {
-                'provider': current_app.config.get('MODEL_PROVIDER'),
-                'llm_model': current_app.config.get('LLM_MODEL'),
-                'embed_model': current_app.config.get('EMBED_MODEL'),
-                'rate_limit': current_app.config.get('RATE_LIMIT_PER_HOUR'),
-                'max_file_size': current_app.config.get('MAX_RESUME_SIZE_MB')
-            }
-        }
-        
-        status_code = 200 if health_data['status'] == 'healthy' else 503
-        return jsonify(health_data), status_code
-        
-    except Exception as e:
-        return jsonify({
-            'status': 'unhealthy',
-            'error': str(e),
-            'timestamp': time.time()
-        }), 503
-
-
-@optimizer_bp.route('/test', methods=['POST'])
-@login_required  
-def test_optimization():
-    """
-    Test endpoint for resume optimization with sample data.
-    Useful for debugging and development.
-    """
-    
-    sample_resume = """John Smith
-Software Engineer
-john.smith@email.com | (555) 123-4567
-
-EXPERIENCE
-Software Developer | TechCorp | 2020-2023
-- Built web applications using Python and Flask
-- Worked with databases and APIs
-- Collaborated with team members
-
-SKILLS
-Python, HTML, CSS, JavaScript"""
-
-    sample_jd = """We are seeking a Senior Python Developer with experience in:
-- Flask and Django frameworks
-- PostgreSQL and database design
-- Docker containerization
-- CI/CD pipelines
-- AWS cloud services
-- Agile development methodologies
-
-Requirements:
-- 3+ years Python experience
-- Experience with REST APIs
-- Knowledge of containerization
-- Strong problem-solving skills"""
-
-    try:
-        # Use sample data
-        resume_input = ResumeInput(text=sample_resume)
-        jd_input = JDInput(text=sample_jd, title="Senior Python Developer", company="TestCorp")
-        options = OptimizationOptions()
-        
-        # Run optimization
-        result = resume_optimization_instance._run_optimization_pipeline(
-            resume_input, jd_input, options, 
-            "test_" + str(int(time.time())), 
-            current_user.id
-        )
-        
-        return jsonify({
-            'status': 'success',
-            'message': 'Test optimization completed'
-        }), 200
-        
-    except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'message': f'Test optimization failed: {str(e)}'
-        }), 500
-
 
 @optimizer_bp.route('/status', methods=['GET']) 
 def optimization_status():
@@ -288,7 +183,7 @@ def show_results(result_id):
      # """Display optimization results page with data from database."""
      try:
         optimization = ResumeOptimization.query.filter_by(
-            id=int(result_id),
+            resume_id=int(result_id),
             user_id=current_user.id
         ).first()
         if not optimization:
