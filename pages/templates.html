@@ -1,0 +1,276 @@
+{% extends "partials/base.html" %}
+{% block title %}Resume Templates - ResumeMatch{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/templates.css') }}">
+{% endblock %}
+
+{% block body_class %}page-templates{% endblock %}
+
+{% block content %}
+<!-- Templates Header -->
+<section class="dashboard-header">
+    <div class="container">
+        <div class="dashboard-welcome">
+            <h1><i class="fas fa-palette text-primary"></i> Resume Templates</h1>
+            <p>Choose from professional, ATS-optimized templates designed to pass through applicant tracking systems</p>
+        </div>
+        <div class="header-actions">
+            <div class="template-filters">
+                <button class="filter-btn active" data-filter="all">All Templates</button>
+                <button class="filter-btn" data-filter="business">Business</button>
+                <button class="filter-btn" data-filter="technology">Technology</button>
+                <button class="filter-btn" data-filter="creative">Creative</button>
+                <button class="filter-btn" data-filter="executive">Executive</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Templates Content -->
+<section class="dashboard-content">
+    <div class="container">
+        <!-- Templates Grid -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Available Templates ({{ templates|length }})</h2>
+                <div class="section-actions">
+                    <div class="view-toggle">
+                        <button class="toggle-btn active" data-view="grid">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="toggle-btn" data-view="list">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="templates-grid" id="templatesGrid">
+                {% for template in templates %}
+                <div class="template-card" data-category="{{ template.category.lower() }}">
+                    <div class="template-preview">
+                        <div class="template-image-container">
+                            <img src="{{ template.preview_image }}" alt="{{ template.name }} Template Preview" class="template-image" />
+                            <div class="template-overlay">
+                                <button class="preview-btn" onclick="previewTemplate({{ template.id }})">
+                                    <i class="fas fa-eye"></i>
+                                    Quick Preview
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {% if template.is_premium %}
+                            <span class="premium-badge">
+                                <i class="fas fa-crown"></i>
+                                Pro
+                            </span>
+                        {% endif %}
+                        
+                        <div class="template-actions">
+                            <button class="template-action" title="Preview Template">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="template-action" title="Use Template" onclick="useTemplate({{ template.id }})">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="template-info">
+                        <div class="template-header">
+                            <h3 class="template-title">{{ template.name }}</h3>
+                            <span class="template-category-badge">{{ template.category }}</span>
+                        </div>
+                        
+                        <p class="template-description">{{ template.description }}</p>
+                        
+                        <div class="template-features">
+                            <span class="feature-tag">
+                                <i class="fas fa-check-circle"></i>
+                                ATS-Friendly
+                            </span>
+                            <span class="feature-tag">
+                                <i class="fas fa-mobile-alt"></i>
+                                Responsive
+                            </span>
+                            {% if not template.is_premium %}
+                            <span class="feature-tag free">
+                                <i class="fas fa-gift"></i>
+                                Free
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="template-card-actions">
+                            {% if template.is_premium %}
+                                <button class="btn btn-outline btn-sm" disabled>
+                                    <i class="fas fa-crown"></i>
+                                    Upgrade to Use
+                                </button>
+                            {% else %}
+                                <button class="btn btn-primary btn-sm" onclick="useTemplate({{ template.id }})">
+                                    <i class="fas fa-plus"></i>
+                                    Use Template
+                                </button>
+                            {% endif %}
+                            <button class="btn btn-outline btn-sm" onclick="previewTemplate({{ template.id }})">
+                                <i class="fas fa-eye"></i>
+                                Preview
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Empty State for Filtered Results -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h2>No Templates Found</h2>
+                <p>Try adjusting your filter or browse all templates.</p>
+                <button class="btn btn-primary" onclick="clearFilters()">
+                    <i class="fas fa-refresh"></i>
+                    Show All Templates
+                </button>
+            </div>
+        </div>
+
+  
+    </div>
+</section>
+
+<!-- Template Preview Modal -->
+<div class="modal-overlay" id="previewModal" style="display: none;">
+    <div class="modal-content template-modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-eye"></i> Template Preview</h3>
+            <button class="modal-close" onclick="closePreview()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="preview-container">
+                <div class="preview-loading">
+                    <div class="spinner"></div>
+                    <p>Loading template preview...</p>
+                </div>
+                <iframe id="previewFrame" style="display: none;"></iframe>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closePreview()">Close</button>
+            <button class="btn btn-primary" id="useTemplateFromPreview">
+                <i class="fas fa-plus"></i>
+                Use This Template
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Template filtering functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const templateCards = document.querySelectorAll('.template-card');
+    const emptyState = document.getElementById('emptyState');
+    const templatesGrid = document.getElementById('templatesGrid');
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+            
+            // Update active button
+            filterBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Filter templates
+            let visibleCount = 0;
+            templateCards.forEach(card => {
+                const category = card.dataset.category;
+                if (filter === 'all' || category === filter) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Show/hide empty state
+            if (visibleCount === 0) {
+                templatesGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+            } else {
+                templatesGrid.style.display = 'grid';
+                emptyState.style.display = 'none';
+            }
+        });
+    });
+
+    // View toggle functionality
+    const viewToggleBtns = document.querySelectorAll('.toggle-btn');
+    viewToggleBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const view = this.dataset.view;
+            
+            viewToggleBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const grid = document.getElementById('templatesGrid');
+            if (view === 'list') {
+                grid.classList.add('list-view');
+            } else {
+                grid.classList.remove('list-view');
+            }
+        });
+    });
+});
+
+// Template actions
+function useTemplate(templateId) {
+    // For now, redirect to optimizer with template parameter
+    window.location.href = `/optimize?template_id=${templateId}`;
+}
+
+function previewTemplate(templateId) {
+    const modal = document.getElementById('previewModal');
+    const frame = document.getElementById('previewFrame');
+    const loading = document.querySelector('.preview-loading');
+    
+    modal.style.display = 'flex';
+    loading.style.display = 'block';
+    frame.style.display = 'none';
+    
+    // Simulate loading preview
+    setTimeout(() => {
+        loading.style.display = 'none';
+        frame.style.display = 'block';
+        frame.src = `/templates/preview/${templateId}`;
+    }, 1000);
+    
+    // Set up use button
+    document.getElementById('useTemplateFromPreview').onclick = () => {
+        closePreview();
+        useTemplate(templateId);
+    };
+}
+
+function closePreview() {
+    document.getElementById('previewModal').style.display = 'none';
+    document.getElementById('previewFrame').src = '';
+}
+
+function clearFilters() {
+    document.querySelector('.filter-btn[data-filter="all"]').click();
+}
+
+// Close modal when clicking overlay
+document.getElementById('previewModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closePreview();
+    }
+});
+</script>
+{% endblock %}
