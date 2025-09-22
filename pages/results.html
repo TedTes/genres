@@ -9,22 +9,7 @@
 
 {% block content %}
 <!-- Compact Results Header -->
-<section class="results-header">
-    <div class="container">
-        <div class="results-header-content">
-            <div class="results-title">
-                <p class="results-subtitle">
-                    {% if optimization_data.job_title %}
-                        Optimized for <strong>{{ optimization_data.job_title }}</strong> position
-                        {% if optimization_data.company_name %} at <strong>{{ optimization_data.company_name }}</strong>{% endif %}
-                    {% else %}
-                        Resume optimized for ATS compatibility and recruiter appeal
-                    {% endif %}
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
+
 
 <!-- Main Results Content -->
 <section class="results-content">
@@ -345,46 +330,7 @@
     </div>
 </section>
 
-<!-- Actions Section -->
-<section class="results-actions">
-    <div class="container">
-        <div class="actions-card">
-            <div class="actions-content">
-                <div class="actions-left">
-                    <h3>Ready to Download?</h3>
-                    <p>Get your optimized resume in professional formats</p>
-                </div>
-                <div class="action-buttons">
-                    {% if optimization_data.artifacts and optimization_data.artifacts.pdf_url %}
-                        <a href="{{ url_for('optimizer.download_resume', file_type='pdf', result_id=result_id) }}" 
-                           class="btn btn-primary" download>
-                            <i class="fas fa-download"></i>
-                            Download PDF
-                        </a>
-                    {% endif %}
-                    
-                    {% if optimization_data.artifacts and optimization_data.artifacts.docx_url %}
-                        <a href="{{ url_for('optimizer.download_resume', file_type='docx', result_id=result_id) }}" 
-                           class="btn btn-secondary" download>
-                            <i class="fas fa-download"></i>
-                            Download DOCX
-                        </a>
-                    {% endif %}
-                    
-                    <button class="btn btn-outline" onclick="copyToClipboard()">
-                        <i class="fas fa-copy"></i>
-                        Copy Text
-                    </button>
-                    
-                    <a href="{{ url_for('optimizer.optimize_page') }}" class="btn btn-outline">
-                        <i class="fas fa-plus"></i>
-                        Optimize Another
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+
 {% endblock %}
 
 {% block extra_js %}
