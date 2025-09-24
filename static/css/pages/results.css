@@ -12,69 +12,7 @@ RESULTS PAGE STYLES
     background: #f8fafc;
     min-height: calc(100vh - 70px);
   }
-  
-  .results-title h1 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    color: #111827;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  
-  .results-title h1::before {
-    content: "✅";
-    font-size: 1.5rem;
-  }
-  
-  .results-subtitle {
-    font-size: 1rem;
-    color: #6b7280;
-    margin: 0;
-    font-weight: 500;
-  }
-  
 
-  .match-score-display {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 0.5rem; 
-  }
-  
-  .score-circle {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: white;
-    border: 3px solid #e5e7eb;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 0.5rem;
-    position: relative;
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  }
-  
-  .score-circle.excellent { 
-    border-color: #10b981; 
-    background: rgba(16, 185, 129, 0.05);
-  }
-  .score-circle.good { 
-    border-color: #3b82f6; 
-    background: rgba(59, 130, 246, 0.05);
-  }
-  .score-circle.fair { 
-    border-color: #f59e0b; 
-    background: rgba(245, 158, 11, 0.05);
-  }
-  .score-circle.needs-work { 
-    border-color: #ef4444; 
-    background: rgba(239, 68, 68, 0.05);
-  }
   
   .score-value {
     font-size: 1.5rem;
@@ -343,53 +281,9 @@ RESULTS PAGE STYLES
     flex-direction: column;
     gap: 1rem;
   }
+
   
-  .resume-controls {
-    background: white;
-    border-radius: 8px;
-    padding: 0.75rem; 
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    border: 1px solid #e5e7eb;
-  }
-  
-  .comparison-toggle {
-    display: flex;
-    background: #f9fafb;
-    border-radius: 6px;
-    padding: 3px;
-  }
-  
-  .toggle-btn {
-    flex: 1;
-    padding: 0.5rem 0.75rem;
-    border: none;
-    background: transparent;
-    color: #6b7280;
-    font-weight: 500;
-    border-radius: 4px;
-    transition: all 0.15s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.375rem;
-    cursor: pointer;
-    font-size: 0.875rem;
-  }
-  
-  .toggle-btn:hover {
-    color: #374151;
-  }
-  
-  .toggle-btn.active {
-    background: white;
-    color: #6366f1;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  }
-  
-  .toggle-btn i {
-    font-size: 0.75rem;
-  }
-  
+
   /* Resume Display Area */
   .resume-display-area {
     background: white;
@@ -693,19 +587,9 @@ RESULTS PAGE STYLES
   /* ==========================================================================
      ACTIONS SECTION
      ========================================================================== */
+ 
   
-  .results-actions {
-    background: white;
-    padding: 2rem 0;
-    border-top: 1px solid #e5e7eb;
-  }
   
-  .actions-card {
-    background: #f9fafb;
-    border-radius: 8px;
-    padding: 1.5rem; 
-    border: 1px solid #e5e7eb;
-  }
   
   .actions-content {
     display: flex;
@@ -812,17 +696,7 @@ RESULTS PAGE STYLES
   }
   
   @media (max-width: 768px) {
-   
-
-    
-    .results-title h1 {
-      font-size: 1.5rem;
-    }
-    
-    .score-circle {
-      width: 70px;
-      height: 70px;
-    }
+  
     
     .score-value {
       font-size: 1.25rem;
@@ -839,10 +713,6 @@ RESULTS PAGE STYLES
       width: 100%;
     }
     
-    .comparison-toggle {
-      flex-direction: column;
-      gap: 3px;
-    }
     
     .analytics-card {
       padding: 1rem;
@@ -876,9 +746,7 @@ RESULTS PAGE STYLES
       padding: 1.5rem 0;
     }
     
-    .results-actions {
-      padding: 1.5rem 0;
-    }
+   
     
     .action-buttons {
       flex-direction: column;
@@ -917,17 +785,200 @@ RESULTS PAGE STYLES
     .experience-item {
       padding: 0.75rem;
     }
-    
    
-    
-    .score-circle {
-      width: 60px;
-      height: 60px;
-    }
     
     .score-value {
       font-size: 1.125rem;
     }
   }
 
+  /* Edit Mode Styles */
+
+
+.edit-toggle {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* Editable Content Styles */
+.editable-content {
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  padding: 0.25rem;
+  margin: -0.25rem;
+}
+
+.editable-content[contenteditable="true"] {
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.editable-content[contenteditable="true"]:focus {
+  background: #fffbeb;
+  border-color: #d97706;
+}
+
+/* Edit Mode Visual Feedback */
+.resume-view.edit-mode .editable-section {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.resume-view.edit-mode .editable-section::before {
+  content: "Click to edit";
+  position: absolute;
+  top: -0.5rem;
+  right: 0.5rem;
+  background: #f59e0b;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.resume-view.edit-mode .editable-section:hover::before {
+  opacity: 1;
+}
+
+.resume-controls {
+  background: white;
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .resume-controls {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+}
+
+@media (max-width: 576px) {
+
+
+}
+
+/* Key Changes Card Styles */
+.changes-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.change-item {
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 6px;
+  border-left: 3px solid #6366f1;
+}
+
+.change-header {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.change-description {
+  font-size: 0.8rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+/* Content Layout with Sidebar */
+.content-layout {
+  display: flex;
+  gap: 1rem;
+  align-items: start;
+}
+
+.resume-display-area {
+  flex: 1;
+}
+
+/* Vertical Action Sidebar */
+.action-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: white;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 1rem;
+}
+
+.icon-btn-vertical {
+  width: 44px;
+  height: 44px;
+  border: 1px solid #d1d5db;
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.15s ease;
+  font-size: 1rem;
+}
+
+.icon-btn-vertical:hover {
+  background: #f9fafb;
+  color: #374151;
+  border-color: #9ca3af;
+}
+
+/* Edit state styles */
+.icon-btn-vertical#enableEditBtn {
+  border-color: #6366f1;
+  color: #6366f1;
+}
+
+.icon-btn-vertical#saveChangesBtn {
+  background: #10b981;
+  border-color: #10b981;
+  color: white;
+}
+
+.icon-btn-vertical#cancelEditBtn {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: white;
+}
+
+.icon-btn-vertical.toggle-btn.active {
+  background: #6366f1;
+  color: white;
+  border-color: #6366f1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content-layout {
+      flex-direction: column;
+  }
   
+  .action-sidebar {
+      flex-direction: row;
+      justify-content: center;
+      position: static;
+  }
+}

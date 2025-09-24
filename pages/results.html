@@ -8,9 +8,6 @@
 {% block body_class %}page-results{% endblock %}
 
 {% block content %}
-<!-- Compact Results Header -->
-
-
 <!-- Main Results Content -->
 <section class="results-content">
     <div class="container">
@@ -111,218 +108,235 @@
                 </div>
                 {% endif %}
 
-                <!-- Processing Info -->
+                <!-- Key Changes -->
                 <div class="analytics-card">
-                    <h3><i class="fas fa-info-circle"></i> Optimization Details</h3>
-                    <div class="details-list">
-                        <div class="detail-item">
-                            <span class="detail-label">Processing Time:</span>
-                            <span class="detail-value">
-                                {% if optimization_data.processing_time_ms %}
-                                    {{ (optimization_data.processing_time_ms / 1000)|round(1) }}s
-                                {% else %}
-                                    < 1s
-                                {% endif %}
-                            </span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Optimization Style:</span>
-                            <span class="detail-value">{{ optimization_data.optimization_style|title or 'Professional' }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">AI Model:</span>
-                            <span class="detail-value">{{ optimization_data.model_provider|title or 'GPT-4' }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Created:</span>
-                            <span class="detail-value">{{ optimization_data.created_at.strftime('%B %d, %Y at %I:%M %p') if optimization_data.created_at else 'Just now' }}</span>
-                        </div>
+                    <h3><i class="fas fa-lightbulb"></i> Key Changes</h3>
+                    <div class="changes-summary">
+                        {% if optimization_data.explanations %}
+                            <div class="change-item">
+                                <div class="change-header">Summary Improvements</div>
+                                <div class="change-description">{{ optimization_data.explanations.summary_changes or 'Enhanced summary to better align with job requirements and highlight key qualifications.' }}</div>
+                            </div>
+                            {% if optimization_data.explanations.experience_improvements %}
+                                <div class="change-item">
+                                    <div class="change-header">Experience Enhancements</div>
+                                    <div class="change-description">{{ optimization_data.explanations.experience_improvements|length }} bullet points improved with stronger action verbs and quantified results</div>
+                                </div>
+                            {% endif %}
+                            {% if optimization_data.explanations.skills_additions %}
+                                <div class="change-item">
+                                    <div class="change-header">Skills & Keywords Added</div>
+                                    <div class="change-description">{{ optimization_data.explanations.skills_additions|length }} new skills and keywords integrated strategically</div>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="change-item">
+                                <div class="change-header">ATS Optimization</div>
+                                <div class="change-description">Improved structure and formatting for better ATS compatibility</div>
+                            </div>
+                            <div class="change-item">
+                                <div class="change-header">Keyword Integration</div>
+                                <div class="change-description">Added missing job-specific terms throughout resume sections</div>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
 
             <!-- Right Column: Resume Content -->
             <div class="resume-column">
-                <!-- Resume Comparison Toggle -->
-                <div class="resume-controls">
-                    <div class="comparison-toggle">
-                        <button class="toggle-btn active" data-view="optimized">
-                            <i class="fas fa-star"></i>
-                            Optimized Resume
-                        </button>
-                        <button class="toggle-btn" data-view="explanations">
-                            <i class="fas fa-lightbulb"></i>
-                            Key Changes
-                        </button>
-                    </div>
-                </div>
+           
 
-                <!-- Resume Display Area -->
-                <div class="resume-display-area">
-                    <!-- Optimized Resume View -->
-                    <div class="resume-view active" id="optimizedView">
-                        {% if optimization_data.optimized_resume %}
-                            {% set resume = optimization_data.optimized_resume %}
-                            
-                            <!-- Header/Contact -->
-                            {% if resume.header %}
-                            <div class="resume-section">
-                                <div class="contact-header">
-                                    {% if resume.header.name %}
-                                        <h2 class="contact-name">{{ resume.header.name }}</h2>
+                <div class="content-layout">
+                    <!-- Resume Display Area -->
+                    <div class="resume-display-area">
+                        <!-- Optimized Resume View -->
+                        <div class="resume-view active" id="optimizedView">
+                            {% if optimization_data.optimized_resume %}
+                                {% set resume = optimization_data.optimized_resume %}
+                                
+                                <!-- Header/Contact -->
+                                {% if resume.header %}
+                                <div class="resume-section editable-section">
+                                    <div class="contact-header">
+                                        {% if resume.header.name %}
+                                            <h2 class="contact-name">{{ resume.header.name }}</h2>
+                                        {% endif %}
+                                        <div class="contact-details">
+                                            {% if resume.header.email %}
+                                                <span class="contact-item">{{ resume.header.email }}</span>
+                                            {% endif %}
+                                            {% if resume.header.phone %}
+                                                <span class="contact-item">{{ resume.header.phone }}</span>
+                                            {% endif %}
+                                            {% if resume.header.location %}
+                                                <span class="contact-item">{{ resume.header.location }}</span>
+                                            {% endif %}
+                                            {% if resume.header.linkedin %}
+                                                <span class="contact-item">{{ resume.header.linkedin }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Summary -->
+                                {% if resume.summary %}
+                                <div class="resume-section editable-section">
+                                    <h3 class="section-title">Professional Summary</h3>
+                                    <div class="section-content">
+                                        <p class="summary-text">{{ resume.summary }}</p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Experience -->
+                                {% if resume.experience %}
+                                <div class="resume-section editable-section">
+                                    <h3 class="section-title">Professional Experience</h3>
+                                    <div class="section-content">
+                                        {% for exp in resume.experience %}
+                                            <div class="experience-item">
+                                                <div class="exp-header">
+                                                    <h4>{{ exp.title or 'Position Title' }}</h4>
+                                                    <div class="exp-meta">
+                                                        <span class="exp-company">{{ exp.company or 'Company Name' }}</span>
+                                                        <span class="exp-dates">{{ exp.duration or 'Date Range' }}</span>
+                                                    </div>
+                                                </div>
+                                                {% if exp.achievements %}
+                                                    <ul class="exp-achievements">
+                                                        {% for achievement in exp.achievements %}
+                                                            <li>{{ achievement }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Skills -->
+                                {% if resume.skills %}
+                                <div class="resume-section editable-section">
+                                    <h3 class="section-title">Technical Skills</h3>
+                                    <div class="section-content">
+                                        <div class="skills-grid">
+                                            {% for category, skills_list in resume.skills.items() %}
+                                                <div class="skill-category">
+                                                    <h5 class="skill-category-title">{{ category.replace('_', ' ')|title }}</h5>
+                                                    <div class="skill-items">
+                                                        {% for skill in skills_list %}
+                                                            <span class="skill-tag">{{ skill }}</span>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Education -->
+                                {% if resume.education %}
+                                <div class="resume-section editable-section">
+                                    <h3 class="section-title">Education</h3>
+                                    <div class="section-content">
+                                        {% for edu in resume.education %}
+                                            <div class="education-item">
+                                                <h4>{{ edu.degree or 'Degree' }}</h4>
+                                                <div class="edu-details">
+                                                    <span class="edu-school">{{ edu.school or 'Institution' }}</span>
+                                                    <span class="edu-year">{{ edu.year or 'Year' }}</span>
+                                                </div>
+                                                {% if edu.gpa %}
+                                                    <div class="edu-gpa">GPA: {{ edu.gpa }}</div>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="resume-placeholder">
+                                    <i class="fas fa-file-alt"></i>
+                                    <p>Optimized resume content will appear here</p>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Explanations View -->
+                        <div class="resume-view" id="explanationsView">
+                            {% if optimization_data.explanations %}
+                                <div class="explanations-content">
+                                    <div class="explanation-section">
+                                        <h4>Summary Improvements</h4>
+                                        <p>{{ optimization_data.explanations.summary_changes or 'Enhanced summary to better align with job requirements and highlight key qualifications.' }}</p>
+                                    </div>
+                                    
+                                    {% if optimization_data.explanations.experience_improvements %}
+                                    <div class="explanation-section">
+                                        <h4>Experience Enhancements</h4>
+                                        <ul>
+                                            {% for improvement in optimization_data.explanations.experience_improvements %}
+                                                <li>{{ improvement }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
                                     {% endif %}
-                                    <div class="contact-details">
-                                        {% if resume.header.email %}
-                                            <span class="contact-item">{{ resume.header.email }}</span>
-                                        {% endif %}
-                                        {% if resume.header.phone %}
-                                            <span class="contact-item">{{ resume.header.phone }}</span>
-                                        {% endif %}
-                                        {% if resume.header.location %}
-                                            <span class="contact-item">{{ resume.header.location }}</span>
-                                        {% endif %}
-                                        {% if resume.header.linkedin %}
-                                            <span class="contact-item">{{ resume.header.linkedin }}</span>
-                                        {% endif %}
+                                    
+                                    {% if optimization_data.explanations.skills_additions %}
+                                    <div class="explanation-section">
+                                        <h4>Skills & Keywords Added</h4>
+                                        <ul>
+                                            {% for addition in optimization_data.explanations.skills_additions %}
+                                                <li>{{ addition }}</li>
+                                            {% endfor %}
+                                        </ul>
                                     </div>
-                                </div>
-                            </div>
-                            {% endif %}
-                            
-                            <!-- Summary -->
-                            {% if resume.summary %}
-                            <div class="resume-section">
-                                <h3 class="section-title">Professional Summary</h3>
-                                <div class="section-content">
-                                    <p class="summary-text">{{ resume.summary }}</p>
-                                </div>
-                            </div>
-                            {% endif %}
-                            
-                            <!-- Experience -->
-                            {% if resume.experience %}
-                            <div class="resume-section">
-                                <h3 class="section-title">Professional Experience</h3>
-                                <div class="section-content">
-                                    {% for exp in resume.experience %}
-                                        <div class="experience-item">
-                                            <div class="exp-header">
-                                                <h4>{{ exp.title or 'Position Title' }}</h4>
-                                                <div class="exp-meta">
-                                                    <span class="exp-company">{{ exp.company or 'Company Name' }}</span>
-                                                    <span class="exp-dates">{{ exp.duration or 'Date Range' }}</span>
-                                                </div>
-                                            </div>
-                                            {% if exp.achievements %}
-                                                <ul class="exp-achievements">
-                                                    {% for achievement in exp.achievements %}
-                                                        <li>{{ achievement }}</li>
-                                                    {% endfor %}
-                                                </ul>
-                                            {% endif %}
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            {% endif %}
-                            
-                            <!-- Skills -->
-                            {% if resume.skills %}
-                            <div class="resume-section">
-                                <h3 class="section-title">Technical Skills</h3>
-                                <div class="section-content">
-                                    <div class="skills-grid">
-                                        {% for category, skills_list in resume.skills.items() %}
-                                            <div class="skill-category">
-                                                <h5 class="skill-category-title">{{ category.replace('_', ' ')|title }}</h5>
-                                                <div class="skill-items">
-                                                    {% for skill in skills_list %}
-                                                        <span class="skill-tag">{{ skill }}</span>
-                                                    {% endfor %}
-                                                </div>
+                                    {% endif %}
+                                    
+                                    {% if optimization_data.explanations.keyword_integration %}
+                                    <div class="explanation-section">
+                                        <h4>Keyword Integration Strategy</h4>
+                                        {% for keyword, strategy in optimization_data.explanations.keyword_integration.items() %}
+                                            <div class="keyword-strategy">
+                                                <strong>{{ keyword|title }}:</strong> {{ strategy }}
                                             </div>
                                         {% endfor %}
                                     </div>
+                                    {% endif %}
                                 </div>
-                            </div>
-                            {% endif %}
-                            
-                            <!-- Education -->
-                            {% if resume.education %}
-                            <div class="resume-section">
-                                <h3 class="section-title">Education</h3>
-                                <div class="section-content">
-                                    {% for edu in resume.education %}
-                                        <div class="education-item">
-                                            <h4>{{ edu.degree or 'Degree' }}</h4>
-                                            <div class="edu-details">
-                                                <span class="edu-school">{{ edu.school or 'Institution' }}</span>
-                                                <span class="edu-year">{{ edu.year or 'Year' }}</span>
-                                            </div>
-                                            {% if edu.gpa %}
-                                                <div class="edu-gpa">GPA: {{ edu.gpa }}</div>
-                                            {% endif %}
-                                        </div>
-                                    {% endfor %}
+                            {% else %}
+                                <div class="resume-placeholder">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <p>Optimization explanations will appear here</p>
                                 </div>
-                            </div>
                             {% endif %}
-                        {% else %}
-                            <div class="resume-placeholder">
-                                <i class="fas fa-file-alt"></i>
-                                <p>Optimized resume content will appear here</p>
-                            </div>
-                        {% endif %}
+                        </div>
                     </div>
 
-                    <!-- Explanations View -->
-                    <div class="resume-view" id="explanationsView">
-                        {% if optimization_data.explanations %}
-                            <div class="explanations-content">
-                                <div class="explanation-section">
-                                    <h4>Summary Improvements</h4>
-                                    <p>{{ optimization_data.explanations.summary_changes or 'Enhanced summary to better align with job requirements and highlight key qualifications.' }}</p>
-                                </div>
-                                
-                                {% if optimization_data.explanations.experience_improvements %}
-                                <div class="explanation-section">
-                                    <h4>Experience Enhancements</h4>
-                                    <ul>
-                                        {% for improvement in optimization_data.explanations.experience_improvements %}
-                                            <li>{{ improvement }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                                {% endif %}
-                                
-                                {% if optimization_data.explanations.skills_additions %}
-                                <div class="explanation-section">
-                                    <h4>Skills & Keywords Added</h4>
-                                    <ul>
-                                        {% for addition in optimization_data.explanations.skills_additions %}
-                                            <li>{{ addition }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                                {% endif %}
-                                
-                                {% if optimization_data.explanations.keyword_integration %}
-                                <div class="explanation-section">
-                                    <h4>Keyword Integration Strategy</h4>
-                                    {% for keyword, strategy in optimization_data.explanations.keyword_integration.items() %}
-                                        <div class="keyword-strategy">
-                                            <strong>{{ keyword|title }}:</strong> {{ strategy }}
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
-                            </div>
-                        {% else %}
-                            <div class="resume-placeholder">
-                                <i class="fas fa-lightbulb"></i>
-                                <p>Optimization explanations will appear here</p>
-                            </div>
-                        {% endif %}
+                    <!-- Vertical Action Sidebar -->
+                    <div class="action-sidebar">
+                        <button class="icon-btn-vertical" id="enableEditBtn" title="Edit Resume" style="display: none;">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="icon-btn-vertical" id="saveChangesBtn" title="Save Changes" style="display: none;">
+                            <i class="fas fa-save"></i>
+                        </button>
+                        <button class="icon-btn-vertical" id="cancelEditBtn" title="Cancel" style="display: none;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <button class="icon-btn-vertical" title="Overview">
+                            <i class="fas fa-chart-line"></i>
+                        </button>
+                        <button class="icon-btn-vertical" onclick="copyToClipboard()" title="Copy to Clipboard">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="icon-btn-vertical" title="Download PDF">
+                            <i class="fas fa-download"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -330,32 +344,34 @@
     </div>
 </section>
 
-
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Resume view toggle functionality
+// Edit Mode Management
+let isEditMode = false;
+let originalContent = {};
+
 document.addEventListener('DOMContentLoaded', function() {
-    const toggleBtns = document.querySelectorAll('.toggle-btn');
-    const resumeViews = document.querySelectorAll('.resume-view');
+    const enableEditBtn = document.getElementById('enableEditBtn');
+    const saveChangesBtn = document.getElementById('saveChangesBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
     
-    toggleBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const targetView = this.dataset.view;
-            
-            // Update active states
-            toggleBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Show/hide views
-            resumeViews.forEach(view => {
-                view.classList.remove('active');
-                if (view.id === targetView + 'View') {
-                    view.classList.add('active');
-                }
-            });
-        });
+    // Show edit controls when resume is loaded
+    if (document.querySelector('.resume-view .summary-text')) {
+        document.getElementById('enableEditBtn').style.display = 'flex';
+    }
+    
+    // Enable edit mode
+    enableEditBtn?.addEventListener('click', enableEditMode);
+    saveChangesBtn?.addEventListener('click', saveChanges);
+    cancelEditBtn?.addEventListener('click', cancelEdit);
+
+    // Overview button functionality (placeholder - can be expanded later)
+    const overviewBtn = document.querySelector('[title="Overview"]');
+    overviewBtn?.addEventListener('click', function() {
+        // Could show analytics overlay, summary modal, or other overview functionality
+        showToast('Overview functionality coming soon!', 'info');
     });
     
     // Simple progress bar animation on load
@@ -366,6 +382,112 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, 100);
 });
+
+function enableEditMode() {
+    isEditMode = true;
+    const resumeView = document.querySelector('#optimizedView');
+    
+    // Target actual elements that exist in your HTML
+    const editableSelectors = [
+        '.summary-text',
+        '.contact-name', 
+        '.exp-achievements li',
+        '.skill-tag'
+    ];
+    
+    let allEditableElements = [];
+    
+    editableSelectors.forEach(selector => {
+        const elements = resumeView.querySelectorAll(selector);
+        elements.forEach((el, index) => {
+            el.classList.add('editable-content');
+            el.setAttribute('data-field', `${selector.replace('.', '')}_${index}`);
+            el.contentEditable = true;
+            allEditableElements.push(el);
+        });
+    });
+    
+    // Store original content
+    allEditableElements.forEach(el => {
+        originalContent[el.dataset.field] = el.innerHTML;
+    });
+    
+    // Update UI
+    resumeView.classList.add('edit-mode');
+    document.getElementById('enableEditBtn').style.display = 'none';
+    document.getElementById('saveChangesBtn').style.display = 'flex';
+    document.getElementById('cancelEditBtn').style.display = 'flex';
+    
+    showToast('Edit mode enabled. Click on highlighted sections to modify them.', 'info');
+}
+
+async function saveChanges() {
+    const resumeView = document.querySelector('#optimizedView');
+    const editableElements = resumeView.querySelectorAll('.editable-content');
+    const changes = {};
+    
+    // Collect changes
+    editableElements.forEach(el => {
+        changes[el.dataset.field] = el.innerHTML.trim();
+    });
+    
+    try {
+        // Send updates to backend
+        const response = await fetch('/api/update-optimized-resume', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                optimization_id: window.optimizationId,
+                changes: changes
+            })
+        });
+        
+        if (!response.ok) throw new Error('Save failed');
+        
+        // Disable edit mode
+        disableEditMode();
+        showToast('Changes saved successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Save failed:', error);
+        showToast('Failed to save changes. Please try again.', 'error');
+    }
+}
+
+function cancelEdit() {
+    // Restore original content
+    const editableElements = document.querySelectorAll('.editable-content');
+    editableElements.forEach(el => {
+        if (originalContent[el.dataset.field]) {
+            el.innerHTML = originalContent[el.dataset.field];
+        }
+    });
+    
+    disableEditMode();
+    showToast('Changes cancelled.', 'info');
+}
+
+function disableEditMode() {
+    isEditMode = false;
+    const resumeView = document.querySelector('#optimizedView');
+    const editableElements = resumeView.querySelectorAll('.editable-content');
+    
+    // Disable editing
+    editableElements.forEach(el => {
+        el.contentEditable = false;
+        el.classList.remove('editable-content');
+    });
+    
+    // Reset UI
+    resumeView.classList.remove('edit-mode');
+    document.getElementById('enableEditBtn').style.display = 'flex';
+    document.getElementById('saveChangesBtn').style.display = 'none';
+    document.getElementById('cancelEditBtn').style.display = 'none';
+    
+    originalContent = {};
+}
 
 // Copy to clipboard functionality
 function copyToClipboard() {
