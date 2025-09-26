@@ -121,3 +121,21 @@ class Subscription(db.Model):
     
     def __repr__(self):
         return f'<Subscription {self.id} for User {self.user_id} ({self.plan_id})>'
+
+
+
+class ResumeTemplate(db.Model):
+    __tablename__ = 'resume_templates'
+    
+    id = db.Column(db.String, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    tier = db.Column(db.Enum('ATS', 'Professional', 'Creative', name='resume_template_tier'), nullable=False)
+    layout = db.Column(db.JSON, nullable=False)
+    supported_sections = db.Column(db.JSON, nullable=False)
+    design_tokens = db.Column(db.JSON, nullable=False)
+    capabilities = db.Column(db.JSON, nullable=False)
+    skeleton_handle = db.Column(db.String)
+    active_version = db.Column(db.Integer, default=1)
+    
+    def __repr__(self):
+        return f'<ResumeTemplate {self.id}>'
