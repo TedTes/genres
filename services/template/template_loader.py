@@ -28,6 +28,6 @@ class TemplateLoader:
         return [{
             'id': t.id,
             'name': t.name,
-            'tier': t.tier.value,  # Convert enum to string
+            # 'tier': t.tier.value,  # Convert enum to string
             'capabilities': t.capabilities
         } for t in templates]
