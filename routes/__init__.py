@@ -2,7 +2,7 @@ from flask import Flask
 from .auth import auth_bp
 from .payment import payment_bp
 from .root import root_bp
-
+from .template import template_bp
 
 
 from .optimizer import optimizer_bp
@@ -15,3 +15,4 @@ def register_routes(app: Flask):
     app.register_blueprint(root_bp)
     app.register_blueprint(optimizer_bp, url_prefix="/api/v1/optimizer")
     app.register_blueprint(error_bp, url_prefix="/api/v1/error")
+    app.register_blueprint(template_bp, url_prefix="/api") 
